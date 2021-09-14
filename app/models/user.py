@@ -1,41 +1,33 @@
-from sqlalchemy import Boolean, Column, Integer, String, BigInteger
-from sqlalchemy.orm import relationship, backref
-from app.db import Base
-from app.models.address import Address
-from app.models.user_preference import UserPreference
-from app.models.user_preference_category import UserPreferenceCategory
-from app.models.billing_information import BillingInformation
+from sqlalchemy import Boolean, Column, Integer, String, Text, text  # type: ignore
+from sqlalchemy.dialects.postgresql import TIMESTAMP  # type: ignore
+from sqlalchemy.sql import func  # type: ignore
+
+from app.database.base import Base
+
 
 class User(Base):
-    __tablename__ = "users"
+    """
+    Defines the user model
+    """
 
-    id = Column(BigInteger, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    password = Column(String)
-    name = Column(String, nullable=False)
-    last_name = Column(String, nullable=True)
-    phone_number = Column(String, nullable=True)
-    ruc = Column(String, nullable=True)
-    is_active = Column(Boolean, default=True)
-    token = Column(String)
-    icargo_user = Column(Boolean, default = True)
-    google_user = Column(Boolean, default=False)
-    fb_user = Column(Boolean, default=False)
-    apple_user = Column(Boolean, default=False)
-    address = relationship(Address, backref=backref('users', lazy=True))
-    billing_information = relationship(BillingInformation, backref=backref('users', lazy=True))
-    user_preference = relationship(UserPreference, backref=backref('users', lazy=True))
-    user_preference_category = relationship(UserPreferenceCategory, backref=backref('users', lazy=True))
-
-    def __init__(self, email, password, name, last_name, phone_number, ruc, icargo_user, google_user, fb_user, apple_user):
-        self.email = email
-        self.password = password
-        self.name = name
-        self.last_name = last_name
-        self.phone_number = phone_number
-        self.ruc = ruc
-        self.is_active = True
-        self.icargo_user = icargo_user
-        self.google_user = google_user
-        self.fb_user = fb_user
-        self.apple_user = apple_user
+    id = Column(Integer, primary_key=True)
+    token = Column(String, unique=True)
+    first_name = Column(String(255))
+    last_name = Column(String(255))
+    username = Column(String(255), nullable=False, unique=True)
+    surname = Column(String(255))
+    email = Column(String(255), nullable=False, unique=True)
+    password = Column(String(255), nullable=False)
+    activation_code = Column(String(255), index=True)
+    persist_code = Column(String(255))
+    reset_password_code = Column(String(255), index=True)
+    permissions = Column(Text)
+    activated_at = Column(TIMESTAMP(precision=0), server_default=func.now())
+    last_login = Column(TIMESTAMP(precision=0))
+    is_activated = Column(Boolean, nullable=False, server_default=text("false"))
+    is_guest = Column(Boolean, nullable=False, server_default=text("false"))
+    is_superuser = Column(Boolean, nullable=False, server_default=text("false"))
+    last_activity = Column(TIMESTAMP(precision=0))
+    last_seen = Column(TIMESTAMP(precision=0))
+    created_ip_address = Column(String(255))
+    last_ip_address = Column(String(255))
