@@ -1,78 +1,72 @@
-
-from pydantic import BaseModel
-from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import timedelta
+from types import FunctionType
 from typing import Optional
-from fastapi import Depends, HTTPException, status
-from jose import JWTError, jwt
 
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.context import CryptContext
+from fastapi import HTTPException, Request  # type: ignore
+from fastapi.security import OAuth2PasswordRequestForm
+from jose import jwt  # type: ignore
+from pydantic import ValidationError
+from sqlalchemy.orm import Session  # type: ignore
 
-from app.utils import oauth
-from app.schemas import user as schemas
-from app.models import user as models
-from app.services import user as user_services
-from app.config import TokenSettings
-
-token_settings = TokenSettings()
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = oauth.OAuth2PasswordBearerCookie(tokenUrl="login")
+from app.audits import AuditAuth
+from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
+from app.constants import AUTHORIZATION
+from app.models.user import User
+from app.repositories.user import get, get_by_username
+from app.schemas import TokenPayload
+from app.services.security import create_access_token
+from app.utils.security import get_payload_from_token, verify_password
 
 
-def authenticate_user(db, username: str, password: str):
-    user = user_services.get_user_by_email(db, username)
+def authenticate(db: Session, *, username: str, password: str) -> Optional[User]:
+    user = get_by_username(db, username)
     if not user:
-        return False
+        return None
     if not verify_password(password, user.password):
-        return False
+        return None
     return user
 
 
-def set_user_token(user):
-    access_token_expires = timedelta(
-        minutes=token_settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
-    )
-    return {"user": user.email, "access_token": access_token, "token_type": "bearer"}
-
-
-def hash_password(plain_password: str):
-    return pwd_context.hash(plain_password)
-
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(
-        to_encode, token_settings.SECRET_KEY, algorithm=token_settings.ALGORITHM)
-    return encoded_jwt
-
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+def get_user_from_token(db: Session, *, token: str) -> Optional[User]:
     try:
-        payload = jwt.decode(token, token_settings.SECRET_KEY,
-                             algorithms=[token_settings.ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data_user = username
-    except JWTError:
-        raise credentials_exception
+        payload = get_payload_from_token(token)
+        token_data = TokenPayload(**payload)
+        return get(db, id=token_data.sub)
+    except (jwt.JWTError, ValidationError):
+        return None
 
-    return token_data_user
+
+def get_user_from_request(request: Request, database_connection_function: FunctionType):
+    auth = request.headers.get(AUTHORIZATION)
+    scheme, token = auth.split()
+    if scheme.lower() != "basic":
+        db_conn = database_connection_function()
+        db = Session(bind=db_conn)
+        return get_user_from_token(db, token=token)
+
+
+def register_audit_auth(db: Session, *, user: User, action: str, ip: str):
+    db_audit = AuditAuth(
+        action=action,
+        user_id=user.id,
+        user=user.email,
+        ip=ip,
+    )
+    db.add(db_audit)
+    db.commit()
+
+
+def login(db: Session, *, request: Request, form_data: OAuth2PasswordRequestForm):
+    user = authenticate(db, username=form_data.username, password=form_data.password)
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+    elif not user.is_activated:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    register_audit_auth(db, user=user, action="login", ip=request.client.host)
+    return {
+        "access_token": create_access_token(
+            user.id, expires_delta=access_token_expires
+        ),
+        "token_type": "bearer",
+    }

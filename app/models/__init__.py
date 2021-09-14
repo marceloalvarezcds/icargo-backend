@@ -1,9 +1,5 @@
-from app.db import Base
-from .product import Product
-from .product_tag import Tag
-from .product_status import ProductStatus
-from .product_detail import ProductDetail
-from .preference_category import PreferenceCategory
-from .preference import Preference
-from .user_preference_category import UserPreferenceCategory
-from .user_preference import UserPreference
+# debe importarse para que alembic pueda detectar y crear las tablas
+from app import audits  # noqa
+from app.database import Base  # noqa
+
+from .user import User  # noqa

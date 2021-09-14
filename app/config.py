@@ -1,6 +1,18 @@
-from pydantic import BaseSettings
+from decouple import config as environ  # type: ignore
 
-class TokenSettings(BaseSettings):
-    SECRET_KEY: str = "3dc9e33440d7bc87558b859b1133e456df4cfd6be9061bd147fa4bf8234c37ea"
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+dburl = str(environ("DATABASE_URL", "localhost:5432"))
+dbuser = str(environ("DATABASE_USER", "test"))
+dbpasw = str(environ("DATABASE_PASS", "test"))
+dbname = str(environ("DATABASE_NAME", "test"))
+dbtype = str(environ("DATABASE_TYPE", "postgresql"))
+
+# 60 minutes * 24 hours * 8 days = 8 days
+ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+
+API_BASE_URL = ""
+
+JWT_ALGORITHM = "HS256"
+
+SECRET_KEY = str(environ("SECRET_KEY", "secret_key"))
+
+SQLALCHEMY_DATABASE_URI = f"{dbtype}://{dbuser}:{dbpasw}@{dburl}/{dbname}"
