@@ -11,14 +11,14 @@ services:
       args:
         INSTALL_DEV: ${INSTALL_DEV}
     ports:
-      - 8100:80
+      - 8101:80
     volumes:
       - ./alembic:/app/alembic
 
   db:
     image: postgres:13.4-buster
     ports:
-      - 8101:5432
+      - 8102:5432
     env_file:
       - .env
     environment:
