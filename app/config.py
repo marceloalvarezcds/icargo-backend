@@ -1,4 +1,7 @@
+from typing import List, Union
+
 from decouple import config as environ  # type: ignore
+from pydantic import AnyHttpUrl, BaseSettings, validator  # type: ignore
 
 dburl = str(environ("DATABASE_URL", "localhost:5432"))
 dbuser = str(environ("DATABASE_USER", "test"))
@@ -16,3 +19,18 @@ JWT_ALGORITHM = "HS256"
 SECRET_KEY = str(environ("SECRET_KEY", "secret_key"))
 
 SQLALCHEMY_DATABASE_URI = f"{dbtype}://{dbuser}:{dbpasw}@{dburl}/{dbname}"
+
+
+class Settings(BaseSettings):
+    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+
+    @validator("BACKEND_CORS_ORIGINS", pre=True)
+    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
+        if isinstance(v, str) and not v.startswith("["):
+            return [i.strip() for i in v.split(",")]
+        elif isinstance(v, (list, str)):
+            return v
+        raise ValueError(v)
+
+
+settings = Settings()
