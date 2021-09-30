@@ -14,6 +14,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 
 API_BASE_URL = ""
 
+ENV = str(environ("ENV", "development"))
+
 JWT_ALGORITHM = "HS256"
 
 SECRET_KEY = str(environ("SECRET_KEY", "secret_key"))
