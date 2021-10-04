@@ -4,7 +4,7 @@ from app.models import User
 from app.repositories import user
 
 
-def seeds(db: Session):
+def user_seeds(db: Session):
     admin_username = "admin-icargo"
     admin_user = user.get_by_username(db, admin_username)
     if admin_user is None:
