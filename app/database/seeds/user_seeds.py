@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session  # type: ignore
 
+from app.config import USER_ADMIN_PASS
 from app.models import User
 from app.repositories import user
+from app.utils.security import get_password_hash
 
 
 def user_seeds(db: Session):
@@ -18,7 +20,7 @@ def user_seeds(db: Session):
             is_activated=True,
             is_guest=False,
             is_superuser=True,
-            password="1c4rg0",
+            password=get_password_hash(USER_ADMIN_PASS),
             modified_by="system",
         )
     db.add(admin_user)
