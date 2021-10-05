@@ -9,7 +9,7 @@ from app.dependencies import get_current_user, get_db_session
 api = APIRouter()
 
 
-@api.get("/", response_model=schemas.User)
+@api.get("/me", response_model=schemas.User)
 def my_account(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
 ) -> Any:
@@ -23,10 +23,13 @@ def my_account(
 def create_user(
     *,
     db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
     user_in: schemas.UserCreate,
     request: Request,
 ) -> Any:
     """
     Create new user.
     """
-    return services.create_user(db, user_in=user_in, request=request)
+    return services.create_user(
+        db, modified_by=current_user.username, user_in=user_in, request=request
+    )

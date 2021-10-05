@@ -14,6 +14,7 @@ services:
       - 8101:80
     volumes:
       - ./alembic:/app/alembic
+      - ./app/reports:/app/app/reports
 
   db:
     image: postgres:13.4-buster

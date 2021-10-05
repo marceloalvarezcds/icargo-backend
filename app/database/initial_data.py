@@ -1,11 +1,17 @@
-# from app.database import SessionLocal  # type: ignore
+from sqlalchemy.orm import Session  # type: ignore
+
+from app.config import ENV
+from app.database.populate import populate
+from app.database.seeds import seeds
+from app.dependencies.database_connection import get_database_connection
 from app.logger import logger
 
 
 def init() -> None:
-    pass
-    # db = SessionLocal()
-    # init_db(db)
+    db = Session(bind=get_database_connection())
+    seeds(db)
+    if ENV == "development":
+        populate(db)
 
 
 def main() -> None:

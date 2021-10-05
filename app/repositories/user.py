@@ -10,7 +10,7 @@ from app.schemas.user import UserCreate
 from app.utils.security import get_md5_hash_hexdigest, get_password_hash
 
 
-def create(db: Session, *, obj_in: UserCreate, request: Request) -> User:
+def create(db: Session, modified_by: str, obj_in: UserCreate, request: Request) -> User:
     created_at = datetime.datetime.now()
     string_to_hash = "%s-%s-%s" % (created_at, obj_in.email, obj_in.username)
     token = get_md5_hash_hexdigest(string_to_hash)
@@ -29,6 +29,7 @@ def create(db: Session, *, obj_in: UserCreate, request: Request) -> User:
         is_superuser=obj_in.is_superuser,
         created_ip_address=ip,
         last_ip_address=ip,
+        modified_by=modified_by,
     )
     db.add(db_obj)
     db.commit()

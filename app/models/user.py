@@ -2,10 +2,11 @@ from sqlalchemy import Boolean, Column, Integer, String, Text, text  # type: ign
 from sqlalchemy.dialects.postgresql import TIMESTAMP  # type: ignore
 from sqlalchemy.sql import func  # type: ignore
 
+from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 
 
-class User(Base):
+class User(AuditMixin, Base):
     """
     Defines the user model
     """

@@ -7,4 +7,4 @@ class AuditMixin:
     __tablename__: str
     id: int
 
-    modified_by = Column(String)
+    modified_by = Column(String(255), server_default="system")
