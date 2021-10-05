@@ -29,6 +29,8 @@ SECRET_KEY = str(environ("SECRET_KEY", "secret_key"))
 
 SQLALCHEMY_DATABASE_URI = f"{dbtype}://{dbuser}:{dbpasw}@{dburl}/{dbname}"
 
+USER_ADMIN_PASS = str(environ("USER_ADMIN_PASS", "user_admin"))
+
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[Union[str, AnyHttpUrl]] = []
