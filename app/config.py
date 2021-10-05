@@ -1,7 +1,14 @@
+import os
 from typing import List, Union
 
 from decouple import config as environ  # type: ignore
 from pydantic import AnyHttpUrl, BaseSettings, validator  # type: ignore
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+REPORTS_FOLDER = os.path.join(dir_path, "reports")
+
+if not os.path.exists(REPORTS_FOLDER):
+    os.mkdir(REPORTS_FOLDER)
 
 dburl = str(environ("DATABASE_URL", "localhost:5432"))
 dbuser = str(environ("DATABASE_USER", "test"))
