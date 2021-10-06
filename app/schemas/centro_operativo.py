@@ -26,3 +26,11 @@ class CentroOperativo(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class CentroOperativoList(CentroOperativo):
+    clasificacion_nombre: str
+    ciudad_nombre: str
+    localidad_nombre: str
+    pais_nombre: str
+    pais_nombre_corto: str

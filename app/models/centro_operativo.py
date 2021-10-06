@@ -7,6 +7,7 @@ from sqlalchemy import (  # type: ignore
     String,
     text,
 )
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
 
@@ -44,3 +45,23 @@ class CentroOperativo(AuditMixin, Base):
     ciudad = relationship(Ciudad, uselist=False)
     contacto_id = Column(Integer, ForeignKey("contacto.id"))
     contacto = relationship(Contacto, uselist=False)
+
+    @hybrid_property
+    def clasificacion_nombre(self):
+        return self.clasificacion.nombre
+
+    @hybrid_property
+    def ciudad_nombre(self):
+        return self.ciudad.nombre
+
+    @hybrid_property
+    def localidad_nombre(self):
+        return self.ciudad.localidad.nombre
+
+    @hybrid_property
+    def pais_nombre(self):
+        return self.ciudad.localidad.pais.nombre
+
+    @hybrid_property
+    def pais_nombre_corto(self):
+        return self.ciudad.localidad.pais.nombre_corto
