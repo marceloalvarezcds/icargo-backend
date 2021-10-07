@@ -1,9 +1,10 @@
 import uvicorn  # type: ignore
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
 from app import app
-from app.config import REPORTS_FOLDER, settings
+from app.config import ENV, REPORTS_FOLDER, settings
 from app.dependencies import get_database_connection
 from app.endpoints import api
 from app.middlewares import AuditRequestMiddleware
@@ -13,6 +14,9 @@ app.mount("/reports", StaticFiles(directory=REPORTS_FOLDER), name=REPORTS_FOLDER
 app.add_middleware(
     AuditRequestMiddleware, database_connection_function=get_database_connection
 )
+
+if ENV != "development":
+    app.add_middleware(HTTPSRedirectMiddleware)
 
 # Set all CORS enabled origins
 if settings.BACKEND_CORS_ORIGINS:
