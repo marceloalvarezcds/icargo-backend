@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String  # type: ignore
+from sqlalchemy import Column, DateTime, String, text  # type: ignore
 from sqlalchemy.orm import declarative_mixin  # type: ignore
 
 
@@ -8,3 +8,4 @@ class AuditMixin:
     id: int
 
     modified_by = Column(String(255), server_default="system")
+    modified_at = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
