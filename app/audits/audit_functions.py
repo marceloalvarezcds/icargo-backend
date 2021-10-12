@@ -6,6 +6,7 @@ from .audit_database import AuditDatabase
 def get_json(target) -> dict:
     row = dict(target.__dict__)
     del row["_sa_instance_state"]
+    row["modified_at"] = target.modified_at.isoformat()
     return dict(row)
 
 

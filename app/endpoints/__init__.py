@@ -1,13 +1,29 @@
 from fastapi import APIRouter
 
-from app.endpoints import centro_operativo, login, user
+from app.endpoints import (
+    centro_operativo,
+    centro_operativo_clasificacion,
+    ciudad,
+    localidad,
+    login,
+    pais,
+    user,
+)
 
 api = APIRouter()
 
 api.include_router(
+    centro_operativo_clasificacion.api,
+    prefix="/centro_operativo_clasificacion",
+    tags=["centro_operativo_clasificacion"],
+)
+api.include_router(
     centro_operativo.api, prefix="/centro_operativo", tags=["centro_operativo"]
 )
+api.include_router(ciudad.api, prefix="/ciudad", tags=["ciudad"])
+api.include_router(localidad.api, prefix="/localidad", tags=["localidad"])
 api.include_router(login.api, prefix="/login", tags=["login"])
+api.include_router(pais.api, prefix="/pais", tags=["pais"])
 api.include_router(user.api, prefix="/user", tags=["user"])
 
 

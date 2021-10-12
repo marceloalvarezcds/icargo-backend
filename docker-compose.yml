@@ -30,3 +30,13 @@ services:
     # volumes:
     #   - ./volumes/db:/var/lib/postgresql/data
     # restart: always
+
+  pictshare:
+    image: hascheksolutions/pictshare:latest
+    ports:
+      - "8103:80"
+    volumes:
+      - pictshare:/usr/share/nginx/html/data
+
+volumes:
+  pictshare:

@@ -32,6 +32,14 @@ SQLALCHEMY_DATABASE_URI = f"{dbtype}://{dbuser}:{dbpasw}@{dburl}/{dbname}"
 USER_ADMIN_PASS = str(environ("USER_ADMIN_PASS", "user_admin"))
 
 
+PICTSHARE_API = str(environ("PICTSHARE_API", "http://localhost:8103/api"))
+
+
+class PictShareSettings(BaseSettings):
+    PICTSHARE_DOCKER: str = "http://pictshare/api"
+    PICTSHARE_UPLOAD: str = "/upload.php"
+
+
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[Union[str, AnyHttpUrl]] = []
 

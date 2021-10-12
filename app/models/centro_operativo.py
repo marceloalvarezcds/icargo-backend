@@ -1,22 +1,23 @@
-from sqlalchemy import (  # type: ignore
-    DECIMAL,
-    Boolean,
-    Column,
-    ForeignKey,
-    Integer,
-    String,
-    text,
-)
+from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, String  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
+from sqlalchemy.sql.schema import Table, UniqueConstraint  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
+from app.enums.estado import EstadoEnum
 
 from .centro_operativo_clasificacion import CentroOperativoClasificacion
 from .ciudad import Ciudad
 from .contacto import Contacto
+
+CentroOperativoContacto = Table(
+    "centro_operativo_contacto",
+    Base.metadata,
+    Column("id", Integer, primary_key=True),
+    Column("centro_operativo_id", Integer, ForeignKey("centro_operativo.id")),
+    Column("contacto_id", Integer, ForeignKey(Contacto.id)),
+)
 
 
 class CentroOperativo(AuditMixin, Base):
@@ -35,7 +36,7 @@ class CentroOperativo(AuditMixin, Base):
     nombre = Column(String(255))
     nombre_corto = Column(String(255))
     logo = Column(String(255))
-    es_moderado = Column(Boolean(), server_default=text("false"))
+    estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     direccion = Column(String(255))
     latitud = Column(DECIMAL)
     longitud = Column(DECIMAL)
@@ -43,8 +44,7 @@ class CentroOperativo(AuditMixin, Base):
     clasificacion = relationship(CentroOperativoClasificacion, uselist=False)
     ciudad_id = Column(Integer, ForeignKey("ciudad.id"))
     ciudad = relationship(Ciudad, uselist=False)
-    contacto_id = Column(Integer, ForeignKey("contacto.id"))
-    contacto = relationship(Contacto, uselist=False)
+    contactos = relationship(Contacto, secondary=CentroOperativoContacto)
 
     @hybrid_property
     def clasificacion_nombre(self):

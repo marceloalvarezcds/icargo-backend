@@ -1,11 +1,27 @@
 import os
 
+from fastapi import UploadFile  # type: ignore
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
+from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
 from app.config import REPORTS_FOLDER
+from app.models import CentroOperativo
+from app.schemas import CentroOperativoForm
+
+from .pictshare import upload_and_get_image_url
+
+
+async def create_centro_operativo(
+    db: Session,
+    data: Json[CentroOperativoForm],  # type: ignore
+    file: UploadFile,
+    modified_by: str,
+) -> CentroOperativo:
+    logo_url = await upload_and_get_image_url(file)
+    return repositories.create_centro_operativo(db, data, logo_url, modified_by)
 
 
 def get_centro_operativo_reports(db: Session) -> str:
