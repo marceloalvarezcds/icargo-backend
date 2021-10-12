@@ -21,6 +21,7 @@ python-jose = "^3.3.0"
 python-multipart = "^0.0.5"
 openpyxl = "^3.0.9"
 aiofiles = "^0.7.0"
+requests = "^2.26.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.910"
@@ -36,6 +37,7 @@ types-orjson = "^3.6.0"
 types-ujson = "^0.1.1"
 nox = "^2021.6.12"
 safety = "^1.10.3"
+types-requests = "^2.25.10"
 
 [tool.isort]
 multi_line_output = 3
