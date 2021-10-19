@@ -1,8 +1,15 @@
 from sqlalchemy.orm import Session  # type: ignore
 
-from .centro_operativo_seeds import centro_operativo_seeds
+from .cargo_seeds import cargo_seeds
+from .composicion_juridica_seeds import composicion_juridica_seeds
+from .contacto_seeds import contacto_seeds
+from .gestor_carga_seeds import gestor_carga_seeds
+from .tipo_documento_seeds import tipo_documento_seeds
 
 
 def populate(db: Session):  # Used only for test data in development
-    pass
-    centro_operativo_seeds(db)
+    cargo_seeds(db)
+    composicion_juridica_seeds(db)
+    contacto_seeds(db)
+    tipo_documento_seeds(db)
+    gestor_carga_seeds(db)

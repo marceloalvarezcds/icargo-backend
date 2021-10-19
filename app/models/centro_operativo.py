@@ -1,7 +1,7 @@
 from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, String  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.sql.schema import Table, UniqueConstraint  # type: ignore
+from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
@@ -9,15 +9,6 @@ from app.enums.estado import EstadoEnum
 
 from .centro_operativo_clasificacion import CentroOperativoClasificacion
 from .ciudad import Ciudad
-from .contacto import Contacto
-
-CentroOperativoContacto = Table(
-    "centro_operativo_contacto",
-    Base.metadata,
-    Column("id", Integer, primary_key=True),
-    Column("centro_operativo_id", Integer, ForeignKey("centro_operativo.id")),
-    Column("contacto_id", Integer, ForeignKey(Contacto.id)),
-)
 
 
 class CentroOperativo(AuditMixin, Base):
@@ -44,7 +35,9 @@ class CentroOperativo(AuditMixin, Base):
     clasificacion = relationship(CentroOperativoClasificacion, uselist=False)
     ciudad_id = Column(Integer, ForeignKey("ciudad.id"))
     ciudad = relationship(Ciudad, uselist=False)
-    contactos = relationship(Contacto, secondary=CentroOperativoContacto)
+    contactos = relationship(
+        "CentroOperativoContactoGestorCarga", back_populates="centro_operativo"
+    )
 
     @hybrid_property
     def clasificacion_nombre(self):

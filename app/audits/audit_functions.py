@@ -1,13 +1,24 @@
+from datetime import date, datetime
+
+from simplejson import dumps
 from sqlalchemy.orm import Session  # type: ignore
 
 from .audit_database import AuditDatabase
+from .audit_mixin import AuditMixin
 
 
-def get_json(target) -> dict:
-    row = dict(target.__dict__)
-    del row["_sa_instance_state"]
-    row["modified_at"] = target.modified_at.isoformat()
-    return dict(row)
+def get_json(target) -> str:
+    target = dict(target.__dict__)
+    del target["_sa_instance_state"]
+    row = dict(target)
+    for key, value in target.items():
+        if isinstance(value, datetime) or isinstance(value, date):
+            row[key] = value.isoformat()
+        elif isinstance(value, AuditMixin):
+            del row[key]
+        else:
+            row[key] = value
+    return dumps(row, skipkeys=True, iterable_as_array=True, for_json=True)
 
 
 def create_audit_database(db_conn, target, action):

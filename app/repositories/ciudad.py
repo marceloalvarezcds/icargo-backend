@@ -1,8 +1,18 @@
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.models import Ciudad
+
+
+def get_ciudad_by_nombre_and_localidad_id(
+    db: Session, nombre: str, localidad_id: int
+) -> Optional[Ciudad]:
+    return (
+        db.query(Ciudad)
+        .filter(Ciudad.nombre == nombre, Ciudad.localidad_id == localidad_id)
+        .first()
+    )
 
 
 def get_ciudad_list(db: Session, localidad_id: int) -> List[Ciudad]:

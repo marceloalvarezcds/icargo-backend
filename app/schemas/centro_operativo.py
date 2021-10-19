@@ -6,31 +6,35 @@ from pydantic import BaseModel
 from app.enums import EstadoEnum
 
 from .centro_operativo_clasificacion import CentroOperativoClasificacion
+from .centro_operativo_contacto_gestor_carga import (
+    CentroOperativoContactoGestorCargaList,
+)
 from .ciudad import Ciudad
-from .contacto import Contacto
+from .contacto import ContactoForm
 
 
 class CentroOperativoBaseModel(BaseModel):
     nombre: str
     nombre_corto: Optional[str] = None
     clasificacion_id: int
+    latitud: Optional[Decimal] = None
+    longitud: Optional[Decimal] = None
     direccion: Optional[str] = None
-    ciudad_id: int
+    ciudad_id: Optional[int] = None
 
 
 class CentroOperativoForm(CentroOperativoBaseModel):
     alias: str
+    contactos: List[ContactoForm]
 
 
 class CentroOperativo(CentroOperativoBaseModel):
     id: int
     logo: Optional[str] = None
     estado: EstadoEnum
-    latitud: Decimal
-    longitud: Decimal
     clasificacion: CentroOperativoClasificacion
-    ciudad: Ciudad
-    contactos: List[Contacto]
+    ciudad: Optional[Ciudad] = None
+    contactos: List[CentroOperativoContactoGestorCargaList]
 
     class Config:
         orm_mode = True
@@ -38,8 +42,8 @@ class CentroOperativo(CentroOperativoBaseModel):
 
 
 class CentroOperativoList(CentroOperativo):
-    clasificacion_nombre: str
-    ciudad_nombre: str
-    localidad_nombre: str
-    pais_nombre: str
-    pais_nombre_corto: str
+    clasificacion_nombre: Optional[str] = None
+    ciudad_nombre: Optional[str] = None
+    localidad_nombre: Optional[str] = None
+    pais_nombre: Optional[str] = None
+    pais_nombre_corto: Optional[str] = None
