@@ -1,5 +1,5 @@
 # should be imported to help code editor (vscode) for autocompletion
-from .cargo import get_cargo_by_descripcion  # noqa
+from .cargo import get_cargo_by_descripcion, get_cargo_list  # noqa
 from .centro_operativo import (  # noqa
     create_centro_operativo,
     edit_centro_operativo,
