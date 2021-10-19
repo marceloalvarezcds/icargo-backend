@@ -1,9 +1,9 @@
 import os
+from typing import Optional
 
-from fastapi import UploadFile  # type: ignore
+from fastapi import HTTPException, UploadFile  # type: ignore
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
-from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
@@ -11,17 +11,47 @@ from app.config import REPORTS_FOLDER
 from app.models import CentroOperativo
 from app.schemas import CentroOperativoForm
 
+from .contacto import update_contacto_list
 from .pictshare import upload_and_get_image_url
 
 
 async def create_centro_operativo(
     db: Session,
-    data: Json[CentroOperativoForm],  # type: ignore
+    data: CentroOperativoForm,
     file: UploadFile,
+    gestor_carga_id: int,
     modified_by: str,
 ) -> CentroOperativo:
     logo_url = await upload_and_get_image_url(file)
-    return repositories.create_centro_operativo(db, data, logo_url, modified_by)
+    obj = repositories.create_centro_operativo(db, data, logo_url, modified_by)
+    update_contacto_list(db, data.contactos, obj, gestor_carga_id, modified_by)
+    return obj
+
+
+def get_centro_operativo_by_id(db: Session, id: int) -> CentroOperativo:
+    obj = repositories.get_centro_operativo_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Centro Operativo no encontrado")
+    return obj
+
+
+async def edit_centro_operativo(
+    id: int,
+    db: Session,
+    data: CentroOperativoForm,
+    file: Optional[UploadFile],
+    gestor_carga_id: int,
+    modified_by: str,
+) -> CentroOperativo:
+    logo_url = await upload_and_get_image_url(file) if file else None
+    obj = get_centro_operativo_by_id(db, id)
+    update_contacto_list(db, data.contactos, obj, gestor_carga_id, modified_by)
+    return repositories.edit_centro_operativo(obj, db, data, logo_url, modified_by)
+
+
+def delete_centro_operativo(db: Session, id: int, modified_by: str) -> CentroOperativo:
+    obj = get_centro_operativo_by_id(db, id)
+    return obj
 
 
 def get_centro_operativo_reports(db: Session) -> str:

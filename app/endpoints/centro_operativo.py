@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from pydantic import Json
@@ -26,6 +26,14 @@ async def centro_operativo_reports(
     return services.get_centro_operativo_reports(db)
 
 
+@api.get("/{id}", response_model=schemas.CentroOperativo)
+async def read_centro_operativo_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+):
+    return services.get_centro_operativo_by_id(db, id)
+
+
 @api.post("/", response_model=schemas.CentroOperativo)
 async def add_new_centro_operativo(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -34,5 +42,27 @@ async def add_new_centro_operativo(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
 ):
     return await services.create_centro_operativo(
-        db, data, file, modified_by=current_user.username
+        db, data, file, 1, modified_by=current_user.username  # type: ignore
     )
+
+
+@api.put("/{id}", response_model=schemas.CentroOperativo)
+async def edit_centro_operativo(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.CentroOperativoForm] = Form(...),  # type: ignore  # noqa: B008
+    file: Optional[UploadFile] = File(None),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return await services.edit_centro_operativo(
+        id, db, data, file, 1, modified_by=current_user.username  # type: ignore
+    )
+
+
+@api.delete("/{id}", response_model=schemas.CentroOperativo)
+async def delete_centro_operativo(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return services.delete_centro_operativo(db, id, modified_by=current_user.username)

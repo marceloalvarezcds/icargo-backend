@@ -15,6 +15,6 @@ def after_update(_, db_conn, target):
     create_audit_database(db_conn, target, action="update")
 
 
-@event.listens_for(AuditMixin, "before_delete", propagate=True)
-def before_delete(_, db_conn, target):
+@event.listens_for(AuditMixin, "after_delete", propagate=True)
+def after_delete(_, db_conn, target):
     create_audit_database(db_conn, target, action="delete")
