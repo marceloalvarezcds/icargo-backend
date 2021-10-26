@@ -15,6 +15,7 @@ class UserBase(BaseModel):
     is_activated: Optional[bool] = True
     is_guest: Optional[bool] = False
     is_superuser: Optional[bool] = False
+    gestor_carga_id: Optional[int] = None
 
 
 # Properties to receive via API on creation

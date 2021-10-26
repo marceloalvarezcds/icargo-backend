@@ -16,5 +16,6 @@ from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
 from .localidad import Localidad  # noqa
 from .moneda import Moneda  # noqa
 from .pais import Pais  # noqa
+from .rol import Rol  # noqa
 from .tipo_documento import TipoDocumento  # noqa
 from .user import User  # noqa

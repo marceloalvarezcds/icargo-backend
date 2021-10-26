@@ -29,5 +29,6 @@ from .contacto import (  # noqa
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
 from .moneda import get_moneda_by_simbolo  # noqa
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
+from .rol import get_rol_by_codigo, get_rol_list  # noqa
 from .tipo_documento import get_tipo_documento_by_descripcion  # noqa
 from .user import create, get, get_by_email, get_by_username  # noqa
