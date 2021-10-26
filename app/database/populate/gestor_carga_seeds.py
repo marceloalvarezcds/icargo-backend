@@ -12,6 +12,7 @@ from app.repositories import (
 )
 
 from .centro_operativo_seeds import centro_operativo_seeds
+from .user_seeds import user_seeds
 
 
 def gestor_carga_seeds(db: Session):
@@ -55,5 +56,6 @@ def gestor_carga_seeds(db: Session):
         db.commit()
 
         centro_operativo_seeds(db, gestor_carga)
+        user_seeds(db, gestor_carga)
     except IntegrityError:
         db.rollback()

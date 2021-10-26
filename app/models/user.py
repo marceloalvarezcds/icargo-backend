@@ -1,9 +1,29 @@
-from sqlalchemy import Boolean, Column, Integer, String, Text, text  # type: ignore
+from sqlalchemy import (  # type: ignore
+    Boolean,
+    Column,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    text,
+)
 from sqlalchemy.dialects.postgresql import TIMESTAMP  # type: ignore
+from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.sql import func  # type: ignore
+from sqlalchemy.sql.schema import Table  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
+
+from .gestor_carga import GestorCarga
+from .rol import Rol
+
+user_rol_table = Table(
+    "user_rol",
+    Base.metadata,
+    Column("user_id", ForeignKey("user.id")),
+    Column("rol_id", ForeignKey("rol.id")),
+)
 
 
 class User(AuditMixin, Base):
@@ -32,3 +52,6 @@ class User(AuditMixin, Base):
     last_seen = Column(TIMESTAMP(precision=0))
     created_ip_address = Column(String(255))
     last_ip_address = Column(String(255))
+    gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
+    gestor_carga = relationship(GestorCarga, uselist=False)
+    roles = relationship(Rol, secondary=user_rol_table)
