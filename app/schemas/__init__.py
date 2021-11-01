@@ -12,6 +12,7 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
 )
 from .ciudad import Ciudad  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
+from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
 from .localidad import Localidad  # noqa
 from .pais import Pais  # noqa
 from .token import Token, TokenPayload  # noqa

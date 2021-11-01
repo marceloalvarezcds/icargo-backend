@@ -18,6 +18,7 @@ def centro_operativo_contacto_gestor_carga_seeds(
     centro_operativo: CentroOperativo,
     contacto: Optional[Contacto],
     gestor_carga: GestorCarga,
+    alias: str,
 ):
     try:
         db.add(
@@ -26,6 +27,7 @@ def centro_operativo_contacto_gestor_carga_seeds(
                 centro_operativo_id=centro_operativo.id,
                 contacto_id=contacto.id if contacto else None,
                 gestor_carga_id=gestor_carga.id,
+                alias=alias,
             )
         )
         db.commit()

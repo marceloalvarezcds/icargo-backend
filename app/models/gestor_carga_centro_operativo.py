@@ -23,7 +23,9 @@ class GestorCargaCentroOperativo(AuditMixin, Base):
     )
     id = Column(Integer, primary_key=True)
     centro_operativo_id = Column(Integer, ForeignKey("centro_operativo.id"))
-    centro_operativo = relationship(CentroOperativo, uselist=False)
+    centro_operativo = relationship(
+        CentroOperativo, uselist=False, back_populates="gestores"
+    )
     gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
     gestor_carga = relationship(GestorCarga, uselist=False)
     alias = Column(String(255))

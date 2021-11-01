@@ -36,6 +36,7 @@ class CentroOperativoContactoGestorCarga(AuditMixin, Base):
     contacto = relationship(Contacto, uselist=False)
     gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
     gestor_carga = relationship(GestorCarga, uselist=False)
+    alias = Column(String(255))
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
 
     @hybrid_property

@@ -2,7 +2,9 @@
 from .cargo import get_cargo_by_descripcion, get_cargo_list  # noqa
 from .centro_operativo import (  # noqa
     create_centro_operativo,
+    delete_centro_operativo,
     edit_centro_operativo,
+    get_centro_operativo_by,
     get_centro_operativo_by_id,
     get_centro_operativo_list,
 )
@@ -25,6 +27,11 @@ from .contacto import (  # noqa
     get_contacto_by_id,
     get_contacto_by_telefono,
     get_contacto_by_telefono_and_email,
+)
+from .gestor_carga_centro_operativo import (  # noqa
+    create_gestor_carga_centro_operativo,
+    edit_gestor_carga_centro_operativo,
+    get_gestor_carga_centro_operativo_by,
 )
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
 from .moneda import get_moneda_by_simbolo  # noqa
