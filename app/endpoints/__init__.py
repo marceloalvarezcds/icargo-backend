@@ -5,6 +5,7 @@ from app.endpoints import (
     centro_operativo,
     centro_operativo_clasificacion,
     ciudad,
+    contacto,
     localidad,
     login,
     pais,
@@ -23,6 +24,7 @@ api.include_router(
     centro_operativo.api, prefix="/centro_operativo", tags=["centro_operativo"]
 )
 api.include_router(ciudad.api, prefix="/ciudad", tags=["ciudad"])
+api.include_router(contacto.api, prefix="/contacto", tags=["contacto"])
 api.include_router(localidad.api, prefix="/localidad", tags=["localidad"])
 api.include_router(login.api, prefix="/login", tags=["login"])
 api.include_router(pais.api, prefix="/pais", tags=["pais"])

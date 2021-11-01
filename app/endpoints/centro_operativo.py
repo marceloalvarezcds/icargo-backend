@@ -30,8 +30,11 @@ async def centro_operativo_reports(
 async def read_centro_operativo_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
 ):
-    return services.get_centro_operativo_by_id(db, id)
+    return services.get_centro_operativo_by_id_and_gestor_carga_id(
+        db, id, current_user.gestor_carga_id
+    )
 
 
 @api.post("/", response_model=schemas.CentroOperativo)
@@ -42,7 +45,7 @@ async def add_new_centro_operativo(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
 ):
     return await services.create_centro_operativo(
-        db, data, file, 1, modified_by=current_user.username  # type: ignore
+        db, data, file, current_user.gestor_carga_id, current_user.username  # type: ignore
     )
 
 
@@ -55,7 +58,7 @@ async def edit_centro_operativo(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
 ):
     return await services.edit_centro_operativo(
-        id, db, data, file, 1, modified_by=current_user.username  # type: ignore
+        id, db, data, file, current_user.gestor_carga_id, current_user.username  # type: ignore
     )
 
 
@@ -65,4 +68,6 @@ async def delete_centro_operativo(
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
 ):
-    return services.delete_centro_operativo(db, id, modified_by=current_user.username)
+    return services.delete_centro_operativo(
+        db, id, current_user.gestor_carga_id, current_user.username
+    )

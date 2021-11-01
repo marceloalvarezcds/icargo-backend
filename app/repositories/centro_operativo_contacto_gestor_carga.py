@@ -34,6 +34,7 @@ def create_centro_operativo_contacto_gestor_carga(
     centro_operativo: CentroOperativo,
     contacto: Contacto,
     gestor_carga_id: int,
+    alias: str,
     modified_by: str,
 ) -> CentroOperativoContactoGestorCarga:
     obj = CentroOperativoContactoGestorCarga(
@@ -41,6 +42,7 @@ def create_centro_operativo_contacto_gestor_carga(
         centro_operativo_id=centro_operativo.id,
         contacto_id=contacto.id,
         gestor_carga_id=gestor_carga_id,
+        alias=alias,
         estado=EstadoEnum.ACTIVO.value,
         modified_by=modified_by,
     )
@@ -57,12 +59,14 @@ def edit_centro_operativo_contacto_gestor_carga(
     centro_operativo: CentroOperativo,
     contacto: Contacto,
     gestor_carga_id: int,
+    alias: str,
     modified_by: str,
 ) -> CentroOperativoContactoGestorCarga:
     obj.cargo_id = cargo.id
     obj.centro_operativo_id = centro_operativo.id
     obj.contacto_id = contacto.id
     obj.gestor_carga_id = gestor_carga_id
+    obj.alias = alias
     obj.estado = EstadoEnum.ACTIVO.value
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()

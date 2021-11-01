@@ -31,7 +31,13 @@ def create_contacto(
     if not contacto:
         contacto = repositories.create_contacto(db, data, modified_by)
     repositories.create_centro_operativo_contacto_gestor_carga(
-        db, data.cargo, centro_operativo, contacto, gestor_carga_id, modified_by
+        db,
+        data.cargo,
+        centro_operativo,
+        contacto,
+        gestor_carga_id,
+        data.alias if data.alias else f"{contacto.nombre} {contacto.apellido}",
+        modified_by,
     )
     return contacto
 
@@ -67,6 +73,13 @@ def edit_contacto(
             centro_operativo,
             contacto,
             gestor_carga_id,
+            (
+                data.alias
+                if data.alias
+                else centro_operativo_contacto_obj.alias
+                if centro_operativo_contacto_obj.alias
+                else f"{contacto.nombre} {contacto.apellido}"
+            ),
             modified_by,
         )
     else:
@@ -101,44 +114,51 @@ def update_contacto_list(
     db: Session,
     contactoList: List[ContactoForm],
     centro_operativo: CentroOperativo,
-    gestor_carga_id: int,
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ):
-    contactos: List[CentroOperativoContactoGestorCarga] = centro_operativo.contactos
-    has_contactos = len(contactos) > 0
-    if has_contactos:
-        found: Dict[int, bool] = {}
-        created: Dict[str, bool] = {}
-        for contacto in contactos:
-            contacto_id = contacto.contacto_id
-            found[contacto_id] = found[contacto_id] if contacto_id in found else False
-            for contactoForm in contactoList:
-                if not contactoForm.id and contactoForm.telefono not in created:
-                    created[contactoForm.telefono] = True
-                    create_contacto(
-                        db, contactoForm, centro_operativo, gestor_carga_id, modified_by
-                    )
-                elif contacto_id == contactoForm.id and not found[contacto_id]:
-                    found[contacto_id] = True
-                    edit_contacto(
-                        contacto_id,
+    if gestor_carga_id:
+        contactos: List[CentroOperativoContactoGestorCarga] = centro_operativo.contactos
+        has_contactos = len(contactos) > 0
+        if has_contactos:
+            found: Dict[int, bool] = {}
+            created: Dict[str, bool] = {}
+            for contacto in contactos:
+                contacto_id = contacto.contacto_id
+                found[contacto_id] = (
+                    found[contacto_id] if contacto_id in found else False
+                )
+                for contactoForm in contactoList:
+                    if not contactoForm.id and contactoForm.telefono not in created:
+                        created[contactoForm.telefono] = True
+                        create_contacto(
+                            db,
+                            contactoForm,
+                            centro_operativo,
+                            gestor_carga_id,
+                            modified_by,
+                        )
+                    elif contacto_id == contactoForm.id and not found[contacto_id]:
+                        found[contacto_id] = True
+                        edit_contacto(
+                            contacto_id,
+                            db,
+                            contactoForm,
+                            centro_operativo,
+                            gestor_carga_id,
+                            modified_by,
+                        )
+                if not found[contacto_id]:
+                    delete_contacto(
                         db,
-                        contactoForm,
+                        contacto_id,
+                        contacto.cargo_id,
                         centro_operativo,
                         gestor_carga_id,
                         modified_by,
                     )
-            if not found[contacto_id]:
-                delete_contacto(
-                    db,
-                    contacto_id,
-                    contacto.cargo_id,
-                    centro_operativo,
-                    gestor_carga_id,
-                    modified_by,
+        else:
+            for contactoForm in contactoList:
+                create_contacto(
+                    db, contactoForm, centro_operativo, gestor_carga_id, modified_by
                 )
-    else:
-        for contactoForm in contactoList:
-            create_contacto(
-                db, contactoForm, centro_operativo, gestor_carga_id, modified_by
-            )
