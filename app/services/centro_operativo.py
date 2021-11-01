@@ -1,31 +1,60 @@
 import os
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import HTTPException, UploadFile  # type: ignore
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import repositories
+from app import logger, repositories, schemas
 from app.config import REPORTS_FOLDER
-from app.models import CentroOperativo
-from app.schemas import CentroOperativoForm
+from app.models import (
+    CentroOperativo,
+    CentroOperativoContactoGestorCarga,
+    GestorCargaCentroOperativo,
+)
 
 from .contacto import update_contacto_list
+from .gestor_carga_centro_operativo import (
+    create_gestor_carga_centro_operativo,
+    edit_gestor_carga_centro_operativo,
+)
 from .pictshare import upload_and_get_image_url
+
+
+def get_centro_operativo_detail(
+    obj: CentroOperativo, gestor_carga_id: Optional[int]
+) -> schemas.CentroOperativo:
+    obj_dict = obj.as_dict(for_json=False)
+    contactos: List[CentroOperativoContactoGestorCarga] = obj.contactos
+    ges: List[GestorCargaCentroOperativo] = obj.gestores
+    gestores = [x for x in ges if x.gestor_carga_id == gestor_carga_id]
+    obj_dict["contactos"] = [
+        x for x in contactos if x.gestor_carga_id == gestor_carga_id
+    ]
+    obj_dict["gestor_carga_centro_operativo"] = (
+        gestores[0] if len(gestores) > 0 else None
+    )
+    obj_dict["clasificacion"] = obj.clasificacion
+    obj_dict["ciudad"] = obj.ciudad
+    logger.info(obj_dict)
+    return schemas.CentroOperativo.parse_obj(obj_dict)
 
 
 async def create_centro_operativo(
     db: Session,
-    data: CentroOperativoForm,
+    data: schemas.CentroOperativoForm,
     file: UploadFile,
-    gestor_carga_id: int,
+    gestor_carga_id: Optional[int],
     modified_by: str,
-) -> CentroOperativo:
+) -> schemas.CentroOperativo:
     logo_url = await upload_and_get_image_url(file)
     obj = repositories.create_centro_operativo(db, data, logo_url, modified_by)
     update_contacto_list(db, data.contactos, obj, gestor_carga_id, modified_by)
-    return obj
+    create_gestor_carga_centro_operativo(
+        db, obj, gestor_carga_id, data.alias, modified_by
+    )
+    return get_centro_operativo_detail(obj, gestor_carga_id)
 
 
 def get_centro_operativo_by_id(db: Session, id: int) -> CentroOperativo:
@@ -35,23 +64,42 @@ def get_centro_operativo_by_id(db: Session, id: int) -> CentroOperativo:
     return obj
 
 
+def get_centro_operativo_by_id_and_gestor_carga_id(
+    db: Session, id: int, gestor_carga_id: Optional[int] = None
+) -> schemas.CentroOperativo:
+    obj = repositories.get_centro_operativo_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Centro Operativo no encontrado")
+    return get_centro_operativo_detail(obj, gestor_carga_id)
+
+
 async def edit_centro_operativo(
     id: int,
     db: Session,
-    data: CentroOperativoForm,
+    data: schemas.CentroOperativoForm,
     file: Optional[UploadFile],
-    gestor_carga_id: int,
+    gestor_carga_id: Optional[int],
     modified_by: str,
-) -> CentroOperativo:
+) -> schemas.CentroOperativo:
+    logger.info(data)
     logo_url = await upload_and_get_image_url(file) if file else None
-    obj = get_centro_operativo_by_id(db, id)
+    to_edit_obj = get_centro_operativo_by_id(db, id)
+    obj = repositories.edit_centro_operativo(
+        to_edit_obj, db, data, logo_url, modified_by
+    )
     update_contacto_list(db, data.contactos, obj, gestor_carga_id, modified_by)
-    return repositories.edit_centro_operativo(obj, db, data, logo_url, modified_by)
+    edit_gestor_carga_centro_operativo(
+        db, obj, gestor_carga_id, data.alias, modified_by
+    )
+    return get_centro_operativo_detail(obj, gestor_carga_id)
 
 
-def delete_centro_operativo(db: Session, id: int, modified_by: str) -> CentroOperativo:
-    obj = get_centro_operativo_by_id(db, id)
-    return obj
+def delete_centro_operativo(
+    db: Session, id: int, gestor_carga_id: Optional[int], modified_by: str
+) -> schemas.CentroOperativo:
+    co = get_centro_operativo_by_id(db, id)
+    obj = repositories.delete_centro_operativo(co, db, modified_by)
+    return get_centro_operativo_detail(obj, gestor_carga_id)
 
 
 def get_centro_operativo_reports(db: Session) -> str:

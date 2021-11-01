@@ -6,25 +6,30 @@ from app.repositories import rol, user
 from app.utils.security import get_password_hash
 
 
-def user_seeds(db: Session, gestor_carga: GestorCarga):
+def user_seeds(
+    db: Session,
+    username: str,
+    first_name: str,
+    last_name: str,
+    gestor_carga: GestorCarga,
+):
     admin_gestor_rol = rol.get_rol_by_codigo(db, CodigoRolEnum.ADMIN_GESTOR_CARGA.value)
-    transred_admin_username = "admin-transred"
-    transred_admin_user = user.get_by_username(db, transred_admin_username)
-    if transred_admin_user is None:
-        transred_admin_user = User(
-            token=transred_admin_username,
-            first_name="Transred",
-            last_name="Admin",
-            username=transred_admin_username,
-            surname=transred_admin_username,
-            email="admin@transred.com",
+    usuario = user.get_by_username(db, username)
+    email = f"{first_name.replace(' ', '-').lower()}@{last_name.replace(' ', '-').lower()}.com"
+    if usuario is None:
+        usuario = User(
+            token=username,
+            first_name=first_name,
+            last_name=last_name,
+            username=username,
+            surname=username,
+            email=email,
             is_activated=True,
             is_guest=False,
             is_superuser=False,
-            password=get_password_hash(transred_admin_username),
+            password=get_password_hash(username),
             gestor_carga_id=gestor_carga.id,
             roles=[admin_gestor_rol],
-            modified_by="system",
         )
-        db.add(transred_admin_user)
+        db.add(usuario)
         db.commit()

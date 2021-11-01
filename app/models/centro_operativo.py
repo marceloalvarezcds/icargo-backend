@@ -28,6 +28,9 @@ class CentroOperativo(AuditMixin, Base):
     nombre_corto = Column(String(255))
     logo = Column(String(255))
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
+    telefono = Column(String(25))
+    email = Column(String(50))
+    pagina_web = Column(String(255))
     direccion = Column(String(255))
     latitud = Column(DECIMAL)
     longitud = Column(DECIMAL)
@@ -37,6 +40,9 @@ class CentroOperativo(AuditMixin, Base):
     ciudad = relationship(Ciudad, uselist=False)
     contactos = relationship(
         "CentroOperativoContactoGestorCarga", back_populates="centro_operativo"
+    )
+    gestores = relationship(
+        "GestorCargaCentroOperativo", back_populates="centro_operativo"
     )
 
     @hybrid_property

@@ -1,10 +1,14 @@
-from sqlalchemy.exc import IntegrityError  # type: ignore
+from typing import Optional
+
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import CentroOperativo, GestorCarga
+from app.models.centro_operativo_clasificacion import CentroOperativoClasificacion
+from app.models.ciudad import Ciudad
 from app.repositories import (
     get_cargo_by_descripcion,
+    get_centro_operativo_by,
     get_centro_operativo_clasificacion_by_nombre,
     get_ciudad_by_nombre_and_localidad_id,
     get_contacto_by_email,
@@ -18,432 +22,498 @@ from .centro_operativo_contacto_gestor_carga_seeds import (
 from .gestor_carga_centro_operativo_seeds import gestor_carga_centro_operativo_seeds
 
 
-def centro_operativo_seeds(db: Session, gestor_carga: GestorCarga):
-    try:
-        silo = get_centro_operativo_clasificacion_by_nombre(db, "Silo")
-        puerto_seco = get_centro_operativo_clasificacion_by_nombre(db, "Puerto seco")
-        puerto_multimodal = get_centro_operativo_clasificacion_by_nombre(
-            db, "Puerto multimodal"
-        )
-        deposito = get_centro_operativo_clasificacion_by_nombre(db, "Deposito")
-        centro_distribucion = get_centro_operativo_clasificacion_by_nombre(
-            db, "Centro de distribución"
-        )
-        campo = get_centro_operativo_clasificacion_by_nombre(db, "Campo")
-        aduana = get_centro_operativo_clasificacion_by_nombre(db, "Aduana")
-        acopio = get_centro_operativo_clasificacion_by_nombre(db, "Acopio")
-
-        paraguay = get_pais_by_nombre_corto(db, "PY")
-        argentina = get_pais_by_nombre_corto(db, "AR")
-        brasil = get_pais_by_nombre_corto(db, "BR")
-
-        alto_parana = (
-            get_localidad_by_nombre_and_pais_id(db, "Alto Parana", paraguay.id)
-            if paraguay
-            else None
-        )
-        itapua = (
-            get_localidad_by_nombre_and_pais_id(db, "Itapua", paraguay.id)
-            if paraguay
-            else None
-        )
-        central = (
-            get_localidad_by_nombre_and_pais_id(db, "Central", paraguay.id)
-            if paraguay
-            else None
-        )
-        canindeyu = (
-            get_localidad_by_nombre_and_pais_id(db, "Canindeyu", paraguay.id)
-            if paraguay
-            else None
-        )
-        caaguazu_localidad = (
-            get_localidad_by_nombre_and_pais_id(db, "Caaguazu", paraguay.id)
-            if paraguay
-            else None
-        )
-        catamarca = (
-            get_localidad_by_nombre_and_pais_id(db, "Catamarca", argentina.id)
-            if argentina
-            else None
-        )
-        parana = (
-            get_localidad_by_nombre_and_pais_id(db, "Paraná", brasil.id)
-            if brasil
-            else None
-        )
-
-        los_cedrales = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Los Cedrales", alto_parana.id)
-            if alto_parana
-            else None
-        )
-        santa_rita = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Santa Rita", alto_parana.id)
-            if alto_parana
-            else None
-        )
-        hernandarias = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Hernandarias", alto_parana.id)
-            if alto_parana
-            else None
-        )
-        la_paz = (
-            get_ciudad_by_nombre_and_localidad_id(db, "La Paz", itapua.id)
-            if itapua
-            else None
-        )
-        encarnacion = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Encarnacion", itapua.id)
-            if itapua
-            else None
-        )
-        san_antonio = (
-            get_ciudad_by_nombre_and_localidad_id(db, "San Antonio", central.id)
-            if central
-            else None
-        )
-        itakyry = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Itakyry", alto_parana.id)
-            if alto_parana
-            else None
-        )
-        san_isidro = (
-            get_ciudad_by_nombre_and_localidad_id(
-                db, "Villa San Isidro Curuguaty", canindeyu.id
+def centro_operativo_seeds(
+    db: Session,
+    nombre: str,
+    telefono: str,
+    email: str,
+    pagina_web: str,
+    direccion: Optional[str],
+    latitud: float,
+    longitud: float,
+    alias: str,
+    cargo_descripcion: str,
+    contacto_email: str,
+    contacto_alias: str,
+    gestor_carga: GestorCarga,
+    clasificacion: Optional[CentroOperativoClasificacion],
+    ciudad: Optional[Ciudad],
+):
+    clasificacion_id = clasificacion.id if clasificacion else None
+    ciudad_id = ciudad.id if ciudad else None
+    if clasificacion_id and ciudad_id:
+        obj = get_centro_operativo_by(db, nombre, clasificacion_id, ciudad_id)
+        if not obj:
+            centro_operativo = CentroOperativo(
+                nombre=nombre,
+                nombre_corto=None,
+                logo=None,
+                estado=EstadoEnum.ACTIVO.value,
+                telefono=telefono,
+                email=email,
+                pagina_web=pagina_web,
+                direccion=direccion,
+                latitud=latitud,
+                longitud=longitud,
+                clasificacion_id=clasificacion_id,
+                ciudad_id=ciudad_id,
             )
-            if canindeyu
-            else None
-        )
-        minga_guazu = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Minga Guazu", alto_parana.id)
-            if alto_parana
-            else None
-        )
-        caaguazu = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Caaguazu", caaguazu_localidad.id)
-            if caaguazu_localidad
-            else None
-        )
-        ciudad_del_este = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Ciudad del Este", alto_parana.id)
-            if alto_parana
-            else None
-        )
-        asuncion = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Asunción", central.id)
-            if central
-            else None
-        )
-        villeta = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Ambato", central.id)
-            if central
-            else None
-        )
-        salto_del_guaira = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Salto del Guaira", canindeyu.id)
-            if canindeyu
-            else None
-        )
-        ambato = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Ambato", catamarca.id)
-            if catamarca
-            else None
-        )
-        california = (
-            get_ciudad_by_nombre_and_localidad_id(db, "Califórnia", parana.id)
-            if parana
-            else None
-        )
+            db.add(centro_operativo)
+            db.commit()
+            gestor_carga_centro_operativo_seeds(
+                db, centro_operativo, gestor_carga, alias
+            )
+            cargo = get_cargo_by_descripcion(db, cargo_descripcion)
+            contacto = get_contacto_by_email(db, contacto_email)
+            centro_operativo_contacto_gestor_carga_seeds(
+                db, cargo, centro_operativo, contacto, gestor_carga, contacto_alias
+            )
 
-        cedrales_co = CentroOperativo(
-            nombre="CARGILL CEDRALES",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="CEDRALES",
-            latitud=-25.658948139894708,
-            longitud=-54.717514329980474,
-            clasificacion_id=silo.id if silo else None,
-            ciudad_id=los_cedrales.id if los_cedrales else None,
-        )
-        santa_rita_co = CentroOperativo(
-            nombre="ADM SANTA RITA",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="SANTA RITA",
-            latitud=-25.7917136,
-            longitud=-55.08793379999997,
-            clasificacion_id=puerto_seco.id if puerto_seco else None,
-            ciudad_id=santa_rita.id if santa_rita else None,
-        )
-        km12_co = CentroOperativo(
-            nombre="GICAL KM12",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="GICAL KM 12",
-            latitud=-25.4921592,
-            longitud=-54.72833349999996,
-            clasificacion_id=puerto_multimodal.id if puerto_multimodal else None,
-            ciudad_id=hernandarias.id if hernandarias else None,
-        )
-        la_paz_co = CentroOperativo(
-            nombre="LA PAZ",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion=None,
-            latitud=-26.991085,
-            longitud=-55.89410369999996,
-            clasificacion_id=deposito.id if deposito else None,
-            ciudad_id=la_paz.id if la_paz else None,
-        )
-        trociuck_co = CentroOperativo(
-            nombre="PUERTO TROCIUCK",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion=None,
-            latitud=-27.2996615,
-            longitud=-56.02708849999999,
-            clasificacion_id=centro_distribucion.id if centro_distribucion else None,
-            ciudad_id=encarnacion.id if encarnacion else None,
-        )
-        san_antonio_co = CentroOperativo(
-            nombre="PUERTO SAN ANTONIO",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="Av. San Antonio",
-            latitud=-25.428378380516225,
-            longitud=-57.55939476199342,
-            clasificacion_id=campo.id if campo else None,
-            ciudad_id=san_antonio.id if san_antonio else None,
-        )
-        santa_fe_co = CentroOperativo(
-            nombre="AGROFERTIL SANTA FE",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="Ciudad de Santa Fe - Alto Paraná",
-            latitud=-25.2215574,
-            longitud=-54.70587929999999,
-            clasificacion_id=aduana.id if aduana else None,
-            ciudad_id=hernandarias.id if hernandarias else None,
-        )
-        itakyry_co = CentroOperativo(
-            nombre="ITAKYRY",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="ITAKYRY",
-            latitud=-24.9852879,
-            longitud=-55.15138009999998,
-            clasificacion_id=acopio.id if acopio else None,
-            ciudad_id=itakyry.id if itakyry else None,
-        )
-        yby_pora_co = CentroOperativo(
-            nombre="ESTANCIA YBY PORA",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion=None,
-            latitud=-24.4724333,
-            longitud=-55.69672809999997,
-            clasificacion_id=silo.id if silo else None,
-            ciudad_id=san_isidro.id if san_isidro else None,
-        )
-        cargill_co = CentroOperativo(
-            nombre="KM 28 - CARGILL SAECA",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="MINGA GUAZU KM 28",
-            latitud=-25.4838585,
-            longitud=-54.885111300000005,
-            clasificacion_id=puerto_seco.id if puerto_seco else None,
-            ciudad_id=minga_guazu.id if minga_guazu else None,
-        )
-        los_cedrales_co = CentroOperativo(
-            nombre="LOS CEDRALES",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="LOS CEDRALES",
-            latitud=-25.6707073,
-            longitud=-54.741203600000006,
-            clasificacion_id=puerto_multimodal.id if puerto_multimodal else None,
-            ciudad_id=salto_del_guaira.id if salto_del_guaira else None,
-        )
-        toledo_co = CentroOperativo(
-            nombre="CARGILL_NUEVA TOLEDO",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="Carlos A. López, Toledo",
-            latitud=-24.972151,
-            longitud=-55.618852100000026,
-            clasificacion_id=deposito.id if deposito else None,
-            ciudad_id=caaguazu.id if caaguazu else None,
-        )
-        vaqueria_co = CentroOperativo(
-            nombre="CARGILL_VAQUERIA",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="Unnamed Road, Vaquería",
-            latitud=-24.9959388,
-            longitud=-55.821775,
-            clasificacion_id=centro_distribucion.id if centro_distribucion else None,
-            ciudad_id=asuncion.id if asuncion else None,
-        )
-        pacuri_co = CentroOperativo(
-            nombre="CARGILL_PACURI",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="Departamento de Alto Paraná",
-            latitud=-25.48814618098412,
-            longitud=-54.89485988242188,
-            clasificacion_id=campo.id if campo else None,
-            ciudad_id=ciudad_del_este.id if ciudad_del_este else None,
-        )
-        caiasa_co = CentroOperativo(
-            nombre="PUERTO CAIASA",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="km 7 Ruta Villeta-Alberdi (Paraguay)",
-            latitud=-25.5802638,
-            longitud=-57.56614209999998,
-            clasificacion_id=acopio.id if acopio else None,
-            ciudad_id=villeta.id if villeta else None,
-        )
-        union_co = CentroOperativo(
-            nombre="PUERTO UNION",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="Puerto Union, gral.",
-            latitud=-25.2299182,
-            longitud=-57.56955529999999,
-            clasificacion_id=aduana.id if aduana else None,
-            ciudad_id=ambato.id if ambato else None,
-        )
-        pozuelo_co = CentroOperativo(
-            nombre="LDC_POZUELO",
-            nombre_corto=None,
-            logo=None,
-            estado=EstadoEnum.ACTIVO.value,
-            direccion="Califórnia, Brazil",
-            latitud=-24.57650659999999,
-            longitud=-54.34180070000002,
-            clasificacion_id=silo.id if silo else None,
-            ciudad_id=california.id if california else None,
-        )
 
-        db.add(cedrales_co)
-        db.add(santa_rita_co)
-        db.add(km12_co)
-        db.add(la_paz_co)
-        db.add(trociuck_co)
-        db.add(san_antonio_co)
-        db.add(santa_fe_co)
-        db.add(itakyry_co)
-        db.add(yby_pora_co)
-        db.add(cargill_co)
-        db.add(los_cedrales_co)
-        db.add(toledo_co)
-        db.add(vaqueria_co)
-        db.add(pacuri_co)
-        db.add(caiasa_co)
-        db.add(union_co)
-        db.add(pozuelo_co)
-        db.commit()
+def cargill_centro_operativo_seeds(db: Session, gestor_carga: GestorCarga):
+    silo = get_centro_operativo_clasificacion_by_nombre(db, "Silo")
+    puerto_seco = get_centro_operativo_clasificacion_by_nombre(db, "Puerto seco")
+    deposito = get_centro_operativo_clasificacion_by_nombre(db, "Deposito")
+    centro_distribucion = get_centro_operativo_clasificacion_by_nombre(
+        db, "Centro de distribución"
+    )
+    campo = get_centro_operativo_clasificacion_by_nombre(db, "Campo")
 
-        gestor_carga_centro_operativo_seeds(db, cedrales_co, gestor_carga, "Cedrales")
-        gestor_carga_centro_operativo_seeds(
-            db, santa_rita_co, gestor_carga, "Santa Rita"
-        )
-        gestor_carga_centro_operativo_seeds(db, km12_co, gestor_carga, "KM12")
-        gestor_carga_centro_operativo_seeds(db, la_paz_co, gestor_carga, "La Paz")
-        gestor_carga_centro_operativo_seeds(db, trociuck_co, gestor_carga, "Trociuck")
-        gestor_carga_centro_operativo_seeds(
-            db, san_antonio_co, gestor_carga, "San Antonio"
-        )
-        gestor_carga_centro_operativo_seeds(db, santa_fe_co, gestor_carga, "Santa Fe")
-        gestor_carga_centro_operativo_seeds(db, itakyry_co, gestor_carga, "Itakyry")
-        gestor_carga_centro_operativo_seeds(db, yby_pora_co, gestor_carga, "Yby Pora")
-        gestor_carga_centro_operativo_seeds(db, cargill_co, gestor_carga, "Cargill")
-        gestor_carga_centro_operativo_seeds(
-            db, los_cedrales_co, gestor_carga, "Los Cedrales"
-        )
-        gestor_carga_centro_operativo_seeds(db, toledo_co, gestor_carga, "Toledo")
-        gestor_carga_centro_operativo_seeds(db, vaqueria_co, gestor_carga, "Vaqueria")
-        gestor_carga_centro_operativo_seeds(db, pacuri_co, gestor_carga, "Pacuri")
-        gestor_carga_centro_operativo_seeds(db, caiasa_co, gestor_carga, "Caiasa")
-        gestor_carga_centro_operativo_seeds(db, union_co, gestor_carga, "Union")
-        gestor_carga_centro_operativo_seeds(db, pozuelo_co, gestor_carga, "Pozuelo")
+    paraguay = get_pais_by_nombre_corto(db, "PY")
 
-        cargo_gerente = get_cargo_by_descripcion(db, "Gerente")
-        cargo_vendedor = get_cargo_by_descripcion(db, "Vendedor")
+    alto_parana = (
+        get_localidad_by_nombre_and_pais_id(db, "Alto Parana", paraguay.id)
+        if paraguay
+        else None
+    )
+    central = (
+        get_localidad_by_nombre_and_pais_id(db, "Central", paraguay.id)
+        if paraguay
+        else None
+    )
+    caaguazu_localidad = (
+        get_localidad_by_nombre_and_pais_id(db, "Caaguazu", paraguay.id)
+        if paraguay
+        else None
+    )
+    los_cedrales = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Los Cedrales", alto_parana.id)
+        if alto_parana
+        else None
+    )
+    minga_guazu = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Minga Guazu", alto_parana.id)
+        if alto_parana
+        else None
+    )
+    caaguazu = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Caaguazu", caaguazu_localidad.id)
+        if caaguazu_localidad
+        else None
+    )
+    ciudad_del_este = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Ciudad del Este", alto_parana.id)
+        if alto_parana
+        else None
+    )
+    asuncion = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Asunción", central.id)
+        if central
+        else None
+    )
 
-        contacto1 = get_contacto_by_email(db, "maria@cardozo.com")
-        contacto2 = get_contacto_by_email(db, "pedro@molinas.com")
-        contacto3 = get_contacto_by_email(db, "sonia@sanchez.com")
+    centro_operativo_seeds(
+        db,
+        nombre="CARGILL CEDRALES",
+        telefono="0982444444",
+        email="contacto@cargill-cedrales.com",
+        pagina_web="cargill-cedrales.com",
+        direccion="CEDRALES",
+        latitud=-25.658948139894708,
+        longitud=-54.717514329980474,
+        alias="Cedrales",
+        cargo_descripcion="Gerente",
+        contacto_email="maria@cardozo.com",
+        contacto_alias="Maria",
+        gestor_carga=gestor_carga,
+        clasificacion=silo,
+        ciudad=los_cedrales,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="KM 28 - CARGILL SAECA",
+        telefono="0982555555",
+        email="contacto@km-28-cargill-saeca.com",
+        pagina_web="km-28-cargill-saeca.com",
+        direccion="MINGA GUAZU KM 28",
+        latitud=-25.4838585,
+        longitud=-54.885111300000005,
+        alias="Cargill",
+        cargo_descripcion="Gerente",
+        contacto_email="pedro@molinas.com",
+        contacto_alias="Pedro",
+        gestor_carga=gestor_carga,
+        clasificacion=puerto_seco,
+        ciudad=minga_guazu,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="CARGILL_NUEVA TOLEDO",
+        telefono="0982666666",
+        email="contacto@cargill-nueva-toledo.com",
+        pagina_web="cargill-nueva-toledo.com",
+        direccion="Carlos A. López, Toledo",
+        latitud=-24.972151,
+        longitud=-55.618852100000026,
+        alias="Toledo",
+        cargo_descripcion="Vendedor",
+        contacto_email="pedro@molinas.com",
+        contacto_alias="Pedro",
+        gestor_carga=gestor_carga,
+        clasificacion=deposito,
+        ciudad=caaguazu,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="CARGILL_VAQUERIA",
+        telefono="0982777777",
+        email="contacto@cargill-vaqueria.com",
+        pagina_web="cargill-vaqueria.com",
+        direccion="Unnamed Road, Vaquería",
+        latitud=-24.9959388,
+        longitud=-55.821775,
+        alias="Vaqueria",
+        cargo_descripcion="Vendedor",
+        contacto_email="sonia@sanchez.com",
+        contacto_alias="Sonia",
+        gestor_carga=gestor_carga,
+        clasificacion=centro_distribucion,
+        ciudad=asuncion,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="CARGILL_PACURI",
+        telefono="0982888888",
+        email="contacto@cargill-pacuri.com",
+        pagina_web="cargill-pacuri.com",
+        direccion="Departamento de Alto Paraná",
+        latitud=-25.48814618098412,
+        longitud=-54.89485988242188,
+        alias="Pacuri",
+        cargo_descripcion="Vendedor",
+        contacto_email="sonia@sanchez.com",
+        contacto_alias="Sonia",
+        gestor_carga=gestor_carga,
+        clasificacion=campo,
+        ciudad=ciudad_del_este,
+    )
 
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_gerente, cedrales_co, contacto1, gestor_carga
+
+def multiple_centro_operativo_seeds(db: Session, gestor_carga: GestorCarga):
+    silo = get_centro_operativo_clasificacion_by_nombre(db, "Silo")
+    puerto_seco = get_centro_operativo_clasificacion_by_nombre(db, "Puerto seco")
+    puerto_multimodal = get_centro_operativo_clasificacion_by_nombre(
+        db, "Puerto multimodal"
+    )
+    deposito = get_centro_operativo_clasificacion_by_nombre(db, "Deposito")
+    centro_distribucion = get_centro_operativo_clasificacion_by_nombre(
+        db, "Centro de distribución"
+    )
+    campo = get_centro_operativo_clasificacion_by_nombre(db, "Campo")
+    aduana = get_centro_operativo_clasificacion_by_nombre(db, "Aduana")
+    acopio = get_centro_operativo_clasificacion_by_nombre(db, "Acopio")
+
+    paraguay = get_pais_by_nombre_corto(db, "PY")
+    argentina = get_pais_by_nombre_corto(db, "AR")
+    brasil = get_pais_by_nombre_corto(db, "BR")
+
+    alto_parana = (
+        get_localidad_by_nombre_and_pais_id(db, "Alto Parana", paraguay.id)
+        if paraguay
+        else None
+    )
+    itapua = (
+        get_localidad_by_nombre_and_pais_id(db, "Itapua", paraguay.id)
+        if paraguay
+        else None
+    )
+    central = (
+        get_localidad_by_nombre_and_pais_id(db, "Central", paraguay.id)
+        if paraguay
+        else None
+    )
+    canindeyu = (
+        get_localidad_by_nombre_and_pais_id(db, "Canindeyu", paraguay.id)
+        if paraguay
+        else None
+    )
+    catamarca = (
+        get_localidad_by_nombre_and_pais_id(db, "Catamarca", argentina.id)
+        if argentina
+        else None
+    )
+    parana = (
+        get_localidad_by_nombre_and_pais_id(db, "Paraná", brasil.id) if brasil else None
+    )
+    santa_rita = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Santa Rita", alto_parana.id)
+        if alto_parana
+        else None
+    )
+    hernandarias = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Hernandarias", alto_parana.id)
+        if alto_parana
+        else None
+    )
+    la_paz = (
+        get_ciudad_by_nombre_and_localidad_id(db, "La Paz", itapua.id)
+        if itapua
+        else None
+    )
+    encarnacion = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Encarnacion", itapua.id)
+        if itapua
+        else None
+    )
+    san_antonio = (
+        get_ciudad_by_nombre_and_localidad_id(db, "San Antonio", central.id)
+        if central
+        else None
+    )
+    itakyry = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Itakyry", alto_parana.id)
+        if alto_parana
+        else None
+    )
+    san_isidro = (
+        get_ciudad_by_nombre_and_localidad_id(
+            db, "Villa San Isidro Curuguaty", canindeyu.id
         )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_gerente, santa_rita_co, contacto1, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_gerente, km12_co, contacto1, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_gerente, la_paz_co, contacto1, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_gerente, trociuck_co, contacto1, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_gerente, san_antonio_co, contacto2, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_gerente, santa_fe_co, contacto2, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_gerente, itakyry_co, contacto2, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_vendedor, yby_pora_co, contacto2, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_vendedor, cargill_co, contacto2, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_vendedor, los_cedrales_co, contacto2, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_vendedor, toledo_co, contacto2, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_vendedor, vaqueria_co, contacto3, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_vendedor, pacuri_co, contacto3, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_vendedor, caiasa_co, contacto3, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_vendedor, union_co, contacto3, gestor_carga
-        )
-        centro_operativo_contacto_gestor_carga_seeds(
-            db, cargo_vendedor, pozuelo_co, contacto3, gestor_carga
-        )
-    except IntegrityError:
-        db.rollback()
+        if canindeyu
+        else None
+    )
+    villeta = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Villeta", central.id)
+        if central
+        else None
+    )
+    salto_del_guaira = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Salto del Guaira", canindeyu.id)
+        if canindeyu
+        else None
+    )
+    ambato = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Ambato", catamarca.id)
+        if catamarca
+        else None
+    )
+    california = (
+        get_ciudad_by_nombre_and_localidad_id(db, "Califórnia", parana.id)
+        if parana
+        else None
+    )
+
+    centro_operativo_seeds(
+        db,
+        nombre="ADM SANTA RITA",
+        telefono="0981111111",
+        email="contacto@adm-santa-rita.com",
+        pagina_web="adm-santa-rita.com",
+        direccion="SANTA RITA",
+        latitud=-25.7917136,
+        longitud=-55.08793379999997,
+        alias="Santa Rita",
+        cargo_descripcion="Gerente",
+        contacto_email="maria@cardozo.com",
+        contacto_alias="Maria",
+        gestor_carga=gestor_carga,
+        clasificacion=puerto_seco,
+        ciudad=santa_rita,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="GICAL KM12",
+        telefono="0981222222",
+        email="contacto@gical-km12.com",
+        pagina_web="gical-km12.com",
+        direccion="GICAL KM 12",
+        latitud=-25.4921592,
+        longitud=-54.72833349999996,
+        alias="KM12",
+        cargo_descripcion="Gerente",
+        contacto_email="maria@cardozo.com",
+        contacto_alias="Maria",
+        gestor_carga=gestor_carga,
+        clasificacion=puerto_multimodal,
+        ciudad=hernandarias,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="LA PAZ",
+        telefono="0981333333",
+        email="contacto@la-paz.com",
+        pagina_web="la-paz.com",
+        direccion=None,
+        latitud=-26.991085,
+        longitud=-55.89410369999996,
+        alias="La Paz",
+        cargo_descripcion="Gerente",
+        contacto_email="maria@cardozo.com",
+        contacto_alias="Maria",
+        gestor_carga=gestor_carga,
+        clasificacion=deposito,
+        ciudad=la_paz,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="PUERTO TROCIUCK",
+        telefono="0981444444",
+        email="contacto@puerto-trociuck.com",
+        pagina_web="puerto-trociuck.com",
+        direccion=None,
+        latitud=-27.2996615,
+        longitud=-56.02708849999999,
+        alias="Trociuck",
+        cargo_descripcion="Gerente",
+        contacto_email="maria@cardozo.com",
+        contacto_alias="Maria",
+        gestor_carga=gestor_carga,
+        clasificacion=centro_distribucion,
+        ciudad=encarnacion,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="PUERTO SAN ANTONIO",
+        telefono="0981555555",
+        email="contacto@puerto-san-antonio.com",
+        pagina_web="puerto-san-antonio.com",
+        direccion="Av. San Antonio",
+        latitud=-25.428378380516225,
+        longitud=-57.55939476199342,
+        alias="San Antonio",
+        cargo_descripcion="Gerente",
+        contacto_email="pedro@molinas.com",
+        contacto_alias="Pedro",
+        gestor_carga=gestor_carga,
+        clasificacion=campo,
+        ciudad=san_antonio,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="AGROFERTIL SANTA FE",
+        telefono="0981666666",
+        email="contacto@agrofertil-santa-fe.com",
+        pagina_web="agrofertil-santa-fe.com",
+        direccion="Ciudad de Santa Fe - Alto Paraná",
+        latitud=-25.2215574,
+        longitud=-54.70587929999999,
+        alias="Santa Fe",
+        cargo_descripcion="Gerente",
+        contacto_email="pedro@molinas.com",
+        contacto_alias="Pedro",
+        gestor_carga=gestor_carga,
+        clasificacion=aduana,
+        ciudad=hernandarias,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="ITAKYRY",
+        telefono="0981777777",
+        email="contacto@itakyry.com",
+        pagina_web="itakyry.com",
+        direccion="ITAKYRY",
+        latitud=-24.9852879,
+        longitud=-55.15138009999998,
+        alias="Itakyry",
+        cargo_descripcion="Gerente",
+        contacto_email="pedro@molinas.com",
+        contacto_alias="Pedro",
+        gestor_carga=gestor_carga,
+        clasificacion=acopio,
+        ciudad=itakyry,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="ESTANCIA YBY PORA",
+        telefono="0981888888",
+        email="contacto@estancia-yby-pora.com",
+        pagina_web="estancia-yby-pora.com",
+        direccion=None,
+        latitud=-24.4724333,
+        longitud=-55.69672809999997,
+        alias="Yby Pora",
+        cargo_descripcion="Vendedor",
+        contacto_email="pedro@molinas.com",
+        contacto_alias="Pedro",
+        gestor_carga=gestor_carga,
+        clasificacion=silo,
+        ciudad=san_isidro,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="LOS CEDRALES",
+        telefono="0981999999",
+        email="contacto@los-cedrales.com",
+        pagina_web="los-cedrales.com",
+        direccion="LOS CEDRALES",
+        latitud=-25.6707073,
+        longitud=-54.741203600000006,
+        alias="Los Cedrales",
+        cargo_descripcion="Vendedor",
+        contacto_email="pedro@molinas.com",
+        contacto_alias="Pedro",
+        gestor_carga=gestor_carga,
+        clasificacion=puerto_multimodal,
+        ciudad=salto_del_guaira,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="PUERTO CAIASA",
+        telefono="0982111111",
+        email="contacto@puerto-caiasa.com",
+        pagina_web="puerto-caiasa.com",
+        direccion="km 7 Ruta Villeta-Alberdi (Paraguay)",
+        latitud=-25.5802638,
+        longitud=-57.56614209999998,
+        alias="Caiasa",
+        cargo_descripcion="Vendedor",
+        contacto_email="sonia@sanchez.com",
+        contacto_alias="Sonia",
+        gestor_carga=gestor_carga,
+        clasificacion=acopio,
+        ciudad=villeta,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="PUERTO UNION",
+        telefono="0982222222",
+        email="contacto@puerto-union.com",
+        pagina_web="puerto-union.com",
+        direccion="Puerto Union, gral.",
+        latitud=-25.2299182,
+        longitud=-57.56955529999999,
+        alias="Union",
+        cargo_descripcion="Vendedor",
+        contacto_email="sonia@sanchez.com",
+        contacto_alias="Sonia",
+        gestor_carga=gestor_carga,
+        clasificacion=aduana,
+        ciudad=ambato,
+    )
+    centro_operativo_seeds(
+        db,
+        nombre="LDC_POZUELO",
+        telefono="0982333333",
+        email="contacto@ldc-pozuelo.com",
+        pagina_web="ldc-pozuelo.com",
+        direccion="Califórnia, Brazil",
+        latitud=-24.57650659999999,
+        longitud=-54.34180070000002,
+        alias="Pozuelo",
+        cargo_descripcion="Vendedor",
+        contacto_email="sonia@sanchez.com",
+        contacto_alias="Sonia",
+        gestor_carga=gestor_carga,
+        clasificacion=silo,
+        ciudad=california,
+    )
