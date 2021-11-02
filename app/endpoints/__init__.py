@@ -9,6 +9,7 @@ from app.endpoints import (
     localidad,
     login,
     pais,
+    remitente,
     user,
 )
 
@@ -28,6 +29,7 @@ api.include_router(contacto.api, prefix="/contacto", tags=["contacto"])
 api.include_router(localidad.api, prefix="/localidad", tags=["localidad"])
 api.include_router(login.api, prefix="/login", tags=["login"])
 api.include_router(pais.api, prefix="/pais", tags=["pais"])
+api.include_router(remitente.api, prefix="/remitente", tags=["remitente"])
 api.include_router(user.api, prefix="/user", tags=["user"])
 
 

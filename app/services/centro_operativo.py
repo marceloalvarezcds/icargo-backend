@@ -14,7 +14,7 @@ from app.models import (
     GestorCargaCentroOperativo,
 )
 
-from .contacto import update_contacto_list
+from .centro_operativo_contacto import update_centro_operativo_contacto_list
 from .gestor_carga_centro_operativo import (
     create_gestor_carga_centro_operativo,
     edit_gestor_carga_centro_operativo,
@@ -50,7 +50,9 @@ async def create_centro_operativo(
 ) -> schemas.CentroOperativo:
     logo_url = await upload_and_get_image_url(file)
     obj = repositories.create_centro_operativo(db, data, logo_url, modified_by)
-    update_contacto_list(db, data.contactos, obj, gestor_carga_id, modified_by)
+    update_centro_operativo_contacto_list(
+        db, data.contactos, obj, gestor_carga_id, modified_by
+    )
     create_gestor_carga_centro_operativo(
         db, obj, gestor_carga_id, data.alias, modified_by
     )
@@ -87,7 +89,9 @@ async def edit_centro_operativo(
     obj = repositories.edit_centro_operativo(
         to_edit_obj, db, data, logo_url, modified_by
     )
-    update_contacto_list(db, data.contactos, obj, gestor_carga_id, modified_by)
+    update_centro_operativo_contacto_list(
+        db, data.contactos, obj, gestor_carga_id, modified_by
+    )
     edit_gestor_carga_centro_operativo(
         db, obj, gestor_carga_id, data.alias, modified_by
     )
@@ -117,7 +121,7 @@ def get_centro_operativo_reports(db: Session) -> str:
     title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=2)
-    title_cell.value = "Nombre Corto"
+    title_cell.value = "Nombre de Fantasía"
     title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=3)

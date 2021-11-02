@@ -20,13 +20,13 @@ def tests(session):
 def lint(session):
     session.install("poetry")
     session.run("poetry", "install")
-    session.run("black", "--check", "app/")
-    session.run("isort", "--check-only", "app")
-    session.run("flake8", "app")
+    session.run("black", "--check", ".")
+    session.run("isort", "--check-only", ".")
+    session.run("flake8", ".")
 
 
 @nox.session
 def typing(session):
     session.install("poetry")
     session.run("poetry", "install")
-    session.run("mypy", "app")
+    session.run("mypy", ".")
