@@ -11,6 +11,7 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
     CentroOperativoContactoGestorCargaList,
 )
 from .ciudad import Ciudad  # noqa
+from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
 from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
 from .gestor_carga_remitente import GestorCargaRemitente  # noqa
@@ -21,5 +22,6 @@ from .remitente_contacto_gestor_carga import (  # noqa
     RemitenteContactoGestorCarga,
     RemitenteContactoGestorCargaList,
 )
+from .tipo_documento import TipoDocumento  # noqa
 from .token import Token, TokenPayload  # noqa
 from .user import User, UserBase, UserCreate, UserInDB, UserInDBBase, UserUpdate  # noqa

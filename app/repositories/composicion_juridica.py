@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -13,3 +13,7 @@ def get_composicion_juridica_by_nombre(
         .filter(ComposicionJuridica.nombre == nombre)
         .first()
     )
+
+
+def get_composicion_juridica_list(db: Session) -> List[ComposicionJuridica]:
+    return db.query(ComposicionJuridica).order_by(ComposicionJuridica.nombre).all()

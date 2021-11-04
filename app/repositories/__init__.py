@@ -19,7 +19,10 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
     get_centro_operativo_contacto_gestor_carga_by,
 )
 from .ciudad import get_ciudad_by_nombre_and_localidad_id, get_ciudad_list  # noqa
-from .composicion_juridica import get_composicion_juridica_by_nombre  # noqa
+from .composicion_juridica import (  # noqa
+    get_composicion_juridica_by_nombre,
+    get_composicion_juridica_list,
+)
 from .contacto import (  # noqa
     create_contacto,
     edit_contacto,
@@ -56,5 +59,8 @@ from .remitente_contacto_gestor_carga import (  # noqa
     get_remitente_contacto_gestor_carga_by,
 )
 from .rol import get_rol_by_codigo, get_rol_list  # noqa
-from .tipo_documento import get_tipo_documento_by_descripcion  # noqa
+from .tipo_documento import (  # noqa
+    get_tipo_documento_by_descripcion,
+    get_tipo_documento_list,
+)
 from .user import create, get, get_by_email, get_by_username  # noqa
