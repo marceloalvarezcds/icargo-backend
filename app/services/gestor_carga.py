@@ -19,6 +19,13 @@ async def create_gestor_carga(
     file: UploadFile,
     modified_by: str,
 ) -> schemas.GestorCarga:
+    if repositories.get_gestor_carga_by(
+        db, data.tipo_documento_id, data.numero_documento
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail=f"El Gestor de Carga con documento {data.numero_documento} ya existe",
+        )
     logo_url = await upload_and_get_image_url(file)
     return repositories.create_gestor_carga(db, data, logo_url, modified_by)
 

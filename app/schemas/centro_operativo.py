@@ -24,7 +24,7 @@ class CentroOperativoBaseModel(BaseModel):
     latitud: Optional[Decimal] = None
     longitud: Optional[Decimal] = None
     direccion: Optional[str] = None
-    ciudad_id: Optional[int] = None
+    ciudad_id: int
 
 
 class CentroOperativoForm(CentroOperativoBaseModel):
@@ -37,7 +37,7 @@ class CentroOperativoBase(CentroOperativoBaseModel):
     logo: Optional[str] = None
     estado: EstadoEnum
     clasificacion: CentroOperativoClasificacion
-    ciudad: Optional[Ciudad] = None
+    ciudad: Ciudad
 
 
 class CentroOperativoList(CentroOperativoBase):

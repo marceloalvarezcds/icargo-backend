@@ -42,6 +42,11 @@ async def create_remitente(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Remitente:
+    if repositories.get_remitente_by(db, data.tipo_documento_id, data.numero_documento):
+        raise HTTPException(
+            status_code=409,
+            detail=f"El Remitente con documento {data.numero_documento} ya existe",
+        )
     logo_url = await upload_and_get_image_url(file)
     obj = repositories.create_remitente(db, data, logo_url, modified_by)
     update_remitente_contacto_list(

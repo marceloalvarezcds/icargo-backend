@@ -47,6 +47,12 @@ async def create_centro_operativo(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.CentroOperativo:
+    if repositories.get_centro_operativo_by(
+        db, data.nombre, data.clasificacion_id, data.ciudad_id
+    ):
+        raise HTTPException(
+            status_code=409, detail=f"El Centro Operativo {data.nombre} ya existe"
+        )
     logo_url = await upload_and_get_image_url(file)
     obj = repositories.create_centro_operativo(db, data, logo_url, modified_by)
     update_centro_operativo_contacto_list(
