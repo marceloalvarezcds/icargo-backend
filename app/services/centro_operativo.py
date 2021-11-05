@@ -6,7 +6,7 @@ from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import logger, repositories, schemas
+from app import repositories, schemas
 from app.config import REPORTS_FOLDER
 from app.models import (
     CentroOperativo,
@@ -37,7 +37,6 @@ def get_centro_operativo_detail(
     )
     obj_dict["clasificacion"] = obj.clasificacion
     obj_dict["ciudad"] = obj.ciudad
-    logger.info(obj_dict)
     return schemas.CentroOperativo.parse_obj(obj_dict)
 
 
@@ -83,7 +82,6 @@ async def edit_centro_operativo(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.CentroOperativo:
-    logger.info(data)
     logo_url = await upload_and_get_image_url(file) if file else None
     to_edit_obj = get_centro_operativo_by_id(db, id)
     obj = repositories.edit_centro_operativo(

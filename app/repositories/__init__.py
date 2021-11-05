@@ -31,6 +31,14 @@ from .contacto import (  # noqa
     get_contacto_by_telefono,
     get_contacto_by_telefono_and_email,
 )
+from .gestor_carga import (  # noqa
+    create_gestor_carga,
+    delete_gestor_carga,
+    edit_gestor_carga,
+    get_gestor_carga_by,
+    get_gestor_carga_by_id,
+    get_gestor_carga_list,
+)
 from .gestor_carga_centro_operativo import (  # noqa
     create_gestor_carga_centro_operativo,
     edit_gestor_carga_centro_operativo,
@@ -42,7 +50,7 @@ from .gestor_carga_remitente import (  # noqa
     get_gestor_carga_remitente_by,
 )
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
-from .moneda import get_moneda_by_simbolo  # noqa
+from .moneda import get_moneda_by_simbolo, get_moneda_list  # noqa
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .remitente import (  # noqa
     create_remitente,

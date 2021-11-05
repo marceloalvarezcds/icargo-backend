@@ -13,9 +13,11 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
 from .ciudad import Ciudad  # noqa
 from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
+from .gestor_carga import GestorCarga, GestorCargaForm, GestorCargaList  # noqa
 from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
 from .gestor_carga_remitente import GestorCargaRemitente  # noqa
 from .localidad import Localidad  # noqa
+from .moneda import Moneda  # noqa
 from .pais import Pais  # noqa
 from .remitente import Remitente, RemitenteForm, RemitenteList  # noqa
 from .remitente_contacto_gestor_carga import (  # noqa

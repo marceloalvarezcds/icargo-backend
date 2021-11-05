@@ -10,6 +10,13 @@ from .centro_operativo import (  # noqa
 )
 from .centro_operativo_contacto import update_centro_operativo_contacto_list  # noqa
 from .contacto import get_contacto_by  # noqa
+from .gestor_carga import (  # noqa
+    create_gestor_carga,
+    delete_gestor_carga,
+    edit_gestor_carga,
+    get_gestor_carga_by_id,
+    get_gestor_carga_reports,
+)
 from .gestor_carga_centro_operativo import (  # noqa
     create_gestor_carga_centro_operativo,
     edit_gestor_carga_centro_operativo,
