@@ -43,6 +43,8 @@ class GestorCarga(AuditMixin, Base):
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
     moneda = relationship(Moneda, uselist=False)
     logo = Column(String(255))
+    telefono = Column(String(25))
+    email = Column(String(50))
     pagina_web = Column(String(255))
     info_complementaria = Column(Text)
     ciudad_id = Column(Integer, ForeignKey("ciudad.id"))

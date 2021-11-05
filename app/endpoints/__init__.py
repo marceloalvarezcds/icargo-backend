@@ -7,8 +7,10 @@ from app.endpoints import (
     ciudad,
     composicion_juridica,
     contacto,
+    gestor_carga,
     localidad,
     login,
+    moneda,
     pais,
     remitente,
     tipo_documento,
@@ -33,8 +35,10 @@ api.include_router(
     tags=["composicion_juridica"],
 )
 api.include_router(contacto.api, prefix="/contacto", tags=["contacto"])
+api.include_router(gestor_carga.api, prefix="/gestor_carga", tags=["gestor_carga"])
 api.include_router(localidad.api, prefix="/localidad", tags=["localidad"])
 api.include_router(login.api, prefix="/login", tags=["login"])
+api.include_router(moneda.api, prefix="/moneda", tags=["moneda"])
 api.include_router(pais.api, prefix="/pais", tags=["pais"])
 api.include_router(remitente.api, prefix="/remitente", tags=["remitente"])
 api.include_router(

@@ -6,7 +6,7 @@ from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import logger, repositories, schemas
+from app import repositories, schemas
 from app.config import REPORTS_FOLDER
 from app.models import GestorCargaRemitente, Remitente, RemitenteContactoGestorCarga
 
@@ -32,7 +32,6 @@ def get_remitente_detail(
     obj_dict["tipo_documento"] = obj.tipo_documento
     obj_dict["composicion_juridica"] = obj.composicion_juridica
     obj_dict["ciudad"] = obj.ciudad
-    logger.info(obj_dict)
     return schemas.Remitente.parse_obj(obj_dict)
 
 
@@ -55,7 +54,7 @@ async def create_remitente(
 def get_remitente_by_id(db: Session, id: int) -> Remitente:
     obj = repositories.get_remitente_by_id(db, id)
     if not obj:
-        raise HTTPException(status_code=404, detail="Centro Operativo no encontrado")
+        raise HTTPException(status_code=404, detail="Remitente no encontrado")
     return obj
 
 
@@ -64,7 +63,7 @@ def get_remitente_by_id_and_gestor_carga_id(
 ) -> schemas.Remitente:
     obj = repositories.get_remitente_by_id(db, id)
     if not obj:
-        raise HTTPException(status_code=404, detail="Centro Operativo no encontrado")
+        raise HTTPException(status_code=404, detail="Remitente no encontrado")
     return get_remitente_detail(obj, gestor_carga_id)
 
 
@@ -76,7 +75,6 @@ async def edit_remitente(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Remitente:
-    logger.info(data)
     logo_url = await upload_and_get_image_url(file) if file else None
     to_edit_obj = get_remitente_by_id(db, id)
     obj = repositories.edit_remitente(to_edit_obj, db, data, logo_url, modified_by)
@@ -100,10 +98,6 @@ def get_remitente_reports(db: Session) -> str:
     wb = Workbook()
     # get worksheet
     ws = wb.active
-    # title = f"Lista de Centros Operativos"
-    # title_cell = ws.cell(row=1, column=1)
-    # title_cell.font = Font(size=12, bold=True)
-    # title_cell.value = title.upper()
 
     title_cell = ws.cell(row=1, column=1)
     title_cell.value = "Nombre"
