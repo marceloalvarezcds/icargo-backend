@@ -80,6 +80,14 @@ async def edit_remitente(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Remitente:
+    exists = repositories.get_remitente_by(
+        db, data.tipo_documento_id, data.numero_documento
+    )
+    if exists and exists.id != id:
+        raise HTTPException(
+            status_code=409,
+            detail=f"El Remitente con documento {data.numero_documento} ya existe",
+        )
     logo_url = await upload_and_get_image_url(file) if file else None
     to_edit_obj = get_remitente_by_id(db, id)
     obj = repositories.edit_remitente(to_edit_obj, db, data, logo_url, modified_by)

@@ -88,6 +88,13 @@ async def edit_centro_operativo(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.CentroOperativo:
+    exists = repositories.get_centro_operativo_by(
+        db, data.nombre, data.clasificacion_id, data.ciudad_id
+    )
+    if exists and exists.id != id:
+        raise HTTPException(
+            status_code=409, detail=f"El Centro Operativo {data.nombre} ya existe"
+        )
     logo_url = await upload_and_get_image_url(file) if file else None
     to_edit_obj = get_centro_operativo_by_id(db, id)
     obj = repositories.edit_centro_operativo(

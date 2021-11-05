@@ -44,6 +44,14 @@ async def edit_gestor_carga(
     file: Optional[UploadFile],
     modified_by: str,
 ) -> schemas.GestorCarga:
+    exists = repositories.get_gestor_carga_by(
+        db, data.tipo_documento_id, data.numero_documento
+    )
+    if exists and exists.id != id:
+        raise HTTPException(
+            status_code=409,
+            detail=f"El Gestor de Carga con documento {data.numero_documento} ya existe",
+        )
     logo_url = await upload_and_get_image_url(file) if file else None
     to_edit_obj = get_gestor_carga_by_id(db, id)
     return repositories.edit_gestor_carga(to_edit_obj, db, data, logo_url, modified_by)
