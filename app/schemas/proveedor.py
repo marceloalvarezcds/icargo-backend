@@ -8,12 +8,12 @@ from app.enums import EstadoEnum
 from .ciudad import Ciudad
 from .composicion_juridica import ComposicionJuridica
 from .contacto import ContactoForm
-from .gestor_carga_remitente import GestorCargaRemitente
-from .remitente_contacto_gestor_carga import RemitenteContactoGestorCargaList
+from .gestor_carga_proveedor import GestorCargaProveedor
+from .proveedor_contacto_gestor_carga import ProveedorContactoGestorCargaList
 from .tipo_documento import TipoDocumento
 
 
-class RemitenteBaseModel(BaseModel):
+class ProveedorBaseModel(BaseModel):
     nombre: str
     nombre_corto: Optional[str] = None
     tipo_documento_id: int
@@ -29,12 +29,12 @@ class RemitenteBaseModel(BaseModel):
     ciudad_id: Optional[int] = None
 
 
-class RemitenteForm(RemitenteBaseModel):
+class ProveedorForm(ProveedorBaseModel):
     alias: Optional[str] = None
     contactos: List[ContactoForm]
 
 
-class RemitenteBase(RemitenteBaseModel):
+class ProveedorBase(ProveedorBaseModel):
     id: int
     tipo_documento: TipoDocumento
     composicion_juridica: ComposicionJuridica
@@ -43,7 +43,7 @@ class RemitenteBase(RemitenteBaseModel):
     ciudad: Optional[Ciudad] = None
 
 
-class RemitenteList(RemitenteBase):
+class ProveedorList(ProveedorBase):
     ciudad_nombre: Optional[str] = None
     composicion_juridica_nombre: Optional[str] = None
     localidad_nombre: Optional[str] = None
@@ -56,6 +56,6 @@ class RemitenteList(RemitenteBase):
         use_enum_values = True
 
 
-class Remitente(RemitenteBase):
-    contactos: List[RemitenteContactoGestorCargaList] = []
-    gestor_carga_remitente: Optional[GestorCargaRemitente] = None
+class Proveedor(ProveedorBase):
+    contactos: List[ProveedorContactoGestorCargaList] = []
+    gestor_carga_proveedor: Optional[GestorCargaProveedor] = None

@@ -15,6 +15,7 @@ from .centro_operativo_seeds import (
     cargill_centro_operativo_seeds,
     multiple_centro_operativo_seeds,
 )
+from .proveedor_seeds import cargill_proveedor_seeds, multiple_proveedor_seeds
 from .remitente_seeds import cargill_remitente_seeds, multiple_remitente_seeds
 from .user_seeds import user_seeds
 
@@ -85,6 +86,8 @@ def gestor_carga_seeds(db: Session):
 
         multiple_centro_operativo_seeds(db, gestor_carga1)
         cargill_centro_operativo_seeds(db, gestor_carga2)
+        multiple_proveedor_seeds(db, gestor_carga1)
+        cargill_proveedor_seeds(db, gestor_carga2)
         multiple_remitente_seeds(db, gestor_carga1)
         cargill_remitente_seeds(db, gestor_carga2)
         user_seeds(db, "admin-transred", "Admin", "Transred", gestor_carga1)

@@ -15,10 +15,16 @@ from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
 from .gestor_carga import GestorCarga, GestorCargaForm, GestorCargaList  # noqa
 from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
+from .gestor_carga_proveedor import GestorCargaProveedor  # noqa
 from .gestor_carga_remitente import GestorCargaRemitente  # noqa
 from .localidad import Localidad  # noqa
 from .moneda import Moneda  # noqa
 from .pais import Pais  # noqa
+from .proveedor import Proveedor, ProveedorForm, ProveedorList  # noqa
+from .proveedor_contacto_gestor_carga import (  # noqa
+    ProveedorContactoGestorCarga,
+    ProveedorContactoGestorCargaList,
+)
 from .remitente import Remitente, RemitenteForm, RemitenteList  # noqa
 from .remitente_contacto_gestor_carga import (  # noqa
     RemitenteContactoGestorCarga,

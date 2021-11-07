@@ -21,11 +21,24 @@ from .gestor_carga_centro_operativo import (  # noqa
     create_gestor_carga_centro_operativo,
     edit_gestor_carga_centro_operativo,
 )
+from .gestor_carga_proveedor import (  # noqa
+    create_gestor_carga_proveedor,
+    edit_gestor_carga_proveedor,
+)
 from .gestor_carga_remitente import (  # noqa
     create_gestor_carga_remitente,
     edit_gestor_carga_remitente,
 )
 from .pictshare import upload_and_get_image_url, upload_image  # noqa
+from .proveedor import (  # noqa
+    create_proveedor,
+    delete_proveedor,
+    edit_proveedor,
+    get_proveedor_by_id,
+    get_proveedor_by_id_and_gestor_carga_id,
+    get_proveedor_reports,
+)
+from .proveedor_contacto import update_proveedor_contacto_list  # noqa
 from .remitente import (  # noqa
     create_remitente,
     delete_remitente,

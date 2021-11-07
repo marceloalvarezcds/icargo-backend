@@ -1,0 +1,73 @@
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, File, Form, UploadFile
+from pydantic import Json
+from sqlalchemy.orm import Session  # type: ignore
+
+from app import models, repositories, schemas, services
+from app.dependencies import get_current_user, get_db_session, reusable_oauth2
+
+api = APIRouter()
+
+
+@api.get("/", response_model=List[schemas.ProveedorList])
+async def read_proveedor_list(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: str = Depends(reusable_oauth2),  # noqa: B008
+):
+    return repositories.get_proveedor_list(db)
+
+
+@api.get("/reports")
+async def proveedor_reports(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: str = Depends(reusable_oauth2),  # noqa: B008
+):
+    return services.get_proveedor_reports(db)
+
+
+@api.get("/{id}", response_model=schemas.Proveedor)
+async def read_proveedor_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_proveedor_by_id_and_gestor_carga_id(
+        db, id, current_user.gestor_carga_id
+    )
+
+
+@api.post("/", response_model=schemas.Proveedor)
+async def add_new_proveedor(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.ProveedorForm] = Form(...),  # type: ignore  # noqa: B008
+    file: UploadFile = File(...),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return await services.create_proveedor(
+        db, data, file, current_user.gestor_carga_id, current_user.username  # type: ignore
+    )
+
+
+@api.put("/{id}", response_model=schemas.Proveedor)
+async def edit_proveedor(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.ProveedorForm] = Form(...),  # type: ignore  # noqa: B008
+    file: Optional[UploadFile] = File(None),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return await services.edit_proveedor(
+        id, db, data, file, current_user.gestor_carga_id, current_user.username  # type: ignore
+    )
+
+
+@api.delete("/{id}", response_model=schemas.Proveedor)
+async def delete_proveedor(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return services.delete_proveedor(
+        db, id, current_user.gestor_carga_id, current_user.username
+    )
