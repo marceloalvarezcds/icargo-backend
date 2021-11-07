@@ -4,7 +4,6 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from app.enums import EstadoEnum
-from app.schemas.gestor_carga_centro_operativo import GestorCargaCentroOperativo
 
 from .centro_operativo_clasificacion import CentroOperativoClasificacion
 from .centro_operativo_contacto_gestor_carga import (
@@ -12,6 +11,7 @@ from .centro_operativo_contacto_gestor_carga import (
 )
 from .ciudad import Ciudad
 from .contacto import ContactoForm
+from .gestor_carga_centro_operativo import GestorCargaCentroOperativo
 
 
 class CentroOperativoBaseModel(BaseModel):

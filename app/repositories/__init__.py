@@ -44,6 +44,11 @@ from .gestor_carga_centro_operativo import (  # noqa
     edit_gestor_carga_centro_operativo,
     get_gestor_carga_centro_operativo_by,
 )
+from .gestor_carga_proveedor import (  # noqa
+    create_gestor_carga_proveedor,
+    edit_gestor_carga_proveedor,
+    get_gestor_carga_proveedor_by,
+)
 from .gestor_carga_remitente import (  # noqa
     create_gestor_carga_remitente,
     edit_gestor_carga_remitente,
@@ -52,6 +57,20 @@ from .gestor_carga_remitente import (  # noqa
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
 from .moneda import get_moneda_by_simbolo, get_moneda_list  # noqa
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
+from .proveedor import (  # noqa
+    create_proveedor,
+    delete_proveedor,
+    edit_proveedor,
+    get_proveedor_by,
+    get_proveedor_by_id,
+    get_proveedor_list,
+)
+from .proveedor_contacto_gestor_carga import (  # noqa
+    create_proveedor_contacto_gestor_carga,
+    delete_proveedor_contacto_gestor_carga,
+    edit_proveedor_contacto_gestor_carga,
+    get_proveedor_contacto_gestor_carga_by,
+)
 from .remitente import (  # noqa
     create_remitente,
     delete_remitente,
