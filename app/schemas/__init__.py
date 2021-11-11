@@ -16,6 +16,7 @@ from .contacto import Contacto, ContactoForm  # noqa
 from .gestor_carga import GestorCarga, GestorCargaForm, GestorCargaList  # noqa
 from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
 from .gestor_carga_proveedor import GestorCargaProveedor  # noqa
+from .gestor_carga_punto_venta import GestorCargaPuntoVenta  # noqa
 from .gestor_carga_remitente import GestorCargaRemitente  # noqa
 from .localidad import Localidad  # noqa
 from .moneda import Moneda  # noqa
@@ -24,6 +25,11 @@ from .proveedor import Proveedor, ProveedorForm, ProveedorList  # noqa
 from .proveedor_contacto_gestor_carga import (  # noqa
     ProveedorContactoGestorCarga,
     ProveedorContactoGestorCargaList,
+)
+from .punto_venta import PuntoVenta, PuntoVentaForm, PuntoVentaList  # noqa
+from .punto_venta_contacto_gestor_carga import (  # noqa
+    PuntoVentaContactoGestorCarga,
+    PuntoVentaContactoGestorCargaList,
 )
 from .remitente import Remitente, RemitenteForm, RemitenteList  # noqa
 from .remitente_contacto_gestor_carga import (  # noqa

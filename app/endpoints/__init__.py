@@ -13,6 +13,7 @@ from app.endpoints import (
     moneda,
     pais,
     proveedor,
+    punto_venta,
     remitente,
     tipo_documento,
     user,
@@ -42,6 +43,7 @@ api.include_router(login.api, prefix="/login", tags=["login"])
 api.include_router(moneda.api, prefix="/moneda", tags=["moneda"])
 api.include_router(pais.api, prefix="/pais", tags=["pais"])
 api.include_router(proveedor.api, prefix="/proveedor", tags=["proveedor"])
+api.include_router(punto_venta.api, prefix="/punto_venta", tags=["punto_venta"])
 api.include_router(remitente.api, prefix="/remitente", tags=["remitente"])
 api.include_router(
     tipo_documento.api, prefix="/tipo_documento", tags=["tipo_documento"]

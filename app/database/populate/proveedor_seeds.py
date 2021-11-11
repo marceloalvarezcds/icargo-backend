@@ -18,6 +18,7 @@ from app.repositories import (
 
 from .gestor_carga_proveedor_seeds import gestor_carga_proveedor_seeds
 from .proveedor_contacto_gestor_carga_seeds import proveedor_contacto_gestor_carga_seeds
+from .punto_venta_seeds import punto_venta_seeds
 
 
 def proveedor_seeds(
@@ -56,6 +57,7 @@ def proveedor_seeds(
                 telefono=telefono,
                 email=email,
                 pagina_web=pagina_web,
+                info_complementaria=None,
                 direccion=direccion,
                 latitud=latitud,
                 longitud=longitud,
@@ -68,6 +70,27 @@ def proveedor_seeds(
             contacto = get_contacto_by_email(db, contacto_email)
             proveedor_contacto_gestor_carga_seeds(
                 db, cargo, proveedor, contacto, gestor_carga, contacto_alias
+            )
+            punto_venta_seeds(
+                db,
+                nombre=nombre,
+                proveedor_id=proveedor.id,
+                tipo_documento=tipo_documento,
+                numero_documento=numero_documento,
+                digito_verificador=digito_verificador,
+                composicion_juridica=composicion_juridica,
+                telefono=telefono,
+                email=email,
+                pagina_web=pagina_web,
+                direccion=direccion,
+                latitud=latitud,
+                longitud=longitud,
+                alias=alias,
+                cargo_descripcion=cargo_descripcion,
+                contacto_email=contacto_email,
+                contacto_alias=contacto_alias,
+                gestor_carga=gestor_carga,
+                ciudad=ciudad,
             )
 
 
