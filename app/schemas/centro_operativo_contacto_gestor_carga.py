@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .cargo import Cargo
 from .contacto import Contacto
 from .estado_base_model import EstadoBaseModel
@@ -11,6 +13,7 @@ class CentroOperativoContactoGestorCarga(EstadoBaseModel):
     contacto_id: int
     contacto: Contacto
     gestor_carga_id: int
+    alias: Optional[str] = None
 
     class Config:
         orm_mode = True

@@ -8,14 +8,15 @@ from app.enums import EstadoEnum
 from .ciudad import Ciudad
 from .composicion_juridica import ComposicionJuridica
 from .contacto import ContactoForm
-from .gestor_carga_proveedor import GestorCargaProveedor
-from .proveedor_contacto_gestor_carga import ProveedorContactoGestorCargaList
+from .gestor_carga_punto_venta import GestorCargaPuntoVenta
+from .punto_venta_contacto_gestor_carga import PuntoVentaContactoGestorCargaList
 from .tipo_documento import TipoDocumento
 
 
-class ProveedorBaseModel(BaseModel):
+class PuntoVentaBaseModel(BaseModel):
     nombre: str
     nombre_corto: Optional[str] = None
+    proveedor_id: int
     tipo_documento_id: int
     numero_documento: str
     digito_verificador: Optional[str] = None
@@ -30,12 +31,12 @@ class ProveedorBaseModel(BaseModel):
     ciudad_id: Optional[int] = None
 
 
-class ProveedorForm(ProveedorBaseModel):
+class PuntoVentaForm(PuntoVentaBaseModel):
     alias: Optional[str] = None
     contactos: List[ContactoForm]
 
 
-class ProveedorBase(ProveedorBaseModel):
+class PuntoVentaBase(PuntoVentaBaseModel):
     id: int
     tipo_documento: TipoDocumento
     composicion_juridica: ComposicionJuridica
@@ -44,7 +45,7 @@ class ProveedorBase(ProveedorBaseModel):
     ciudad: Optional[Ciudad] = None
 
 
-class ProveedorList(ProveedorBase):
+class PuntoVentaList(PuntoVentaBase):
     ciudad_nombre: Optional[str] = None
     composicion_juridica_nombre: Optional[str] = None
     localidad_nombre: Optional[str] = None
@@ -57,6 +58,6 @@ class ProveedorList(ProveedorBase):
         use_enum_values = True
 
 
-class Proveedor(ProveedorBase):
-    contactos: List[ProveedorContactoGestorCargaList] = []
-    gestor_carga_proveedor: Optional[GestorCargaProveedor] = None
+class PuntoVenta(PuntoVentaBase):
+    contactos: List[PuntoVentaContactoGestorCargaList] = []
+    gestor_carga_punto_venta: Optional[GestorCargaPuntoVenta] = None

@@ -16,12 +16,13 @@ from app.enums.estado import EstadoEnum
 
 from .ciudad import Ciudad
 from .composicion_juridica import ComposicionJuridica
+from .proveedor import Proveedor
 from .tipo_documento import TipoDocumento
 
 
-class Proveedor(AuditMixin, Base):
+class PuntoVenta(AuditMixin, Base):
     """
-    Defines the proveedor model
+    Defines the punto_venta model
     """
 
     __table_args__ = (
@@ -33,6 +34,8 @@ class Proveedor(AuditMixin, Base):
     id = Column(Integer, primary_key=True)
     nombre = Column(String(255))
     nombre_corto = Column(String(255))
+    proveedor_id = Column(Integer, ForeignKey("proveedor.id"))
+    proveedor = relationship(Proveedor, uselist=False)
     tipo_documento_id = Column(Integer, ForeignKey("tipo_documento.id"))
     tipo_documento = relationship(TipoDocumento, uselist=False)
     numero_documento = Column(String(255))
@@ -50,8 +53,10 @@ class Proveedor(AuditMixin, Base):
     longitud = Column(DECIMAL)
     ciudad_id = Column(Integer, ForeignKey("ciudad.id"))
     ciudad = relationship(Ciudad, uselist=False)
-    contactos = relationship("ProveedorContactoGestorCarga", back_populates="proveedor")
-    gestores = relationship("GestorCargaProveedor", back_populates="proveedor")
+    contactos = relationship(
+        "PuntoVentaContactoGestorCarga", back_populates="punto_venta"
+    )
+    gestores = relationship("GestorCargaPuntoVenta", back_populates="punto_venta")
 
     @hybrid_property
     def ciudad_nombre(self):
