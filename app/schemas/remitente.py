@@ -23,6 +23,7 @@ class RemitenteBaseModel(BaseModel):
     telefono: str
     email: Optional[str] = None
     pagina_web: Optional[str] = None
+    info_complementaria: Optional[str] = None
     latitud: Optional[Decimal] = None
     longitud: Optional[Decimal] = None
     direccion: Optional[str] = None

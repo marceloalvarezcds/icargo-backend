@@ -1,4 +1,11 @@
-from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, String  # type: ignore
+from sqlalchemy import (  # type: ignore
+    DECIMAL,
+    Column,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
@@ -37,6 +44,7 @@ class Remitente(AuditMixin, Base):
     telefono = Column(String(25))
     email = Column(String(50))
     pagina_web = Column(String(255))
+    info_complementaria = Column(Text)
     direccion = Column(String(255))
     latitud = Column(DECIMAL)
     longitud = Column(DECIMAL)

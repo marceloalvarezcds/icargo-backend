@@ -54,6 +54,7 @@ def create_proveedor(
         telefono=data.telefono,
         email=data.email,
         pagina_web=data.pagina_web,
+        info_complementaria=data.info_complementaria,
         direccion=data.direccion,
         latitud=data.latitud,
         longitud=data.longitud,
@@ -82,6 +83,7 @@ def edit_proveedor(
     obj.telefono = data.telefono
     obj.email = data.email
     obj.pagina_web = data.pagina_web
+    obj.info_complementaria = data.info_complementaria
     obj.direccion = data.direccion
     obj.latitud = data.latitud
     obj.longitud = data.longitud
