@@ -62,6 +62,7 @@ from .gestor_carga_remitente import (  # noqa
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
 from .moneda import get_moneda_by_simbolo, get_moneda_list  # noqa
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
+from .permiso import get_permiso_by, get_permiso_list  # noqa
 from .proveedor import (  # noqa
     create_proveedor,
     delete_proveedor,

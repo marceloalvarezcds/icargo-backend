@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session  # type: ignore
 
+from app.database.seeds.permiso_seeds import entities_permiso_seeds
 from app.enums import CodigoRolEnum
 from app.models import GestorCarga, User
 from app.repositories import rol, user
@@ -33,3 +34,4 @@ def user_seeds(
         )
         db.add(usuario)
         db.commit()
+        entities_permiso_seeds(db, usuario)
