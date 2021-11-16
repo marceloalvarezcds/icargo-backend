@@ -6,6 +6,8 @@ from app.models import User
 from app.repositories import rol, user
 from app.utils.security import get_password_hash
 
+from .permiso_seeds.admin_icargo_permiso_seeds import admin_icargo_permiso_seeds
+
 
 def user_seeds(db: Session):
     admin_icargo_rol = rol.get_rol_by_codigo(db, CodigoRolEnum.ADMIN_ICARGO.value)
@@ -26,7 +28,9 @@ def user_seeds(db: Session):
             roles=[admin_icargo_rol],
             modified_by="system",
         )
-    db.add(admin_user)
+        db.add(admin_user)
+        db.commit()
+        admin_icargo_permiso_seeds(db, admin_user)
 
     if ENV == "development":
         admin_suplente_icargo_rol = rol.get_rol_by_codigo(
@@ -45,10 +49,10 @@ def user_seeds(db: Session):
                 is_activated=True,
                 is_guest=False,
                 is_superuser=True,
-                password=get_password_hash(USER_ADMIN_PASS),
+                password=get_password_hash(admin_suplente_username),
                 roles=[admin_suplente_icargo_rol],
                 modified_by="system",
             )
-        db.add(admin_suplente_user)
-
-    db.commit()
+            db.add(admin_suplente_user)
+            db.commit()
+            admin_icargo_permiso_seeds(db, admin_suplente_user)

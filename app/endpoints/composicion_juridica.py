@@ -4,7 +4,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
-from app.dependencies import get_db_session, reusable_oauth2
+from app.dependencies import Permiso, get_db_session
+from app.enums import PermisoAccionEnum as a
+from app.enums import PermisoModeloEnum as m
 
 api = APIRouter()
 
@@ -12,6 +14,6 @@ api = APIRouter()
 @api.get("/", response_model=List[schemas.ComposicionJuridica])
 async def read_composicion_juridica_list(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: str = Depends(reusable_oauth2),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.COMPOSICION_JURIDICA)),  # noqa: B008
 ):
     return repositories.get_composicion_juridica_list(db)

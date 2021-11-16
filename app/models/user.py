@@ -16,6 +16,7 @@ from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 
 from .gestor_carga import GestorCarga
+from .permiso import Permiso
 from .rol import Rol
 
 user_rol_table = Table(
@@ -23,6 +24,13 @@ user_rol_table = Table(
     Base.metadata,
     Column("user_id", ForeignKey("user.id")),
     Column("rol_id", ForeignKey("rol.id")),
+)
+
+user_permiso_table = Table(
+    "user_permiso",
+    Base.metadata,
+    Column("user_id", ForeignKey("user.id")),
+    Column("permiso_id", ForeignKey("permiso.id")),
 )
 
 
@@ -55,3 +63,4 @@ class User(AuditMixin, Base):
     gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
     gestor_carga = relationship(GestorCarga, uselist=False)
     roles = relationship(Rol, secondary=user_rol_table)
+    permisos = relationship(Permiso, secondary=user_permiso_table)

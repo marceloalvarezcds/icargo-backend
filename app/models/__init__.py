@@ -19,6 +19,7 @@ from .gestor_carga_remitente import GestorCargaRemitente  # noqa
 from .localidad import Localidad  # noqa
 from .moneda import Moneda  # noqa
 from .pais import Pais  # noqa
+from .permiso import Permiso  # noqa
 from .proveedor import Proveedor  # noqa
 from .proveedor_contacto_gestor_carga import ProveedorContactoGestorCarga  # noqa
 from .punto_venta import PuntoVenta  # noqa

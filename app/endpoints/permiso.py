@@ -11,9 +11,9 @@ from app.enums import PermisoModeloEnum as m
 api = APIRouter()
 
 
-@api.get("/", response_model=List[schemas.Cargo])
-async def read_cargo_list(
+@api.get("/", response_model=List[schemas.Permiso])
+async def read_permiso_list(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.CARGO)),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.PERMISO)),  # noqa: B008
 ):
-    return repositories.get_cargo_list(db)
+    return repositories.get_permiso_list(db)

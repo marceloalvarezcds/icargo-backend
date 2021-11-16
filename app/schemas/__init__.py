@@ -21,6 +21,7 @@ from .gestor_carga_remitente import GestorCargaRemitente  # noqa
 from .localidad import Localidad  # noqa
 from .moneda import Moneda  # noqa
 from .pais import Pais  # noqa
+from .permiso import Permiso  # noqa
 from .proveedor import Proveedor, ProveedorForm, ProveedorList  # noqa
 from .proveedor_contacto_gestor_carga import (  # noqa
     ProveedorContactoGestorCarga,
@@ -38,4 +39,12 @@ from .remitente_contacto_gestor_carga import (  # noqa
 )
 from .tipo_documento import TipoDocumento  # noqa
 from .token import Token, TokenPayload  # noqa
-from .user import User, UserBase, UserCreate, UserInDB, UserInDBBase, UserUpdate  # noqa
+from .user import (  # noqa
+    User,
+    UserAccount,
+    UserBase,
+    UserCreate,
+    UserInDB,
+    UserInDBBase,
+    UserUpdate,
+)

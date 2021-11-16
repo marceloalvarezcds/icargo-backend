@@ -1,7 +1,9 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr
+
+from .permiso import Permiso
 
 
 # Shared properties
@@ -50,6 +52,10 @@ class UserInDBBase(UserBase):
 # Additional properties to return via API
 class User(UserInDBBase):
     pass
+
+
+class UserAccount(UserInDBBase):
+    permisos: List[Permiso] = []
 
 
 # Additional properties stored in DB

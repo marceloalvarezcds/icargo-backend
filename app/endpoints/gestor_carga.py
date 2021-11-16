@@ -5,7 +5,9 @@ from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import models, repositories, schemas, services
-from app.dependencies import get_current_user, get_db_session, reusable_oauth2
+from app.dependencies import Permiso, get_current_user, get_db_session
+from app.enums import PermisoAccionEnum as a
+from app.enums import PermisoModeloEnum as m
 
 api = APIRouter()
 
@@ -13,7 +15,7 @@ api = APIRouter()
 @api.get("/", response_model=List[schemas.GestorCargaList])
 async def read_gestor_carga_list(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: str = Depends(reusable_oauth2),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.GESTOR_CARGA)),  # noqa: B008
 ):
     return repositories.get_gestor_carga_list(db)
 
@@ -21,7 +23,7 @@ async def read_gestor_carga_list(
 @api.get("/reports")
 async def gestor_carga_reports(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: str = Depends(reusable_oauth2),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.GESTOR_CARGA)),  # noqa: B008
 ):
     return services.get_gestor_carga_reports(db)
 
@@ -30,7 +32,7 @@ async def gestor_carga_reports(
 async def read_gestor_carga_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: str = Depends(reusable_oauth2),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.GESTOR_CARGA)),  # noqa: B008
 ):
     return services.get_gestor_carga_by_id(db, id)
 
@@ -41,6 +43,7 @@ async def add_new_gestor_carga(
     data: Json[schemas.GestorCargaForm] = Form(...),  # type: ignore  # noqa: B008
     file: UploadFile = File(...),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.GESTOR_CARGA)),  # noqa: B008
 ):
     return await services.create_gestor_carga(
         db, data, file, current_user.username  # type: ignore
@@ -54,6 +57,7 @@ async def edit_gestor_carga(
     data: Json[schemas.GestorCargaForm] = Form(...),  # type: ignore  # noqa: B008
     file: Optional[UploadFile] = File(None),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.GESTOR_CARGA)),  # noqa: B008
 ):
     return await services.edit_gestor_carga(
         id, db, data, file, current_user.username  # type: ignore
@@ -65,5 +69,6 @@ async def delete_gestor_carga(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.ELIMINAR, m.GESTOR_CARGA)),  # noqa: B008
 ):
     return services.delete_gestor_carga(db, id, current_user.username)
