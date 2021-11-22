@@ -50,6 +50,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
 )
 from .tipo_documento import TipoDocumento  # noqa
 from .tipo_persona import TipoPersona  # noqa
+from .tipo_registro import TipoRegistro  # noqa
 from .token import Token, TokenPayload  # noqa
 from .user import (  # noqa
     User,

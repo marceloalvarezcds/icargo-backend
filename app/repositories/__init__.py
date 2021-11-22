@@ -130,6 +130,10 @@ from .tipo_documento import (  # noqa
     get_tipo_documento_list,
 )
 from .tipo_persona import get_tipo_persona_by_descripcion, get_tipo_persona_list  # noqa
+from .tipo_registro import (  # noqa
+    get_tipo_registro_by_descripcion,
+    get_tipo_registro_list,
+)
 from .user import (  # noqa
     create,
     get,
