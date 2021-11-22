@@ -21,6 +21,10 @@ from .gestor_carga_centro_operativo import (  # noqa
     create_gestor_carga_centro_operativo,
     edit_gestor_carga_centro_operativo,
 )
+from .gestor_carga_propietario import (  # noqa
+    create_gestor_carga_propietario,
+    edit_gestor_carga_propietario,
+)
 from .gestor_carga_proveedor import (  # noqa
     create_gestor_carga_proveedor,
     edit_gestor_carga_proveedor,
@@ -34,6 +38,15 @@ from .gestor_carga_remitente import (  # noqa
     edit_gestor_carga_remitente,
 )
 from .pictshare import upload_and_get_image_url, upload_image  # noqa
+from .propietario import (  # noqa
+    create_propietario,
+    delete_propietario,
+    edit_propietario,
+    get_propietario_by_id,
+    get_propietario_by_id_and_gestor_cuenta_id,
+    get_propietario_reports,
+)
+from .propietario_contacto import update_propietario_contacto_list  # noqa
 from .proveedor import (  # noqa
     create_proveedor,
     delete_proveedor,

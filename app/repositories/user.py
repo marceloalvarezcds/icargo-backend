@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import Request  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
@@ -47,3 +47,7 @@ def get_by_email(db: Session, *, email: str) -> Optional[User]:
 
 def get_by_username(db: Session, username: str) -> Optional[User]:
     return db.query(User).filter(User.username == username).first()
+
+
+def get_user_list_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> List[User]:
+    return db.query(User).filter(User.gestor_carga_id == gestor_carga_id).all()

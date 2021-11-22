@@ -23,6 +23,7 @@ openpyxl = "^3.0.9"
 aiofiles = "^0.7.0"
 requests = "^2.26.0"
 simplejson = "^3.17.5"
+orjson = "^3.6.4"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.910"

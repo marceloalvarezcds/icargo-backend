@@ -44,6 +44,11 @@ from .gestor_carga_centro_operativo import (  # noqa
     edit_gestor_carga_centro_operativo,
     get_gestor_carga_centro_operativo_by,
 )
+from .gestor_carga_propietario import (  # noqa
+    create_gestor_carga_propietario,
+    edit_gestor_carga_propietario,
+    get_gestor_carga_propietario_by,
+)
 from .gestor_carga_proveedor import (  # noqa
     create_gestor_carga_proveedor,
     edit_gestor_carga_proveedor,
@@ -63,6 +68,20 @@ from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  
 from .moneda import get_moneda_by_simbolo, get_moneda_list  # noqa
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .permiso import get_permiso_by, get_permiso_list  # noqa
+from .propietario import (  # noqa
+    create_propietario,
+    delete_propietario,
+    edit_propietario,
+    get_propietario_by,
+    get_propietario_by_id,
+    get_propietario_list,
+)
+from .propietario_contacto_gestor_carga import (  # noqa
+    create_propietario_contacto_gestor_carga,
+    delete_propietario_contacto_gestor_carga,
+    edit_propietario_contacto_gestor_carga,
+    get_propietario_contacto_gestor_carga_by,
+)
 from .proveedor import (  # noqa
     create_proveedor,
     delete_proveedor,
@@ -110,4 +129,11 @@ from .tipo_documento import (  # noqa
     get_tipo_documento_by_descripcion,
     get_tipo_documento_list,
 )
-from .user import create, get, get_by_email, get_by_username  # noqa
+from .tipo_persona import get_tipo_persona_by_descripcion, get_tipo_persona_list  # noqa
+from .user import (  # noqa
+    create,
+    get,
+    get_by_email,
+    get_by_username,
+    get_user_list_by_gestor_carga_id,
+)
