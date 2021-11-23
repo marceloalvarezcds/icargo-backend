@@ -13,9 +13,11 @@ class PermisoAccionEnum(Enum):
 
 
 class PermisoModeloEnum(Enum):
+    CAMION = "camion"
     CARGO = "cargo"
     CENTRO_OPERATIVO_CLASIFICACION = "centro_operativo_clasificacion"
     CENTRO_OPERATIVO = "centro_operativo"
+    CHOFER = "chofer"
     CIUDAD = "ciudad"
     COMPOSICION_JURIDICA = "composicion_juridica"
     CONTACTO = "contacto"
@@ -29,6 +31,7 @@ class PermisoModeloEnum(Enum):
     PUNTO_VENTA = "punto_venta"
     REMITENTE = "remitente"
     ROL = "rol"
+    SEMIRREMOLQUE = "semirremolque"
     TIPO_DOCUMENTO = "tipo_documento"
     TIPO_PERSONA = "tipo_persona"
     TIPO_REGISTRO = "tipo_registro"
