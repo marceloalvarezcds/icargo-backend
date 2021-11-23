@@ -22,6 +22,8 @@ class AuditMixin:
     __tablename__: str
     id: int
 
+    created_by = Column(String(255), server_default="system")
+    created_at = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
     modified_by = Column(String(255), server_default="system")
     modified_at = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
 

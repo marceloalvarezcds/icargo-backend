@@ -1,0 +1,120 @@
+from datetime import datetime
+from typing import List, Optional
+
+from sqlalchemy.orm import Session  # type: ignore
+from sqlalchemy.sql.elements import and_  # type: ignore
+
+from app.enums import EstadoEnum
+from app.models import Propietario
+from app.schemas import PropietarioForm
+
+
+def get_propietario_list(db: Session) -> List[Propietario]:
+    return (
+        db.query(Propietario)
+        .filter(Propietario.estado != EstadoEnum.ELIMINADO.value)
+        .all()
+    )
+
+
+def get_propietario_by(
+    db: Session,
+    tipo_persona_id: int,
+    ruc: str,
+) -> Optional[Propietario]:
+    return (
+        db.query(Propietario)
+        .filter(
+            and_(
+                Propietario.ruc == ruc,
+                Propietario.tipo_persona_id == tipo_persona_id,
+            )
+        )
+        .first()
+    )
+
+
+def get_propietario_by_id(db: Session, id: int) -> Optional[Propietario]:
+    return db.query(Propietario).filter(Propietario.id == id).first()
+
+
+def create_propietario(
+    db: Session,
+    data: PropietarioForm,
+    gestor_cuenta_id: Optional[int],
+    foto_documento_url: str,
+    foto_perfil_url: str,
+    modified_by: str,
+) -> Propietario:
+    obj = Propietario(
+        nombre=data.nombre,
+        tipo_persona_id=data.tipo_persona_id,
+        ruc=data.ruc,
+        digito_verificador=data.digito_verificador,
+        pais_origen_id=data.pais_origen_id,
+        fecha_nacimiento=data.fecha_nacimiento,
+        gestor_cuenta_id=gestor_cuenta_id,
+        oficial_cuenta_id=data.oficial_cuenta_id,
+        es_chofer=data.es_chofer,
+        foto_documento=foto_documento_url,
+        foto_perfil=foto_perfil_url,
+        estado=EstadoEnum.PENDIENTE.value,
+        telefono=data.telefono,
+        email=data.email,
+        direccion=data.direccion,
+        ciudad_id=data.ciudad_id,
+        modified_by=modified_by,
+    )
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+def edit_propietario(
+    obj: Propietario,
+    db: Session,
+    data: PropietarioForm,
+    foto_documento_url: Optional[str],
+    foto_perfil_url: Optional[str],
+    modified_by: str,
+) -> Propietario:
+    if data.tipo_persona_id and data.ruc:
+        obj.ruc = data.ruc
+        obj.tipo_persona_id = data.tipo_persona_id
+        obj.digito_verificador = data.digito_verificador
+        obj.fecha_nacimiento = data.fecha_nacimiento
+        obj.es_chofer = data.es_chofer
+        obj.email = data.email
+        obj.direccion = data.direccion
+        obj.ciudad_id = data.ciudad_id
+        if data.nombre:
+            obj.nombre = data.nombre
+        if data.pais_origen_id:
+            obj.pais_origen_id = data.pais_origen_id
+        if data.oficial_cuenta_id:
+            obj.oficial_cuenta_id = data.oficial_cuenta_id
+        if data.telefono:
+            obj.telefono = data.telefono
+        if foto_documento_url:
+            obj.foto_documento = foto_documento_url
+        if foto_perfil_url:
+            obj.foto_perfil = foto_perfil_url
+        obj.modified_by = modified_by
+        obj.modified_at = datetime.now()
+        db.commit()
+        db.refresh(obj)
+    return obj
+
+
+def delete_propietario(
+    obj: Propietario,
+    db: Session,
+    modified_by: str,
+) -> Propietario:
+    obj.estado = EstadoEnum.ELIMINADO.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj

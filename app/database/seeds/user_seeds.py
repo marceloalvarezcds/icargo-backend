@@ -6,7 +6,7 @@ from app.models import User
 from app.repositories import rol, user
 from app.utils.security import get_password_hash
 
-from .permiso_seeds.admin_icargo_permiso_seeds import admin_icargo_permiso_seeds
+from .permiso_seeds import admin_icargo_permiso_seeds
 
 
 def user_seeds(db: Session):
