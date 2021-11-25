@@ -48,7 +48,8 @@ def get_propietario_detail(
 async def create_propietario(
     db: Session,
     data: schemas.PropietarioForm,
-    foto_documento_file: UploadFile,
+    foto_documento_frente_file: UploadFile,
+    foto_documento_reverso_file: UploadFile,
     foto_perfil_file: UploadFile,
     gestor_cuenta_id: Optional[int],
     modified_by: str,
@@ -58,10 +59,26 @@ async def create_propietario(
             status_code=409,
             detail=f"El Propietario con documento {data.ruc} ya existe",
         )
-    foto_documento_url = await upload_and_get_image_url(foto_documento_file)
+    foto_documento_frente_url = await upload_and_get_image_url(
+        foto_documento_frente_file
+    )
+    foto_documento_reverso_url = await upload_and_get_image_url(
+        foto_documento_reverso_file
+    )
+    if foto_documento_frente_url == foto_documento_reverso_url:
+        raise HTTPException(
+            status_code=400,
+            detail="El reverso y el frente del documento no pueden ser las mismas imágenes",
+        )
     foto_perfil_url = await upload_and_get_image_url(foto_perfil_file)
     obj = repositories.create_propietario(
-        db, data, gestor_cuenta_id, foto_documento_url, foto_perfil_url, modified_by
+        db,
+        data,
+        gestor_cuenta_id,
+        foto_documento_frente_url,
+        foto_documento_reverso_url,
+        foto_perfil_url,
+        modified_by,
     )
     update_propietario_contacto_list(
         db, data.contactos, obj, gestor_cuenta_id, modified_by
@@ -90,7 +107,8 @@ async def edit_propietario(
     id: int,
     db: Session,
     data: schemas.PropietarioForm,
-    foto_documento_file: Optional[UploadFile],
+    foto_documento_frente_file: Optional[UploadFile],
+    foto_documento_reverso_file: Optional[UploadFile],
     foto_perfil_file: Optional[UploadFile],
     gestor_cuenta_id: Optional[int],
     modified_by: str,
@@ -101,17 +119,37 @@ async def edit_propietario(
             status_code=409,
             detail=f"El Propietario con documento {data.ruc} ya existe",
         )
-    foto_documento_url = (
-        await upload_and_get_image_url(foto_documento_file)
-        if foto_documento_file
+    foto_documento_frente_url = (
+        await upload_and_get_image_url(foto_documento_frente_file)
+        if foto_documento_frente_file
         else None
     )
+    foto_documento_reverso_url = (
+        await upload_and_get_image_url(foto_documento_reverso_file)
+        if foto_documento_reverso_file
+        else None
+    )
+    if (
+        foto_documento_frente_url
+        and foto_documento_reverso_url
+        and foto_documento_frente_url == foto_documento_reverso_url
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="El reverso y el frente del documento no pueden ser las mismas imágenes",
+        )
     foto_perfil_url = (
         await upload_and_get_image_url(foto_perfil_file) if foto_perfil_file else None
     )
     to_edit_obj = get_propietario_by_id(db, id)
     obj = repositories.edit_propietario(
-        to_edit_obj, db, data, foto_documento_url, foto_perfil_url, modified_by
+        to_edit_obj,
+        db,
+        data,
+        foto_documento_frente_url,
+        foto_documento_reverso_url,
+        foto_perfil_url,
+        modified_by,
     )
     update_propietario_contacto_list(
         db, data.contactos, obj, gestor_cuenta_id, modified_by

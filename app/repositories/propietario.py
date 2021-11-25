@@ -42,7 +42,8 @@ def create_propietario(
     db: Session,
     data: PropietarioForm,
     gestor_cuenta_id: Optional[int],
-    foto_documento_url: str,
+    foto_documento_frente_url: str,
+    foto_documento_reverso_url: str,
     foto_perfil_url: str,
     modified_by: str,
 ) -> Propietario:
@@ -56,7 +57,8 @@ def create_propietario(
         gestor_cuenta_id=gestor_cuenta_id,
         oficial_cuenta_id=data.oficial_cuenta_id,
         es_chofer=data.es_chofer,
-        foto_documento=foto_documento_url,
+        foto_documento_frente=foto_documento_frente_url,
+        foto_documento_reverso=foto_documento_reverso_url,
         foto_perfil=foto_perfil_url,
         estado=EstadoEnum.PENDIENTE.value,
         telefono=data.telefono,
@@ -75,7 +77,8 @@ def edit_propietario(
     obj: Propietario,
     db: Session,
     data: PropietarioForm,
-    foto_documento_url: Optional[str],
+    foto_documento_frente_url: Optional[str],
+    foto_documento_reverso_url: Optional[str],
     foto_perfil_url: Optional[str],
     modified_by: str,
 ) -> Propietario:
@@ -96,8 +99,10 @@ def edit_propietario(
             obj.oficial_cuenta_id = data.oficial_cuenta_id
         if data.telefono:
             obj.telefono = data.telefono
-        if foto_documento_url:
-            obj.foto_documento = foto_documento_url
+        if foto_documento_frente_url:
+            obj.foto_documento_frente = foto_documento_frente_url
+        if foto_documento_reverso_url:
+            obj.foto_documento_reverso = foto_documento_reverso_url
         if foto_perfil_url:
             obj.foto_perfil = foto_perfil_url
         obj.modified_by = modified_by

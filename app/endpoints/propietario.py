@@ -44,15 +44,17 @@ async def read_propietario_by_id(
 async def add_new_propietario(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.PropietarioForm] = Form(...),  # type: ignore  # noqa: B008
-    foto_documento_file: UploadFile = File(None),  # noqa: B008
-    foto_perfil_file: UploadFile = File(None),  # noqa: B008
+    foto_documento_frente_file: UploadFile = File(...),  # noqa: B008
+    foto_documento_reverso_file: UploadFile = File(...),  # noqa: B008
+    foto_perfil_file: UploadFile = File(...),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.PROPIETARIO)),  # noqa: B008
 ):
     return await services.create_propietario(
         db,
         data,  # type: ignore
-        foto_documento_file,
+        foto_documento_frente_file,
+        foto_documento_reverso_file,
         foto_perfil_file,
         current_user.gestor_carga_id,
         current_user.username,
@@ -64,7 +66,8 @@ async def edit_propietario(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.PropietarioEditForm] = Form(...),  # type: ignore  # noqa: B008
-    foto_documento_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_documento_frente_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_documento_reverso_file: Optional[UploadFile] = File(None),  # noqa: B008
     foto_perfil_file: Optional[UploadFile] = File(None),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.PROPIETARIO)),  # noqa: B008
@@ -73,7 +76,8 @@ async def edit_propietario(
         id,
         db,
         data,  # type: ignore
-        foto_documento_file,
+        foto_documento_frente_file,
+        foto_documento_reverso_file,
         foto_perfil_file,
         current_user.gestor_carga_id,
         current_user.username,

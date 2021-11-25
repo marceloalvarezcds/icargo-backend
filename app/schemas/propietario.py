@@ -22,7 +22,8 @@ class PropietarioBaseModel(BaseModel):
     pais_origen_id: int
     fecha_nacimiento: Optional[Date] = None
     oficial_cuenta_id: int
-    foto_documento: Optional[str] = None
+    foto_documento_frente: Optional[str] = None
+    foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
     es_chofer: bool = False
     telefono: str
@@ -32,6 +33,8 @@ class PropietarioBaseModel(BaseModel):
 
 
 class PropietarioForm(PropietarioBaseModel):
+    pais_id: int
+    localidad_id: int
     alias: Optional[str] = None
     contactos: List[ContactoForm]
 
@@ -44,13 +47,16 @@ class PropietarioEditForm(BaseModel):
     pais_origen_id: Optional[int] = None
     fecha_nacimiento: Optional[Date] = None
     oficial_cuenta_id: Optional[int] = None
-    foto_documento: Optional[str] = None
+    foto_documento_frente: Optional[str] = None
+    foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
     es_chofer: Optional[bool] = False
     telefono: Optional[str] = None
     email: Optional[str] = None
     direccion: Optional[str] = None
     ciudad_id: Optional[int] = None
+    pais_id: Optional[int] = None
+    localidad_id: Optional[int] = None
     alias: Optional[str] = None
     contactos: List[ContactoForm]
 

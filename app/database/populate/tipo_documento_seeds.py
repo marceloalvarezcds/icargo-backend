@@ -9,6 +9,7 @@ def tipo_documento_seeds(db: Session):
         db.add(TipoDocumento(descripcion="RUC"))
         db.add(TipoDocumento(descripcion="Cédula"))
         db.add(TipoDocumento(descripcion="Pasaporte"))
+        db.add(TipoDocumento(descripcion="Carta Argentina"))
         db.commit()
     except IntegrityError:
         db.rollback()
