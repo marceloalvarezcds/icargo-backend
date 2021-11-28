@@ -12,101 +12,101 @@ from app.enums import PermisoModeloEnum as m
 api = APIRouter()
 
 
-@api.get("/", response_model=List[schemas.PropietarioList])
-async def read_propietario_list(
+@api.get("/", response_model=List[schemas.ChoferList])
+async def read_chofer_list(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.PROPIETARIO)),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.CHOFER)),  # noqa: B008
 ):
-    return repositories.get_propietario_list(db)
+    return repositories.get_chofer_list(db)
 
 
 @api.get("/reports")
-async def propietario_reports(
+async def chofer_reports(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.REPORTE, m.PROPIETARIO)),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.CHOFER)),  # noqa: B008
 ):
-    return services.get_propietario_reports(db)
+    return services.get_chofer_reports(db)
 
 
-@api.get("/{id}", response_model=schemas.Propietario)
-async def read_propietario_by_id(
+@api.get("/{id}", response_model=schemas.Chofer)
+async def read_chofer_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.VER, m.PROPIETARIO)),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.CHOFER)),  # noqa: B008
 ):
-    return services.get_propietario_by_id_and_gestor_cuenta_id(
+    return services.get_chofer_by_id_and_gestor_cuenta_id(
         db, id, current_user.gestor_carga_id
     )
 
 
-@api.post("/", response_model=schemas.Propietario)
-async def add_new_propietario(
+@api.post("/", response_model=schemas.Chofer)
+async def add_new_chofer(
     db: Session = Depends(get_db_session),  # noqa: B008
-    data: Json[schemas.PropietarioForm] = Form(...),  # type: ignore  # noqa: B008
+    data: Json[schemas.ChoferForm] = Form(...),  # type: ignore  # noqa: B008
     foto_documento_frente_file: UploadFile = File(...),  # noqa: B008
     foto_documento_reverso_file: UploadFile = File(...),  # noqa: B008
     foto_perfil_file: UploadFile = File(...),  # noqa: B008
-    foto_documento_frente_chofer_file: Optional[UploadFile] = File(None),  # noqa: B008
-    foto_documento_reverso_chofer_file: Optional[UploadFile] = File(None),  # noqa: B008
-    foto_registro_frente_file: Optional[UploadFile] = File(None),  # noqa: B008
-    foto_registro_reverso_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_registro_frente_file: UploadFile = File(...),  # noqa: B008
+    foto_registro_reverso_file: UploadFile = File(...),  # noqa: B008
+    foto_documento_frente_propietario_file: UploadFile = File(None),  # noqa: B008
+    foto_documento_reverso_propietario_file: UploadFile = File(None),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.CREAR, m.PROPIETARIO)),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.CHOFER)),  # noqa: B008
 ):
-    return await services.create_propietario(
+    return await services.create_chofer(
         db,
         data,  # type: ignore
         foto_documento_frente_file,
         foto_documento_reverso_file,
         foto_perfil_file,
-        foto_documento_frente_chofer_file,
-        foto_documento_reverso_chofer_file,
         foto_registro_frente_file,
         foto_registro_reverso_file,
+        foto_documento_frente_propietario_file,
+        foto_documento_reverso_propietario_file,
         current_user.gestor_carga_id,
         current_user.username,
     )
 
 
-@api.put("/{id}", response_model=schemas.Propietario)
-async def edit_propietario(
+@api.put("/{id}", response_model=schemas.Chofer)
+async def edit_chofer(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    data: Json[schemas.PropietarioEditForm] = Form(...),  # type: ignore  # noqa: B008
+    data: Json[schemas.ChoferEditForm] = Form(...),  # type: ignore  # noqa: B008
     foto_documento_frente_file: Optional[UploadFile] = File(None),  # noqa: B008
     foto_documento_reverso_file: Optional[UploadFile] = File(None),  # noqa: B008
     foto_perfil_file: Optional[UploadFile] = File(None),  # noqa: B008
-    foto_documento_frente_chofer_file: Optional[UploadFile] = File(None),  # noqa: B008
-    foto_documento_reverso_chofer_file: Optional[UploadFile] = File(None),  # noqa: B008
     foto_registro_frente_file: Optional[UploadFile] = File(None),  # noqa: B008
     foto_registro_reverso_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_documento_frente_propietario_file: UploadFile = File(None),  # noqa: B008
+    foto_documento_reverso_propietario_file: UploadFile = File(None),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.EDITAR, m.PROPIETARIO)),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.CHOFER)),  # noqa: B008
 ):
-    return await services.edit_propietario(
+    return await services.edit_chofer(
         id,
         db,
         data,  # type: ignore
         foto_documento_frente_file,
         foto_documento_reverso_file,
         foto_perfil_file,
-        foto_documento_frente_chofer_file,
-        foto_documento_reverso_chofer_file,
         foto_registro_frente_file,
         foto_registro_reverso_file,
+        foto_documento_frente_propietario_file,
+        foto_documento_reverso_propietario_file,
         current_user.gestor_carga_id,
         current_user.username,
     )
 
 
-@api.delete("/{id}", response_model=schemas.Propietario)
-async def delete_propietario(
+@api.delete("/{id}", response_model=schemas.Chofer)
+async def delete_chofer(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.ELIMINAR, m.PROPIETARIO)),  # noqa: B008
+    _: bool = Depends(Permiso(a.ELIMINAR, m.CHOFER)),  # noqa: B008
 ):
-    return services.delete_propietario(
+    return services.delete_chofer(
         db, id, current_user.gestor_carga_id, current_user.username
     )

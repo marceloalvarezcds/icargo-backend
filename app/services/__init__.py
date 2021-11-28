@@ -9,6 +9,14 @@ from .centro_operativo import (  # noqa
     get_centro_operativo_reports,
 )
 from .centro_operativo_contacto import update_centro_operativo_contacto_list  # noqa
+from .chofer import (  # noqa
+    create_chofer,
+    delete_chofer,
+    edit_chofer,
+    get_chofer_by_id,
+    get_chofer_by_id_and_gestor_cuenta_id,
+    get_chofer_reports,
+)
 from .contacto import get_contacto_by  # noqa
 from .gestor_carga import (  # noqa
     create_gestor_carga,
@@ -20,6 +28,10 @@ from .gestor_carga import (  # noqa
 from .gestor_carga_centro_operativo import (  # noqa
     create_gestor_carga_centro_operativo,
     edit_gestor_carga_centro_operativo,
+)
+from .gestor_carga_chofer import (  # noqa
+    create_gestor_carga_chofer,
+    edit_gestor_carga_chofer,
 )
 from .gestor_carga_propietario import (  # noqa
     create_gestor_carga_propietario,

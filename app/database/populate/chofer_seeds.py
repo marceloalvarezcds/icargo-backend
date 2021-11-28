@@ -4,80 +4,89 @@ from typing import Optional
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import Chofer, Ciudad, GestorCarga, Pais, Propietario, TipoPersona, User
+from app.models import (
+    Chofer,
+    Ciudad,
+    GestorCarga,
+    Pais,
+    TipoDocumento,
+    TipoRegistro,
+    User,
+)
 from app.repositories import (
-    get_cargo_by_descripcion,
     get_chofer_by,
     get_ciudad_by_nombre_and_localidad_id,
-    get_contacto_by_email,
     get_localidad_by_nombre_and_pais_id,
     get_pais_by_nombre_corto,
-    get_propietario_by,
     get_tipo_documento_by_descripcion,
-    get_tipo_persona_by_descripcion,
+    get_tipo_registro_by_descripcion,
     get_user_list_by_gestor_carga_id,
 )
 
-from .gestor_carga_propietario_seeds import gestor_carga_propietario_seeds
-from .propietario_contacto_gestor_carga_seeds import (
-    propietario_contacto_gestor_carga_seeds,
-)
+from .gestor_carga_chofer_seeds import gestor_carga_chofer_seeds
 
 
-def propietario_seeds(
+def chofer_seeds(
     db: Session,
     nombre: str,
-    tipo_persona: Optional[TipoPersona],
+    tipo_documento: Optional[TipoDocumento],
+    pais_emisor_documento: Optional[Pais],
+    numero_documento: str,
     ruc: str,
     digito_verificador: str,
-    pais_origen: Optional[Pais],
-    es_chofer: bool,
+    es_propietario: bool,
+    ciudad_emisor_registro: Optional[Ciudad],
+    tipo_registro: Optional[TipoRegistro],
+    numero_registro: str,
     telefono: str,
     email: str,
     direccion: Optional[str],
     alias: str,
-    cargo_descripcion: str,
-    contacto_email: str,
-    contacto_alias: str,
     gestor_cuenta: GestorCarga,
     oficial_cuenta: User,
     ciudad: Optional[Ciudad],
-    chofer: Optional[Chofer] = None,
 ):
-    if tipo_persona and pais_origen and ciudad:
-        obj = get_propietario_by(db, tipo_persona.id, ruc)
+    if tipo_documento and pais_emisor_documento and numero_documento and ciudad:
+        obj = get_chofer_by(
+            db, tipo_documento.id, pais_emisor_documento.id, numero_documento
+        )
         if not obj:
-            propietario = Propietario(
+            chofer = Chofer(
                 nombre=nombre,
-                tipo_persona_id=tipo_persona.id,
+                tipo_documento_id=tipo_documento.id,
+                pais_emisor_documento_id=pais_emisor_documento.id,
+                numero_documento=numero_documento,
                 ruc=ruc,
                 digito_verificador=digito_verificador,
-                pais_origen_id=pais_origen.id,
-                es_chofer=es_chofer,
                 fecha_nacimiento=date(1981, 6, 1),
                 gestor_cuenta_id=gestor_cuenta.id,
                 oficial_cuenta_id=oficial_cuenta.id,
+                es_propietario=es_propietario,
                 foto_documento_frente=None,
                 foto_documento_reverso=None,
                 foto_perfil=None,
+                # inicio registro
+                ciudad_emisor_registro_id=ciudad_emisor_registro.id
+                if ciudad_emisor_registro
+                else None,
+                tipo_registro_id=tipo_registro.id if tipo_registro else None,
+                numero_registro=numero_registro,
+                vencimiento_registro=date(2023, 6, 1),
+                foto_registro_frente=None,
+                foto_registro_reverso=None,
+                # fin registro
                 estado=EstadoEnum.PENDIENTE.value,
                 telefono=telefono,
                 email=email,
                 direccion=direccion,
                 ciudad_id=ciudad.id,
-                chofer_id=chofer.id if chofer else None,
             )
-            db.add(propietario)
+            db.add(chofer)
             db.commit()
-            gestor_carga_propietario_seeds(db, propietario, gestor_cuenta, alias)
-            cargo = get_cargo_by_descripcion(db, cargo_descripcion)
-            contacto = get_contacto_by_email(db, contacto_email)
-            propietario_contacto_gestor_carga_seeds(
-                db, cargo, propietario, contacto, gestor_cuenta, contacto_alias
-            )
+            gestor_carga_chofer_seeds(db, chofer, gestor_cuenta, alias)
 
 
-def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
+def cargill_chofer_seeds(db: Session, gestor_cuenta: GestorCarga):
     oficial_cuenta = get_user_list_by_gestor_carga_id(db, gestor_cuenta.id)[0]
 
     paraguay = get_pais_by_nombre_corto(db, "PY")
@@ -123,113 +132,117 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         else None
     )
 
-    fisica = get_tipo_persona_by_descripcion(db, "Física")
-    juridica = get_tipo_persona_by_descripcion(db, "Jurídica")
-
     cedula = get_tipo_documento_by_descripcion(db, "Cédula")
-    chofer = None
-    if cedula and paraguay:
-        chofer = get_chofer_by(db, cedula.id, paraguay.id, "3500500")
+    pasaporte = get_tipo_documento_by_descripcion(db, "Pasaporte")
+    ruc = get_tipo_documento_by_descripcion(db, "RUC")
+    carta = get_tipo_documento_by_descripcion(db, "Carta Argentina")
 
-    propietario_seeds(
+    profesional_a = get_tipo_registro_by_descripcion(db, "Profesional A")
+    profesional_b = get_tipo_registro_by_descripcion(db, "Profesional A")
+
+    chofer_seeds(
         db,
-        nombre="Propietario Chofer 1",
-        tipo_persona=fisica,
+        nombre="Chofer Cargill 1",
+        tipo_documento=cedula,
+        pais_emisor_documento=paraguay,
+        numero_documento="3500500",
         ruc="3500500",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=True,
+        es_propietario=True,
+        ciudad_emisor_registro=los_cedrales,
+        tipo_registro=profesional_a,
+        numero_registro="3500500",
         telefono="0982444444",
         email="contacto@cargill-cedrales.com",
         direccion="CEDRALES",
         alias="Cedrales",
-        cargo_descripcion="Gerente",
-        contacto_email="maria@cardozo.com",
-        contacto_alias="Maria",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=los_cedrales,
-        chofer=chofer,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="KM 28 - CARGILL SAECA",
-        tipo_persona=juridica,
+        nombre="Chofer Cargill 2",
+        tipo_documento=pasaporte,
+        pais_emisor_documento=paraguay,
+        numero_documento="p-500500",
         ruc="p-500500",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=minga_guazu,
+        tipo_registro=profesional_b,
+        numero_registro="p-500500",
         telefono="0982555555",
         email="contacto@km-28-cargill-saeca.com",
         direccion="MINGA GUAZU KM 28",
         alias="Cargill",
-        cargo_descripcion="Gerente",
-        contacto_email="pedro@molinas.com",
-        contacto_alias="Pedro",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=minga_guazu,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="CARGILL_NUEVA TOLEDO",
-        tipo_persona=juridica,
+        nombre="Chofer Cargill 3",
+        tipo_documento=ruc,
+        pais_emisor_documento=paraguay,
+        numero_documento="800500500",
         ruc="800500500",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=caaguazu,
+        tipo_registro=profesional_a,
+        numero_registro="800500500",
         telefono="0982666666",
         email="contacto@cargill-nueva-toledo.com",
         direccion="Carlos A. López, Toledo",
         alias="Toledo",
-        cargo_descripcion="Vendedor",
-        contacto_email="pedro@molinas.com",
-        contacto_alias="Pedro",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=caaguazu,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="CARGILL_VAQUERIA",
-        tipo_persona=fisica,
+        nombre="Chofer Cargill 4",
+        tipo_documento=carta,
+        pais_emisor_documento=paraguay,
+        numero_documento="3600600",
         ruc="3600600",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=asuncion,
+        tipo_registro=profesional_b,
+        numero_registro="3600600",
         telefono="0982777777",
         email="contacto@cargill-vaqueria.com",
         direccion="Unnamed Road, Vaquería",
         alias="Vaqueria",
-        cargo_descripcion="Vendedor",
-        contacto_email="sonia@sanchez.com",
-        contacto_alias="Sonia",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=asuncion,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="CARGILL_PACURI",
-        tipo_persona=juridica,
+        nombre="Chofer Cargill 5",
+        tipo_documento=cedula,
+        pais_emisor_documento=paraguay,
+        numero_documento="p-600600",
         ruc="p-600600",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=ciudad_del_este,
+        tipo_registro=profesional_a,
+        numero_registro="p-600600",
         telefono="0982888888",
         email="contacto@cargill-pacuri.com",
         direccion="Departamento de Alto Paraná",
         alias="Pacuri",
-        cargo_descripcion="Vendedor",
-        contacto_email="sonia@sanchez.com",
-        contacto_alias="Sonia",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=ciudad_del_este,
     )
 
 
-def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
+def multiple_chofer_seeds(db: Session, gestor_cuenta: GestorCarga):
     oficial_cuenta = get_user_list_by_gestor_carga_id(db, gestor_cuenta.id)[0]
 
     paraguay = get_pais_by_nombre_corto(db, "PY")
@@ -322,239 +335,250 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         else None
     )
 
-    fisica = get_tipo_persona_by_descripcion(db, "Física")
-    juridica = get_tipo_persona_by_descripcion(db, "Jurídica")
-
     cedula = get_tipo_documento_by_descripcion(db, "Cédula")
-    chofer = None
-    if cedula and paraguay:
-        chofer = get_chofer_by(db, cedula.id, paraguay.id, "3100100")
+    pasaporte = get_tipo_documento_by_descripcion(db, "Pasaporte")
+    ruc = get_tipo_documento_by_descripcion(db, "RUC")
+    carta = get_tipo_documento_by_descripcion(db, "Carta Argentina")
 
-    propietario_seeds(
+    profesional_a = get_tipo_registro_by_descripcion(db, "Profesional A")
+    profesional_b = get_tipo_registro_by_descripcion(db, "Profesional A")
+
+    chofer_seeds(
         db,
-        nombre="Propietario Transred 1",
-        tipo_persona=fisica,
+        nombre="Chofer Transred 1",
+        tipo_documento=cedula,
+        pais_emisor_documento=paraguay,
+        numero_documento="3100100",
         ruc="3100100",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=True,
+        es_propietario=True,
+        ciudad_emisor_registro=encarnacion,
+        tipo_registro=profesional_a,
+        numero_registro="3100100",
         telefono="0981111111",
         email="contacto@adm-santa-rita.com",
         direccion="SANTA RITA",
         alias="Santa Rita",
-        cargo_descripcion="Gerente",
-        contacto_email="maria@cardozo.com",
-        contacto_alias="Maria",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=santa_rita,
-        chofer=chofer,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="GICAL KM12",
-        tipo_persona=juridica,
+        nombre="Chofer Transred 2",
+        tipo_documento=pasaporte,
+        pais_emisor_documento=paraguay,
+        numero_documento="p-100100",
         ruc="p-100100",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=hernandarias,
+        tipo_registro=profesional_b,
+        numero_registro="p-100100",
         telefono="0981222222",
         email="contacto@gical-km12.com",
         direccion="GICAL KM 12",
         alias="KM12",
-        cargo_descripcion="Gerente",
-        contacto_email="maria@cardozo.com",
-        contacto_alias="Maria",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=hernandarias,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="LA PAZ",
-        tipo_persona=juridica,
+        nombre="Chofer Transred 3",
+        tipo_documento=ruc,
+        pais_emisor_documento=paraguay,
+        numero_documento="800100100",
         ruc="800100100",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=la_paz,
+        tipo_registro=profesional_a,
+        numero_registro="800100100",
         telefono="0981333333",
         email="contacto@la-paz.com",
         direccion=None,
         alias="La Paz",
-        cargo_descripcion="Gerente",
-        contacto_email="maria@cardozo.com",
-        contacto_alias="Maria",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=la_paz,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="PUERTO TROCIUCK",
-        tipo_persona=fisica,
+        nombre="Chofer Transred 4",
+        tipo_documento=carta,
+        pais_emisor_documento=paraguay,
+        numero_documento="3200200",
         ruc="3200200",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=encarnacion,
+        tipo_registro=profesional_b,
+        numero_registro="3200200",
         telefono="0981444444",
         email="contacto@puerto-trociuck.com",
         direccion=None,
         alias="Trociuck",
-        cargo_descripcion="Gerente",
-        contacto_email="maria@cardozo.com",
-        contacto_alias="Maria",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=encarnacion,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="PUERTO SAN ANTONIO",
-        tipo_persona=juridica,
+        nombre="Chofer Transred 5",
+        tipo_documento=cedula,
+        pais_emisor_documento=paraguay,
+        numero_documento="p-200200",
         ruc="p-200200",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=san_antonio,
+        tipo_registro=profesional_a,
+        numero_registro="p-200200",
         telefono="0981555555",
         email="contacto@puerto-san-antonio.com",
         direccion="Av. San Antonio",
         alias="San Antonio",
-        cargo_descripcion="Gerente",
-        contacto_email="pedro@molinas.com",
-        contacto_alias="Pedro",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=san_antonio,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="AGROFERTIL SANTA FE",
-        tipo_persona=juridica,
+        nombre="Chofer Transred 6",
+        tipo_documento=pasaporte,
+        pais_emisor_documento=paraguay,
+        numero_documento="800200200",
         ruc="800200200",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=hernandarias,
+        tipo_registro=profesional_b,
+        numero_registro="800200200",
         telefono="0981666666",
         email="contacto@agrofertil-santa-fe.com",
         direccion="Ciudad de Santa Fe - Alto Paraná",
         alias="Santa Fe",
-        cargo_descripcion="Gerente",
-        contacto_email="pedro@molinas.com",
-        contacto_alias="Pedro",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=hernandarias,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="ITAKYRY",
-        tipo_persona=fisica,
+        nombre="Chofer Transred 7",
+        tipo_documento=ruc,
+        pais_emisor_documento=paraguay,
+        numero_documento="3300300",
         ruc="3300300",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=encarnacion,
+        tipo_registro=profesional_a,
+        numero_registro="3300300",
         telefono="0981777777",
         email="contacto@itakyry.com",
         direccion="ITAKYRY",
         alias="Itakyry",
-        cargo_descripcion="Gerente",
-        contacto_email="pedro@molinas.com",
-        contacto_alias="Pedro",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=itakyry,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="ESTANCIA YBY PORA",
-        tipo_persona=juridica,
+        nombre="Chofer Transred 8",
+        tipo_documento=carta,
+        pais_emisor_documento=paraguay,
+        numero_documento="p-300300",
         ruc="p-300300",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=san_isidro,
+        tipo_registro=profesional_b,
+        numero_registro="p-300300",
         telefono="0981888888",
         email="contacto@estancia-yby-pora.com",
         direccion=None,
         alias="Yby Pora",
-        cargo_descripcion="Vendedor",
-        contacto_email="pedro@molinas.com",
-        contacto_alias="Pedro",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=san_isidro,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="LOS CEDRALES",
-        tipo_persona=juridica,
+        nombre="Chofer Transred 9",
+        tipo_documento=cedula,
+        pais_emisor_documento=paraguay,
+        numero_documento="800300300",
         ruc="800300300",
         digito_verificador="1",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=salto_del_guaira,
+        tipo_registro=profesional_a,
+        numero_registro="800300300",
         telefono="0981999999",
         email="contacto@los-cedrales.com",
         direccion="LOS CEDRALES",
         alias="Los Cedrales",
-        cargo_descripcion="Vendedor",
-        contacto_email="pedro@molinas.com",
-        contacto_alias="Pedro",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=salto_del_guaira,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="PUERTO CAIASA",
-        tipo_persona=fisica,
+        nombre="Chofer Transred 10",
+        tipo_documento=pasaporte,
+        pais_emisor_documento=paraguay,
+        numero_documento="3400400",
         ruc="3400400",
         digito_verificador="2",
-        pais_origen=paraguay,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=villeta,
+        tipo_registro=profesional_b,
+        numero_registro="3400400",
         telefono="0982111111",
         email="contacto@puerto-caiasa.com",
         direccion="km 7 Ruta Villeta-Alberdi (Paraguay)",
         alias="Caiasa",
-        cargo_descripcion="Vendedor",
-        contacto_email="sonia@sanchez.com",
-        contacto_alias="Sonia",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=villeta,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="PUERTO UNION",
-        tipo_persona=juridica,
+        nombre="Chofer Transred 11",
+        tipo_documento=ruc,
+        pais_emisor_documento=argentina,
+        numero_documento="p-400400",
         ruc="p-400400",
         digito_verificador="2",
-        pais_origen=argentina,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=ambato,
+        tipo_registro=profesional_a,
+        numero_registro="p-400400",
         telefono="0982222222",
         email="contacto@puerto-union.com",
         direccion="Puerto Union, gral.",
         alias="Union",
-        cargo_descripcion="Vendedor",
-        contacto_email="sonia@sanchez.com",
-        contacto_alias="Sonia",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=ambato,
     )
-    propietario_seeds(
+    chofer_seeds(
         db,
-        nombre="LDC_POZUELO",
-        tipo_persona=juridica,
+        nombre="Chofer Transred 12",
+        tipo_documento=carta,
+        pais_emisor_documento=brasil,
+        numero_documento="800400400",
         ruc="800400400",
         digito_verificador="3",
-        pais_origen=brasil,
-        es_chofer=False,
+        es_propietario=False,
+        ciudad_emisor_registro=california,
+        tipo_registro=profesional_b,
+        numero_registro="800400400",
         telefono="0982333333",
         email="contacto@ldc-pozuelo.com",
         direccion="Califórnia, Brazil",
         alias="Pozuelo",
-        cargo_descripcion="Vendedor",
-        contacto_email="sonia@sanchez.com",
-        contacto_alias="Sonia",
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=california,

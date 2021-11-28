@@ -6,7 +6,7 @@ from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Propietario
-from app.schemas import PropietarioForm
+from app.schemas import Chofer, PropietarioEditForm, PropietarioForm
 
 
 def get_propietario_list(db: Session) -> List[Propietario]:
@@ -45,6 +45,7 @@ def create_propietario(
     foto_documento_frente_url: str,
     foto_documento_reverso_url: str,
     foto_perfil_url: str,
+    chofer: Optional[Chofer],
     modified_by: str,
 ) -> Propietario:
     obj = Propietario(
@@ -65,6 +66,7 @@ def create_propietario(
         email=data.email,
         direccion=data.direccion,
         ciudad_id=data.ciudad_id,
+        chofer_id=chofer.id if chofer else None,
         modified_by=modified_by,
     )
     db.add(obj)
@@ -76,10 +78,11 @@ def create_propietario(
 def edit_propietario(
     obj: Propietario,
     db: Session,
-    data: PropietarioForm,
+    data: PropietarioEditForm,
     foto_documento_frente_url: Optional[str],
     foto_documento_reverso_url: Optional[str],
     foto_perfil_url: Optional[str],
+    chofer: Optional[Chofer],
     modified_by: str,
 ) -> Propietario:
     if data.tipo_persona_id and data.ruc:
@@ -105,6 +108,7 @@ def edit_propietario(
             obj.foto_documento_reverso = foto_documento_reverso_url
         if foto_perfil_url:
             obj.foto_perfil = foto_perfil_url
+        obj.chofer_id = chofer.id if chofer else None
         obj.modified_by = modified_by
         obj.modified_at = datetime.now()
         db.commit()

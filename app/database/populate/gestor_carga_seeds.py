@@ -15,6 +15,7 @@ from .centro_operativo_seeds import (
     cargill_centro_operativo_seeds,
     multiple_centro_operativo_seeds,
 )
+from .chofer_seeds import cargill_chofer_seeds, multiple_chofer_seeds
 from .propietario_seeds import cargill_propietario_seeds, multiple_propietario_seeds
 from .proveedor_seeds import cargill_proveedor_seeds, multiple_proveedor_seeds
 from .remitente_seeds import cargill_remitente_seeds, multiple_remitente_seeds
@@ -96,6 +97,8 @@ def gestor_carga_seeds(db: Session):
             db, "admin-suplente-transred", "Admin Suplente", "Transred", gestor_carga1
         )
         user_seeds(db, "admin-cargill", "Admin", "Cargill", gestor_carga2)
+        multiple_chofer_seeds(db, gestor_carga1)
+        cargill_chofer_seeds(db, gestor_carga2)
         multiple_propietario_seeds(db, gestor_carga1)
         cargill_propietario_seeds(db, gestor_carga2)
     except IntegrityError:

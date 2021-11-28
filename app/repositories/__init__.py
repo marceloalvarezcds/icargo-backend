@@ -18,6 +18,18 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
     edit_centro_operativo_contacto_gestor_carga,
     get_centro_operativo_contacto_gestor_carga_by,
 )
+from .chofer import (  # noqa
+    create_chofer,
+    delete_chofer,
+    edit_chofer,
+    get_chofer_by,
+    get_chofer_by_id,
+    get_chofer_list,
+)
+from .chofer_propietario import (  # noqa
+    create_propietario_by_chofer,
+    edit_propietario_by_chofer,
+)
 from .ciudad import get_ciudad_by_nombre_and_localidad_id, get_ciudad_list  # noqa
 from .composicion_juridica import (  # noqa
     get_composicion_juridica_by_nombre,
@@ -43,6 +55,11 @@ from .gestor_carga_centro_operativo import (  # noqa
     create_gestor_carga_centro_operativo,
     edit_gestor_carga_centro_operativo,
     get_gestor_carga_centro_operativo_by,
+)
+from .gestor_carga_chofer import (  # noqa
+    create_gestor_carga_chofer,
+    edit_gestor_carga_chofer,
+    get_gestor_carga_chofer_by,
 )
 from .gestor_carga_propietario import (  # noqa
     create_gestor_carga_propietario,
@@ -75,6 +92,10 @@ from .propietario import (  # noqa
     get_propietario_by,
     get_propietario_by_id,
     get_propietario_list,
+)
+from .propietario_chofer import (  # noqa
+    create_chofer_by_propietario,
+    edit_chofer_by_propietario,
 )
 from .propietario_contacto_gestor_carga import (  # noqa
     create_propietario_contacto_gestor_carga,
