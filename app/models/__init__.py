@@ -8,11 +8,13 @@ from .centro_operativo_clasificacion import CentroOperativoClasificacion  # noqa
 from .centro_operativo_contacto_gestor_carga import (  # noqa
     CentroOperativoContactoGestorCarga,
 )
+from .chofer import Chofer  # noqa
 from .ciudad import Ciudad  # noqa
 from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto  # noqa
 from .gestor_carga import GestorCarga  # noqa
 from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
+from .gestor_carga_chofer import GestorCargaChofer  # noqa
 from .gestor_carga_propietario import GestorCargaPropietario  # noqa
 from .gestor_carga_proveedor import GestorCargaProveedor  # noqa
 from .gestor_carga_punto_venta import GestorCargaPuntoVenta  # noqa

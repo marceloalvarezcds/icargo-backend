@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional
+from typing import Optional, cast
 
 from fastapi import HTTPException, UploadFile  # type: ignore
 from openpyxl import Workbook  # type: ignore
@@ -8,48 +8,30 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
-from app.models import (
-    GestorCargaPropietario,
-    Propietario,
-    PropietarioContactoGestorCarga,
-)
+from app.models import Propietario
 
 from .gestor_carga_propietario import (
     create_gestor_carga_propietario,
     edit_gestor_carga_propietario,
 )
-from .pictshare import upload_and_get_image_url
+from .propietario_check_files import check_files, get_propietario_detail
+from .propietario_chofer import (
+    create_or_edit_chofer_by_propietario,
+    delete_chofer_by_id,
+)
 from .propietario_contacto import update_propietario_contacto_list
-
-
-def get_propietario_detail(
-    obj: Propietario, gestor_cuenta_id: Optional[int]
-) -> schemas.Propietario:
-    obj_dict = obj.as_dict(for_json=False)
-    contactos: List[PropietarioContactoGestorCarga] = obj.contactos
-    ges: List[GestorCargaPropietario] = obj.gestores
-    gestores = [x for x in ges if x.gestor_carga_id == gestor_cuenta_id]
-    obj_dict["contactos"] = [
-        x for x in contactos if x.gestor_carga_id == gestor_cuenta_id
-    ]
-    obj_dict["gestor_carga_propietario"] = gestores[0] if len(gestores) > 0 else None
-    obj_dict["tipo_persona"] = obj.tipo_persona
-    obj_dict["gestor_cuenta_nombre"] = (
-        obj.gestor_cuenta.nombre if obj.gestor_cuenta else None
-    )
-    obj_dict[
-        "oficial_cuenta_nombre"
-    ] = f"{obj.oficial_cuenta.first_name} {obj.oficial_cuenta.last_name}"
-    obj_dict["pais_origen"] = obj.pais_origen
-    obj_dict["ciudad"] = obj.ciudad
-    return schemas.Propietario.parse_obj(obj_dict)
 
 
 async def create_propietario(
     db: Session,
     data: schemas.PropietarioForm,
-    foto_documento_file: UploadFile,
+    foto_documento_frente_file: UploadFile,
+    foto_documento_reverso_file: UploadFile,
     foto_perfil_file: UploadFile,
+    foto_documento_frente_chofer_file: Optional[UploadFile],
+    foto_documento_reverso_chofer_file: Optional[UploadFile],
+    foto_registro_frente_file: Optional[UploadFile],
+    foto_registro_reverso_file: Optional[UploadFile],
     gestor_cuenta_id: Optional[int],
     modified_by: str,
 ) -> schemas.Propietario:
@@ -58,10 +40,37 @@ async def create_propietario(
             status_code=409,
             detail=f"El Propietario con documento {data.ruc} ya existe",
         )
-    foto_documento_url = await upload_and_get_image_url(foto_documento_file)
-    foto_perfil_url = await upload_and_get_image_url(foto_perfil_file)
+    (
+        foto_documento_frente_url,
+        foto_documento_reverso_url,
+        foto_perfil_url,
+    ) = await check_files(
+        foto_documento_frente_file,
+        foto_documento_reverso_file,
+        foto_perfil_file,
+    )
+    chofer = None
+    if data.es_chofer:
+        chofer = await create_or_edit_chofer_by_propietario(
+            db,
+            data,
+            foto_documento_frente_chofer_file,
+            foto_documento_reverso_chofer_file,
+            foto_registro_frente_file,
+            foto_registro_reverso_file,
+            foto_perfil_url,
+            gestor_cuenta_id,
+            modified_by,
+        )
     obj = repositories.create_propietario(
-        db, data, gestor_cuenta_id, foto_documento_url, foto_perfil_url, modified_by
+        db,
+        data,
+        gestor_cuenta_id,
+        cast(str, foto_documento_frente_url),
+        cast(str, foto_documento_reverso_url),
+        cast(str, foto_perfil_url),
+        chofer,
+        modified_by,
     )
     update_propietario_contacto_list(
         db, data.contactos, obj, gestor_cuenta_id, modified_by
@@ -89,29 +98,61 @@ def get_propietario_by_id_and_gestor_cuenta_id(
 async def edit_propietario(
     id: int,
     db: Session,
-    data: schemas.PropietarioForm,
-    foto_documento_file: Optional[UploadFile],
+    data: schemas.PropietarioEditForm,
+    foto_documento_frente_file: Optional[UploadFile],
+    foto_documento_reverso_file: Optional[UploadFile],
     foto_perfil_file: Optional[UploadFile],
+    foto_documento_frente_chofer_file: Optional[UploadFile],
+    foto_documento_reverso_chofer_file: Optional[UploadFile],
+    foto_registro_frente_file: Optional[UploadFile],
+    foto_registro_reverso_file: Optional[UploadFile],
     gestor_cuenta_id: Optional[int],
     modified_by: str,
 ) -> schemas.Propietario:
-    exists = repositories.get_propietario_by(db, data.tipo_persona_id, data.ruc)
-    if exists and exists.id != id:
-        raise HTTPException(
-            status_code=409,
-            detail=f"El Propietario con documento {data.ruc} ya existe",
-        )
-    foto_documento_url = (
-        await upload_and_get_image_url(foto_documento_file)
-        if foto_documento_file
-        else None
-    )
-    foto_perfil_url = (
-        await upload_and_get_image_url(foto_perfil_file) if foto_perfil_file else None
+    if data.tipo_persona_id and data.ruc:
+        exists = repositories.get_propietario_by(db, data.tipo_persona_id, data.ruc)
+        if exists and exists.id != id:
+            raise HTTPException(
+                status_code=409,
+                detail=f"El Propietario con documento {data.ruc} ya existe",
+            )
+    (
+        foto_documento_frente_url,
+        foto_documento_reverso_url,
+        foto_perfil_url,
+    ) = await check_files(
+        foto_documento_frente_file,
+        foto_documento_reverso_file,
+        foto_perfil_file,
     )
     to_edit_obj = get_propietario_by_id(db, id)
+    chofer_id = to_edit_obj.chofer_id
+    chofer = None
+    if data.es_chofer:
+        chofer_data = cast(schemas.PropietarioForm, data)
+        chofer = await create_or_edit_chofer_by_propietario(
+            db,
+            chofer_data,
+            foto_documento_frente_chofer_file,
+            foto_documento_reverso_chofer_file,
+            foto_registro_frente_file,
+            foto_registro_reverso_file,
+            foto_perfil_url,
+            gestor_cuenta_id,
+            modified_by,
+            chofer_id,
+        )
+    else:
+        delete_chofer_by_id(db, chofer_id, modified_by)
     obj = repositories.edit_propietario(
-        to_edit_obj, db, data, foto_documento_url, foto_perfil_url, modified_by
+        to_edit_obj,
+        db,
+        data,
+        foto_documento_frente_url,
+        foto_documento_reverso_url,
+        foto_perfil_url,
+        chofer,
+        modified_by,
     )
     update_propietario_contacto_list(
         db, data.contactos, obj, gestor_cuenta_id, modified_by
@@ -138,12 +179,16 @@ def get_propietario_reports(db: Session) -> str:
     title_cell.value = "Nombre"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=3)
+    title_cell = ws.cell(row=1, column=2)
     title_cell.value = "Tipo de Persona"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=4)
+    title_cell = ws.cell(row=1, column=3)
     title_cell.value = "RUC"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=4)
+    title_cell.value = "Pais de Origen"
     title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=5)
@@ -162,15 +207,34 @@ def get_propietario_reports(db: Session) -> str:
     title_cell.value = "Ubicación"
     title_cell.font = Font(bold=True)
 
+    title_cell = ws.cell(row=1, column=9)
+    title_cell.value = "Usuario creación"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=10)
+    title_cell.value = "Fecha creación"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=11)
+    title_cell.value = "Usuario modificación"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=12)
+    title_cell.value = "Fecha modificación"
+    title_cell.font = Font(bold=True)
+
     for row, item in enumerate(datalist):
         value_cell = ws.cell(row=row + 2, column=1)
         value_cell.value = item.nombre
 
-        value_cell = ws.cell(row=row + 2, column=3)
+        value_cell = ws.cell(row=row + 2, column=2)
         value_cell.value = item.tipo_persona.descripcion
 
-        value_cell = ws.cell(row=row + 2, column=4)
+        value_cell = ws.cell(row=row + 2, column=3)
         value_cell.value = item.ruc
+
+        value_cell = ws.cell(row=row + 2, column=4)
+        value_cell.value = item.pais_origen.nombre
 
         value_cell = ws.cell(row=row + 2, column=5)
         value_cell.value = item.gestor_cuenta.nombre if item.gestor_cuenta else ""
@@ -183,6 +247,18 @@ def get_propietario_reports(db: Session) -> str:
 
         value_cell = ws.cell(row=row + 2, column=8)
         value_cell.value = f"{item.ciudad.nombre}/{item.ciudad.localidad.nombre}/{item.ciudad.localidad.pais.nombre_corto}"  # noqa
+
+        value_cell = ws.cell(row=row + 2, column=9)
+        value_cell.value = item.created_by
+
+        value_cell = ws.cell(row=row + 2, column=10)
+        value_cell.value = item.created_at
+
+        value_cell = ws.cell(row=row + 2, column=11)
+        value_cell.value = item.modified_by
+
+        value_cell = ws.cell(row=row + 2, column=12)
+        value_cell.value = item.modified_at
 
     ws.auto_filter.ref = ws.dimensions
     filename = "propietario_reports.xls"

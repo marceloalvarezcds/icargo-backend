@@ -15,33 +15,35 @@ from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums.estado import EstadoEnum
 
-from .chofer import Chofer
 from .ciudad import Ciudad
 from .gestor_carga import GestorCarga
 from .pais import Pais
-from .tipo_persona import TipoPersona
+from .tipo_documento import TipoDocumento
+from .tipo_registro import TipoRegistro
 from .user import User
 
 
-class Propietario(AuditMixin, Base):
+class Chofer(AuditMixin, Base):
     """
-    Defines the propietario model
+    Defines the chofer model
     """
 
     __table_args__ = (
         UniqueConstraint(
-            "tipo_persona_id",
-            "ruc",
+            "tipo_documento_id",
+            "pais_emisor_documento_id",
+            "numero_documento",
         ),
     )
     id = Column(Integer, primary_key=True)
     nombre = Column(String(255))
-    tipo_persona_id = Column(Integer, ForeignKey("tipo_persona.id"))
-    tipo_persona = relationship(TipoPersona, uselist=False)
+    tipo_documento_id = Column(Integer, ForeignKey("tipo_documento.id"))
+    tipo_documento = relationship(TipoDocumento, uselist=False)
+    pais_emisor_documento_id = Column(Integer, ForeignKey("pais.id"))
+    pais_emisor_documento = relationship(Pais, uselist=False)
+    numero_documento = Column(String(255))
     ruc = Column(String(255))
     digito_verificador = Column(String(2))
-    pais_origen_id = Column(Integer, ForeignKey("pais.id"))
-    pais_origen = relationship(Pais, uselist=False)
     fecha_nacimiento = Column(DateTime)
     gestor_cuenta_id = Column(Integer, ForeignKey("gestor_carga.id"))
     gestor_cuenta = relationship(GestorCarga, uselist=False)
@@ -50,19 +52,26 @@ class Propietario(AuditMixin, Base):
     foto_documento_frente = Column(String(255))
     foto_documento_reverso = Column(String(255))
     foto_perfil = Column(String(255))
-    es_chofer = Column(Boolean, nullable=False, server_default=text("false"))
+    es_propietario = Column(Boolean, nullable=False, server_default=text("false"))
+    # inicio registro
+    ciudad_emisor_registro_id = Column(Integer, ForeignKey("ciudad.id"))
+    ciudad_emisor_registro = relationship(
+        Ciudad, uselist=False, foreign_keys=[ciudad_emisor_registro_id]
+    )
+    tipo_registro_id = Column(Integer, ForeignKey("tipo_registro.id"))
+    tipo_registro = relationship(TipoRegistro, uselist=False)
+    numero_registro = Column(String(255))
+    vencimiento_registro = Column(DateTime)
+    foto_registro_frente = Column(String(255))
+    foto_registro_reverso = Column(String(255))
+    # fin registro
     estado = Column(String(255), server_default=EstadoEnum.PENDIENTE.value)
     telefono = Column(String(25))
     email = Column(String(50))
     direccion = Column(String(255))
     ciudad_id = Column(Integer, ForeignKey("ciudad.id"))
-    ciudad = relationship(Ciudad, uselist=False)
-    chofer_id = Column(Integer, ForeignKey("chofer.id"))
-    chofer = relationship(Chofer, uselist=False)
-    contactos = relationship(
-        "PropietarioContactoGestorCarga", back_populates="propietario"
-    )
-    gestores = relationship("GestorCargaPropietario", back_populates="propietario")
+    ciudad = relationship(Ciudad, uselist=False, foreign_keys=[ciudad_id])
+    gestores = relationship("GestorCargaChofer", back_populates="chofer")
 
     @hybrid_property
     def ciudad_nombre(self):
@@ -89,13 +98,13 @@ class Propietario(AuditMixin, Base):
         return self.ciudad.localidad.pais.nombre_corto
 
     @hybrid_property
-    def pais_origen_nombre(self):
-        return self.pais_origen.nombre
+    def pais_emisor_documento_nombre(self):
+        return self.pais_emisor_documento.nombre
 
     @hybrid_property
-    def pais_origen_nombre_corto(self):
-        return self.pais_origen.nombre_corto
+    def pais_emisor_documento_nombre_corto(self):
+        return self.pais_emisor_documento.nombre_corto
 
     @hybrid_property
-    def tipo_persona_descripcion(self):
-        return self.tipo_persona.descripcion
+    def tipo_documento_descripcion(self):
+        return self.tipo_documento.descripcion

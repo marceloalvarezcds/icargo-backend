@@ -1,82 +1,73 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
 from app.enums import EstadoEnum
 
 from .ciudad import Ciudad
-from .contacto import ContactoForm
 from .date_model import Date
-from .gestor_carga_propietario import GestorCargaPropietario
+from .gestor_carga_chofer import GestorCargaChofer
 from .localidad import Localidad
 from .pais import Pais
-from .propietario_contacto_gestor_carga import PropietarioContactoGestorCargaList
 from .tipo_documento import TipoDocumento
-from .tipo_persona import TipoPersona
 from .tipo_registro import TipoRegistro
 
 
-class PropietarioBaseModel(BaseModel):
+class ChoferBaseModel(BaseModel):
     nombre: str
-    tipo_persona_id: int
-    ruc: str
-    digito_verificador: str
-    pais_origen_id: int
+    tipo_documento_id: int
+    pais_emisor_documento_id: int
+    numero_documento: str
+    ruc: Optional[str] = None
+    digito_verificador: Optional[str] = None
     fecha_nacimiento: Optional[Date] = None
     oficial_cuenta_id: int
     foto_documento_frente: Optional[str] = None
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
-    es_chofer: bool = False
-    # INICIO Datos del Chofer
-    tipo_documento_id: Optional[int] = None
-    pais_emisor_documento_id: Optional[int] = None
-    numero_documento: Optional[str] = None
-    foto_documento_frente_chofer: Optional[str] = None
-    foto_documento_reverso_chofer: Optional[str] = None
+    es_propietario: bool = False
+    # Datos del Propietario
+    pais_origen_id: Optional[int] = None
+    foto_documento_frente_propietario: Optional[str] = None
+    foto_documento_reverso_propietario: Optional[str] = None
     # inicio registro
-    pais_emisor_registro_id: Optional[int] = None
-    localidad_emisor_registro_id: Optional[int] = None
-    ciudad_emisor_registro_id: Optional[int] = None
-    tipo_registro_id: Optional[int] = None
-    numero_registro: Optional[str] = None
-    vencimiento_registro: Optional[Date] = None
+    pais_emisor_registro_id: int
+    localidad_emisor_registro_id: int
+    ciudad_emisor_registro_id: int
+    tipo_registro_id: int
+    numero_registro: str
+    vencimiento_registro: Date
     foto_registro_frente: Optional[str] = None
     foto_registro_reverso: Optional[str] = None
     # fin registro
-    # FIN Datos del Chofer
     telefono: str
     email: Optional[str] = None
     direccion: Optional[str] = None
     ciudad_id: int
 
 
-class PropietarioForm(PropietarioBaseModel):
-    pais_id: int
-    localidad_id: int
+class ChoferForm(ChoferBaseModel):
     alias: Optional[str] = None
-    contactos: List[ContactoForm]
 
 
-class PropietarioEditForm(BaseModel):
+class ChoferEditForm(BaseModel):
     nombre: Optional[str] = None
-    tipo_persona_id: Optional[int] = None
+    tipo_documento_id: Optional[int] = None
+    pais_emisor_documento_id: Optional[int] = None
+    numero_documento: Optional[str] = None
     ruc: Optional[str] = None
     digito_verificador: Optional[str] = None
-    pais_origen_id: Optional[int] = None
     fecha_nacimiento: Optional[Date] = None
     oficial_cuenta_id: Optional[int] = None
     foto_documento_frente: Optional[str] = None
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
-    es_chofer: Optional[bool] = False
-    # INICIO Datos del Chofer
-    tipo_documento_id: Optional[int] = None
-    pais_emisor_documento_id: Optional[int] = None
-    numero_documento: Optional[str] = None
-    foto_documento_frente_chofer: Optional[str] = None
-    foto_documento_reverso_chofer: Optional[str] = None
+    es_propietario: Optional[bool] = False
+    # Datos del Propietario
+    pais_origen_id: Optional[int] = None
+    foto_documento_frente_propietario: Optional[str] = None
+    foto_documento_reverso_propietario: Optional[str] = None
     # inicio registro
     pais_emisor_registro_id: Optional[int] = None
     localidad_emisor_registro_id: Optional[int] = None
@@ -87,34 +78,28 @@ class PropietarioEditForm(BaseModel):
     foto_registro_frente: Optional[str] = None
     foto_registro_reverso: Optional[str] = None
     # fin registro
-    # FIN Datos del Chofer
     telefono: Optional[str] = None
     email: Optional[str] = None
     direccion: Optional[str] = None
     ciudad_id: Optional[int] = None
-    pais_id: Optional[int] = None
-    localidad_id: Optional[int] = None
     alias: Optional[str] = None
-    contactos: List[ContactoForm]
 
 
-class PropietarioBase(PropietarioBaseModel):
+class ChoferBase(ChoferBaseModel):
     id: int
-    tipo_persona: TipoPersona
-    pais_origen: Pais
+    tipo_documento: TipoDocumento
+    pais_emisor_documento: Pais
     gestor_cuenta_id: int
     gestor_cuenta_nombre: str
     oficial_cuenta_nombre: Optional[str] = None
-    # INICIO Datos del Chofer
-    tipo_documento: Optional[TipoDocumento] = None
-    pais_emisor_documento: Optional[Pais] = None
+    # Datos del Propietario
+    pais_origen: Optional[Pais] = None
     # inicio registro
     pais_emisor_registro: Optional[Pais] = None
     localidad_emisor_registro: Optional[Localidad] = None
     ciudad_emisor_registro: Optional[Ciudad] = None
     tipo_registro: Optional[TipoRegistro] = None
     # fin registro
-    # FIN Datos del Chofer
     estado: EstadoEnum
     ciudad: Ciudad
 
@@ -123,20 +108,36 @@ class PropietarioBase(PropietarioBaseModel):
         use_enum_values = True
 
 
-class PropietarioList(PropietarioBase):
+class ChoferList(BaseModel):
+    id: int
+    nombre: str
+    tipo_documento_id: int
+    tipo_documento_descripcion: Optional[str] = None
+    pais_emisor_documento_id: int
+    pais_emisor_documento_nombre: Optional[str] = None
+    pais_emisor_documento_nombre_corto: Optional[str] = None
+    numero_documento: str
+    fecha_nacimiento: Optional[Date] = None
+    gestor_cuenta_id: int
+    gestor_cuenta_nombre: str
+    oficial_cuenta_nombre: Optional[str] = None
+    es_propietario: Optional[bool] = False
+    estado: EstadoEnum
+    direccion: Optional[str] = None
+    ciudad: Ciudad
     ciudad_nombre: Optional[str] = None
     localidad_nombre: Optional[str] = None
     pais_nombre: Optional[str] = None
     pais_nombre_corto: Optional[str] = None
-    pais_origen_nombre: Optional[str] = None
-    pais_origen_nombre_corto: Optional[str] = None
-    tipo_persona_descripcion: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True
 
 
-class Propietario(PropietarioBase):
+class Chofer(ChoferBase):
     created_by: str
     created_at: datetime
     modified_by: str
     modified_at: datetime
-    contactos: List[PropietarioContactoGestorCargaList] = []
-    gestor_carga_propietario: Optional[GestorCargaPropietario] = None
+    gestor_carga_chofer: Optional[GestorCargaChofer] = None
