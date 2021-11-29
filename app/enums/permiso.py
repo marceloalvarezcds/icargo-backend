@@ -19,6 +19,7 @@ class PermisoModeloEnum(Enum):
     CENTRO_OPERATIVO = "centro_operativo"
     CHOFER = "chofer"
     CIUDAD = "ciudad"
+    COLOR = "color"
     COMPOSICION_JURIDICA = "composicion_juridica"
     CONTACTO = "contacto"
     GESTOR_CARGA = "gestor_carga"

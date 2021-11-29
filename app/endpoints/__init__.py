@@ -6,6 +6,7 @@ from app.endpoints import (
     centro_operativo_clasificacion,
     chofer,
     ciudad,
+    color,
     composicion_juridica,
     contacto,
     gestor_carga,
@@ -37,6 +38,7 @@ api.include_router(
 )
 api.include_router(chofer.api, prefix="/chofer", tags=["chofer"])
 api.include_router(ciudad.api, prefix="/ciudad", tags=["ciudad"])
+api.include_router(color.api, prefix="/color", tags=["color"])
 api.include_router(
     composicion_juridica.api,
     prefix="/composicion_juridica",

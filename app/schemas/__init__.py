@@ -12,6 +12,7 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
 )
 from .chofer import Chofer, ChoferEditForm, ChoferForm, ChoferList  # noqa
 from .ciudad import Ciudad  # noqa
+from .color import Color  # noqa
 from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
 from .gestor_carga import GestorCarga, GestorCargaForm, GestorCargaList  # noqa
