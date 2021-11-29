@@ -1,15 +1,11 @@
-from sqlalchemy import Column, Integer, String  # type: ignore
-
-from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
-from app.enums.estado import EstadoEnum
+
+from .seleccionable_mixin import SeleccionableMixin
 
 
-class EnteEmisorTransporte(AuditMixin, Base):
+class EnteEmisorTransporte(SeleccionableMixin, Base):
     """
     Defines the ente emisor transporte model
     """
 
-    id = Column(Integer, primary_key=True)
-    descripcion = Column(String(255), unique=True)
-    estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
+    pass
