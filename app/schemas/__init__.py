@@ -55,6 +55,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
     RemitenteContactoGestorCarga,
     RemitenteContactoGestorCargaList,
 )
+from .semi_clasificacion import SemiClasificacion  # noqa
 from .tipo_documento import TipoDocumento  # noqa
 from .tipo_persona import TipoPersona  # noqa
 from .tipo_registro import TipoRegistro  # noqa

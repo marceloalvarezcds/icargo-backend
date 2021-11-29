@@ -37,6 +37,7 @@ class PermisoModeloEnum(Enum):
     REMITENTE = "remitente"
     ROL = "rol"
     SEMIRREMOLQUE = "semirremolque"
+    SEMI_CLASIFICACION = "semi_clasificacion"
     TIPO_DOCUMENTO = "tipo_documento"
     TIPO_PERSONA = "tipo_persona"
     TIPO_REGISTRO = "tipo_registro"
