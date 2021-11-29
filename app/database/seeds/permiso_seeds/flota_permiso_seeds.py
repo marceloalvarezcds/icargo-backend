@@ -58,6 +58,15 @@ def permiso_generico_seeds(db: Session, user: User):
             "Listar Ente Emisor del Automotor",
         )
     )
+    permisos.append(
+        permiso_seeds(
+            db,
+            a.LISTAR,
+            m.ENTE_EMISOR_TRANSPORTE,
+            True,
+            "Listar Ente Emisor del Transporte",
+        )
+    )
     permisos.append(permiso_seeds(db, a.LISTAR, m.LOCALIDAD))
     permisos.append(permiso_seeds(db, a.LISTAR, m.PAIS, True, "Listar País"))
     permisos.append(

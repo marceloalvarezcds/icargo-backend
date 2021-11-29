@@ -48,6 +48,10 @@ from .ente_emisor_automotor import (  # noqa
     get_ente_emisor_automotor_by_descripcion,
     get_ente_emisor_automotor_list,
 )
+from .ente_emisor_transporte import (  # noqa
+    get_ente_emisor_transporte_by_descripcion,
+    get_ente_emisor_transporte_list,
+)
 from .gestor_carga import (  # noqa
     create_gestor_carga,
     delete_gestor_carga,
