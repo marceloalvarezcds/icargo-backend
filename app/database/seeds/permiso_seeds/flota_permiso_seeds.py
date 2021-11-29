@@ -71,6 +71,9 @@ def permiso_generico_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.LISTAR, m.MARCA_CAMION, True, "Listar Marca de Camión")
     )
+    permisos.append(
+        permiso_seeds(db, a.LISTAR, m.MARCA_SEMI, True, "Listar Marca de Semi")
+    )
     permisos.append(permiso_seeds(db, a.LISTAR, m.PAIS, True, "Listar País"))
     permisos.append(
         permiso_seeds(db, a.LISTAR, m.TIPO_PERSONA, True, "Listar Tipo de Persona")

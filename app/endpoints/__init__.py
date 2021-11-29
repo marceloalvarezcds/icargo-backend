@@ -15,6 +15,7 @@ from app.endpoints import (
     localidad,
     login,
     marca_camion,
+    marca_semi,
     moneda,
     pais,
     permiso,
@@ -62,6 +63,7 @@ api.include_router(gestor_carga.api, prefix="/gestor_carga", tags=["gestor_carga
 api.include_router(localidad.api, prefix="/localidad", tags=["localidad"])
 api.include_router(login.api, prefix="/login", tags=["login"])
 api.include_router(marca_camion.api, prefix="/marca_camion", tags=["marca_camion"])
+api.include_router(marca_semi.api, prefix="/marca_semi", tags=["marca_semi"])
 api.include_router(moneda.api, prefix="/moneda", tags=["moneda"])
 api.include_router(pais.api, prefix="/pais", tags=["pais"])
 api.include_router(permiso.api, prefix="/permiso", tags=["permiso"])

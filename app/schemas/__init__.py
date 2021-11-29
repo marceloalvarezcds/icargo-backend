@@ -26,6 +26,7 @@ from .gestor_carga_punto_venta import GestorCargaPuntoVenta  # noqa
 from .gestor_carga_remitente import GestorCargaRemitente  # noqa
 from .localidad import Localidad  # noqa
 from .marca_camion import MarcaCamion  # noqa
+from .marca_semi import MarcaSemi  # noqa
 from .moneda import Moneda  # noqa
 from .pais import Pais  # noqa
 from .permiso import Permiso  # noqa

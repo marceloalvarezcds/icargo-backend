@@ -5,6 +5,7 @@ from .color_seeds import color_seeds
 from .ente_emisor_automotor_seeds import ente_emisor_automotor_seeds
 from .ente_emisor_transporte_seeds import ente_emisor_transporte_seeds
 from .marca_camion_seeds import marca_camion_seeds
+from .marca_semi_seeds import marca_semi_seeds
 from .moneda_seeds import moneda_seeds
 from .pais_seeds import pais_seeds
 from .rol_seeds import rol_seeds
@@ -19,6 +20,7 @@ def seeds(db: Session):
     ente_emisor_automotor_seeds(db)
     ente_emisor_transporte_seeds(db)
     marca_camion_seeds(db)
+    marca_semi_seeds(db)
     moneda_seeds(db)
     pais_seeds(db)
     rol_seeds(db)
