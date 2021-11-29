@@ -22,6 +22,7 @@ class PermisoModeloEnum(Enum):
     COLOR = "color"
     COMPOSICION_JURIDICA = "composicion_juridica"
     CONTACTO = "contacto"
+    ENTE_EMISOR_AUTOMOTOR = "ente_emisor_automotor"
     GESTOR_CARGA = "gestor_carga"
     LOCALIDAD = "localidad"
     MONEDA = "moneda"

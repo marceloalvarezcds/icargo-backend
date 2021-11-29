@@ -9,6 +9,7 @@ from app.endpoints import (
     color,
     composicion_juridica,
     contacto,
+    ente_emisor_automotor,
     gestor_carga,
     localidad,
     login,
@@ -45,6 +46,11 @@ api.include_router(
     tags=["composicion_juridica"],
 )
 api.include_router(contacto.api, prefix="/contacto", tags=["contacto"])
+api.include_router(
+    ente_emisor_automotor.api,
+    prefix="/ente_emisor_automotor",
+    tags=["ente_emisor_automotor"],
+)
 api.include_router(gestor_carga.api, prefix="/gestor_carga", tags=["gestor_carga"])
 api.include_router(localidad.api, prefix="/localidad", tags=["localidad"])
 api.include_router(login.api, prefix="/login", tags=["login"])
