@@ -26,6 +26,7 @@ class PermisoModeloEnum(Enum):
     ENTE_EMISOR_TRANSPORTE = "ente_emisor_transporte"
     GESTOR_CARGA = "gestor_carga"
     LOCALIDAD = "localidad"
+    MARCA_CAMION = "marca_camion"
     MONEDA = "moneda"
     PAIS = "pais"
     PERMISO = "permiso"
