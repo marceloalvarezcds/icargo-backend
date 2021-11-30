@@ -14,6 +14,7 @@ from .tipo_camion_seeds import tipo_camion_seeds
 from .tipo_carga_seeds import tipo_carga_seeds
 from .tipo_persona_seeds import tipo_persona_seeds
 from .tipo_registro_seeds import tipo_registro_seeds
+from .tipo_semi_seeds import tipo_semi_seeds
 from .user_seeds import user_seeds
 
 
@@ -32,4 +33,5 @@ def seeds(db: Session):
     tipo_carga_seeds(db)
     tipo_persona_seeds(db)
     tipo_registro_seeds(db)
+    tipo_semi_seeds(db)
     user_seeds(db)
