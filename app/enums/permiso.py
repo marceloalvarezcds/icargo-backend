@@ -38,6 +38,7 @@ class PermisoModeloEnum(Enum):
     ROL = "rol"
     SEMIRREMOLQUE = "semirremolque"
     SEMI_CLASIFICACION = "semi_clasificacion"
+    TIPO_CAMION = "tipo_camion"
     TIPO_CARGA = "tipo_carga"
     TIPO_DOCUMENTO = "tipo_documento"
     TIPO_PERSONA = "tipo_persona"

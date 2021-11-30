@@ -24,6 +24,7 @@ from app.endpoints import (
     punto_venta,
     remitente,
     semi_clasificacion,
+    tipo_camion,
     tipo_carga,
     tipo_documento,
     tipo_persona,
@@ -76,6 +77,7 @@ api.include_router(remitente.api, prefix="/remitente", tags=["remitente"])
 api.include_router(
     semi_clasificacion.api, prefix="/semi_clasificacion", tags=["semi_clasificacion"]
 )
+api.include_router(tipo_camion.api, prefix="/tipo_camion", tags=["tipo_camion"])
 api.include_router(tipo_carga.api, prefix="/tipo_carga", tags=["tipo_carga"])
 api.include_router(
     tipo_documento.api, prefix="/tipo_documento", tags=["tipo_documento"]

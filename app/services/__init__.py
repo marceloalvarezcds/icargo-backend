@@ -49,7 +49,11 @@ from .gestor_carga_remitente import (  # noqa
     create_gestor_carga_remitente,
     edit_gestor_carga_remitente,
 )
-from .pictshare import upload_and_get_image_url, upload_image  # noqa
+from .pictshare import (  # noqa
+    upload_and_get_binary_url,
+    upload_and_get_image_url,
+    upload_image,
+)
 from .propietario import (  # noqa
     create_propietario,
     delete_propietario,
