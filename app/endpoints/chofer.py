@@ -20,6 +20,17 @@ async def read_chofer_list(
     return repositories.get_chofer_list(db)
 
 
+@api.get("/gestor_cuenta", response_model=List[schemas.ChoferList])
+async def read_chofer_list_by_gestor_cuenta(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.CHOFER)),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return repositories.get_chofer_list_by_gestor_cuenta_id(
+        db, current_user.gestor_carga_id
+    )
+
+
 @api.get("/reports")
 async def chofer_reports(
     db: Session = Depends(get_db_session),  # noqa: B008

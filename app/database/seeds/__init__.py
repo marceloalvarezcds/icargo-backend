@@ -21,7 +21,6 @@ from .user_seeds import user_seeds
 def seeds(db: Session):
     centro_operativo_clasificacion_seeds(db)
     color_seeds(db)
-    ente_emisor_automotor_seeds(db)
     ente_emisor_transporte_seeds(db)
     marca_camion_seeds(db)
     marca_semi_seeds(db)
@@ -35,3 +34,4 @@ def seeds(db: Session):
     tipo_registro_seeds(db)
     tipo_semi_seeds(db)
     user_seeds(db)
+    ente_emisor_automotor_seeds(db)

@@ -2,6 +2,7 @@
 from app import audits  # noqa
 from app.database import Base  # noqa
 
+from .camion import Camion  # noqa
 from .cargo import Cargo  # noqa
 from .centro_operativo import CentroOperativo  # noqa
 from .centro_operativo_clasificacion import CentroOperativoClasificacion  # noqa

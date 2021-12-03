@@ -1,6 +1,6 @@
-from typing import BinaryIO, Optional, Union
+from typing import BinaryIO, Optional, Tuple, Union
 
-from fastapi import UploadFile  # type: ignore
+from fastapi import HTTPException, UploadFile
 from requests import post
 
 from app.config import PICTSHARE_API, PictShareSettings
@@ -36,3 +36,13 @@ async def upload_image(file: UploadFile) -> PictShareResponse:
 async def upload_and_get_image_url(file: UploadFile) -> str:
     response = await upload_image(file)
     return f"{PICTSHARE_API}/{response.hash}"
+
+
+async def check_duplicate_images(
+    image1: Optional[UploadFile], image2: Optional[UploadFile], err: str
+) -> Tuple[Optional[str], Optional[str]]:
+    url1 = await upload_and_get_image_url(image1) if image1 else None
+    url2 = await upload_and_get_image_url(image2) if image2 else None
+    if url1 and url2 and url1 == url2:
+        raise HTTPException(status_code=400, detail=err)
+    return (url1, url2)

@@ -13,6 +13,21 @@ def get_chofer_list(db: Session) -> List[Chofer]:
     return db.query(Chofer).filter(Chofer.estado != EstadoEnum.ELIMINADO.value).all()
 
 
+def get_chofer_list_by_gestor_cuenta_id(
+    db: Session, gestor_cuenta_id: int
+) -> List[Chofer]:
+    return (
+        db.query(Chofer)
+        .filter(
+            and_(
+                Chofer.gestor_cuenta_id == gestor_cuenta_id,
+                Chofer.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .all()
+    )
+
+
 def get_chofer_by(
     db: Session,
     tipo_documento_id: int,

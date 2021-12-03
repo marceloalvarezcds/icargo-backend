@@ -237,10 +237,10 @@ def get_propietario_reports(db: Session) -> str:
         value_cell.value = item.pais_origen.nombre
 
         value_cell = ws.cell(row=row + 2, column=5)
-        value_cell.value = item.gestor_cuenta.nombre if item.gestor_cuenta else ""
+        value_cell.value = item.gestor_cuenta_nombre
 
         value_cell = ws.cell(row=row + 2, column=6)
-        value_cell.value = item.oficial_cuenta.nombre if item.oficial_cuenta else ""
+        value_cell.value = item.oficial_cuenta_nombre
 
         value_cell = ws.cell(row=row + 2, column=7)
         value_cell.value = item.direccion if item.direccion else ""

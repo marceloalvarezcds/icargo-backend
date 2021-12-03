@@ -17,6 +17,21 @@ def get_propietario_list(db: Session) -> List[Propietario]:
     )
 
 
+def get_propietario_list_by_gestor_cuenta_id(
+    db: Session, gestor_cuenta_id: int
+) -> List[Propietario]:
+    return (
+        db.query(Propietario)
+        .filter(
+            and_(
+                Propietario.gestor_cuenta_id == gestor_cuenta_id,
+                Propietario.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .all()
+    )
+
+
 def get_propietario_by(
     db: Session,
     tipo_persona_id: int,

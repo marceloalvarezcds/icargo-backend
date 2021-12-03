@@ -1,5 +1,12 @@
 # should be imported to help code editor (vscode) for autocompletion
 from .auth import get_user_from_request, login  # noqa
+from .camion import (  # noqa
+    create_camion,
+    delete_camion,
+    edit_camion,
+    get_camion_by_id,
+    get_camion_reports,
+)
 from .centro_operativo import (  # noqa
     create_centro_operativo,
     delete_centro_operativo,
@@ -50,6 +57,7 @@ from .gestor_carga_remitente import (  # noqa
     edit_gestor_carga_remitente,
 )
 from .pictshare import (  # noqa
+    check_duplicate_images,
     upload_and_get_binary_url,
     upload_and_get_image_url,
     upload_image,

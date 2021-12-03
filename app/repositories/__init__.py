@@ -1,4 +1,13 @@
 # should be imported to help code editor (vscode) for autocompletion
+from .camion import (  # noqa
+    create_camion,
+    delete_camion,
+    edit_camion,
+    get_camion_by,
+    get_camion_by_id,
+    get_camion_list,
+    get_camion_list_by_propietario_id,
+)
 from .cargo import get_cargo_by_descripcion, get_cargo_list  # noqa
 from .centro_operativo import (  # noqa
     create_centro_operativo,
@@ -25,6 +34,7 @@ from .chofer import (  # noqa
     get_chofer_by,
     get_chofer_by_id,
     get_chofer_list,
+    get_chofer_list_by_gestor_cuenta_id,
 )
 from .chofer_propietario import (  # noqa
     create_propietario_by_chofer,
@@ -103,6 +113,7 @@ from .propietario import (  # noqa
     get_propietario_by,
     get_propietario_by_id,
     get_propietario_list,
+    get_propietario_list_by_gestor_cuenta_id,
 )
 from .propietario_chofer import (  # noqa
     create_chofer_by_propietario,

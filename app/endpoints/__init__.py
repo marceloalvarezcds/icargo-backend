@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.endpoints import (
+    camion,
     cargo,
     centro_operativo,
     centro_operativo_clasificacion,
@@ -35,6 +36,7 @@ from app.endpoints import (
 
 api = APIRouter()
 
+api.include_router(camion.api, prefix="/camion", tags=["camion"])
 api.include_router(cargo.api, prefix="/cargo", tags=["cargo"])
 api.include_router(
     centro_operativo_clasificacion.api,
