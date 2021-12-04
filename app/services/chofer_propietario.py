@@ -4,6 +4,7 @@ from fastapi import HTTPException, UploadFile  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
+from app.enums.estado import EstadoEnum
 from app.models import Chofer
 from app.schemas import ChoferForm, Propietario
 
@@ -67,7 +68,7 @@ async def create_or_edit_propietario_by_chofer(
     return get_propietario_detail(obj, gestor_cuenta_id)
 
 
-def delete_propietario_by_ruc(
+def disable_propietario_by_ruc(
     db: Session,
     propietario_ruc: Optional[str],
     modified_by: str,
@@ -75,4 +76,6 @@ def delete_propietario_by_ruc(
     if propietario_ruc:
         propietario = get_propietario_by_ruc(db, propietario_ruc)
         if propietario:
-            repositories.delete_propietario(propietario, db, modified_by)
+            repositories.change_propietario_status(
+                propietario, db, EstadoEnum.INACTIVO, modified_by
+            )

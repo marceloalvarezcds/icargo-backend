@@ -170,14 +170,23 @@ def edit_camion(
     return obj
 
 
-def delete_camion(
+def change_camion_status(
     obj: Camion,
     db: Session,
+    status: EstadoEnum,
     modified_by: str,
 ) -> Camion:
-    obj.estado = EstadoEnum.ELIMINADO.value
+    obj.estado = status.value
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()
     db.refresh(obj)
     return obj
+
+
+def delete_camion(
+    obj: Camion,
+    db: Session,
+    modified_by: str,
+) -> Camion:
+    return change_camion_status(obj, db, EstadoEnum.ELIMINADO, modified_by)

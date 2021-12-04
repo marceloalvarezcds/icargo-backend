@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class PermisoAccionEnum(Enum):
+    CAMBIAR_ESTADO = "cambiar_estado"
     CREAR = "crear"
     EDITAR = "editar"
     ELIMINAR = "eliminar"

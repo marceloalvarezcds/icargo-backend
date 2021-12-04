@@ -4,6 +4,7 @@ from fastapi import HTTPException, UploadFile  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
+from app.enums.estado import EstadoEnum
 from app.schemas import Chofer, PropietarioForm
 
 from .chofer import get_chofer_detail
@@ -66,7 +67,7 @@ async def create_or_edit_chofer_by_propietario(
         )
         edit_gestor_carga_chofer(db, obj, gestor_cuenta_id, data.alias, modified_by)
     else:
-        delete_chofer_by_id(db, chofer_id, modified_by)
+        disable_chofer_by_id(db, chofer_id, modified_by)
         obj = repositories.create_chofer_by_propietario(
             db,
             data,
@@ -82,7 +83,7 @@ async def create_or_edit_chofer_by_propietario(
     return get_chofer_detail(db, obj, gestor_cuenta_id)
 
 
-def delete_chofer_by_id(
+def disable_chofer_by_id(
     db: Session,
     chofer_id: Optional[int],
     modified_by: str,
@@ -90,4 +91,6 @@ def delete_chofer_by_id(
     if chofer_id:
         chofer = repositories.get_chofer_by_id(db, chofer_id)
         if chofer:
-            repositories.delete_chofer(chofer, db, modified_by)
+            repositories.change_chofer_status(
+                chofer, db, EstadoEnum.INACTIVO, modified_by
+            )

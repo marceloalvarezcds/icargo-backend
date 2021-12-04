@@ -157,14 +157,23 @@ def edit_chofer(
     return obj
 
 
-def delete_chofer(
+def change_chofer_status(
     obj: Chofer,
     db: Session,
+    status: EstadoEnum,
     modified_by: str,
 ) -> Chofer:
-    obj.estado = EstadoEnum.ELIMINADO.value
+    obj.estado = status.value
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()
     db.refresh(obj)
     return obj
+
+
+def delete_chofer(
+    obj: Chofer,
+    db: Session,
+    modified_by: str,
+) -> Chofer:
+    return change_chofer_status(obj, db, EstadoEnum.ELIMINADO, modified_by)

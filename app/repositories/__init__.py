@@ -1,5 +1,6 @@
 # should be imported to help code editor (vscode) for autocompletion
 from .camion import (  # noqa
+    change_camion_status,
     create_camion,
     delete_camion,
     edit_camion,
@@ -28,6 +29,7 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
     get_centro_operativo_contacto_gestor_carga_by,
 )
 from .chofer import (  # noqa
+    change_chofer_status,
     create_chofer,
     delete_chofer,
     edit_chofer,
@@ -107,6 +109,7 @@ from .moneda import get_moneda_by_simbolo, get_moneda_list  # noqa
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .permiso import get_permiso_by, get_permiso_list  # noqa
 from .propietario import (  # noqa
+    change_propietario_status,
     create_propietario,
     delete_propietario,
     edit_propietario,

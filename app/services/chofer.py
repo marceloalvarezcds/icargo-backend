@@ -13,7 +13,7 @@ from app.models import Chofer
 from .chofer_check_files import check_files, get_chofer_detail
 from .chofer_propietario import (
     create_or_edit_propietario_by_chofer,
-    delete_propietario_by_ruc,
+    disable_propietario_by_ruc,
 )
 from .gestor_carga_chofer import create_gestor_carga_chofer, edit_gestor_carga_chofer
 
@@ -162,7 +162,7 @@ async def edit_chofer(
             modified_by,
         )
     else:
-        delete_propietario_by_ruc(db, to_edit_obj.ruc, modified_by)
+        disable_propietario_by_ruc(db, to_edit_obj.ruc, modified_by)
     return get_chofer_detail(db, obj, gestor_cuenta_id)
 
 
