@@ -113,6 +113,10 @@ class CamionList(BaseModel):
     pais_emisor_placa_nombre: str
     pais_emisor_placa_nombre_corto: str
     tipo_descripcion: str
+    created_by: str
+    created_at: datetime
+    modified_by: str
+    modified_at: datetime
 
     class Config:
         orm_mode = True

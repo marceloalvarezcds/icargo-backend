@@ -117,6 +117,10 @@ class PropietarioBase(PropietarioBaseModel):
     # FIN Datos del Chofer
     estado: EstadoEnum
     ciudad: Ciudad
+    created_by: str
+    created_at: datetime
+    modified_by: str
+    modified_at: datetime
 
     class Config:
         orm_mode = True
@@ -134,9 +138,5 @@ class PropietarioList(PropietarioBase):
 
 
 class Propietario(PropietarioBase):
-    created_by: str
-    created_at: datetime
-    modified_by: str
-    modified_at: datetime
     contactos: List[PropietarioContactoGestorCargaList] = []
     gestor_carga_propietario: Optional[GestorCargaPropietario] = None
