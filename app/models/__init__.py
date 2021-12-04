@@ -2,6 +2,7 @@
 from app import audits  # noqa
 from app.database import Base  # noqa
 
+from .camion import Camion  # noqa
 from .cargo import Cargo  # noqa
 from .centro_operativo import CentroOperativo  # noqa
 from .centro_operativo_clasificacion import CentroOperativoClasificacion  # noqa
@@ -10,8 +11,11 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
 )
 from .chofer import Chofer  # noqa
 from .ciudad import Ciudad  # noqa
+from .color import Color  # noqa
 from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto  # noqa
+from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa
+from .ente_emisor_transporte import EnteEmisorTransporte  # noqa
 from .gestor_carga import GestorCarga  # noqa
 from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
 from .gestor_carga_chofer import GestorCargaChofer  # noqa
@@ -20,6 +24,8 @@ from .gestor_carga_proveedor import GestorCargaProveedor  # noqa
 from .gestor_carga_punto_venta import GestorCargaPuntoVenta  # noqa
 from .gestor_carga_remitente import GestorCargaRemitente  # noqa
 from .localidad import Localidad  # noqa
+from .marca_camion import MarcaCamion  # noqa
+from .marca_semi import MarcaSemi  # noqa
 from .moneda import Moneda  # noqa
 from .pais import Pais  # noqa
 from .permiso import Permiso  # noqa
@@ -32,7 +38,11 @@ from .punto_venta_contacto_gestor_carga import PuntoVentaContactoGestorCarga  # 
 from .remitente import Remitente  # noqa
 from .remitente_contacto_gestor_carga import RemitenteContactoGestorCarga  # noqa
 from .rol import Rol  # noqa
+from .semi_clasificacion import SemiClasificacion  # noqa
+from .tipo_camion import TipoCamion  # noqa
+from .tipo_carga import TipoCarga  # noqa
 from .tipo_documento import TipoDocumento  # noqa
 from .tipo_persona import TipoPersona  # noqa
 from .tipo_registro import TipoRegistro  # noqa
+from .tipo_semi import TipoSemi  # noqa
 from .user import User  # noqa

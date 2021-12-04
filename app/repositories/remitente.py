@@ -11,7 +11,10 @@ from app.schemas import RemitenteForm
 
 def get_remitente_list(db: Session) -> List[Remitente]:
     return (
-        db.query(Remitente).filter(Remitente.estado != EstadoEnum.ELIMINADO.value).all()
+        db.query(Remitente)
+        .filter(Remitente.estado != EstadoEnum.ELIMINADO.value)
+        .order_by(Remitente.nombre)
+        .all()
     )
 
 

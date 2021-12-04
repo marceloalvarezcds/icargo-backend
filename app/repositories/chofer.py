@@ -10,7 +10,28 @@ from app.schemas import ChoferEditForm, ChoferForm
 
 
 def get_chofer_list(db: Session) -> List[Chofer]:
-    return db.query(Chofer).filter(Chofer.estado != EstadoEnum.ELIMINADO.value).all()
+    return (
+        db.query(Chofer)
+        .filter(Chofer.estado != EstadoEnum.ELIMINADO.value)
+        .order_by(Chofer.nombre)
+        .all()
+    )
+
+
+def get_chofer_list_by_gestor_cuenta_id(
+    db: Session, gestor_cuenta_id: int
+) -> List[Chofer]:
+    return (
+        db.query(Chofer)
+        .filter(
+            and_(
+                Chofer.gestor_cuenta_id == gestor_cuenta_id,
+                Chofer.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(Chofer.nombre)
+        .all()
+    )
 
 
 def get_chofer_by(
@@ -136,14 +157,23 @@ def edit_chofer(
     return obj
 
 
-def delete_chofer(
+def change_chofer_status(
     obj: Chofer,
     db: Session,
+    status: EstadoEnum,
     modified_by: str,
 ) -> Chofer:
-    obj.estado = EstadoEnum.ELIMINADO.value
+    obj.estado = status.value
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()
     db.refresh(obj)
     return obj
+
+
+def delete_chofer(
+    obj: Chofer,
+    db: Session,
+    modified_by: str,
+) -> Chofer:
+    return change_chofer_status(obj, db, EstadoEnum.ELIMINADO, modified_by)

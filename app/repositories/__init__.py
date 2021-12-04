@@ -1,4 +1,14 @@
 # should be imported to help code editor (vscode) for autocompletion
+from .camion import (  # noqa
+    change_camion_status,
+    create_camion,
+    delete_camion,
+    edit_camion,
+    get_camion_by,
+    get_camion_by_id,
+    get_camion_list,
+    get_camion_list_by_propietario_id,
+)
 from .cargo import get_cargo_by_descripcion, get_cargo_list  # noqa
 from .centro_operativo import (  # noqa
     create_centro_operativo,
@@ -19,18 +29,21 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
     get_centro_operativo_contacto_gestor_carga_by,
 )
 from .chofer import (  # noqa
+    change_chofer_status,
     create_chofer,
     delete_chofer,
     edit_chofer,
     get_chofer_by,
     get_chofer_by_id,
     get_chofer_list,
+    get_chofer_list_by_gestor_cuenta_id,
 )
 from .chofer_propietario import (  # noqa
     create_propietario_by_chofer,
     edit_propietario_by_chofer,
 )
 from .ciudad import get_ciudad_by_nombre_and_localidad_id, get_ciudad_list  # noqa
+from .color import get_color_by_descripcion, get_color_list  # noqa
 from .composicion_juridica import (  # noqa
     get_composicion_juridica_by_nombre,
     get_composicion_juridica_list,
@@ -42,6 +55,14 @@ from .contacto import (  # noqa
     get_contacto_by_id,
     get_contacto_by_telefono,
     get_contacto_by_telefono_and_email,
+)
+from .ente_emisor_automotor import (  # noqa
+    get_ente_emisor_automotor_by_descripcion,
+    get_ente_emisor_automotor_list,
+)
+from .ente_emisor_transporte import (  # noqa
+    get_ente_emisor_transporte_by_descripcion,
+    get_ente_emisor_transporte_list,
 )
 from .gestor_carga import (  # noqa
     create_gestor_carga,
@@ -82,16 +103,20 @@ from .gestor_carga_remitente import (  # noqa
     get_gestor_carga_remitente_by,
 )
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
+from .marca_camion import get_marca_camion_by_descripcion, get_marca_camion_list  # noqa
+from .marca_semi import get_marca_semi_by_descripcion, get_marca_semi_list  # noqa
 from .moneda import get_moneda_by_simbolo, get_moneda_list  # noqa
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .permiso import get_permiso_by, get_permiso_list  # noqa
 from .propietario import (  # noqa
+    change_propietario_status,
     create_propietario,
     delete_propietario,
     edit_propietario,
     get_propietario_by,
     get_propietario_by_id,
     get_propietario_list,
+    get_propietario_list_by_gestor_cuenta_id,
 )
 from .propietario_chofer import (  # noqa
     create_chofer_by_propietario,
@@ -146,6 +171,12 @@ from .remitente_contacto_gestor_carga import (  # noqa
     get_remitente_contacto_gestor_carga_by,
 )
 from .rol import get_rol_by_codigo, get_rol_list  # noqa
+from .semi_clasificacion import (  # noqa
+    get_semi_clasificacion_by_descripcion,
+    get_semi_clasificacion_list,
+)
+from .tipo_camion import get_tipo_camion_by_descripcion, get_tipo_camion_list  # noqa
+from .tipo_carga import get_tipo_carga_by_descripcion, get_tipo_carga_list  # noqa
 from .tipo_documento import (  # noqa
     get_tipo_documento_by_descripcion,
     get_tipo_documento_list,
@@ -155,6 +186,7 @@ from .tipo_registro import (  # noqa
     get_tipo_registro_by_descripcion,
     get_tipo_registro_list,
 )
+from .tipo_semi import get_tipo_semi_by_descripcion, get_tipo_semi_list  # noqa
 from .user import (  # noqa
     create,
     get,

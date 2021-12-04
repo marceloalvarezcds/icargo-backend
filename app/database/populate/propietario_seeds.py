@@ -4,24 +4,53 @@ from typing import Optional
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import Chofer, Ciudad, GestorCarga, Pais, Propietario, TipoPersona, User
+from app.models import (
+    Chofer,
+    Ciudad,
+    Color,
+    GestorCarga,
+    MarcaCamion,
+    Pais,
+    Propietario,
+    TipoCamion,
+    TipoDocumento,
+    TipoPersona,
+    User,
+)
 from app.repositories import (
     get_cargo_by_descripcion,
     get_chofer_by,
     get_ciudad_by_nombre_and_localidad_id,
+    get_color_by_descripcion,
     get_contacto_by_email,
     get_localidad_by_nombre_and_pais_id,
+    get_marca_camion_by_descripcion,
     get_pais_by_nombre_corto,
     get_propietario_by,
+    get_tipo_camion_by_descripcion,
     get_tipo_documento_by_descripcion,
     get_tipo_persona_by_descripcion,
     get_user_list_by_gestor_carga_id,
 )
 
+from .camion_seeds import camion_seeds
 from .gestor_carga_propietario_seeds import gestor_carga_propietario_seeds
 from .propietario_contacto_gestor_carga_seeds import (
     propietario_contacto_gestor_carga_seeds,
 )
+
+
+def get_chofer_by_tipo_documento_pais_ruc(
+    db: Session,
+    tipo_documento: Optional[TipoDocumento],
+    pais_emisor_documento: Optional[Pais],
+    numero_documento: str,
+) -> Optional[Chofer]:
+    if tipo_documento and pais_emisor_documento and numero_documento:
+        return get_chofer_by(
+            db, tipo_documento.id, pais_emisor_documento.id, numero_documento
+        )
+    return None
 
 
 def propietario_seeds(
@@ -43,6 +72,11 @@ def propietario_seeds(
     oficial_cuenta: User,
     ciudad: Optional[Ciudad],
     chofer: Optional[Chofer] = None,
+    # Datos Camion y Semi
+    color: Optional[Color] = None,
+    # datos camion
+    marca_camion: Optional[MarcaCamion] = None,
+    tipo_camion: Optional[TipoCamion] = None,
 ):
     if tipo_persona and pais_origen and ciudad:
         obj = get_propietario_by(db, tipo_persona.id, ruc)
@@ -65,7 +99,7 @@ def propietario_seeds(
                 email=email,
                 direccion=direccion,
                 ciudad_id=ciudad.id,
-                chofer_id=chofer.id if chofer else None,
+                chofer_id=(chofer.id if chofer else None) if es_chofer else None,
             )
             db.add(propietario)
             db.commit()
@@ -74,6 +108,20 @@ def propietario_seeds(
             contacto = get_contacto_by_email(db, contacto_email)
             propietario_contacto_gestor_carga_seeds(
                 db, cargo, propietario, contacto, gestor_cuenta, contacto_alias
+            )
+            camion_seeds(
+                db,
+                placa=f"1{ruc}",
+                propietario=propietario,
+                chofer=chofer,
+                numero_chasis=f"2{ruc}",
+                ciudad_habilitacion_municipal=ciudad,
+                numero_habilitacion_municipal=f"3{ruc}",
+                numero_habilitacion_transporte=f"4{ruc}",
+                titular_habilitacion_automotor=nombre,
+                marca=marca_camion,
+                tipo=tipo_camion,
+                color=color,
             )
 
 
@@ -127,15 +175,45 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
     juridica = get_tipo_persona_by_descripcion(db, "Jurídica")
 
     cedula = get_tipo_documento_by_descripcion(db, "Cédula")
-    chofer = None
-    if cedula and paraguay:
-        chofer = get_chofer_by(db, cedula.id, paraguay.id, "3500500")
+    pasaporte = get_tipo_documento_by_descripcion(db, "Pasaporte")
+    ruc = get_tipo_documento_by_descripcion(db, "RUC")
+    carta = get_tipo_documento_by_descripcion(db, "Carta Argentina")
+
+    doc1 = "3500500"
+    doc2 = "p-500500"
+    doc3 = "800500500"
+    doc4 = "3600600"
+    doc5 = "p-600600"
+
+    chofer1 = get_chofer_by_tipo_documento_pais_ruc(db, cedula, paraguay, doc1)
+    chofer2 = get_chofer_by_tipo_documento_pais_ruc(db, pasaporte, paraguay, doc2)
+    chofer3 = get_chofer_by_tipo_documento_pais_ruc(db, ruc, paraguay, doc3)
+    chofer4 = get_chofer_by_tipo_documento_pais_ruc(db, carta, paraguay, doc4)
+    chofer5 = get_chofer_by_tipo_documento_pais_ruc(db, cedula, paraguay, doc5)
+
+    azul = get_color_by_descripcion(db, "AZUL")
+    blanco = get_color_by_descripcion(db, "BLANCO")
+    gris = get_color_by_descripcion(db, "GRIS")
+    negro = get_color_by_descripcion(db, "NEGRO")
+    rojo = get_color_by_descripcion(db, "ROJO")
+
+    lumavit = get_marca_camion_by_descripcion(db, "LUMAVIT")
+    mercedes = get_marca_camion_by_descripcion(db, "MERCEDES BENZ")
+    metalurgica = get_marca_camion_by_descripcion(db, "METALURGICA GUTIERREZ")
+    phoenix = get_marca_camion_by_descripcion(db, "PHOENIX")
+    scania = get_marca_camion_by_descripcion(db, "SCANIA")
+
+    trucky = get_tipo_camion_by_descripcion(db, "Trucky")
+    chasis = get_tipo_camion_by_descripcion(db, "Chasis & Acoplado")
+    trucado = get_tipo_camion_by_descripcion(db, "1S.2D (trucado)")
+    sencillo = get_tipo_camion_by_descripcion(db, "1S.1S (sencillo)")
+    normal = get_tipo_camion_by_descripcion(db, "1S.1D (normal)")
 
     propietario_seeds(
         db,
         nombre="Propietario Chofer 1",
         tipo_persona=fisica,
-        ruc="3500500",
+        ruc=doc1,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=True,
@@ -149,13 +227,16 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=los_cedrales,
-        chofer=chofer,
+        chofer=chofer1,
+        color=azul,
+        marca_camion=lumavit,
+        tipo_camion=trucky,
     )
     propietario_seeds(
         db,
         nombre="KM 28 - CARGILL SAECA",
         tipo_persona=juridica,
-        ruc="p-500500",
+        ruc=doc2,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -169,12 +250,16 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=minga_guazu,
+        chofer=chofer2,
+        color=blanco,
+        marca_camion=mercedes,
+        tipo_camion=chasis,
     )
     propietario_seeds(
         db,
         nombre="CARGILL_NUEVA TOLEDO",
         tipo_persona=juridica,
-        ruc="800500500",
+        ruc=doc3,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -188,12 +273,16 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=caaguazu,
+        chofer=chofer3,
+        color=gris,
+        marca_camion=metalurgica,
+        tipo_camion=trucado,
     )
     propietario_seeds(
         db,
         nombre="CARGILL_VAQUERIA",
         tipo_persona=fisica,
-        ruc="3600600",
+        ruc=doc4,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -207,12 +296,16 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=asuncion,
+        chofer=chofer4,
+        color=negro,
+        marca_camion=phoenix,
+        tipo_camion=sencillo,
     )
     propietario_seeds(
         db,
         nombre="CARGILL_PACURI",
         tipo_persona=juridica,
-        ruc="p-600600",
+        ruc=doc5,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -226,6 +319,10 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=ciudad_del_este,
+        chofer=chofer5,
+        color=rojo,
+        marca_camion=scania,
+        tipo_camion=normal,
     )
 
 
@@ -326,15 +423,62 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
     juridica = get_tipo_persona_by_descripcion(db, "Jurídica")
 
     cedula = get_tipo_documento_by_descripcion(db, "Cédula")
-    chofer = None
-    if cedula and paraguay:
-        chofer = get_chofer_by(db, cedula.id, paraguay.id, "3100100")
+    pasaporte = get_tipo_documento_by_descripcion(db, "Pasaporte")
+    ruc = get_tipo_documento_by_descripcion(db, "RUC")
+    carta = get_tipo_documento_by_descripcion(db, "Carta Argentina")
+
+    doc1 = "3100100"
+    doc2 = "p-100100"
+    doc3 = "800100100"
+    doc4 = "3200200"
+    doc5 = "p-200200"
+    doc6 = "800200200"
+    doc7 = "3300300"
+    doc8 = "p-300300"
+    doc9 = "800300300"
+    doc10 = "3400400"
+    doc11 = "p-400400"
+    doc12 = "800400400"
+
+    chofer1 = get_chofer_by_tipo_documento_pais_ruc(db, cedula, paraguay, doc1)
+    chofer2 = get_chofer_by_tipo_documento_pais_ruc(db, pasaporte, paraguay, doc2)
+    chofer3 = get_chofer_by_tipo_documento_pais_ruc(db, ruc, paraguay, doc3)
+    chofer4 = get_chofer_by_tipo_documento_pais_ruc(db, carta, paraguay, doc4)
+    chofer5 = get_chofer_by_tipo_documento_pais_ruc(db, cedula, paraguay, doc5)
+    chofer6 = get_chofer_by_tipo_documento_pais_ruc(db, pasaporte, paraguay, doc6)
+    chofer7 = get_chofer_by_tipo_documento_pais_ruc(db, ruc, paraguay, doc7)
+    chofer8 = get_chofer_by_tipo_documento_pais_ruc(db, carta, paraguay, doc8)
+    chofer9 = get_chofer_by_tipo_documento_pais_ruc(db, cedula, paraguay, doc9)
+    chofer10 = get_chofer_by_tipo_documento_pais_ruc(db, pasaporte, paraguay, doc10)
+    chofer11 = get_chofer_by_tipo_documento_pais_ruc(db, ruc, argentina, doc11)
+    chofer12 = get_chofer_by_tipo_documento_pais_ruc(db, carta, brasil, doc12)
+
+    azul = get_color_by_descripcion(db, "AZUL")
+    blanco = get_color_by_descripcion(db, "BLANCO")
+    gris = get_color_by_descripcion(db, "GRIS")
+    negro = get_color_by_descripcion(db, "NEGRO")
+    rojo = get_color_by_descripcion(db, "ROJO")
+    verde = get_color_by_descripcion(db, "VERDE")
+
+    lumavit = get_marca_camion_by_descripcion(db, "LUMAVIT")
+    mercedes = get_marca_camion_by_descripcion(db, "MERCEDES BENZ")
+    metalurgica = get_marca_camion_by_descripcion(db, "METALURGICA GUTIERREZ")
+    phoenix = get_marca_camion_by_descripcion(db, "PHOENIX")
+    scania = get_marca_camion_by_descripcion(db, "SCANIA")
+    tecno = get_marca_camion_by_descripcion(db, "TECNO EQUIPO")
+    volvo = get_marca_camion_by_descripcion(db, "VOLVO")
+
+    trucky = get_tipo_camion_by_descripcion(db, "Trucky")
+    chasis = get_tipo_camion_by_descripcion(db, "Chasis & Acoplado")
+    trucado = get_tipo_camion_by_descripcion(db, "1S.2D (trucado)")
+    sencillo = get_tipo_camion_by_descripcion(db, "1S.1S (sencillo)")
+    normal = get_tipo_camion_by_descripcion(db, "1S.1D (normal)")
 
     propietario_seeds(
         db,
         nombre="Propietario Transred 1",
         tipo_persona=fisica,
-        ruc="3100100",
+        ruc=doc1,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=True,
@@ -348,13 +492,16 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=santa_rita,
-        chofer=chofer,
+        chofer=chofer1,
+        color=azul,
+        marca_camion=lumavit,
+        tipo_camion=trucky,
     )
     propietario_seeds(
         db,
         nombre="GICAL KM12",
         tipo_persona=juridica,
-        ruc="p-100100",
+        ruc=doc2,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -368,12 +515,16 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=hernandarias,
+        chofer=chofer2,
+        color=blanco,
+        marca_camion=mercedes,
+        tipo_camion=chasis,
     )
     propietario_seeds(
         db,
         nombre="LA PAZ",
         tipo_persona=juridica,
-        ruc="800100100",
+        ruc=doc3,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -387,12 +538,16 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=la_paz,
+        chofer=chofer3,
+        color=gris,
+        marca_camion=metalurgica,
+        tipo_camion=trucado,
     )
     propietario_seeds(
         db,
         nombre="PUERTO TROCIUCK",
         tipo_persona=fisica,
-        ruc="3200200",
+        ruc=doc4,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -406,12 +561,16 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=encarnacion,
+        chofer=chofer4,
+        color=negro,
+        marca_camion=phoenix,
+        tipo_camion=sencillo,
     )
     propietario_seeds(
         db,
         nombre="PUERTO SAN ANTONIO",
         tipo_persona=juridica,
-        ruc="p-200200",
+        ruc=doc5,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -425,12 +584,16 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=san_antonio,
+        chofer=chofer5,
+        color=rojo,
+        marca_camion=scania,
+        tipo_camion=normal,
     )
     propietario_seeds(
         db,
         nombre="AGROFERTIL SANTA FE",
         tipo_persona=juridica,
-        ruc="800200200",
+        ruc=doc6,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -444,12 +607,16 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=hernandarias,
+        chofer=chofer6,
+        color=verde,
+        marca_camion=tecno,
+        tipo_camion=trucky,
     )
     propietario_seeds(
         db,
         nombre="ITAKYRY",
         tipo_persona=fisica,
-        ruc="3300300",
+        ruc=doc7,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -463,12 +630,16 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=itakyry,
+        chofer=chofer7,
+        color=azul,
+        marca_camion=volvo,
+        tipo_camion=chasis,
     )
     propietario_seeds(
         db,
         nombre="ESTANCIA YBY PORA",
         tipo_persona=juridica,
-        ruc="p-300300",
+        ruc=doc8,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -482,12 +653,16 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=san_isidro,
+        chofer=chofer8,
+        color=blanco,
+        marca_camion=lumavit,
+        tipo_camion=trucado,
     )
     propietario_seeds(
         db,
         nombre="LOS CEDRALES",
         tipo_persona=juridica,
-        ruc="800300300",
+        ruc=doc9,
         digito_verificador="1",
         pais_origen=paraguay,
         es_chofer=False,
@@ -501,12 +676,16 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=salto_del_guaira,
+        chofer=chofer9,
+        color=gris,
+        marca_camion=mercedes,
+        tipo_camion=sencillo,
     )
     propietario_seeds(
         db,
         nombre="PUERTO CAIASA",
         tipo_persona=fisica,
-        ruc="3400400",
+        ruc=doc10,
         digito_verificador="2",
         pais_origen=paraguay,
         es_chofer=False,
@@ -520,12 +699,16 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=villeta,
+        chofer=chofer10,
+        color=negro,
+        marca_camion=metalurgica,
+        tipo_camion=normal,
     )
     propietario_seeds(
         db,
         nombre="PUERTO UNION",
         tipo_persona=juridica,
-        ruc="p-400400",
+        ruc=doc11,
         digito_verificador="2",
         pais_origen=argentina,
         es_chofer=False,
@@ -539,12 +722,16 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=ambato,
+        chofer=chofer11,
+        color=rojo,
+        marca_camion=phoenix,
+        tipo_camion=trucky,
     )
     propietario_seeds(
         db,
         nombre="LDC_POZUELO",
         tipo_persona=juridica,
-        ruc="800400400",
+        ruc=doc12,
         digito_verificador="3",
         pais_origen=brasil,
         es_chofer=False,
@@ -558,4 +745,8 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         gestor_cuenta=gestor_cuenta,
         oficial_cuenta=oficial_cuenta,
         ciudad=california,
+        chofer=chofer12,
+        color=verde,
+        marca_camion=scania,
+        tipo_camion=chasis,
     )

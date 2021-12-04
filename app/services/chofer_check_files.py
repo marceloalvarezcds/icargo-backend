@@ -1,13 +1,13 @@
 from typing import List, Optional, Tuple
 
-from fastapi import HTTPException, UploadFile
+from fastapi import UploadFile
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import schemas
 from app.models import Chofer, GestorCargaChofer
 from app.services import propietario_check_files
 
-from .pictshare import upload_and_get_image_url
+from .pictshare import check_duplicate_images
 
 
 async def check_files(
@@ -26,25 +26,14 @@ async def check_files(
         foto_documento_reverso_file,
         foto_perfil_file,
     )
-    foto_registro_frente_url = (
-        await upload_and_get_image_url(foto_registro_frente_file)
-        if foto_registro_frente_file
-        else None
+    (
+        foto_registro_frente_url,
+        foto_registro_reverso_url,
+    ) = await check_duplicate_images(
+        foto_registro_frente_file,
+        foto_registro_reverso_file,
+        "El reverso y el frente del registro no pueden ser las mismas imágenes",
     )
-    foto_registro_reverso_url = (
-        await upload_and_get_image_url(foto_registro_reverso_file)
-        if foto_registro_reverso_file
-        else None
-    )
-    if (
-        foto_registro_frente_url
-        and foto_registro_reverso_url
-        and foto_registro_frente_url == foto_registro_reverso_url
-    ):
-        raise HTTPException(
-            status_code=400,
-            detail="El reverso y el frente del registro no pueden ser las mismas imágenes",
-        )
     return (
         foto_documento_frente_url,
         foto_documento_reverso_url,

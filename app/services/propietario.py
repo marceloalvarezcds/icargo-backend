@@ -17,7 +17,7 @@ from .gestor_carga_propietario import (
 from .propietario_check_files import check_files, get_propietario_detail
 from .propietario_chofer import (
     create_or_edit_chofer_by_propietario,
-    delete_chofer_by_id,
+    disable_chofer_by_id,
 )
 from .propietario_contacto import update_propietario_contacto_list
 
@@ -127,7 +127,7 @@ async def edit_propietario(
     )
     to_edit_obj = get_propietario_by_id(db, id)
     chofer_id = to_edit_obj.chofer_id
-    chofer = None
+    chofer = to_edit_obj.chofer
     if data.es_chofer:
         chofer_data = cast(schemas.PropietarioForm, data)
         chofer = await create_or_edit_chofer_by_propietario(
@@ -143,7 +143,7 @@ async def edit_propietario(
             chofer_id,
         )
     else:
-        delete_chofer_by_id(db, chofer_id, modified_by)
+        disable_chofer_by_id(db, chofer_id, modified_by)
     obj = repositories.edit_propietario(
         to_edit_obj,
         db,
@@ -237,10 +237,10 @@ def get_propietario_reports(db: Session) -> str:
         value_cell.value = item.pais_origen.nombre
 
         value_cell = ws.cell(row=row + 2, column=5)
-        value_cell.value = item.gestor_cuenta.nombre if item.gestor_cuenta else ""
+        value_cell.value = item.gestor_cuenta_nombre
 
         value_cell = ws.cell(row=row + 2, column=6)
-        value_cell.value = item.oficial_cuenta.nombre if item.oficial_cuenta else ""
+        value_cell.value = item.oficial_cuenta_nombre
 
         value_cell = ws.cell(row=row + 2, column=7)
         value_cell.value = item.direccion if item.direccion else ""

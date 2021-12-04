@@ -96,6 +96,7 @@ def edit_chofer_by_propietario(
     if foto_registro_reverso_url:
         obj.foto_registro_reverso = foto_registro_reverso_url
     # fin registro
+    obj.estado = EstadoEnum.PENDIENTE.value
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()

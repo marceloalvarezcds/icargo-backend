@@ -47,14 +47,57 @@ def permiso_generico_seeds(db: Session, user: User):
     permisos = []
     permisos.append(permiso_seeds(db, a.LISTAR, m.CARGO))
     permisos.append(permiso_seeds(db, a.LISTAR, m.CIUDAD))
+    permisos.append(permiso_seeds(db, a.LISTAR, m.COLOR))
     permisos.append(permiso_seeds(db, a.VER, m.CONTACTO))
+    permisos.append(
+        permiso_seeds(
+            db,
+            a.LISTAR,
+            m.ENTE_EMISOR_AUTOMOTOR,
+            True,
+            "Listar Ente Emisor del Automotor",
+        )
+    )
+    permisos.append(
+        permiso_seeds(
+            db,
+            a.LISTAR,
+            m.ENTE_EMISOR_TRANSPORTE,
+            True,
+            "Listar Ente Emisor del Transporte",
+        )
+    )
     permisos.append(permiso_seeds(db, a.LISTAR, m.LOCALIDAD))
+    permisos.append(
+        permiso_seeds(db, a.LISTAR, m.MARCA_CAMION, True, "Listar Marca de Camión")
+    )
+    permisos.append(
+        permiso_seeds(db, a.LISTAR, m.MARCA_SEMI, True, "Listar Marca de Semi")
+    )
     permisos.append(permiso_seeds(db, a.LISTAR, m.PAIS, True, "Listar País"))
+    permisos.append(
+        permiso_seeds(
+            db,
+            a.LISTAR,
+            m.SEMI_CLASIFICACION,
+            True,
+            "Listar Clasificación Semi-remolque",
+        )
+    )
+    permisos.append(
+        permiso_seeds(db, a.LISTAR, m.TIPO_CAMION, True, "Listar Tipo de Camion")
+    )
+    permisos.append(
+        permiso_seeds(db, a.LISTAR, m.TIPO_CARGA, True, "Listar Tipo de Carga")
+    )
     permisos.append(
         permiso_seeds(db, a.LISTAR, m.TIPO_PERSONA, True, "Listar Tipo de Persona")
     )
     permisos.append(
         permiso_seeds(db, a.LISTAR, m.TIPO_REGISTRO, True, "Listar Tipo de Registro")
+    )
+    permisos.append(
+        permiso_seeds(db, a.LISTAR, m.TIPO_SEMI, True, "Listar Tipo de Semi-Remolque")
     )
     permisos.append(permiso_seeds(db, a.LISTAR, m.USER))
     permisos.append(permiso_seeds(db, a.VER, m.USER))

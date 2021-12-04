@@ -82,6 +82,7 @@ def edit_propietario_by_chofer(
         obj.foto_documento_reverso = foto_documento_reverso_url
     if foto_perfil_url:
         obj.foto_perfil = foto_perfil_url
+    obj.estado = EstadoEnum.PENDIENTE.value
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()

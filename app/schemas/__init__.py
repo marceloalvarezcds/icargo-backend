@@ -1,4 +1,5 @@
 # should be imported to help code editor (vscode) for autocompletion
+from .camion import Camion, CamionForm, CamionList  # noqa
 from .cargo import Cargo  # noqa
 from .centro_operativo import (  # noqa
     CentroOperativo,
@@ -12,8 +13,11 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
 )
 from .chofer import Chofer, ChoferEditForm, ChoferForm, ChoferList  # noqa
 from .ciudad import Ciudad  # noqa
+from .color import Color  # noqa
 from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
+from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa
+from .ente_emisor_transporte import EnteEmisorTransporte  # noqa
 from .gestor_carga import GestorCarga, GestorCargaForm, GestorCargaList  # noqa
 from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
 from .gestor_carga_chofer import GestorCargaChofer  # noqa
@@ -22,6 +26,8 @@ from .gestor_carga_proveedor import GestorCargaProveedor  # noqa
 from .gestor_carga_punto_venta import GestorCargaPuntoVenta  # noqa
 from .gestor_carga_remitente import GestorCargaRemitente  # noqa
 from .localidad import Localidad  # noqa
+from .marca_camion import MarcaCamion  # noqa
+from .marca_semi import MarcaSemi  # noqa
 from .moneda import Moneda  # noqa
 from .pais import Pais  # noqa
 from .permiso import Permiso  # noqa
@@ -50,9 +56,13 @@ from .remitente_contacto_gestor_carga import (  # noqa
     RemitenteContactoGestorCarga,
     RemitenteContactoGestorCargaList,
 )
+from .semi_clasificacion import SemiClasificacion  # noqa
+from .tipo_camion import TipoCamion  # noqa
+from .tipo_carga import TipoCarga  # noqa
 from .tipo_documento import TipoDocumento  # noqa
 from .tipo_persona import TipoPersona  # noqa
 from .tipo_registro import TipoRegistro  # noqa
+from .tipo_semi import TipoSemi  # noqa
 from .token import Token, TokenPayload  # noqa
 from .user import (  # noqa
     User,

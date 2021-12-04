@@ -32,8 +32,8 @@ class ChoferBaseModel(BaseModel):
     foto_documento_frente_propietario: Optional[str] = None
     foto_documento_reverso_propietario: Optional[str] = None
     # inicio registro
-    pais_emisor_registro_id: int
-    localidad_emisor_registro_id: int
+    pais_emisor_registro_id: Optional[int] = None
+    localidad_emisor_registro_id: Optional[int] = None
     ciudad_emisor_registro_id: int
     tipo_registro_id: int
     numero_registro: str
@@ -129,6 +129,10 @@ class ChoferList(BaseModel):
     localidad_nombre: Optional[str] = None
     pais_nombre: Optional[str] = None
     pais_nombre_corto: Optional[str] = None
+    created_by: str
+    created_at: datetime
+    modified_by: str
+    modified_at: datetime
 
     class Config:
         orm_mode = True

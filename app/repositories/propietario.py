@@ -13,6 +13,23 @@ def get_propietario_list(db: Session) -> List[Propietario]:
     return (
         db.query(Propietario)
         .filter(Propietario.estado != EstadoEnum.ELIMINADO.value)
+        .order_by(Propietario.nombre)
+        .all()
+    )
+
+
+def get_propietario_list_by_gestor_cuenta_id(
+    db: Session, gestor_cuenta_id: int
+) -> List[Propietario]:
+    return (
+        db.query(Propietario)
+        .filter(
+            and_(
+                Propietario.gestor_cuenta_id == gestor_cuenta_id,
+                Propietario.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(Propietario.nombre)
         .all()
     )
 
@@ -116,14 +133,23 @@ def edit_propietario(
     return obj
 
 
-def delete_propietario(
+def change_propietario_status(
     obj: Propietario,
     db: Session,
+    status: EstadoEnum,
     modified_by: str,
 ) -> Propietario:
-    obj.estado = EstadoEnum.ELIMINADO.value
+    obj.estado = status.value
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()
     db.refresh(obj)
     return obj
+
+
+def delete_propietario(
+    obj: Propietario,
+    db: Session,
+    modified_by: str,
+) -> Propietario:
+    return change_propietario_status(obj, db, EstadoEnum.ELIMINADO, modified_by)

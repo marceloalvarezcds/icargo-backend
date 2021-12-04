@@ -1,6 +1,6 @@
 from typing import List, Optional, Tuple
 
-from fastapi import HTTPException, UploadFile
+from fastapi import UploadFile
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
@@ -11,7 +11,7 @@ from app.models import (
     PropietarioContactoGestorCarga,
 )
 
-from .pictshare import upload_and_get_image_url
+from .pictshare import check_duplicate_images, upload_and_get_image_url
 
 
 async def check_files(
@@ -19,25 +19,14 @@ async def check_files(
     foto_documento_reverso_file: Optional[UploadFile],
     foto_perfil_file: Optional[UploadFile],
 ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
-    foto_documento_frente_url = (
-        await upload_and_get_image_url(foto_documento_frente_file)
-        if foto_documento_frente_file
-        else None
+    (
+        foto_documento_frente_url,
+        foto_documento_reverso_url,
+    ) = await check_duplicate_images(
+        foto_documento_frente_file,
+        foto_documento_reverso_file,
+        "El reverso y el frente del documento no pueden ser las mismas imágenes",
     )
-    foto_documento_reverso_url = (
-        await upload_and_get_image_url(foto_documento_reverso_file)
-        if foto_documento_reverso_file
-        else None
-    )
-    if (
-        foto_documento_frente_url
-        and foto_documento_reverso_url
-        and foto_documento_frente_url == foto_documento_reverso_url
-    ):
-        raise HTTPException(
-            status_code=400,
-            detail="El reverso y el frente del documento no pueden ser las mismas imágenes",
-        )
     foto_perfil_url = (
         await upload_and_get_image_url(foto_perfil_file) if foto_perfil_file else None
     )

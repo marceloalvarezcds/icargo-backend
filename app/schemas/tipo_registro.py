@@ -1,9 +1,5 @@
-from .estado_base_model import EstadoBaseModel
+from .seleccionable_base_model import SeleccionableBaseModel
 
 
-class TipoRegistro(EstadoBaseModel):
-    id: int
-    descripcion: str
-
-    class Config:
-        orm_mode = True
+class TipoRegistro(SeleccionableBaseModel):
+    pass
