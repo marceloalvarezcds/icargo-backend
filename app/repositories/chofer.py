@@ -10,7 +10,12 @@ from app.schemas import ChoferEditForm, ChoferForm
 
 
 def get_chofer_list(db: Session) -> List[Chofer]:
-    return db.query(Chofer).filter(Chofer.estado != EstadoEnum.ELIMINADO.value).all()
+    return (
+        db.query(Chofer)
+        .filter(Chofer.estado != EstadoEnum.ELIMINADO.value)
+        .order_by(Chofer.nombre)
+        .all()
+    )
 
 
 def get_chofer_list_by_gestor_cuenta_id(
@@ -24,6 +29,7 @@ def get_chofer_list_by_gestor_cuenta_id(
                 Chofer.estado != EstadoEnum.ELIMINADO.value,
             )
         )
+        .order_by(Chofer.nombre)
         .all()
     )
 

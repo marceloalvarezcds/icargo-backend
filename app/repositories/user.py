@@ -50,4 +50,9 @@ def get_by_username(db: Session, username: str) -> Optional[User]:
 
 
 def get_user_list_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> List[User]:
-    return db.query(User).filter(User.gestor_carga_id == gestor_carga_id).all()
+    return (
+        db.query(User)
+        .filter(User.gestor_carga_id == gestor_carga_id)
+        .order_by(User.first_name.desc(), User.last_name)
+        .all()
+    )

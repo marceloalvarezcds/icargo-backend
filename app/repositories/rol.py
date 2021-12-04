@@ -10,4 +10,4 @@ def get_rol_by_codigo(db: Session, codigo: str) -> Optional[Rol]:
 
 
 def get_rol_list(db: Session) -> List[Rol]:
-    return db.query(Rol).all()
+    return db.query(Rol).order_by(Rol.descripcion).all()

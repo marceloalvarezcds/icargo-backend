@@ -9,7 +9,12 @@ from app.schemas import CamionForm
 
 
 def get_camion_list(db: Session) -> List[Camion]:
-    return db.query(Camion).filter(Camion.estado != EstadoEnum.ELIMINADO.value).all()
+    return (
+        db.query(Camion)
+        .filter(Camion.estado != EstadoEnum.ELIMINADO.value)
+        .order_by(Camion.placa)
+        .all()
+    )
 
 
 def get_camion_by(db: Session, placa: str) -> Optional[Camion]:
@@ -21,7 +26,12 @@ def get_camion_by_id(db: Session, id: int) -> Optional[Camion]:
 
 
 def get_camion_list_by_propietario_id(db: Session, propietario_id: int) -> List[Camion]:
-    return db.query(Camion).filter(Camion.propietario_id == propietario_id).all()
+    return (
+        db.query(Camion)
+        .filter(Camion.propietario_id == propietario_id)
+        .order_by(Camion.placa)
+        .all()
+    )
 
 
 def create_camion(

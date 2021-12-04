@@ -10,4 +10,4 @@ def get_cargo_by_descripcion(db: Session, descripcion: str) -> Optional[Cargo]:
 
 
 def get_cargo_list(db: Session) -> List[Cargo]:
-    return db.query(Cargo).all()
+    return db.query(Cargo).order_by(Cargo.descripcion).all()

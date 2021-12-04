@@ -18,4 +18,8 @@ def get_centro_operativo_clasificacion_by_nombre(
 def get_centro_operativo_clasificacion_list(
     db: Session,
 ) -> List[CentroOperativoClasificacion]:
-    return db.query(CentroOperativoClasificacion).all()
+    return (
+        db.query(CentroOperativoClasificacion)
+        .order_by(CentroOperativoClasificacion.nombre)
+        .all()
+    )

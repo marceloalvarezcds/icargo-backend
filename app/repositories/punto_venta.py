@@ -18,6 +18,7 @@ def get_punto_venta_list(db: Session, proveedor_id: int) -> List[PuntoVenta]:
                 PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
             )
         )
+        .order_by(PuntoVenta.nombre)
         .all()
     )
 

@@ -13,6 +13,7 @@ def get_gestor_carga_list(db: Session) -> List[GestorCarga]:
     return (
         db.query(GestorCarga)
         .filter(GestorCarga.estado != EstadoEnum.ELIMINADO.value)
+        .order_by(GestorCarga.nombre)
         .all()
     )
 

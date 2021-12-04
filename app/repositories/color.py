@@ -10,4 +10,4 @@ def get_color_by_descripcion(db: Session, descripcion: str) -> Optional[Color]:
 
 
 def get_color_list(db: Session) -> List[Color]:
-    return db.query(Color).order_by(Color.descripcion).all()
+    return db.query(Color).order_by(Color.descripcion).order_by(Color.descripcion).all()
