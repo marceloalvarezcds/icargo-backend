@@ -99,4 +99,11 @@ from .remitente import (  # noqa
 )
 from .remitente_contacto import update_remitente_contacto_list  # noqa
 from .security import create_access_token  # noqa
+from .semi import (  # noqa
+    create_semi,
+    delete_semi,
+    edit_semi,
+    get_semi_by_id,
+    get_semi_reports,
+)
 from .user import create_user  # noqa
