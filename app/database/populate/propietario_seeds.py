@@ -10,11 +10,15 @@ from app.models import (
     Color,
     GestorCarga,
     MarcaCamion,
+    MarcaSemi,
     Pais,
     Propietario,
+    SemiClasificacion,
     TipoCamion,
+    TipoCarga,
     TipoDocumento,
     TipoPersona,
+    TipoSemi,
     User,
 )
 from app.repositories import (
@@ -25,11 +29,15 @@ from app.repositories import (
     get_contacto_by_email,
     get_localidad_by_nombre_and_pais_id,
     get_marca_camion_by_descripcion,
+    get_marca_semi_by_descripcion,
     get_pais_by_nombre_corto,
     get_propietario_by,
+    get_semi_clasificacion_by_descripcion,
     get_tipo_camion_by_descripcion,
+    get_tipo_carga_by_descripcion,
     get_tipo_documento_by_descripcion,
     get_tipo_persona_by_descripcion,
+    get_tipo_semi_by_descripcion,
     get_user_list_by_gestor_carga_id,
 )
 
@@ -38,6 +46,7 @@ from .gestor_carga_propietario_seeds import gestor_carga_propietario_seeds
 from .propietario_contacto_gestor_carga_seeds import (
     propietario_contacto_gestor_carga_seeds,
 )
+from .semi_seeds import semi_seeds
 
 
 def get_chofer_by_tipo_documento_pais_ruc(
@@ -77,6 +86,11 @@ def propietario_seeds(
     # datos camion
     marca_camion: Optional[MarcaCamion] = None,
     tipo_camion: Optional[TipoCamion] = None,
+    # datos semi
+    marca_semi: Optional[MarcaSemi] = None,
+    clasificacion_semi: Optional[SemiClasificacion] = None,
+    tipo_semi: Optional[TipoSemi] = None,
+    tipo_carga: Optional[TipoCarga] = None,
 ):
     if tipo_persona and pais_origen and ciudad:
         obj = get_propietario_by(db, tipo_persona.id, ruc)
@@ -121,6 +135,21 @@ def propietario_seeds(
                 titular_habilitacion_automotor=nombre,
                 marca=marca_camion,
                 tipo=tipo_camion,
+                color=color,
+            )
+            semi_seeds(
+                db,
+                placa=f"1{ruc}",
+                propietario=propietario,
+                numero_chasis=f"2{ruc}",
+                ciudad_habilitacion_municipal=ciudad,
+                numero_habilitacion_municipal=f"3{ruc}",
+                numero_habilitacion_transporte=f"4{ruc}",
+                titular_habilitacion_automotor=nombre,
+                marca=marca_semi,
+                clasificacion=clasificacion_semi,
+                tipo=tipo_semi,
+                tipo_carga=tipo_carga,
                 color=color,
             )
 
@@ -209,6 +238,27 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
     sencillo = get_tipo_camion_by_descripcion(db, "1S.1S (sencillo)")
     normal = get_tipo_camion_by_descripcion(db, "1S.1D (normal)")
 
+    guerra_semi = get_marca_semi_by_descripcion(db, "GUERRA")
+    librelato_semi = get_marca_semi_by_descripcion(db, "LIBRELATO")
+    lumavit_semi = get_marca_semi_by_descripcion(db, "LUMAVIT")
+    metalurgica_semi = get_marca_semi_by_descripcion(db, "METALURGICA GUTIERREZ")
+    noma_semi = get_marca_semi_by_descripcion(db, "NOMA")
+
+    carreta = get_semi_clasificacion_by_descripcion(db, "CARRETA ABIERTA")
+    granelero = get_semi_clasificacion_by_descripcion(db, "GRANELERO")
+    plancha = get_semi_clasificacion_by_descripcion(db, "PLANCHA")
+    sider = get_semi_clasificacion_by_descripcion(db, "SIDER")
+    tanque = get_semi_clasificacion_by_descripcion(db, "TANQUE")
+
+    d1 = get_tipo_semi_by_descripcion(db, "1D")
+    d1_1d = get_tipo_semi_by_descripcion(db, "1D.1D")
+    d1_2d = get_tipo_semi_by_descripcion(db, "1D.2D")
+    d2 = get_tipo_semi_by_descripcion(db, "2D")
+    d3 = get_tipo_semi_by_descripcion(db, "3D")
+
+    seca = get_tipo_carga_by_descripcion(db, "SECA")
+    liquida = get_tipo_carga_by_descripcion(db, "LÍQUIDA")
+
     propietario_seeds(
         db,
         nombre="Propietario Chofer 1",
@@ -231,6 +281,10 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=azul,
         marca_camion=lumavit,
         tipo_camion=trucky,
+        marca_semi=guerra_semi,
+        clasificacion_semi=carreta,
+        tipo_semi=d1,
+        tipo_carga=seca,
     )
     propietario_seeds(
         db,
@@ -254,6 +308,10 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=blanco,
         marca_camion=mercedes,
         tipo_camion=chasis,
+        marca_semi=librelato_semi,
+        clasificacion_semi=granelero,
+        tipo_semi=d1_1d,
+        tipo_carga=liquida,
     )
     propietario_seeds(
         db,
@@ -277,6 +335,10 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=gris,
         marca_camion=metalurgica,
         tipo_camion=trucado,
+        marca_semi=lumavit_semi,
+        clasificacion_semi=plancha,
+        tipo_semi=d1_2d,
+        tipo_carga=seca,
     )
     propietario_seeds(
         db,
@@ -300,6 +362,10 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=negro,
         marca_camion=phoenix,
         tipo_camion=sencillo,
+        marca_semi=metalurgica_semi,
+        clasificacion_semi=sider,
+        tipo_semi=d2,
+        tipo_carga=liquida,
     )
     propietario_seeds(
         db,
@@ -323,6 +389,10 @@ def cargill_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=rojo,
         marca_camion=scania,
         tipo_camion=normal,
+        marca_semi=noma_semi,
+        clasificacion_semi=tanque,
+        tipo_semi=d3,
+        tipo_carga=seca,
     )
 
 
@@ -474,6 +544,32 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
     sencillo = get_tipo_camion_by_descripcion(db, "1S.1S (sencillo)")
     normal = get_tipo_camion_by_descripcion(db, "1S.1D (normal)")
 
+    guerra_semi = get_marca_semi_by_descripcion(db, "GUERRA")
+    librelato_semi = get_marca_semi_by_descripcion(db, "LIBRELATO")
+    lumavit_semi = get_marca_semi_by_descripcion(db, "LUMAVIT")
+    metalurgica_semi = get_marca_semi_by_descripcion(db, "METALURGICA GUTIERREZ")
+    noma_semi = get_marca_semi_by_descripcion(db, "NOMA")
+    phoenix_semi = get_marca_semi_by_descripcion(db, "PHOENIX")
+    randon_semi = get_marca_semi_by_descripcion(db, "RANDON")
+    rodovale_semi = get_marca_semi_by_descripcion(db, "RODOVALE")
+    tecno_semi = get_marca_semi_by_descripcion(db, "TECNO EQUIPO")
+
+    carreta = get_semi_clasificacion_by_descripcion(db, "CARRETA ABIERTA")
+    granelero = get_semi_clasificacion_by_descripcion(db, "GRANELERO")
+    plancha = get_semi_clasificacion_by_descripcion(db, "PLANCHA")
+    sider = get_semi_clasificacion_by_descripcion(db, "SIDER")
+    tanque = get_semi_clasificacion_by_descripcion(db, "TANQUE")
+    tanque_inox = get_semi_clasificacion_by_descripcion(db, "TANQUE INOX")
+
+    d1 = get_tipo_semi_by_descripcion(db, "1D")
+    d1_1d = get_tipo_semi_by_descripcion(db, "1D.1D")
+    d1_2d = get_tipo_semi_by_descripcion(db, "1D.2D")
+    d2 = get_tipo_semi_by_descripcion(db, "2D")
+    d3 = get_tipo_semi_by_descripcion(db, "3D")
+
+    seca = get_tipo_carga_by_descripcion(db, "SECA")
+    liquida = get_tipo_carga_by_descripcion(db, "LÍQUIDA")
+
     propietario_seeds(
         db,
         nombre="Propietario Transred 1",
@@ -496,6 +592,10 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=azul,
         marca_camion=lumavit,
         tipo_camion=trucky,
+        marca_semi=guerra_semi,
+        clasificacion_semi=carreta,
+        tipo_semi=d1,
+        tipo_carga=seca,
     )
     propietario_seeds(
         db,
@@ -519,6 +619,10 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=blanco,
         marca_camion=mercedes,
         tipo_camion=chasis,
+        marca_semi=librelato_semi,
+        clasificacion_semi=granelero,
+        tipo_semi=d1_1d,
+        tipo_carga=liquida,
     )
     propietario_seeds(
         db,
@@ -542,6 +646,10 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=gris,
         marca_camion=metalurgica,
         tipo_camion=trucado,
+        marca_semi=lumavit_semi,
+        clasificacion_semi=plancha,
+        tipo_semi=d1_2d,
+        tipo_carga=seca,
     )
     propietario_seeds(
         db,
@@ -565,6 +673,10 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=negro,
         marca_camion=phoenix,
         tipo_camion=sencillo,
+        marca_semi=metalurgica_semi,
+        clasificacion_semi=sider,
+        tipo_semi=d2,
+        tipo_carga=liquida,
     )
     propietario_seeds(
         db,
@@ -588,6 +700,10 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=rojo,
         marca_camion=scania,
         tipo_camion=normal,
+        marca_semi=noma_semi,
+        clasificacion_semi=tanque,
+        tipo_semi=d3,
+        tipo_carga=seca,
     )
     propietario_seeds(
         db,
@@ -611,6 +727,10 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=verde,
         marca_camion=tecno,
         tipo_camion=trucky,
+        marca_semi=phoenix_semi,
+        clasificacion_semi=tanque_inox,
+        tipo_semi=d1,
+        tipo_carga=liquida,
     )
     propietario_seeds(
         db,
@@ -634,6 +754,10 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=azul,
         marca_camion=volvo,
         tipo_camion=chasis,
+        marca_semi=randon_semi,
+        clasificacion_semi=carreta,
+        tipo_semi=d1_1d,
+        tipo_carga=seca,
     )
     propietario_seeds(
         db,
@@ -657,6 +781,10 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=blanco,
         marca_camion=lumavit,
         tipo_camion=trucado,
+        marca_semi=rodovale_semi,
+        clasificacion_semi=granelero,
+        tipo_semi=d1_2d,
+        tipo_carga=liquida,
     )
     propietario_seeds(
         db,
@@ -680,6 +808,10 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=gris,
         marca_camion=mercedes,
         tipo_camion=sencillo,
+        marca_semi=tecno_semi,
+        clasificacion_semi=plancha,
+        tipo_semi=d2,
+        tipo_carga=seca,
     )
     propietario_seeds(
         db,
@@ -703,6 +835,10 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=negro,
         marca_camion=metalurgica,
         tipo_camion=normal,
+        marca_semi=guerra_semi,
+        clasificacion_semi=sider,
+        tipo_semi=d3,
+        tipo_carga=liquida,
     )
     propietario_seeds(
         db,
@@ -726,6 +862,10 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=rojo,
         marca_camion=phoenix,
         tipo_camion=trucky,
+        marca_semi=librelato_semi,
+        clasificacion_semi=tanque,
+        tipo_semi=d1,
+        tipo_carga=seca,
     )
     propietario_seeds(
         db,
@@ -749,4 +889,8 @@ def multiple_propietario_seeds(db: Session, gestor_cuenta: GestorCarga):
         color=verde,
         marca_camion=scania,
         tipo_camion=chasis,
+        marca_semi=lumavit_semi,
+        clasificacion_semi=tanque_inox,
+        tipo_semi=d1_1d,
+        tipo_carga=liquida,
     )
