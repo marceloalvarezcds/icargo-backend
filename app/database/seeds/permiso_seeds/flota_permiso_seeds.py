@@ -107,6 +107,7 @@ def permiso_generico_seeds(db: Session, user: User):
 
 def permiso_camion_seeds(db: Session, user: User):
     permisos = []
+    permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.CAMION))
     permisos.append(permiso_seeds(db, a.CREAR, m.CAMION))
     permisos.append(permiso_seeds(db, a.EDITAR, m.CAMION))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.CAMION))
@@ -133,6 +134,7 @@ def permiso_camion_seeds(db: Session, user: User):
 
 def permiso_chofer_seeds(db: Session, user: User):
     permisos = []
+    permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.CHOFER))
     permisos.append(permiso_seeds(db, a.CREAR, m.CHOFER))
     permisos.append(permiso_seeds(db, a.EDITAR, m.CHOFER))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.CHOFER))
@@ -159,6 +161,7 @@ def permiso_chofer_seeds(db: Session, user: User):
 
 def permiso_propietario_seeds(db: Session, user: User):
     permisos = []
+    permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.PROPIETARIO))
     permisos.append(permiso_seeds(db, a.CREAR, m.PROPIETARIO))
     permisos.append(permiso_seeds(db, a.EDITAR, m.PROPIETARIO))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.PROPIETARIO))
@@ -187,6 +190,7 @@ def permiso_propietario_seeds(db: Session, user: User):
 
 def permiso_semirremolque_seeds(db: Session, user: User):
     permisos = []
+    permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.SEMIRREMOLQUE))
     permisos.append(permiso_seeds(db, a.CREAR, m.SEMIRREMOLQUE))
     permisos.append(permiso_seeds(db, a.EDITAR, m.SEMIRREMOLQUE))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.SEMIRREMOLQUE))

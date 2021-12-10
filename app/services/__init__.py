@@ -1,6 +1,7 @@
 # should be imported to help code editor (vscode) for autocompletion
 from .auth import get_user_from_request, login  # noqa
 from .camion import (  # noqa
+    change_camion_status,
     create_camion,
     delete_camion,
     edit_camion,
@@ -17,6 +18,7 @@ from .centro_operativo import (  # noqa
 )
 from .centro_operativo_contacto import update_centro_operativo_contacto_list  # noqa
 from .chofer import (  # noqa
+    change_chofer_status,
     create_chofer,
     delete_chofer,
     edit_chofer,
@@ -63,6 +65,7 @@ from .pictshare import (  # noqa
     upload_image,
 )
 from .propietario import (  # noqa
+    change_propietario_status,
     create_propietario,
     delete_propietario,
     edit_propietario,
@@ -100,6 +103,7 @@ from .remitente import (  # noqa
 from .remitente_contacto import update_remitente_contacto_list  # noqa
 from .security import create_access_token  # noqa
 from .semi import (  # noqa
+    change_semi_status,
     create_semi,
     delete_semi,
     edit_semi,

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
+from app.enums import EstadoEnum
 from app.models import Chofer
 
 from .chofer_check_files import check_files, get_chofer_detail
@@ -172,6 +173,13 @@ def delete_chofer(
     co = get_chofer_by_id(db, id)
     obj = repositories.delete_chofer(co, db, modified_by)
     return get_chofer_detail(db, obj, gestor_cuenta_id)
+
+
+def change_chofer_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.Camion:
+    co = get_chofer_by_id(db, id)
+    return repositories.change_chofer_status(co, db, status, modified_by)
 
 
 def get_chofer_reports(db: Session) -> str:

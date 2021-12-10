@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
+from app.enums import EstadoEnum
 from app.models import Propietario
 
 from .gestor_carga_propietario import (
@@ -167,6 +168,13 @@ def delete_propietario(
     co = get_propietario_by_id(db, id)
     obj = repositories.delete_propietario(co, db, modified_by)
     return get_propietario_detail(obj, gestor_cuenta_id)
+
+
+def change_propietario_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.Camion:
+    co = get_propietario_by_id(db, id)
+    return repositories.change_propietario_status(co, db, status, modified_by)
 
 
 def get_propietario_reports(db: Session) -> str:

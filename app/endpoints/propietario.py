@@ -8,6 +8,7 @@ from app import models, repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+from app.enums.estado import EstadoEnum
 
 api = APIRouter()
 
@@ -120,4 +121,28 @@ async def delete_propietario(
 ):
     return services.delete_propietario(
         db, id, current_user.gestor_carga_id, current_user.username
+    )
+
+
+@api.get("/{id}/active", response_model=schemas.Propietario)
+def active_propietario_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.PROPIETARIO)),  # noqa: B008
+):
+    return services.change_propietario_status(
+        db, id, EstadoEnum.ACTIVO, current_user.username
+    )
+
+
+@api.get("/{id}/inactive", response_model=schemas.Propietario)
+def inactive_propietario_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.PROPIETARIO)),  # noqa: B008
+):
+    return services.change_propietario_status(
+        db, id, EstadoEnum.INACTIVO, current_user.username
     )
