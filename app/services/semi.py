@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
+from app.enums import EstadoEnum
 from app.models import Semi
 
 from .camion_check_files import check_files
@@ -124,6 +125,13 @@ async def edit_semi(
 def delete_semi(db: Session, id: int, modified_by: str) -> schemas.Semi:
     co = get_semi_by_id(db, id)
     return repositories.delete_semi(co, db, modified_by)
+
+
+def change_semi_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.Camion:
+    co = get_semi_by_id(db, id)
+    return repositories.change_semi_status(co, db, status, modified_by)
 
 
 def get_semi_reports(db: Session) -> str:

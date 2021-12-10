@@ -8,6 +8,7 @@ from app import models, repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+from app.enums.estado import EstadoEnum
 
 api = APIRouter()
 
@@ -122,3 +123,25 @@ async def delete_semi(
     _: bool = Depends(Permiso(a.ELIMINAR, m.SEMIRREMOLQUE)),  # noqa: B008
 ):
     return services.delete_semi(db, id, current_user.username)
+
+
+@api.get("/{id}/active", response_model=schemas.Semi)
+def active_semi_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.SEMIRREMOLQUE)),  # noqa: B008
+):
+    return services.change_semi_status(db, id, EstadoEnum.ACTIVO, current_user.username)
+
+
+@api.get("/{id}/inactive", response_model=schemas.Semi)
+def inactive_semi_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.SEMIRREMOLQUE)),  # noqa: B008
+):
+    return services.change_semi_status(
+        db, id, EstadoEnum.INACTIVO, current_user.username
+    )
