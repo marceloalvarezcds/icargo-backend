@@ -31,6 +31,7 @@ from app.endpoints import (
     tipo_camion,
     tipo_carga,
     tipo_concepto_complemento,
+    tipo_concepto_descuento,
     tipo_documento,
     tipo_persona,
     tipo_registro,
@@ -93,6 +94,11 @@ api.include_router(
     tipo_concepto_complemento.api,
     prefix="/tipo_concepto_complemento",
     tags=["tipo_concepto_complemento"],
+)
+api.include_router(
+    tipo_concepto_descuento.api,
+    prefix="/tipo_concepto_descuento",
+    tags=["tipo_concepto_descuento"],
 )
 api.include_router(
     tipo_documento.api, prefix="/tipo_documento", tags=["tipo_documento"]

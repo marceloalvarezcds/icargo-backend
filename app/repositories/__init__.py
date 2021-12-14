@@ -196,6 +196,10 @@ from .tipo_concepto_complemento import (  # noqa
     get_tipo_concepto_complemento_by_descripcion,
     get_tipo_concepto_complemento_list,
 )
+from .tipo_concepto_descuento import (  # noqa
+    get_tipo_concepto_descuento_by_descripcion,
+    get_tipo_concepto_descuento_list,
+)
 from .tipo_documento import (  # noqa
     get_tipo_documento_by_descripcion,
     get_tipo_documento_list,
