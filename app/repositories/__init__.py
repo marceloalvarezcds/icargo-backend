@@ -108,6 +108,7 @@ from .marca_semi import get_marca_semi_by_descripcion, get_marca_semi_list  # no
 from .moneda import get_moneda_by_simbolo, get_moneda_list  # noqa
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .permiso import get_permiso_by, get_permiso_list  # noqa
+from .producto import get_producto_by_descripcion, get_producto_list  # noqa
 from .propietario import (  # noqa
     change_propietario_status,
     create_propietario,

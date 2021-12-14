@@ -20,6 +20,7 @@ from app.endpoints import (
     moneda,
     pais,
     permiso,
+    producto,
     propietario,
     proveedor,
     punto_venta,
@@ -74,6 +75,7 @@ api.include_router(marca_semi.api, prefix="/marca_semi", tags=["marca_semi"])
 api.include_router(moneda.api, prefix="/moneda", tags=["moneda"])
 api.include_router(pais.api, prefix="/pais", tags=["pais"])
 api.include_router(permiso.api, prefix="/permiso", tags=["permiso"])
+api.include_router(producto.api, prefix="/producto", tags=["producto"])
 api.include_router(propietario.api, prefix="/propietario", tags=["propietario"])
 api.include_router(proveedor.api, prefix="/proveedor", tags=["proveedor"])
 api.include_router(punto_venta.api, prefix="/punto_venta", tags=["punto_venta"])

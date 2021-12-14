@@ -31,6 +31,7 @@ from .marca_semi import MarcaSemi  # noqa
 from .moneda import Moneda  # noqa
 from .pais import Pais  # noqa
 from .permiso import Permiso  # noqa
+from .producto import Producto  # noqa
 from .propietario import (  # noqa
     Propietario,
     PropietarioEditForm,
