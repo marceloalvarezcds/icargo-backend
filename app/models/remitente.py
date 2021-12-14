@@ -66,6 +66,10 @@ class Remitente(AuditMixin, Base):
         return self.ciudad.localidad.nombre
 
     @hybrid_property
+    def pais_id(self):
+        return self.ciudad.localidad.pais_id
+
+    @hybrid_property
     def pais_nombre(self):
         return self.ciudad.localidad.pais.nombre
 

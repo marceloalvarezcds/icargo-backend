@@ -29,6 +29,7 @@ from .marca_semi import MarcaSemi  # noqa
 from .moneda import Moneda  # noqa
 from .pais import Pais  # noqa
 from .permiso import Permiso  # noqa
+from .producto import Producto  # noqa
 from .propietario import Propietario  # noqa
 from .propietario_contacto_gestor_carga import PropietarioContactoGestorCarga  # noqa
 from .proveedor import Proveedor  # noqa
@@ -40,10 +41,14 @@ from .remitente_contacto_gestor_carga import RemitenteContactoGestorCarga  # noq
 from .rol import Rol  # noqa
 from .semi import Semi  # noqa
 from .semi_clasificacion import SemiClasificacion  # noqa
+from .tipo_anticipo import TipoAnticipo  # noqa
 from .tipo_camion import TipoCamion  # noqa
 from .tipo_carga import TipoCarga  # noqa
+from .tipo_concepto_complemento import TipoConceptoComplemento  # noqa
+from .tipo_concepto_descuento import TipoConceptoDescuento  # noqa
 from .tipo_documento import TipoDocumento  # noqa
 from .tipo_persona import TipoPersona  # noqa
 from .tipo_registro import TipoRegistro  # noqa
 from .tipo_semi import TipoSemi  # noqa
+from .unidad import Unidad  # noqa
 from .user import User  # noqa
