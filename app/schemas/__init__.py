@@ -59,6 +59,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
 )
 from .semi import Semi, SemiForm, SemiList  # noqa
 from .semi_clasificacion import SemiClasificacion  # noqa
+from .tipo_anticipo import TipoAnticipo  # noqa
 from .tipo_camion import TipoCamion  # noqa
 from .tipo_carga import TipoCarga  # noqa
 from .tipo_documento import TipoDocumento  # noqa

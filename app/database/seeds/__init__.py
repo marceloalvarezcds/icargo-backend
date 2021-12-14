@@ -11,6 +11,7 @@ from .pais_seeds import pais_seeds
 from .producto_seeds import producto_seeds
 from .rol_seeds import rol_seeds
 from .semi_clasificacion_seeds import semi_clasificacion_seeds
+from .tipo_anticipo_seeds import tipo_anticipo_seeds
 from .tipo_camion_seeds import tipo_camion_seeds
 from .tipo_carga_seeds import tipo_carga_seeds
 from .tipo_persona_seeds import tipo_persona_seeds
@@ -30,6 +31,7 @@ def seeds(db: Session):
     producto_seeds(db)
     rol_seeds(db)
     semi_clasificacion_seeds(db)
+    tipo_anticipo_seeds(db)
     tipo_camion_seeds(db)
     tipo_carga_seeds(db)
     tipo_persona_seeds(db)

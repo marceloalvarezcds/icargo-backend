@@ -186,6 +186,10 @@ from .semi_clasificacion import (  # noqa
     get_semi_clasificacion_by_descripcion,
     get_semi_clasificacion_list,
 )
+from .tipo_anticipo import (  # noqa
+    get_tipo_anticipo_by_descripcion,
+    get_tipo_anticipo_list,
+)
 from .tipo_camion import get_tipo_camion_by_descripcion, get_tipo_camion_list  # noqa
 from .tipo_carga import get_tipo_carga_by_descripcion, get_tipo_carga_list  # noqa
 from .tipo_documento import (  # noqa
