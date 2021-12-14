@@ -19,6 +19,7 @@ from .tipo_concepto_descuento_seeds import tipo_concepto_descuento_seeds
 from .tipo_persona_seeds import tipo_persona_seeds
 from .tipo_registro_seeds import tipo_registro_seeds
 from .tipo_semi_seeds import tipo_semi_seeds
+from .unidad_seeds import unidad_seeds
 from .user_seeds import user_seeds
 
 
@@ -41,5 +42,6 @@ def seeds(db: Session):
     tipo_persona_seeds(db)
     tipo_registro_seeds(db)
     tipo_semi_seeds(db)
+    unidad_seeds(db)
     user_seeds(db)
     ente_emisor_automotor_seeds(db)

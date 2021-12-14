@@ -210,6 +210,7 @@ from .tipo_registro import (  # noqa
     get_tipo_registro_list,
 )
 from .tipo_semi import get_tipo_semi_by_descripcion, get_tipo_semi_list  # noqa
+from .unidad import get_unidad_by_descripcion, get_unidad_list  # noqa
 from .user import (  # noqa
     create,
     get,

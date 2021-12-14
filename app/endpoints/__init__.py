@@ -36,6 +36,7 @@ from app.endpoints import (
     tipo_persona,
     tipo_registro,
     tipo_semi,
+    unidad,
     user,
 )
 
@@ -106,6 +107,7 @@ api.include_router(
 api.include_router(tipo_persona.api, prefix="/tipo_persona", tags=["tipo_persona"])
 api.include_router(tipo_registro.api, prefix="/tipo_registro", tags=["tipo_registro"])
 api.include_router(tipo_semi.api, prefix="/tipo_semi", tags=["tipo_semi"])
+api.include_router(unidad.api, prefix="/unidad", tags=["unidad"])
 api.include_router(user.api, prefix="/user", tags=["user"])
 
 
