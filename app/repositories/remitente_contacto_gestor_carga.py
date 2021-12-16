@@ -27,6 +27,13 @@ def get_remitente_contacto_gestor_carga_by(
     )
 
 
+def get_remitente_contacto_gestor_carga_by_id(
+    db: Session,
+    id: int,
+) -> Optional[RemitenteContactoGestorCarga]:
+    return db.query(RemitenteContactoGestorCarga).get(id)
+
+
 def create_remitente_contacto_gestor_carga(
     db: Session,
     cargo: Cargo,

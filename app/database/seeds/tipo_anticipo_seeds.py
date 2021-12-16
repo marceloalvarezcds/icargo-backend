@@ -9,7 +9,7 @@ def tipo_anticipo_seeds(db: Session):
         db.add(TipoAnticipo(descripcion="EFECTIVO"))
         db.add(TipoAnticipo(descripcion="COMBUSTIBLE"))
         db.add(TipoAnticipo(descripcion="LUBRICANTES"))
-        db.add(TipoAnticipo(descripcion="VARIOS"))
+        db.add(TipoAnticipo(descripcion="OTROS"))
         db.commit()
     except IntegrityError:
         db.rollback()

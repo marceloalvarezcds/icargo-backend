@@ -28,6 +28,13 @@ def get_centro_operativo_contacto_gestor_carga_by(
     )
 
 
+def get_centro_operativo_contacto_gestor_carga_by_id(
+    db: Session,
+    id: int,
+) -> Optional[CentroOperativoContactoGestorCarga]:
+    return db.query(CentroOperativoContactoGestorCarga).get(id)
+
+
 def create_centro_operativo_contacto_gestor_carga(
     db: Session,
     cargo: Cargo,

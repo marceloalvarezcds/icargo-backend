@@ -27,6 +27,16 @@ from .chofer import (  # noqa
     get_chofer_reports,
 )
 from .contacto import get_contacto_by  # noqa
+from .flete import (  # noqa
+    change_flete_public_status,
+    change_flete_status,
+    create_flete,
+    delete_flete,
+    edit_flete,
+    get_flete_detail_by_id,
+    get_flete_reports,
+)
+from .flete_destinatario import get_destinatario_list_by_flete_id  # noqa
 from .gestor_carga import (  # noqa
     create_gestor_carga,
     delete_gestor_carga,

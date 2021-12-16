@@ -1,0 +1,169 @@
+from datetime import datetime
+from decimal import Decimal
+from typing import List, Optional
+
+from pydantic import BaseModel
+
+from app.enums import EstadoEnum, TipoFleteEnum
+
+from .centro_operativo import CentroOperativo
+from .date_model import Date
+from .flete_anticipo import FleteAnticipo, FleteAnticipoForm
+from .flete_complemento import FleteComplemento, FleteComplementoForm
+from .flete_descuento import FleteDescuento, FleteDescuentoForm
+from .flete_destinatario import FleteDestinatario
+from .moneda import Moneda
+from .producto import Producto
+from .remitente import Remitente
+from .tipo_carga import TipoCarga
+from .unidad import Unidad
+
+
+class FleteFormBaseModel(BaseModel):
+    remitente_id: int
+    producto_id: int
+    tipo_carga_id: int
+    numero_factura: str
+    numero_crt: Optional[str]
+    publicado: bool
+    es_subasta: bool
+    # INICIO Tramo de Fletes
+    origen_id: int
+    origen_indicacion: Optional[str]
+    destino_id: int
+    destino_indicacion: Optional[str]
+    distancia: Optional[Decimal]
+    # FIN Tramo de Fletes
+    # INICIO Cantidad y Flete
+    condicion_cantidad: Decimal
+    # inicio - Condiciones para el Gestor de Cuenta
+    condicion_gestor_cuenta_moneda_id: int
+    condicion_gestor_cuenta_tarifa: Decimal
+    condicion_gestor_cuenta_unidad_id: int
+    # fin - Condiciones para el Gestor de Cuenta
+    # inicio - Condiciones para el Propietario
+    condicion_propietario_moneda_id: int
+    condicion_propietario_tarifa: Decimal
+    condicion_propietario_unidad_id: int
+    # fin - Condiciones para el Propietario
+    # FIN Cantidad y Flete
+    # INICIO Mermas de Fletes
+    # inicio - Mermas para el Gestor de Cuenta
+    merma_gestor_cuenta_valor: Decimal
+    merma_gestor_cuenta_moneda_id: int
+    merma_gestor_cuenta_unidad_id: int
+    merma_gestor_cuenta_es_porcentual: bool = False
+    merma_gestor_cuenta_tolerancia: Decimal
+    # fin - Mermas para el Gestor de Cuenta
+    # inicio - Mermas para el Propietario
+    merma_propietario_valor: Decimal
+    merma_propietario_moneda_id: int
+    merma_propietario_unidad_id: int
+    merma_propietario_es_porcentual: bool = False
+    merma_propietario_tolerancia: Decimal
+    # fin - Mermas para el Propietario
+    # FIN Mermas de Fletes
+    vigencia_anticipos: Date
+    # INICIO Emisión de Órdenes
+    emision_orden_texto_legal: str
+    emision_orden_detalle: str
+    # FIN Emisión de Órdenes
+
+
+class FleteForm(FleteFormBaseModel):
+    anticipos: List[FleteAnticipoForm]
+    complementos: List[FleteComplementoForm]
+    descuentos: List[FleteDescuentoForm]
+    # INICIO Emisión de Órdenes
+    destinatarios: List[FleteDestinatario]
+    # FIN Emisión de Órdenes
+
+
+class Flete(FleteFormBaseModel):
+    id: int
+    remitente: Remitente
+    producto: Producto
+    tipo_carga: TipoCarga
+    estado: EstadoEnum
+    gestor_cuenta_id: int
+    # INICIO Tramo de Fletes
+    origen: CentroOperativo
+    destino: CentroOperativo
+    # FIN Tramo de Fletes
+    # INICIO Cantidad y Flete
+    # inicio - Condiciones para el Gestor de Cuenta
+    condicion_gestor_cuenta_moneda: Moneda
+    condicion_gestor_cuenta_unidad: Unidad
+    # fin - Condiciones para el Gestor de Cuenta
+    # inicio - Condiciones para el Propietario
+    condicion_propietario_moneda: Moneda
+    condicion_propietario_unidad: Unidad
+    # fin - Condiciones para el Propietario
+    # FIN Cantidad y Flete
+    # INICIO Mermas de Fletes
+    # inicio - Mermas para el Gestor de Cuenta
+    merma_gestor_cuenta_moneda: Moneda
+    merma_gestor_cuenta_unidad: Unidad
+    # fin - Mermas para el Gestor de Cuenta
+    # inicio - Mermas para el Propietario
+    merma_propietario_moneda: Moneda
+    merma_propietario_unidad: Unidad
+    # fin - Mermas para el Propietario
+    # FIN Mermas de Fletes
+    # INICIO Emisión de Órdenes
+    destinatarios: List[FleteDestinatario]
+    # FIN Emisión de Órdenes
+    anticipos: List[FleteAnticipo]
+    complementos: List[FleteComplemento]
+    descuentos: List[FleteDescuento]
+    tipo_flete: TipoFleteEnum
+    created_by: str
+    created_at: datetime
+    modified_by: str
+    modified_at: datetime
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True
+
+
+class FleteList(FleteFormBaseModel):
+    id: int
+    remitente_nombre: str
+    producto_descripcion: str
+    tipo_carga_descripcion: str
+    estado: EstadoEnum
+    gestor_cuenta_nombre: str
+    # INICIO Tramo de Fletes
+    origen_nombre: str
+    destino_nombre: str
+    # FIN Tramo de Fletes
+    # INICIO Cantidad y Flete
+    # inicio - Condiciones para el Gestor de Cuenta
+    condicion_gestor_cuenta_moneda_nombre: str
+    condicion_gestor_cuenta_unidad_descripcion: str
+    # fin - Condiciones para el Gestor de Cuenta
+    # inicio - Condiciones para el Propietario
+    condicion_propietario_moneda_nombre: str
+    condicion_propietario_unidad_descripcion: str
+    # fin - Condiciones para el Propietario
+    # FIN Cantidad y Flete
+    # INICIO Mermas de Fletes
+    # inicio - Mermas para el Gestor de Cuenta
+    merma_gestor_cuenta_moneda_nombre: str
+    merma_gestor_cuenta_unidad_descripcion: str
+    # fin - Mermas para el Gestor de Cuenta
+    # inicio - Mermas para el Propietario
+    merma_propietario_moneda_nombre: str
+    merma_propietario_unidad_descripcion: str
+    # fin - Mermas para el Propietario
+    # FIN Mermas de Fletes
+    tipo_flete: TipoFleteEnum
+    created_by: str
+    created_at: datetime
+    modified_by: str
+    modified_at: datetime
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True

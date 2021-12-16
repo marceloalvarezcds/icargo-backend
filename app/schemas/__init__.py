@@ -18,6 +18,11 @@ from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
 from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa
 from .ente_emisor_transporte import EnteEmisorTransporte  # noqa
+from .flete import Flete, FleteForm, FleteList  # noqa
+from .flete_anticipo import FleteAnticipo, FleteAnticipoForm  # noqa
+from .flete_complemento import FleteComplemento, FleteComplementoForm  # noqa
+from .flete_descuento import FleteDescuento, FleteDescuentoForm  # noqa
+from .flete_destinatario import FleteDestinatario  # noqa
 from .gestor_carga import GestorCarga, GestorCargaForm, GestorCargaList  # noqa
 from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
 from .gestor_carga_chofer import GestorCargaChofer  # noqa

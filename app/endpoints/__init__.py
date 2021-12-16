@@ -12,6 +12,7 @@ from app.endpoints import (
     contacto,
     ente_emisor_automotor,
     ente_emisor_transporte,
+    flete,
     gestor_carga,
     localidad,
     login,
@@ -71,6 +72,7 @@ api.include_router(
     prefix="/ente_emisor_transporte",
     tags=["ente_emisor_transporte"],
 )
+api.include_router(flete.api, prefix="/flete", tags=["flete"])
 api.include_router(gestor_carga.api, prefix="/gestor_carga", tags=["gestor_carga"])
 api.include_router(localidad.api, prefix="/localidad", tags=["localidad"])
 api.include_router(login.api, prefix="/login", tags=["login"])

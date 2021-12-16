@@ -16,6 +16,10 @@ from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto  # noqa
 from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa
 from .ente_emisor_transporte import EnteEmisorTransporte  # noqa
+from .flete import Flete  # noqa
+from .flete_anticipo import FleteAnticipo  # noqa
+from .flete_complemento import FleteComplemento  # noqa
+from .flete_descuento import FleteDescuento  # noqa
 from .gestor_carga import GestorCarga  # noqa
 from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
 from .gestor_carga_chofer import GestorCargaChofer  # noqa

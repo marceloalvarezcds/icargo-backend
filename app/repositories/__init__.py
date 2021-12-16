@@ -27,6 +27,7 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
     delete_centro_operativo_contacto_gestor_carga,
     edit_centro_operativo_contacto_gestor_carga,
     get_centro_operativo_contacto_gestor_carga_by,
+    get_centro_operativo_contacto_gestor_carga_by_id,
 )
 from .chofer import (  # noqa
     change_chofer_status,
@@ -63,6 +64,38 @@ from .ente_emisor_automotor import (  # noqa
 from .ente_emisor_transporte import (  # noqa
     get_ente_emisor_transporte_by_descripcion,
     get_ente_emisor_transporte_list,
+)
+from .flete import (  # noqa
+    change_flete_public_status,
+    change_flete_status,
+    create_flete,
+    delete_flete,
+    edit_flete,
+    get_flete_by,
+    get_flete_by_id,
+    get_flete_list,
+    update_flete_destinatarios,
+)
+from .flete_anticipo import (  # noqa
+    create_flete_anticipo,
+    delete_flete_anticipo,
+    edit_flete_anticipo,
+    get_flete_anticipo_by,
+    get_flete_anticipo_by_id,
+)
+from .flete_complemento import (  # noqa
+    create_flete_complemento,
+    delete_flete_complemento,
+    edit_flete_complemento,
+    get_flete_complemento_by,
+    get_flete_complemento_by_id,
+)
+from .flete_descuento import (  # noqa
+    create_flete_descuento,
+    delete_flete_descuento,
+    edit_flete_descuento,
+    get_flete_descuento_by,
+    get_flete_descuento_by_id,
 )
 from .gestor_carga import (  # noqa
     create_gestor_carga,
@@ -170,6 +203,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
     delete_remitente_contacto_gestor_carga,
     edit_remitente_contacto_gestor_carga,
     get_remitente_contacto_gestor_carga_by,
+    get_remitente_contacto_gestor_carga_by_id,
 )
 from .rol import get_rol_by_codigo, get_rol_list  # noqa
 from .semi import (  # noqa
