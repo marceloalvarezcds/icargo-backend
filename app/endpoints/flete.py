@@ -112,13 +112,18 @@ def unpublish_flete_by_id(
     return services.change_flete_public_status(db, id, False, current_user.username)
 
 
-@api.get("/{id}/destinatarios", response_model=List[schemas.FleteDestinatario])
+@api.get(
+    "/destinatarios/{remitente_id}/{origen_id}/{destino_id}",
+    response_model=List[schemas.FleteDestinatario],
+)
 def read_flete_destinatario_list_by_id(
-    id: int,
+    remitente_id: int,
+    origen_id: int,
+    destino_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.VER, m.FLETE)),  # noqa: B008
 ):
-    return services.get_destinatario_list_by_flete_id(
-        db, id, current_user.gestor_carga_id
+    return services.get_destinatario_list_by(
+        db, remitente_id, origen_id, destino_id, current_user.gestor_carga_id
     )

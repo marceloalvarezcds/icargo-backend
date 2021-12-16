@@ -36,7 +36,7 @@ from .flete import (  # noqa
     get_flete_detail_by_id,
     get_flete_reports,
 )
-from .flete_destinatario import get_destinatario_list_by_flete_id  # noqa
+from .flete_destinatario import get_destinatario_list_by  # noqa
 from .gestor_carga import (  # noqa
     create_gestor_carga,
     delete_gestor_carga,

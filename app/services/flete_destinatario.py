@@ -4,17 +4,16 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums import FleteDestinatarioEnum
 from app.models import (
-    CentroOperativo,
     CentroOperativoContactoGestorCarga,
     Flete,
-    Remitente,
     RemitenteContactoGestorCarga,
     User,
 )
 from app.repositories import get as get_user_by_id
 from app.repositories import (
+    get_centro_operativo_by_id,
     get_centro_operativo_contacto_gestor_carga_by_id,
-    get_flete_by_id,
+    get_remitente_by_id,
     get_remitente_contacto_gestor_carga_by_id,
     get_user_list_by_gestor_carga_id,
     update_flete_destinatarios,
@@ -22,8 +21,12 @@ from app.repositories import (
 from app.schemas import FleteDestinatario
 
 
-def get_destinatario_list_by_flete_id(
-    db: Session, flete_id: int, gestor_cuenta_id: Optional[int]
+def get_destinatario_list_by(
+    db: Session,
+    remitente_id: int,
+    origen_id: int,
+    destino_id: int,
+    gestor_cuenta_id: Optional[int],
 ) -> List[FleteDestinatario]:
     lista: List[FleteDestinatario] = []
     if gestor_cuenta_id:
@@ -37,13 +40,12 @@ def get_destinatario_list_by_flete_id(
                     nombre=f"{item.first_name} {item.last_name}",
                 )
             )
-    flete = get_flete_by_id(db, flete_id)
-    if flete:
-        remitente: Remitente = flete.remitente
+    remitente = get_remitente_by_id(db, remitente_id)
+    origen = get_centro_operativo_by_id(db, origen_id)
+    destino = get_centro_operativo_by_id(db, destino_id)
+    if remitente and origen and destino:
         remitente_contactos: List[RemitenteContactoGestorCarga] = remitente.contactos
-        origen: CentroOperativo = flete.origen
         origen_contactos: List[CentroOperativoContactoGestorCarga] = origen.contactos
-        destino: CentroOperativo = flete.destino
         destino_contactos: List[CentroOperativoContactoGestorCarga] = destino.contactos
         for item in remitente_contactos:
             if gestor_cuenta_id and item.gestor_carga_id == gestor_cuenta_id:
