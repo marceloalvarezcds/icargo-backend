@@ -17,6 +17,7 @@ from .centro_operativo import (  # noqa
     get_centro_operativo_by,
     get_centro_operativo_by_id,
     get_centro_operativo_list,
+    get_centro_operativo_list_by_gestor_cuenta_id,
 )
 from .centro_operativo_clasificacion import (  # noqa
     get_centro_operativo_clasificacion_by_nombre,
@@ -197,6 +198,7 @@ from .remitente import (  # noqa
     get_remitente_by,
     get_remitente_by_id,
     get_remitente_list,
+    get_remitente_list_by_gestor_cuenta_id,
 )
 from .remitente_contacto_gestor_carga import (  # noqa
     create_remitente_contacto_gestor_carga,

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import CentroOperativo
+from app.models import CentroOperativo, CentroOperativoContactoGestorCarga
 from app.schemas.centro_operativo import CentroOperativoForm
 
 
@@ -13,6 +13,25 @@ def get_centro_operativo_list(db: Session) -> List[CentroOperativo]:
     return (
         db.query(CentroOperativo)
         .filter(CentroOperativo.estado != EstadoEnum.ELIMINADO.value)
+        .order_by(CentroOperativo.nombre)
+        .all()
+    )
+
+
+def get_centro_operativo_list_by_gestor_cuenta_id(
+    db: Session, gestor_cuenta_id: int
+) -> List[CentroOperativo]:
+    return (
+        db.query(CentroOperativo)
+        .filter(
+            and_(
+                CentroOperativo.estado != EstadoEnum.ELIMINADO.value,
+                CentroOperativo.contactos.any(
+                    CentroOperativoContactoGestorCarga.gestor_carga_id
+                    == gestor_cuenta_id
+                ),
+            )
+        )
         .order_by(CentroOperativo.nombre)
         .all()
     )
