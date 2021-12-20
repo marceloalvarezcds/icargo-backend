@@ -84,6 +84,7 @@ class Flete(FleteFormBaseModel):
     remitente: Remitente
     producto: Producto
     tipo_carga: TipoCarga
+    publicado_descripcion: str
     estado: EstadoEnum
     gestor_cuenta_id: int
     # INICIO Tramo de Fletes
@@ -132,6 +133,7 @@ class FleteList(FleteFormBaseModel):
     remitente_nombre: str
     producto_descripcion: str
     tipo_carga_descripcion: str
+    publicado_descripcion: str
     estado: EstadoEnum
     gestor_cuenta_nombre: str
     # INICIO Tramo de Fletes

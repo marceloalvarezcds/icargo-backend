@@ -213,6 +213,10 @@ class Flete(AuditMixin, Base):
         return self.producto.descripcion
 
     @hybrid_property
+    def publicado_descripcion(self):
+        return "Si" if self.publicado else "No"
+
+    @hybrid_property
     def remitente_nombre(self):
         return self.remitente.nombre
 

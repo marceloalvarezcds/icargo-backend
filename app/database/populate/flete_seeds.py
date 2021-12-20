@@ -196,11 +196,11 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             detalle="Flete Descuento Detalle",
                             habilitar_pago_proveedor=True,
                             anticipado=True,
-                            # INICIO Monto a pagar al Propietario
+                            # INICIO Monto a cobrar al Propietario
                             propietario_monto=Decimal(100),
                             propietario_moneda_id=pyg.id,
-                            # FIN Monto a pagar al Propietario
-                            # INICIO Monto a cobrar al Remitente
+                            # FIN Monto a cobrar al Propietario
+                            # INICIO Monto a pagar al Proveedor
                             proveedor_monto=Decimal(100),
                             proveedor_moneda_id=pyg.id,
                             proveedor_id=1,

@@ -312,7 +312,7 @@ def get_flete_reports(db: Session) -> str:
         value_cell.value = item.numero_crt
 
         value_cell = ws.cell(row=row + 2, column=7)
-        value_cell.value = item.publicado
+        value_cell.value = item.publicado_descripcion
 
         value_cell = ws.cell(row=row + 2, column=8)
         value_cell.value = "Subasta" if item.es_subasta else "Flete"
