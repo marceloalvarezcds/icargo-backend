@@ -72,7 +72,6 @@ from .flete import (  # noqa
     create_flete,
     delete_flete,
     edit_flete,
-    get_flete_by,
     get_flete_by_id,
     get_flete_list,
     update_flete_destinatarios,

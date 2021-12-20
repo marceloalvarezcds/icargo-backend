@@ -23,8 +23,7 @@ class FleteFormBaseModel(BaseModel):
     remitente_id: int
     producto_id: int
     tipo_carga_id: int
-    numero_factura: str
-    numero_crt: Optional[str]
+    numero_lote: Optional[str]
     publicado: bool
     es_subasta: bool
     # INICIO Tramo de Fletes

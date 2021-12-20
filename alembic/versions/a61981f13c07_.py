@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 242c2281fb07
+Revision ID: a61981f13c07
 Revises: 5e5aacd12e66
-Create Date: 2021-12-16 03:27:47.638692
+Create Date: 2021-12-20 17:05:34.188655
 
 """
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "242c2281fb07"
+revision = "a61981f13c07"
 down_revision = "5e5aacd12e66"
 branch_labels = None
 depends_on = None
@@ -42,8 +42,7 @@ def upgrade():
         sa.Column("remitente_id", sa.Integer(), nullable=True),
         sa.Column("producto_id", sa.Integer(), nullable=True),
         sa.Column("tipo_carga_id", sa.Integer(), nullable=True),
-        sa.Column("numero_factura", sa.String(length=255), nullable=True),
-        sa.Column("numero_crt", sa.String(length=255), nullable=True),
+        sa.Column("numero_lote", sa.String(length=255), nullable=True),
         sa.Column("gestor_cuenta_id", sa.Integer(), nullable=True),
         sa.Column(
             "publicado", sa.Boolean(), server_default=sa.text("false"), nullable=True
@@ -171,9 +170,6 @@ def upgrade():
             ["tipo_carga.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint(
-            "remitente_id", "producto_id", "tipo_carga_id", "numero_factura"
-        ),
     )
     op.create_table(
         "flete_anticipo",
