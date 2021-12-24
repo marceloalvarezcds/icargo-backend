@@ -169,6 +169,7 @@ from .proveedor import (  # noqa
     get_proveedor_by,
     get_proveedor_by_id,
     get_proveedor_list,
+    get_proveedor_list_by_gestor_cuenta_id,
 )
 from .proveedor_contacto_gestor_carga import (  # noqa
     create_proveedor_contacto_gestor_carga,

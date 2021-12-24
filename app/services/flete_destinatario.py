@@ -125,6 +125,9 @@ def update_flete_destinatario_list(
     flete: Flete,
     modified_by: str,
 ):
+    flete.emision_orden_centro_operativo_destinatarios = []
+    flete.emision_orden_remitente_destinatarios = []
+    flete.emision_orden_user_destinatarios = []
     for data in dataList:
         if data.tipo_destinatario == FleteDestinatarioEnum.CENTRO_OPERATIVO.value:
             obj = get_centro_operativo_contacto_gestor_carga_by_id(db, data.id)

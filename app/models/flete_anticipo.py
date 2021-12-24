@@ -1,4 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, Numeric  # type: ignore
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
 
@@ -21,3 +22,7 @@ class FleteAnticipo(AuditMixin, Base):
     porcentaje = Column(Numeric(38, 10))
     flete_id = Column(Integer, ForeignKey("flete.id"))
     flete = relationship(Flete, uselist=False, back_populates="anticipos")
+
+    @hybrid_property
+    def tipo_descripcion(self):
+        return self.tipo.descripcion

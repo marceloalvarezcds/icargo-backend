@@ -12,8 +12,8 @@ class FleteDescuentoForm(BaseModel):
     id: Optional[int] = None
     concepto_id: int
     detalle: Optional[str]
-    habilitar_pago_proveedor: bool
-    anticipado: bool
+    habilitar_pago_proveedor: Optional[bool] = False
+    anticipado: Optional[bool] = False
     # INICIO Monto a cobrar al Propietario
     propietario_monto: Optional[Decimal] = None
     propietario_moneda_id: Optional[int] = None
@@ -28,11 +28,15 @@ class FleteDescuentoForm(BaseModel):
 class FleteDescuento(FleteDescuentoForm):
     id: int
     concepto: TipoConceptoDescuento
+    concepto_descripcion: str
     # INICIO Monto a cobrar al Propietario
     propietario_moneda: Moneda
+    propietario_moneda_nombre: str
     # FIN Monto a cobrar al Propietario
     # INICIO Monto a pagar al Proveedor
     proveedor_moneda: Optional[Moneda]
+    proveedor_moneda_nombre: Optional[str] = None
     proveedor: Optional[Proveedor] = None
+    proveedor_nombre: Optional[str] = None
     # FIN Monto a pagar al Proveedor
     flete_id: int

@@ -31,6 +31,9 @@ def flete_admin_permiso_seeds(db: Session, user: User):
 def flete_permiso_seeds(db: Session, user: User):
     permiso_generico_seeds(db, user)
     permiso_flete_seeds(db, user)
+    permiso_flete_anticipo_seeds(db, user)
+    permiso_flete_complemento_seeds(db, user)
+    permiso_flete_descuento_seeds(db, user)
 
 
 def permiso_generico_seeds(db: Session, user: User):

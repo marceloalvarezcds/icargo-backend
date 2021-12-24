@@ -56,6 +56,7 @@ def create_flete_descuento(
         # INICIO Monto a pagar al Proveedor
         proveedor_monto=data.proveedor_monto,
         proveedor_moneda_id=data.proveedor_moneda_id,
+        proveedor_id=data.proveedor_id,
         # FIN Monto a pagar al Proveedor
         modified_by=modified_by,
     )
@@ -82,6 +83,7 @@ def edit_flete_descuento(
     # INICIO Monto a pagar al Proveedor
     obj.proveedor_monto = data.proveedor_monto
     obj.proveedor_moneda_id = data.proveedor_moneda_id
+    obj.proveedor_id = data.proveedor_id
     # FIN Monto a pagar al Proveedor
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()

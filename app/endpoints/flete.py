@@ -45,7 +45,7 @@ async def add_new_flete(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.FLETE)),  # noqa: B008
 ):
-    return await services.create_flete(
+    return services.create_flete(
         db,
         data,  # type: ignore
         current_user.gestor_carga_id,
@@ -61,7 +61,7 @@ async def edit_flete(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.FLETE)),  # noqa: B008
 ):
-    return await services.edit_flete(
+    return services.edit_flete(
         id,
         db,
         data,  # type: ignore
