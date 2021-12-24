@@ -170,9 +170,15 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # FIN Emisión de Órdenes
                     vigencia_anticipos=datetime(2022, 6, 1).isoformat(),
                     anticipos=[
-                        FleteAnticipoForm(tipo_id=efectivo.id, porcentaje=Decimal(10)),
                         FleteAnticipoForm(
-                            tipo_id=combustible.id, porcentaje=Decimal(10)
+                            tipo_id=efectivo.id,
+                            tipo_descripcion=efectivo.descripcion,
+                            porcentaje=Decimal(10),
+                        ),
+                        FleteAnticipoForm(
+                            tipo_id=combustible.id,
+                            tipo_descripcion=combustible.descripcion,
+                            porcentaje=Decimal(10),
                         ),
                     ],
                     complementos=[
@@ -296,14 +302,26 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # FIN Emisión de Órdenes
                     vigencia_anticipos=datetime(2022, 6, 1).isoformat(),
                     anticipos=[
-                        FleteAnticipoForm(tipo_id=efectivo.id, porcentaje=Decimal(10)),
                         FleteAnticipoForm(
-                            tipo_id=combustible.id, porcentaje=Decimal(10)
+                            tipo_id=efectivo.id,
+                            tipo_descripcion=efectivo.descripcion,
+                            porcentaje=Decimal(10),
                         ),
                         FleteAnticipoForm(
-                            tipo_id=lubricantes.id, porcentaje=Decimal(10)
+                            tipo_id=combustible.id,
+                            tipo_descripcion=combustible.descripcion,
+                            porcentaje=Decimal(10),
                         ),
-                        FleteAnticipoForm(tipo_id=otros.id, porcentaje=Decimal(10)),
+                        FleteAnticipoForm(
+                            tipo_id=lubricantes.id,
+                            tipo_descripcion=lubricantes.descripcion,
+                            porcentaje=Decimal(10),
+                        ),
+                        FleteAnticipoForm(
+                            tipo_id=otros.id,
+                            tipo_descripcion=otros.descripcion,
+                            porcentaje=Decimal(10),
+                        ),
                     ],
                     complementos=[
                         FleteComplementoForm(
