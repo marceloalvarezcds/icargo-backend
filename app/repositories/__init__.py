@@ -17,6 +17,7 @@ from .centro_operativo import (  # noqa
     get_centro_operativo_by,
     get_centro_operativo_by_id,
     get_centro_operativo_list,
+    get_centro_operativo_list_by_gestor_cuenta_id,
 )
 from .centro_operativo_clasificacion import (  # noqa
     get_centro_operativo_clasificacion_by_nombre,
@@ -71,7 +72,6 @@ from .flete import (  # noqa
     create_flete,
     delete_flete,
     edit_flete,
-    get_flete_by,
     get_flete_by_id,
     get_flete_list,
     update_flete_destinatarios,
@@ -169,6 +169,7 @@ from .proveedor import (  # noqa
     get_proveedor_by,
     get_proveedor_by_id,
     get_proveedor_list,
+    get_proveedor_list_by_gestor_cuenta_id,
 )
 from .proveedor_contacto_gestor_carga import (  # noqa
     create_proveedor_contacto_gestor_carga,
@@ -197,6 +198,7 @@ from .remitente import (  # noqa
     get_remitente_by,
     get_remitente_by_id,
     get_remitente_list,
+    get_remitente_list_by_gestor_cuenta_id,
 )
 from .remitente_contacto_gestor_carga import (  # noqa
     create_remitente_contacto_gestor_carga,

@@ -9,6 +9,7 @@ from .tipo_anticipo import TipoAnticipo
 class FleteAnticipoForm(BaseModel):
     id: Optional[int] = None
     tipo_id: int
+    tipo_descripcion: str
     porcentaje: Decimal
 
 

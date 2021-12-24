@@ -23,8 +23,7 @@ class FleteFormBaseModel(BaseModel):
     remitente_id: int
     producto_id: int
     tipo_carga_id: int
-    numero_factura: str
-    numero_crt: Optional[str]
+    numero_lote: Optional[str]
     publicado: bool
     es_subasta: bool
     # INICIO Tramo de Fletes
@@ -84,6 +83,7 @@ class Flete(FleteFormBaseModel):
     remitente: Remitente
     producto: Producto
     tipo_carga: TipoCarga
+    publicado_descripcion: str
     estado: EstadoEnum
     gestor_cuenta_id: int
     # INICIO Tramo de Fletes
@@ -132,6 +132,7 @@ class FleteList(FleteFormBaseModel):
     remitente_nombre: str
     producto_descripcion: str
     tipo_carga_descripcion: str
+    publicado_descripcion: str
     estado: EstadoEnum
     gestor_cuenta_nombre: str
     # INICIO Tramo de Fletes

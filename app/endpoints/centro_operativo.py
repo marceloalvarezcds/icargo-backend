@@ -20,6 +20,17 @@ async def read_centro_operativo_list(
     return repositories.get_centro_operativo_list(db)
 
 
+@api.get("/gestor_cuenta_id", response_model=List[schemas.CentroOperativoList])
+async def read_centro_operativo_list_by_gestor_cuenta_id(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.CENTRO_OPERATIVO)),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return repositories.get_centro_operativo_list_by_gestor_cuenta_id(
+        db, current_user.gestor_carga_id
+    )
+
+
 @api.get("/reports")
 async def centro_operativo_reports(
     db: Session = Depends(get_db_session),  # noqa: B008

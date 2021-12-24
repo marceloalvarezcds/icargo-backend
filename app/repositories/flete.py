@@ -16,28 +16,9 @@ def get_flete_list(db: Session) -> List[Flete]:
             Flete.remitente_id,
             Flete.producto_id,
             Flete.tipo_carga_id,
-            Flete.numero_factura,
+            Flete.numero_lote,
         )
         .all()
-    )
-
-
-def get_flete_by(
-    db: Session,
-    remitente_id: int,
-    producto_id: int,
-    tipo_carga_id: int,
-    numero_factura: str,
-) -> Optional[Flete]:
-    return (
-        db.query(Flete)
-        .filter(
-            Flete.remitente_id == remitente_id,
-            Flete.producto_id == producto_id,
-            Flete.tipo_carga_id == tipo_carga_id,
-            Flete.numero_factura == numero_factura,
-        )
-        .first()
     )
 
 
@@ -55,8 +36,7 @@ def create_flete(
         remitente_id=data.remitente_id,
         producto_id=data.producto_id,
         tipo_carga_id=data.tipo_carga_id,
-        numero_factura=data.numero_factura,
-        numero_crt=data.numero_crt,
+        numero_lote=data.numero_lote,
         gestor_cuenta_id=gestor_cuenta_id,
         publicado=data.publicado,
         es_subasta=data.es_subasta,
@@ -120,17 +100,11 @@ def edit_flete(
     gestor_cuenta_id: Optional[int],
     modified_by: str,
 ) -> Flete:
-    if (
-        data.remitente_id
-        and data.producto_id
-        and data.tipo_carga_id
-        and data.numero_factura
-    ):
+    if data.remitente_id and data.producto_id and data.tipo_carga_id:
         obj.remitente_id = data.remitente_id
         obj.producto_id = data.producto_id
         obj.tipo_carga_id = data.tipo_carga_id
-        obj.numero_factura = data.numero_factura
-        obj.numero_crt = data.numero_crt
+        obj.numero_lote = data.numero_lote
         obj.gestor_cuenta_id = gestor_cuenta_id
         obj.publicado = data.publicado
         obj.es_subasta = data.es_subasta

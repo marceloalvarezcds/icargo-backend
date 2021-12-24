@@ -11,7 +11,7 @@ from sqlalchemy import (  # type: ignore
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.sql.schema import Table, UniqueConstraint  # type: ignore
+from sqlalchemy.sql.schema import Table  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
@@ -61,11 +61,6 @@ class Flete(AuditMixin, Base):
     Defines the flete model
     """
 
-    __table_args__ = (
-        UniqueConstraint(
-            "remitente_id", "producto_id", "tipo_carga_id", "numero_factura"
-        ),
-    )
     id = Column(Integer, primary_key=True)
     remitente_id = Column(Integer, ForeignKey("remitente.id"))
     remitente = relationship(Remitente, uselist=False)
@@ -73,8 +68,7 @@ class Flete(AuditMixin, Base):
     producto = relationship(Producto, uselist=False)
     tipo_carga_id = Column(Integer, ForeignKey("tipo_carga.id"))
     tipo_carga = relationship(TipoCarga, uselist=False)
-    numero_factura = Column(String(255))
-    numero_crt = Column(String(255))
+    numero_lote = Column(String(255))
     gestor_cuenta_id = Column(Integer, ForeignKey("gestor_carga.id"))
     gestor_cuenta = relationship(GestorCarga, uselist=False)
     publicado = Column(Boolean, server_default=text("false"))
@@ -213,6 +207,10 @@ class Flete(AuditMixin, Base):
         return self.producto.descripcion
 
     @hybrid_property
+    def publicado_descripcion(self):
+        return "Si" if self.publicado else "No"
+
+    @hybrid_property
     def remitente_nombre(self):
         return self.remitente.nombre
 
@@ -221,10 +219,12 @@ class Flete(AuditMixin, Base):
         return self.tipo_carga.descripcion
 
     @hybrid_property
-    def tipo_flete(self):
+    def tipo_flete(self) -> TipoFleteEnum:
         if self.origen.pais_id == self.destino.pais_id:
             return TipoFleteEnum.DOMESTICO
         elif self.gestor_cuenta.pais_id == self.origen.pais_id:
             return TipoFleteEnum.EXPORTACION
         elif self.gestor_cuenta.pais_id == self.destino.pais_id:
             return TipoFleteEnum.IMPORTACION
+        else:
+            return TipoFleteEnum.DESCONOCIDO

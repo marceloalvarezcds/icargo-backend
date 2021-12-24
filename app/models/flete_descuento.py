@@ -7,6 +7,7 @@ from sqlalchemy import (  # type: ignore
     Text,
     text,
 )
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
 
@@ -58,3 +59,19 @@ class FleteDescuento(AuditMixin, Base):
     # FIN Monto a pagar al Proveedor
     flete_id = Column(Integer, ForeignKey("flete.id"))
     flete = relationship(Flete, uselist=False, back_populates="descuentos")
+
+    @hybrid_property
+    def concepto_descripcion(self):
+        return self.concepto.descripcion
+
+    @hybrid_property
+    def propietario_moneda_nombre(self):
+        return self.propietario_moneda.nombre
+
+    @hybrid_property
+    def proveedor_moneda_nombre(self):
+        return self.proveedor_moneda.nombre
+
+    @hybrid_property
+    def proveedor_nombre(self):
+        return self.proveedor.nombre
