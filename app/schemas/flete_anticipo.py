@@ -10,7 +10,7 @@ class FleteAnticipoForm(BaseModel):
     id: Optional[int] = None
     tipo_id: int
     tipo_descripcion: str
-    porcentaje: Decimal
+    porcentaje: Optional[Decimal] = None
 
 
 class FleteAnticipo(FleteAnticipoForm):
