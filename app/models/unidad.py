@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Numeric  # type: ignore
+from sqlalchemy import Column, Numeric, String  # type: ignore
 
 from app.database.base import Base
 
@@ -10,4 +10,5 @@ class Unidad(SeleccionableMixin, Base):
     Defines the unidad model
     """
 
+    abreviatura = Column(String(255))
     conversion_kg = Column(Numeric(38, 10))

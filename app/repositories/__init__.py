@@ -228,6 +228,10 @@ from .tipo_anticipo import (  # noqa
 )
 from .tipo_camion import get_tipo_camion_by_descripcion, get_tipo_camion_list  # noqa
 from .tipo_carga import get_tipo_carga_by_descripcion, get_tipo_carga_list  # noqa
+from .tipo_comprobante import (  # noqa
+    get_tipo_comprobante_by_descripcion,
+    get_tipo_comprobante_list,
+)
 from .tipo_concepto_complemento import (  # noqa
     get_tipo_concepto_complemento_by_descripcion,
     get_tipo_concepto_complemento_list,

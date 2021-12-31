@@ -14,6 +14,7 @@ from .semi_clasificacion_seeds import semi_clasificacion_seeds
 from .tipo_anticipo_seeds import tipo_anticipo_seeds
 from .tipo_camion_seeds import tipo_camion_seeds
 from .tipo_carga_seeds import tipo_carga_seeds
+from .tipo_comprobante_seeds import tipo_comprobante_seeds
 from .tipo_concepto_complemento_seeds import tipo_concepto_complemento_seeds
 from .tipo_concepto_descuento_seeds import tipo_concepto_descuento_seeds
 from .tipo_persona_seeds import tipo_persona_seeds
@@ -31,12 +32,12 @@ def seeds(db: Session):
     marca_semi_seeds(db)
     moneda_seeds(db)
     pais_seeds(db)
-    producto_seeds(db)
     rol_seeds(db)
     semi_clasificacion_seeds(db)
     tipo_anticipo_seeds(db)
     tipo_camion_seeds(db)
     tipo_carga_seeds(db)
+    tipo_comprobante_seeds(db)
     tipo_concepto_complemento_seeds(db)
     tipo_concepto_descuento_seeds(db)
     tipo_persona_seeds(db)
@@ -45,3 +46,5 @@ def seeds(db: Session):
     unidad_seeds(db)
     user_seeds(db)
     ente_emisor_automotor_seeds(db)
+    # dependent models
+    producto_seeds(db)

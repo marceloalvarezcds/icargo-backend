@@ -47,6 +47,7 @@ class PermisoModeloEnum(Enum):
     TIPO_ANTICIPO = "tipo_anticipo"
     TIPO_CAMION = "tipo_camion"
     TIPO_CARGA = "tipo_carga"
+    TIPO_COMPROBANTE = "tipo_comprobante"
     TIPO_CONCEPTO_COMPLEMENTO = "tipo_concepto_complemento"
     TIPO_CONCEPTO_DESCUENTO = "tipo_concepto_descuento"
     TIPO_DOCUMENTO = "tipo_documento"

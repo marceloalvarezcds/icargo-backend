@@ -1,6 +1,10 @@
+from sqlalchemy import Column, ForeignKey, Integer  # type: ignore
+from sqlalchemy.orm import relationship  # type: ignore
+
 from app.database.base import Base
 
 from .seleccionable_mixin import SeleccionableMixin
+from .tipo_carga import TipoCarga
 
 
 class Producto(SeleccionableMixin, Base):
@@ -8,4 +12,5 @@ class Producto(SeleccionableMixin, Base):
     Defines the producto model
     """
 
-    pass
+    tipo_carga_id = Column(Integer, ForeignKey("tipo_carga.id"))
+    tipo_carga = relationship(TipoCarga, uselist=False)

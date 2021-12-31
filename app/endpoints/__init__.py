@@ -31,6 +31,7 @@ from app.endpoints import (
     tipo_anticipo,
     tipo_camion,
     tipo_carga,
+    tipo_comprobante,
     tipo_concepto_complemento,
     tipo_concepto_descuento,
     tipo_documento,
@@ -93,6 +94,9 @@ api.include_router(semi.api, prefix="/semi", tags=["semi"])
 api.include_router(tipo_anticipo.api, prefix="/tipo_anticipo", tags=["tipo_anticipo"])
 api.include_router(tipo_camion.api, prefix="/tipo_camion", tags=["tipo_camion"])
 api.include_router(tipo_carga.api, prefix="/tipo_carga", tags=["tipo_carga"])
+api.include_router(
+    tipo_comprobante.api, prefix="/tipo_comprobante", tags=["tipo_comprobante"]
+)
 api.include_router(
     tipo_concepto_complemento.api,
     prefix="/tipo_concepto_complemento",

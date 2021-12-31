@@ -48,6 +48,7 @@ from .semi_clasificacion import SemiClasificacion  # noqa
 from .tipo_anticipo import TipoAnticipo  # noqa
 from .tipo_camion import TipoCamion  # noqa
 from .tipo_carga import TipoCarga  # noqa
+from .tipo_comprobante import TipoComprobante  # noqa
 from .tipo_concepto_complemento import TipoConceptoComplemento  # noqa
 from .tipo_concepto_descuento import TipoConceptoDescuento  # noqa
 from .tipo_documento import TipoDocumento  # noqa
