@@ -6,6 +6,7 @@ from .contacto_seeds import contacto_seeds
 from .flete_cargill_seeds import flete_cargill_seeds
 from .flete_seeds import flete_seeds
 from .gestor_carga_seeds import gestor_carga_seeds
+from .orden_carga_seeds import orden_carga_seeds
 from .tipo_documento_seeds import tipo_documento_seeds
 
 
@@ -17,3 +18,5 @@ def populate(db: Session):  # Used only for test data in development
     gestor_carga_seeds(db)
     flete_seeds(db, 1)
     flete_cargill_seeds(db, 2)
+    orden_carga_seeds(db, 1)
+    orden_carga_seeds(db, 2)

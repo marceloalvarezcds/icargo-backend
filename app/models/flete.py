@@ -69,8 +69,8 @@ class Flete(AuditMixin, Base):
     tipo_carga_id = Column(Integer, ForeignKey("tipo_carga.id"))
     tipo_carga = relationship(TipoCarga, uselist=False)
     numero_lote = Column(String(255))
-    gestor_cuenta_id = Column(Integer, ForeignKey("gestor_carga.id"))
-    gestor_cuenta = relationship(GestorCarga, uselist=False)
+    gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
+    gestor_carga = relationship(GestorCarga, uselist=False)
     publicado = Column(Boolean, server_default=text("false"))
     es_subasta = Column(Boolean, server_default=text("false"))
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
@@ -179,8 +179,8 @@ class Flete(AuditMixin, Base):
         return self.destino.nombre
 
     @hybrid_property
-    def gestor_cuenta_nombre(self):
-        return self.gestor_cuenta.nombre
+    def gestor_carga_nombre(self):
+        return self.gestor_carga.nombre
 
     @hybrid_property
     def merma_gestor_cuenta_moneda_nombre(self):
@@ -222,9 +222,9 @@ class Flete(AuditMixin, Base):
     def tipo_flete(self) -> TipoFleteEnum:
         if self.origen.pais_id == self.destino.pais_id:
             return TipoFleteEnum.DOMESTICO
-        elif self.gestor_cuenta.pais_id == self.origen.pais_id:
+        elif self.gestor_carga.pais_id == self.origen.pais_id:
             return TipoFleteEnum.EXPORTACION
-        elif self.gestor_cuenta.pais_id == self.destino.pais_id:
+        elif self.gestor_carga.pais_id == self.destino.pais_id:
             return TipoFleteEnum.IMPORTACION
         else:
             return TipoFleteEnum.DESCONOCIDO

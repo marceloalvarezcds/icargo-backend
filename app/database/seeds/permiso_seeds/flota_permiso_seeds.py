@@ -15,6 +15,9 @@ def flota_admin_permiso_seeds(db: Session, user: User):
     permisos.append(permiso_seeds(db, a.VER, m.CAMION))
     permisos.append(permiso_seeds(db, a.REPORTE, m.CAMION, True, "Reporte de Camion"))
 
+    permisos.append(permiso_seeds(db, a.LISTAR, m.CAMION_SEMI_NETO))
+    permisos.append(permiso_seeds(db, a.VER, m.CAMION_SEMI_NETO))
+
     permisos.append(permiso_seeds(db, a.LISTAR, m.CHOFER))
     permisos.append(permiso_seeds(db, a.VER, m.CHOFER))
     permisos.append(permiso_seeds(db, a.REPORTE, m.CHOFER, True, "Reporte de Chofer"))
@@ -38,6 +41,7 @@ def flota_admin_permiso_seeds(db: Session, user: User):
 def flota_permiso_seeds(db: Session, user: User):
     permiso_generico_seeds(db, user)
     permiso_camion_seeds(db, user)
+    permiso_camion_semi_neto_seeds(db, user)
     permiso_chofer_seeds(db, user)
     permiso_propietario_seeds(db, user)
     permiso_semirremolque_seeds(db, user)
@@ -128,6 +132,17 @@ def permiso_camion_seeds(db: Session, user: User):
     )
     permisos.append(permiso_seeds(db, a.VER, m.CAMION))
     permisos.append(permiso_seeds(db, a.REPORTE, m.CAMION, True, "Reporte de Camion"))
+    user.permisos.extend(permisos)
+    db.commit()
+
+
+def permiso_camion_semi_neto_seeds(db: Session, user: User):
+    permisos = []
+    permisos.append(permiso_seeds(db, a.CREAR, m.CAMION_SEMI_NETO))
+    permisos.append(permiso_seeds(db, a.EDITAR, m.CAMION_SEMI_NETO))
+    permisos.append(permiso_seeds(db, a.ELIMINAR, m.CAMION_SEMI_NETO))
+    permisos.append(permiso_seeds(db, a.LISTAR, m.CAMION_SEMI_NETO))
+    permisos.append(permiso_seeds(db, a.VER, m.CAMION_SEMI_NETO))
     user.permisos.extend(permisos)
     db.commit()
 

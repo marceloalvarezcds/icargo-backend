@@ -12,6 +12,7 @@ from app.repositories import (
 )
 
 from .gestor_carga_punto_venta_seeds import gestor_carga_punto_venta_seeds
+from .insumo_punto_venta_seeds import insumo_punto_venta_list_seeds
 from .punto_venta_contacto_gestor_carga_seeds import (
     punto_venta_contacto_gestor_carga_seeds,
 )
@@ -69,3 +70,4 @@ def punto_venta_seeds(
             punto_venta_contacto_gestor_carga_seeds(
                 db, cargo, punto_venta, contacto, gestor_carga, contacto_alias
             )
+            insumo_punto_venta_list_seeds(db, punto_venta, gestor_carga)

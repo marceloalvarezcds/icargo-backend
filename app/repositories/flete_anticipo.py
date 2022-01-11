@@ -38,6 +38,7 @@ def create_flete_anticipo(
     obj = FleteAnticipo(
         flete_id=flete_id,
         tipo_id=data.tipo_id,
+        tipo_insumo_id=data.tipo_insumo_id,
         porcentaje=data.porcentaje,
         modified_by=modified_by,
     )
@@ -54,6 +55,7 @@ def edit_flete_anticipo(
     modified_by: str,
 ) -> FleteAnticipo:
     obj.tipo_id = data.tipo_id
+    obj.tipo_insumo_id = data.tipo_insumo_id
     obj.porcentaje = data.porcentaje
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()

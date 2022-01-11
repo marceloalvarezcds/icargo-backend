@@ -1,4 +1,3 @@
-from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 
@@ -85,7 +84,7 @@ class Flete(FleteFormBaseModel):
     tipo_carga: TipoCarga
     publicado_descripcion: str
     estado: EstadoEnum
-    gestor_cuenta_id: int
+    gestor_carga_id: int
     # INICIO Tramo de Fletes
     origen: CentroOperativo
     destino: CentroOperativo
@@ -118,9 +117,9 @@ class Flete(FleteFormBaseModel):
     descuentos: List[FleteDescuento]
     tipo_flete: TipoFleteEnum
     created_by: str
-    created_at: datetime
+    created_at: Date
     modified_by: str
-    modified_at: datetime
+    modified_at: Date
 
     class Config:
         orm_mode = True
@@ -134,7 +133,7 @@ class FleteList(FleteFormBaseModel):
     tipo_carga_descripcion: str
     publicado_descripcion: str
     estado: EstadoEnum
-    gestor_cuenta_nombre: str
+    gestor_carga_nombre: str
     # INICIO Tramo de Fletes
     origen_nombre: str
     destino_nombre: str
@@ -161,9 +160,9 @@ class FleteList(FleteFormBaseModel):
     # FIN Mermas de Fletes
     tipo_flete: TipoFleteEnum
     created_by: str
-    created_at: datetime
+    created_at: Date
     modified_by: str
-    modified_at: datetime
+    modified_at: Date
 
     class Config:
         orm_mode = True

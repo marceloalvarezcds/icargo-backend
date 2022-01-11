@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
+from sqlalchemy.sql.elements import and_  # type: ignore
+from sqlalchemy.sql.expression import false, true  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Flete
@@ -11,13 +13,36 @@ from app.schemas import FleteForm
 def get_flete_list(db: Session) -> List[Flete]:
     return (
         db.query(Flete)
-        .filter(Flete.estado != EstadoEnum.ELIMINADO.value)
+        .filter(
+            and_(
+                Flete.estado != EstadoEnum.ELIMINADO.value,
+                Flete.es_subasta
+                == false(),  # Filtro temporal hasta implementar subastas
+            )
+        )
         .order_by(
+            Flete.created_at,
             Flete.remitente_id,
             Flete.producto_id,
             Flete.tipo_carga_id,
             Flete.numero_lote,
         )
+        .all()
+    )
+
+
+def get_flete_list_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> List[Flete]:
+    return (
+        db.query(Flete)
+        .filter(
+            and_(
+                Flete.gestor_carga_id == gestor_carga_id,
+                Flete.estado != EstadoEnum.ELIMINADO.value,
+                Flete.publicado == true(),
+                Flete.es_subasta == false(),
+            )
+        )
+        .order_by(Flete.created_at)
         .all()
     )
 
@@ -29,7 +54,7 @@ def get_flete_by_id(db: Session, id: int) -> Optional[Flete]:
 def create_flete(
     db: Session,
     data: FleteForm,
-    gestor_cuenta_id: Optional[int],
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Flete:
     obj = Flete(
@@ -37,7 +62,7 @@ def create_flete(
         producto_id=data.producto_id,
         tipo_carga_id=data.tipo_carga_id,
         numero_lote=data.numero_lote,
-        gestor_cuenta_id=gestor_cuenta_id,
+        gestor_carga_id=gestor_carga_id,
         publicado=data.publicado,
         es_subasta=data.es_subasta,
         # INICIO Tramo de Fletes
@@ -97,7 +122,7 @@ def edit_flete(
     obj: Flete,
     db: Session,
     data: FleteForm,
-    gestor_cuenta_id: Optional[int],
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Flete:
     if data.remitente_id and data.producto_id and data.tipo_carga_id:
@@ -105,7 +130,7 @@ def edit_flete(
         obj.producto_id = data.producto_id
         obj.tipo_carga_id = data.tipo_carga_id
         obj.numero_lote = data.numero_lote
-        obj.gestor_cuenta_id = gestor_cuenta_id
+        obj.gestor_carga_id = gestor_carga_id
         obj.publicado = data.publicado
         obj.es_subasta = data.es_subasta
         # INICIO Tramo de Fletes

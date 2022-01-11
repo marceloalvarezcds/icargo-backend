@@ -8,7 +8,12 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
-from app.models import GestorCargaPuntoVenta, PuntoVenta, PuntoVentaContactoGestorCarga
+from app.models import (
+    GestorCargaPuntoVenta,
+    InsumoPuntoVenta,
+    PuntoVenta,
+    PuntoVentaContactoGestorCarga,
+)
 
 from .gestor_carga_punto_venta import (
     create_gestor_carga_punto_venta,
@@ -25,10 +30,12 @@ def get_punto_venta_detail(
     contactos: List[PuntoVentaContactoGestorCarga] = obj.contactos
     ges: List[GestorCargaPuntoVenta] = obj.gestores
     gestores = [x for x in ges if x.gestor_carga_id == gestor_carga_id]
+    insumos: List[InsumoPuntoVenta] = obj.insumos
     obj_dict["contactos"] = [
         x for x in contactos if x.gestor_carga_id == gestor_carga_id
     ]
     obj_dict["gestor_carga_punto_venta"] = gestores[0] if len(gestores) > 0 else None
+    obj_dict["insumos"] = [x for x in insumos if x.gestor_carga_id == gestor_carga_id]
     obj_dict["tipo_documento"] = obj.tipo_documento
     obj_dict["composicion_juridica"] = obj.composicion_juridica
     obj_dict["ciudad"] = obj.ciudad

@@ -4,6 +4,7 @@ from .centro_operativo_clasificacion_seeds import centro_operativo_clasificacion
 from .color_seeds import color_seeds
 from .ente_emisor_automotor_seeds import ente_emisor_automotor_seeds
 from .ente_emisor_transporte_seeds import ente_emisor_transporte_seeds
+from .insumo_seeds import insumo_seeds
 from .marca_camion_seeds import marca_camion_seeds
 from .marca_semi_seeds import marca_semi_seeds
 from .moneda_seeds import moneda_seeds
@@ -17,6 +18,7 @@ from .tipo_carga_seeds import tipo_carga_seeds
 from .tipo_comprobante_seeds import tipo_comprobante_seeds
 from .tipo_concepto_complemento_seeds import tipo_concepto_complemento_seeds
 from .tipo_concepto_descuento_seeds import tipo_concepto_descuento_seeds
+from .tipo_insumo_seeds import tipo_insumo_seeds
 from .tipo_persona_seeds import tipo_persona_seeds
 from .tipo_registro_seeds import tipo_registro_seeds
 from .tipo_semi_seeds import tipo_semi_seeds
@@ -40,6 +42,7 @@ def seeds(db: Session):
     tipo_comprobante_seeds(db)
     tipo_concepto_complemento_seeds(db)
     tipo_concepto_descuento_seeds(db)
+    tipo_insumo_seeds(db)
     tipo_persona_seeds(db)
     tipo_registro_seeds(db)
     tipo_semi_seeds(db)
@@ -47,4 +50,5 @@ def seeds(db: Session):
     user_seeds(db)
     ente_emisor_automotor_seeds(db)
     # dependent models
+    insumo_seeds(db)
     producto_seeds(db)

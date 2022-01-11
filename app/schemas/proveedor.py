@@ -60,3 +60,7 @@ class ProveedorList(ProveedorBase):
 class Proveedor(ProveedorBase):
     contactos: List[ProveedorContactoGestorCargaList] = []
     gestor_carga_proveedor: Optional[GestorCargaProveedor] = None
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True

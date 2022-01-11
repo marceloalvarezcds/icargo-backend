@@ -3,6 +3,7 @@ from app import audits  # noqa
 from app.database import Base  # noqa
 
 from .camion import Camion  # noqa
+from .camion_semi_neto import CamionSemiNeto  # noqa
 from .cargo import Cargo  # noqa
 from .centro_operativo import CentroOperativo  # noqa
 from .centro_operativo_clasificacion import CentroOperativoClasificacion  # noqa
@@ -27,10 +28,20 @@ from .gestor_carga_propietario import GestorCargaPropietario  # noqa
 from .gestor_carga_proveedor import GestorCargaProveedor  # noqa
 from .gestor_carga_punto_venta import GestorCargaPuntoVenta  # noqa
 from .gestor_carga_remitente import GestorCargaRemitente  # noqa
+from .insumo import Insumo  # noqa
+from .insumo_punto_venta import InsumoPuntoVenta  # noqa
+from .insumo_punto_venta_precio import InsumoPuntoVentaPrecio  # noqa
 from .localidad import Localidad  # noqa
 from .marca_camion import MarcaCamion  # noqa
 from .marca_semi import MarcaSemi  # noqa
 from .moneda import Moneda  # noqa
+from .orden_carga import OrdenCarga  # noqa
+from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado  # noqa
+from .orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo  # noqa
+from .orden_carga_complemento import OrdenCargaComplemento  # noqa
+from .orden_carga_descuento import OrdenCargaDescuento  # noqa
+from .orden_carga_remision_destino import OrdenCargaRemisionDestino  # noqa
+from .orden_carga_remision_origen import OrdenCargaRemisionOrigen  # noqa
 from .pais import Pais  # noqa
 from .permiso import Permiso  # noqa
 from .producto import Producto  # noqa
@@ -52,6 +63,7 @@ from .tipo_comprobante import TipoComprobante  # noqa
 from .tipo_concepto_complemento import TipoConceptoComplemento  # noqa
 from .tipo_concepto_descuento import TipoConceptoDescuento  # noqa
 from .tipo_documento import TipoDocumento  # noqa
+from .tipo_insumo import TipoInsumo  # noqa
 from .tipo_persona import TipoPersona  # noqa
 from .tipo_registro import TipoRegistro  # noqa
 from .tipo_semi import TipoSemi  # noqa
