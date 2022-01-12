@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.endpoints import (
     camion,
+    camion_semi_neto,
     cargo,
     centro_operativo,
     centro_operativo_clasificacion,
@@ -14,11 +15,18 @@ from app.endpoints import (
     ente_emisor_transporte,
     flete,
     gestor_carga,
+    insumo,
     localidad,
     login,
     marca_camion,
     marca_semi,
     moneda,
+    orden_carga,
+    orden_carga_anticipo_retirado,
+    orden_carga_complemento,
+    orden_carga_descuento,
+    orden_carga_remision_destino,
+    orden_carga_remision_origen,
     pais,
     permiso,
     producto,
@@ -31,6 +39,7 @@ from app.endpoints import (
     tipo_anticipo,
     tipo_camion,
     tipo_carga,
+    tipo_comprobante,
     tipo_concepto_complemento,
     tipo_concepto_descuento,
     tipo_documento,
@@ -44,6 +53,9 @@ from app.endpoints import (
 api = APIRouter()
 
 api.include_router(camion.api, prefix="/camion", tags=["camion"])
+api.include_router(
+    camion_semi_neto.api, prefix="/camion_semi_neto", tags=["camion_semi_neto"]
+)
 api.include_router(cargo.api, prefix="/cargo", tags=["cargo"])
 api.include_router(
     centro_operativo_clasificacion.api,
@@ -74,11 +86,38 @@ api.include_router(
 )
 api.include_router(flete.api, prefix="/flete", tags=["flete"])
 api.include_router(gestor_carga.api, prefix="/gestor_carga", tags=["gestor_carga"])
+api.include_router(insumo.api, prefix="/insumo", tags=["insumo"])
 api.include_router(localidad.api, prefix="/localidad", tags=["localidad"])
 api.include_router(login.api, prefix="/login", tags=["login"])
 api.include_router(marca_camion.api, prefix="/marca_camion", tags=["marca_camion"])
 api.include_router(marca_semi.api, prefix="/marca_semi", tags=["marca_semi"])
 api.include_router(moneda.api, prefix="/moneda", tags=["moneda"])
+api.include_router(orden_carga.api, prefix="/orden_carga", tags=["orden_carga"])
+api.include_router(
+    orden_carga_anticipo_retirado.api,
+    prefix="/orden_carga_anticipo_retirado",
+    tags=["orden_carga_anticipo_retirado"],
+)
+api.include_router(
+    orden_carga_complemento.api,
+    prefix="/orden_carga_complemento",
+    tags=["orden_carga_complemento"],
+)
+api.include_router(
+    orden_carga_descuento.api,
+    prefix="/orden_carga_descuento",
+    tags=["orden_carga_descuento"],
+)
+api.include_router(
+    orden_carga_remision_destino.api,
+    prefix="/orden_carga_remision_destino",
+    tags=["orden_carga_remision_destino"],
+)
+api.include_router(
+    orden_carga_remision_origen.api,
+    prefix="/orden_carga_remision_origen",
+    tags=["orden_carga_remision_origen"],
+)
 api.include_router(pais.api, prefix="/pais", tags=["pais"])
 api.include_router(permiso.api, prefix="/permiso", tags=["permiso"])
 api.include_router(producto.api, prefix="/producto", tags=["producto"])
@@ -93,6 +132,9 @@ api.include_router(semi.api, prefix="/semi", tags=["semi"])
 api.include_router(tipo_anticipo.api, prefix="/tipo_anticipo", tags=["tipo_anticipo"])
 api.include_router(tipo_camion.api, prefix="/tipo_camion", tags=["tipo_camion"])
 api.include_router(tipo_carga.api, prefix="/tipo_carga", tags=["tipo_carga"])
+api.include_router(
+    tipo_comprobante.api, prefix="/tipo_comprobante", tags=["tipo_comprobante"]
+)
 api.include_router(
     tipo_concepto_complemento.api,
     prefix="/tipo_concepto_complemento",

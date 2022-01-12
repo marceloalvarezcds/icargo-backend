@@ -2,9 +2,11 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
+from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Camion
+from app.models.propietario import Propietario
 from app.schemas import CamionForm
 
 
@@ -12,6 +14,24 @@ def get_camion_list(db: Session) -> List[Camion]:
     return (
         db.query(Camion)
         .filter(Camion.estado != EstadoEnum.ELIMINADO.value)
+        .order_by(Camion.placa)
+        .all()
+    )
+
+
+def get_camion_list_by_gestor_cuenta_id(
+    db: Session, gestor_cuenta_id: int
+) -> List[Camion]:
+    return (
+        db.query(Camion)
+        .filter(
+            and_(
+                Camion.propietario.has(
+                    Propietario.gestor_cuenta_id == gestor_cuenta_id
+                ),
+                Camion.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
         .order_by(Camion.placa)
         .all()
     )

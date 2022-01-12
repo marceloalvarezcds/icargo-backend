@@ -1,5 +1,6 @@
 # should be imported to help code editor (vscode) for autocompletion
 from .camion import Camion, CamionForm, CamionList  # noqa
+from .camion_semi_neto import CamionSemiNeto, CamionSemiNetoForm  # noqa
 from .cargo import Cargo  # noqa
 from .centro_operativo import (  # noqa
     CentroOperativo,
@@ -30,10 +31,40 @@ from .gestor_carga_propietario import GestorCargaPropietario  # noqa
 from .gestor_carga_proveedor import GestorCargaProveedor  # noqa
 from .gestor_carga_punto_venta import GestorCargaPuntoVenta  # noqa
 from .gestor_carga_remitente import GestorCargaRemitente  # noqa
+from .insumo import Insumo, InsumoForm  # noqa
+from .insumo_punto_venta import InsumoPuntoVenta  # noqa
+from .insumo_punto_venta_precio import (  # noqa
+    InsumoPuntoVentaPrecio,
+    InsumoPuntoVentaPrecioForm,
+    InsumoPuntoVentaPrecioList,
+)
 from .localidad import Localidad  # noqa
 from .marca_camion import MarcaCamion  # noqa
 from .marca_semi import MarcaSemi  # noqa
 from .moneda import Moneda  # noqa
+from .orden_carga import (  # noqa
+    OrdenCarga,
+    OrdenCargaEditForm,
+    OrdenCargaForm,
+    OrdenCargaList,
+)
+from .orden_carga_anticipo_retirado import (  # noqa
+    OrdenCargaAnticipoRetirado,
+    OrdenCargaAnticipoRetiradoForm,
+)
+from .orden_carga_complemento import (  # noqa
+    OrdenCargaComplemento,
+    OrdenCargaComplementoForm,
+)
+from .orden_carga_descuento import OrdenCargaDescuento, OrdenCargaDescuentoForm  # noqa
+from .orden_carga_remision_destino import (  # noqa
+    OrdenCargaRemisionDestino,
+    OrdenCargaRemisionDestinoForm,
+)
+from .orden_carga_remision_origen import (  # noqa
+    OrdenCargaRemisionOrigen,
+    OrdenCargaRemisionOrigenForm,
+)
 from .pais import Pais  # noqa
 from .permiso import Permiso  # noqa
 from .producto import Producto  # noqa
@@ -67,9 +98,11 @@ from .semi_clasificacion import SemiClasificacion  # noqa
 from .tipo_anticipo import TipoAnticipo  # noqa
 from .tipo_camion import TipoCamion  # noqa
 from .tipo_carga import TipoCarga  # noqa
+from .tipo_comprobante import TipoComprobante  # noqa
 from .tipo_concepto_complemento import TipoConceptoComplemento  # noqa
 from .tipo_concepto_descuento import TipoConceptoDescuento  # noqa
 from .tipo_documento import TipoDocumento  # noqa
+from .tipo_insumo import TipoInsumo  # noqa
 from .tipo_persona import TipoPersona  # noqa
 from .tipo_registro import TipoRegistro  # noqa
 from .tipo_semi import TipoSemi  # noqa

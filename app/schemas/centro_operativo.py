@@ -55,3 +55,7 @@ class CentroOperativoList(CentroOperativoBase):
 class CentroOperativo(CentroOperativoBase):
     contactos: List[CentroOperativoContactoGestorCargaList] = []
     gestor_carga_centro_operativo: Optional[GestorCargaCentroOperativo] = None
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True

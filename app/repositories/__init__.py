@@ -7,7 +7,16 @@ from .camion import (  # noqa
     get_camion_by,
     get_camion_by_id,
     get_camion_list,
+    get_camion_list_by_gestor_cuenta_id,
     get_camion_list_by_propietario_id,
+)
+from .camion_semi_neto import (  # noqa
+    get_camion_semi_neto_by_camion_id_and_semi_id,
+    get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id,
+    get_camion_semi_neto_list_by_camion_id,
+    get_camion_semi_neto_list_by_camion_id_and_producto_id,
+    get_camion_semi_neto_list_by_producto_id,
+    get_camion_semi_neto_list_by_producto_id_null,
 )
 from .cargo import get_cargo_by_descripcion, get_cargo_list  # noqa
 from .centro_operativo import (  # noqa
@@ -74,6 +83,7 @@ from .flete import (  # noqa
     edit_flete,
     get_flete_by_id,
     get_flete_list,
+    get_flete_list_by_gestor_carga_id,
     update_flete_destinatarios,
 )
 from .flete_anticipo import (  # noqa
@@ -135,10 +145,69 @@ from .gestor_carga_remitente import (  # noqa
     edit_gestor_carga_remitente,
     get_gestor_carga_remitente_by,
 )
+from .insumo import get_insumo_by_descripcion, get_insumo_list  # noqa
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
 from .marca_camion import get_marca_camion_by_descripcion, get_marca_camion_list  # noqa
 from .marca_semi import get_marca_semi_by_descripcion, get_marca_semi_list  # noqa
 from .moneda import get_moneda_by_simbolo, get_moneda_list  # noqa
+from .orden_carga import (  # noqa
+    aceptar_orden_carga,
+    arribado_a_cargar_orden_carga,
+    arribado_a_descargar_orden_carga,
+    cancelar_orden_carga,
+    cargar_orden_carga,
+    change_orden_carga_anticipos_liberados,
+    change_orden_carga_status,
+    conciliar_orden_carga,
+    contabilizar_orden_carga,
+    create_orden_carga,
+    delete_orden_carga,
+    descargar_orden_carga,
+    edit_orden_carga,
+    finalizar_orden_carga,
+    get_orden_carga_by_id,
+    get_orden_carga_list,
+    liquidar_orden_carga,
+)
+from .orden_carga_anticipo_retirado import (  # noqa
+    create_orden_carga_anticipo_retirado,
+    delete_orden_carga_anticipo_retirado,
+    edit_orden_carga_anticipo_retirado,
+    get_orden_carga_anticipo_retirado_by,
+    get_orden_carga_anticipo_retirado_by_id,
+)
+from .orden_carga_complemento import (  # noqa
+    create_orden_carga_complemento,
+    delete_orden_carga_complemento,
+    edit_orden_carga_complemento,
+    get_orden_carga_complemento_by,
+    get_orden_carga_complemento_by_id,
+)
+from .orden_carga_complemento_flete import (  # noqa
+    create_orden_carga_complemento_by_flete,
+)
+from .orden_carga_descuento import (  # noqa
+    create_orden_carga_descuento,
+    delete_orden_carga_descuento,
+    edit_orden_carga_descuento,
+    get_orden_carga_descuento_by,
+    get_orden_carga_descuento_by_id,
+)
+from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete  # noqa
+from .orden_carga_remision_destino import (  # noqa
+    create_orden_carga_remision_destino,
+    delete_orden_carga_remision_destino,
+    edit_orden_carga_remision_destino,
+    get_orden_carga_remision_destino_by,
+    get_orden_carga_remision_destino_by_id,
+)
+from .orden_carga_remision_origen import (  # noqa
+    create_orden_carga_remision_origen,
+    delete_orden_carga_remision_origen,
+    edit_orden_carga_remision_origen,
+    get_orden_carga_remision_origen_by,
+    get_orden_carga_remision_origen_by_id,
+)
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .permiso import get_permiso_by, get_permiso_list  # noqa
 from .producto import get_producto_by_descripcion, get_producto_list  # noqa
@@ -228,6 +297,10 @@ from .tipo_anticipo import (  # noqa
 )
 from .tipo_camion import get_tipo_camion_by_descripcion, get_tipo_camion_list  # noqa
 from .tipo_carga import get_tipo_carga_by_descripcion, get_tipo_carga_list  # noqa
+from .tipo_comprobante import (  # noqa
+    get_tipo_comprobante_by_descripcion,
+    get_tipo_comprobante_list,
+)
 from .tipo_concepto_complemento import (  # noqa
     get_tipo_concepto_complemento_by_descripcion,
     get_tipo_concepto_complemento_list,
@@ -240,6 +313,7 @@ from .tipo_documento import (  # noqa
     get_tipo_documento_by_descripcion,
     get_tipo_documento_list,
 )
+from .tipo_insumo import get_tipo_insumo_by_descripcion, get_tipo_insumo_list  # noqa
 from .tipo_persona import get_tipo_persona_by_descripcion, get_tipo_persona_list  # noqa
 from .tipo_registro import (  # noqa
     get_tipo_registro_by_descripcion,

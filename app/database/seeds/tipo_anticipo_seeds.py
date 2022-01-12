@@ -7,9 +7,7 @@ from app.models import TipoAnticipo
 def tipo_anticipo_seeds(db: Session):
     try:
         db.add(TipoAnticipo(descripcion="EFECTIVO"))
-        db.add(TipoAnticipo(descripcion="COMBUSTIBLE"))
-        db.add(TipoAnticipo(descripcion="LUBRICANTES"))
-        db.add(TipoAnticipo(descripcion="OTROS"))
+        db.add(TipoAnticipo(descripcion="TIPO DE INSUMO"))
         db.commit()
     except IntegrityError:
         db.rollback()

@@ -30,13 +30,13 @@ def get_flete_detail(model: Flete) -> schemas.Flete:
 def create_flete(
     db: Session,
     data: schemas.FleteForm,
-    gestor_cuenta_id: Optional[int],
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Flete:
     obj = repositories.create_flete(
         db,
         data,
-        gestor_cuenta_id,
+        gestor_carga_id,
         modified_by,
     )
     update_flete_anticipo_list(db, data.anticipos, obj, modified_by)
@@ -61,7 +61,7 @@ def edit_flete(
     id: int,
     db: Session,
     data: schemas.FleteForm,
-    gestor_cuenta_id: Optional[int],
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Flete:
     to_edit_obj = get_flete_by_id(db, id)
@@ -69,7 +69,7 @@ def edit_flete(
         to_edit_obj,
         db,
         data,
-        gestor_cuenta_id,
+        gestor_carga_id,
         modified_by,
     )
     update_flete_anticipo_list(db, data.anticipos, obj, modified_by)

@@ -82,6 +82,7 @@ class Semi(AuditMixin, Base):
     ancho = Column(Numeric(38, 10))
     volumen = Column(Numeric(38, 10))
     # FIN Capacidad del Camión
+    combinaciones = relationship("CamionSemiNeto", back_populates="semi")
 
     @hybrid_property
     def ciudad_habilitacion_municipal_nombre(self):
@@ -106,6 +107,10 @@ class Semi(AuditMixin, Base):
     @hybrid_property
     def marca_descripcion(self):
         return self.marca.descripcion
+
+    @hybrid_property
+    def neto(self):
+        return self.bruto - self.tara
 
     @hybrid_property
     def oficial_cuenta_nombre(self):

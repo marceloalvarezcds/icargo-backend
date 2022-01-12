@@ -9,6 +9,7 @@ from .ciudad import Ciudad
 from .composicion_juridica import ComposicionJuridica
 from .contacto import ContactoForm
 from .gestor_carga_punto_venta import GestorCargaPuntoVenta
+from .insumo_punto_venta import InsumoPuntoVenta
 from .punto_venta_contacto_gestor_carga import PuntoVentaContactoGestorCargaList
 from .tipo_documento import TipoDocumento
 
@@ -61,3 +62,4 @@ class PuntoVentaList(PuntoVentaBase):
 class PuntoVenta(PuntoVentaBase):
     contactos: List[PuntoVentaContactoGestorCargaList] = []
     gestor_carga_punto_venta: Optional[GestorCargaPuntoVenta] = None
+    insumos: List[InsumoPuntoVenta] = []

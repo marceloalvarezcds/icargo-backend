@@ -57,6 +57,7 @@ class PuntoVenta(AuditMixin, Base):
         "PuntoVentaContactoGestorCarga", back_populates="punto_venta"
     )
     gestores = relationship("GestorCargaPuntoVenta", back_populates="punto_venta")
+    insumos = relationship("InsumoPuntoVenta", back_populates="punto_venta")
 
     @hybrid_property
     def ciudad_nombre(self):

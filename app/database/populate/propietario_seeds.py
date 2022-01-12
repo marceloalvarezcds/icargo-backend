@@ -1,4 +1,6 @@
 from datetime import date
+from decimal import Decimal
+from random import randrange
 from typing import Optional
 
 from sqlalchemy.orm import Session  # type: ignore
@@ -123,6 +125,7 @@ def propietario_seeds(
             propietario_contacto_gestor_carga_seeds(
                 db, cargo, propietario, contacto, gestor_cuenta, contacto_alias
             )
+            current_year = date.today().year
             camion_seeds(
                 db,
                 placa=f"1{ruc}",
@@ -136,6 +139,9 @@ def propietario_seeds(
                 marca=marca_camion,
                 tipo=tipo_camion,
                 color=color,
+                anho=randrange(1990, current_year),
+                bruto=Decimal(randrange(35000, 50000)),
+                tara=Decimal(randrange(10000, 30000)),
             )
             semi_seeds(
                 db,
@@ -151,6 +157,9 @@ def propietario_seeds(
                 tipo=tipo_semi,
                 tipo_carga=tipo_carga,
                 color=color,
+                anho=randrange(1990, current_year),
+                bruto=Decimal(randrange(35000, 50000)),
+                tara=Decimal(randrange(10000, 30000)),
             )
 
 

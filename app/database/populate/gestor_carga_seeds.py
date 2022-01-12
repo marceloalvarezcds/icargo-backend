@@ -11,6 +11,7 @@ from app.repositories import (
     get_tipo_documento_by_descripcion,
 )
 
+from .camion_semi_neto_seeds import camion_semi_producto_combination_seeds
 from .centro_operativo_seeds import (
     cargill_centro_operativo_seeds,
     multiple_centro_operativo_seeds,
@@ -101,5 +102,8 @@ def gestor_carga_seeds(db: Session):
         cargill_chofer_seeds(db, gestor_carga2)
         multiple_propietario_seeds(db, gestor_carga1)
         cargill_propietario_seeds(db, gestor_carga2)
+        # camion y semi deben estar creados para la combinación
+        camion_semi_producto_combination_seeds(db, gestor_carga1)
+        camion_semi_producto_combination_seeds(db, gestor_carga2)
     except IntegrityError:
         db.rollback()
