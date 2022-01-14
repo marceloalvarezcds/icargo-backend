@@ -153,6 +153,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.gestor_carga.nombre
 
     @hybrid_property
+    def gestor_carga_moneda_nombre(self):
+        return self.gestor_carga.moneda_nombre
+
+    @hybrid_property
     def nro_tickets(self):
         return ", ".join([x.numero_documento for x in self.remisiones_destino])
 

@@ -25,6 +25,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoForm):
     id: int
     gestor_carga_id: int
     gestor_carga_nombre: str
+    gestor_carga_moneda_nombre: str
     insumo_descripcion: Optional[str] = None
     insumo_fecha_precio: Optional[Date] = None
     insumo_moneda_nombre: Optional[str] = None
@@ -32,11 +33,20 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoForm):
     insumo_tipo_descripcion: Optional[str] = None
     insumo_unidad_abreviatura: Optional[str] = None
     insumo_unidad_descripcion: Optional[str] = None
-    punto_venta_nombre: str
     moneda_nombre: str
+    proveedor_nombre: str
+    punto_venta_nombre: str
+    punto_venta_pais_nombre: str
+    tipo_anticipo_descripcion: str
     tipo_comprobante_descripcion: str
+    tipo_insumo_descripcion: str
     unidad_abreviatura: Optional[str] = None
     unidad_descripcion: Optional[str] = None
+    # Auditoría
+    created_by: str
+    created_at: Date
+    modified_by: str
+    modified_at: Date
 
     class Config:
         orm_mode = True

@@ -31,6 +31,7 @@ class OrdenCargaDescuento(OrdenCargaDescuentoForm):
     id: int
     concepto: TipoConceptoDescuento
     concepto_descripcion: str
+    anticipado_descripcion: str
     # INICIO Monto a cobrar al Propietario
     propietario_moneda: Moneda
     propietario_moneda_nombre: str

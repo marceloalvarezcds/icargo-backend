@@ -47,6 +47,8 @@ class OrdenCarga(OrdenCargaForm):
     flete_remitente_numero_documento: str
     flete_tipo: TipoFleteEnum
     gestor_carga_id: int
+    gestor_carga_nombre: str
+    gestor_carga_moneda_nombre: str
     # Campos para la edición
     estado: EstadoEnum
     orden_carga_estado: OrdenCargaEstadoEnum
@@ -111,7 +113,9 @@ class OrdenCargaList(OrdenCargaForm):
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
     flete_tipo: TipoFleteEnum
+    gestor_carga_id: int
     gestor_carga_nombre: str
+    gestor_carga_moneda_nombre: str
     # Campos para la edición
     estado: EstadoEnum
     orden_carga_estado: OrdenCargaEstadoEnum

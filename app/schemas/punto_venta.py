@@ -39,6 +39,7 @@ class PuntoVentaForm(PuntoVentaBaseModel):
 
 class PuntoVentaBase(PuntoVentaBaseModel):
     id: int
+    proveedor_nombre: str
     tipo_documento: TipoDocumento
     composicion_juridica: ComposicionJuridica
     logo: Optional[str] = None
@@ -52,6 +53,7 @@ class PuntoVentaList(PuntoVentaBase):
     localidad_nombre: Optional[str] = None
     pais_nombre: Optional[str] = None
     pais_nombre_corto: Optional[str] = None
+    proveedor_nombre: str
     tipo_documento_descripcion: Optional[str] = None
 
     class Config:

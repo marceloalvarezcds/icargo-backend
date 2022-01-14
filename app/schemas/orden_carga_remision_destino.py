@@ -12,6 +12,7 @@ class OrdenCargaRemisionDestinoForm(BaseModel):
     unidad_id: int
     foto_documento: Optional[str] = None
     numero_documento_origen: Optional[str] = None
+    destino_id: Optional[int] = None
     orden_carga_id: int
 
 
@@ -20,6 +21,8 @@ class OrdenCargaRemisionDestino(OrdenCargaRemisionDestinoForm):
     fecha: Date
     unidad_abreviatura: str
     unidad_descripcion: str
+    destino_nombre: Optional[str] = None
+    gestor_carga_moneda_nombre: str
 
     class Config:
         orm_mode = True

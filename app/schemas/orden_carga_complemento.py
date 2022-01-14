@@ -29,6 +29,7 @@ class OrdenCargaComplemento(OrdenCargaComplementoForm):
     id: int
     concepto: TipoConceptoComplemento
     concepto_descripcion: str
+    anticipado_descripcion: str
     # INICIO Monto a pagar al Propietario
     propietario_moneda: Moneda
     propietario_moneda_nombre: str

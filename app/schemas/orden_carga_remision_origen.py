@@ -19,6 +19,7 @@ class OrdenCargaRemisionOrigen(OrdenCargaRemisionOrigenForm):
     fecha: Date
     unidad_abreviatura: str
     unidad_descripcion: str
+    gestor_carga_moneda_nombre: str
 
     class Config:
         orm_mode = True

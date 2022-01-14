@@ -69,6 +69,10 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         return self.orden_carga.gestor_carga_nombre
 
     @hybrid_property
+    def gestor_carga_moneda_nombre(self):
+        return self.orden_carga.gestor_carga_moneda_nombre
+
+    @hybrid_property
     def insumo_descripcion(self):
         return self.insumo_punto_venta_precio.insumo_descripcion
 
@@ -97,16 +101,32 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         return self.insumo_punto_venta_precio.insumo_unidad_descripcion
 
     @hybrid_property
-    def punto_venta_nombre(self):
-        return self.punto_venta.nombre
-
-    @hybrid_property
     def moneda_nombre(self):
         return self.moneda.nombre
 
     @hybrid_property
+    def proveedor_nombre(self):
+        return self.punto_venta.proveedor_nombre
+
+    @hybrid_property
+    def punto_venta_nombre(self):
+        return self.punto_venta.nombre
+
+    @hybrid_property
+    def punto_venta_pais_nombre(self):
+        return self.punto_venta.pais_nombre
+
+    @hybrid_property
+    def tipo_anticipo_descripcion(self):
+        return self.flete_anticipo.tipo_descripcion
+
+    @hybrid_property
     def tipo_comprobante_descripcion(self):
         return self.tipo_comprobante.descripcion
+
+    @hybrid_property
+    def tipo_insumo_descripcion(self):
+        return self.flete_anticipo.tipo_insumo_descripcion
 
     @hybrid_property
     def unidad_abreviatura(self):

@@ -59,6 +59,10 @@ class OrdenCargaComplemento(AuditMixin, Base):
     flete_id = Column(Integer, ForeignKey("flete.id"))
 
     @hybrid_property
+    def anticipado_descripcion(self):
+        return "Si" if self.anticipado else "No"
+
+    @hybrid_property
     def concepto_descripcion(self):
         return self.concepto.descripcion
 
