@@ -3,6 +3,7 @@ from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy.orm import Session  # type: ignore
+from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.models import OrdenCargaComplemento
 from app.schemas import OrdenCargaComplementoForm
@@ -16,16 +17,20 @@ def get_orden_carga_complemento_by(
     remitente_moneda_id: Optional[int],
     remitente_monto: Optional[Decimal],
     orden_carga_id: int,
+    flete_id: Optional[int],
 ) -> Optional[OrdenCargaComplemento]:
     return (
         db.query(OrdenCargaComplemento)
         .filter(
-            OrdenCargaComplemento.concepto_id == concepto_id,
-            OrdenCargaComplemento.propietario_moneda_id == propietario_moneda_id,
-            OrdenCargaComplemento.propietario_monto == propietario_monto,
-            OrdenCargaComplemento.remitente_moneda_id == remitente_moneda_id,
-            OrdenCargaComplemento.remitente_monto == remitente_monto,
-            OrdenCargaComplemento.orden_carga_id == orden_carga_id,
+            and_(
+                OrdenCargaComplemento.concepto_id == concepto_id,
+                OrdenCargaComplemento.propietario_moneda_id == propietario_moneda_id,
+                OrdenCargaComplemento.propietario_monto == propietario_monto,
+                OrdenCargaComplemento.remitente_moneda_id == remitente_moneda_id,
+                OrdenCargaComplemento.remitente_monto == remitente_monto,
+                OrdenCargaComplemento.orden_carga_id == orden_carga_id,
+                OrdenCargaComplemento.flete_id == flete_id,
+            )
         )
         .first()
     )
@@ -46,17 +51,17 @@ def create_orden_carga_complemento(
     modified_by: str,
 ) -> OrdenCargaComplemento:
     obj = OrdenCargaComplemento(
-        concepto_id=data.concepto_id,
+        concepto_id=data.concepto.id,
         detalle=data.detalle,
         habilitar_cobro_remitente=data.habilitar_cobro_remitente,
         anticipado=data.anticipado,
         # INICIO Monto a pagar al Propietario
         propietario_monto=data.propietario_monto,
-        propietario_moneda_id=data.propietario_moneda_id,
+        propietario_moneda_id=data.propietario_moneda.id,
         # FIN Monto a pagar al Propietario
         # INICIO Monto a cobrar al Remitente
         remitente_monto=data.remitente_monto,
-        remitente_moneda_id=data.remitente_moneda_id,
+        remitente_moneda_id=data.remitente_moneda.id if data.remitente_moneda else None,
         # FIN Monto a cobrar al Remitente
         orden_carga_id=data.orden_carga_id,
         flete_id=data.flete_id,
@@ -75,17 +80,19 @@ def edit_orden_carga_complemento(
     data: OrdenCargaComplementoForm,
     modified_by: str,
 ) -> OrdenCargaComplemento:
-    obj.concepto_id = data.concepto_id
+    obj.concepto_id = data.concepto.id
     obj.detalle = data.detalle
     obj.habilitar_cobro_remitente = data.habilitar_cobro_remitente
     obj.anticipado = data.anticipado
     # INICIO Monto a pagar al Propietario
     obj.propietario_monto = data.propietario_monto
-    obj.propietario_moneda_id = data.propietario_moneda_id
+    obj.propietario_moneda_id = data.propietario_moneda.id
     # FIN Monto a pagar al Propietario
     # INICIO Monto a cobrar al Remitente
     obj.remitente_monto = data.remitente_monto
-    obj.remitente_moneda_id = data.remitente_moneda_id
+    obj.remitente_moneda_id = (
+        data.remitente_moneda.id if data.remitente_moneda else None
+    )
     # FIN Monto a cobrar al Remitente
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()

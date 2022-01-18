@@ -18,6 +18,7 @@ def create_orden_carga_complemento_by_flete(
         data.remitente_moneda_id,
         data.remitente_monto,
         orden_carga.id,
+        data.flete_id,
     ):
         raise HTTPException(status_code=409, detail="El Complemento ya existe")
     return repositories.create_orden_carga_complemento_by_flete(
