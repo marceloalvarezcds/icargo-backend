@@ -18,6 +18,7 @@ def create_orden_carga_descuento_by_flete(
         data.proveedor_moneda_id,
         data.proveedor_monto,
         orden_carga.id,
+        data.flete_id,
     ):
         raise HTTPException(status_code=409, detail="El Descuento ya existe")
     return repositories.create_orden_carga_descuento_by_flete(

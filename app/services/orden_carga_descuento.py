@@ -12,12 +12,13 @@ def create_orden_carga_descuento(
 ) -> schemas.OrdenCargaDescuento:
     if repositories.get_orden_carga_descuento_by(
         db,
-        data.concepto_id,
-        data.propietario_moneda_id,
+        data.concepto.id,
+        data.propietario_moneda.id,
         data.propietario_monto,
-        data.proveedor_moneda_id,
+        data.proveedor_moneda.id if data.proveedor_moneda else None,
         data.proveedor_monto,
         data.orden_carga_id,
+        data.flete_id,
     ):
         raise HTTPException(status_code=409, detail="El Descuento ya existe")
     return repositories.create_orden_carga_descuento(
@@ -42,12 +43,13 @@ def edit_orden_carga_descuento(
 ) -> schemas.OrdenCargaDescuento:
     exists = repositories.get_orden_carga_descuento_by(
         db,
-        data.concepto_id,
-        data.propietario_moneda_id,
+        data.concepto.id,
+        data.propietario_moneda.id,
         data.propietario_monto,
-        data.proveedor_moneda_id,
+        data.proveedor_moneda.id if data.proveedor_moneda else None,
         data.proveedor_monto,
         data.orden_carga_id,
+        data.flete_id,
     )
     if exists and exists.id != id:
         raise HTTPException(status_code=409, detail="El Descuento ya existe")
