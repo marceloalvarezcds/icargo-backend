@@ -207,6 +207,7 @@ from .orden_carga_remision_origen import (  # noqa
     edit_orden_carga_remision_origen,
     get_orden_carga_remision_origen_by,
     get_orden_carga_remision_origen_by_id,
+    get_orden_carga_remision_origen_list_by_orden_carga_id,
 )
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .permiso import get_permiso_by, get_permiso_list  # noqa

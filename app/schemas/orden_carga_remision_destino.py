@@ -18,11 +18,15 @@ class OrdenCargaRemisionDestinoForm(BaseModel):
 
 class OrdenCargaRemisionDestino(OrdenCargaRemisionDestinoForm):
     id: int
-    fecha: Date
     unidad_abreviatura: str
     unidad_descripcion: str
     destino_nombre: Optional[str] = None
     gestor_carga_moneda_nombre: str
+    # Auditoría
+    created_by: str
+    created_at: Date
+    modified_by: str
+    modified_at: Date
 
     class Config:
         orm_mode = True
