@@ -16,6 +16,8 @@ from app.endpoints import (
     flete,
     gestor_carga,
     insumo,
+    insumo_punto_venta,
+    insumo_punto_venta_precio,
     localidad,
     login,
     marca_camion,
@@ -87,6 +89,14 @@ api.include_router(
 api.include_router(flete.api, prefix="/flete", tags=["flete"])
 api.include_router(gestor_carga.api, prefix="/gestor_carga", tags=["gestor_carga"])
 api.include_router(insumo.api, prefix="/insumo", tags=["insumo"])
+api.include_router(
+    insumo_punto_venta.api, prefix="/insumo_punto_venta", tags=["insumo_punto_venta"]
+)
+api.include_router(
+    insumo_punto_venta_precio.api,
+    prefix="/insumo_punto_venta_precio",
+    tags=["insumo_punto_venta_precio"],
+)
 api.include_router(localidad.api, prefix="/localidad", tags=["localidad"])
 api.include_router(login.api, prefix="/login", tags=["login"])
 api.include_router(marca_camion.api, prefix="/marca_camion", tags=["marca_camion"])

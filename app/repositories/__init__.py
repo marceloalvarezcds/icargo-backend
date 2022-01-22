@@ -145,7 +145,13 @@ from .gestor_carga_remitente import (  # noqa
     edit_gestor_carga_remitente,
     get_gestor_carga_remitente_by,
 )
-from .insumo import get_insumo_by_descripcion, get_insumo_list  # noqa
+from .insumo import (  # noqa
+    get_insumo_by_descripcion,
+    get_insumo_list,
+    get_insumo_list_by_tipo_insumo_id,
+)
+from .insumo_punto_venta import get_insumo_punto_venta_list_by_insumo_id  # noqa
+from .insumo_punto_venta_precio import get_last_insumo_punto_venta_precio  # noqa
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
 from .marca_camion import get_marca_camion_by_descripcion, get_marca_camion_list  # noqa
 from .marca_semi import get_marca_semi_by_descripcion, get_marca_semi_list  # noqa

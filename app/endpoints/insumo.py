@@ -17,3 +17,12 @@ async def read_insumo_list(
     _: bool = Depends(Permiso(a.LISTAR, m.INSUMO)),  # noqa: B008
 ):
     return repositories.get_insumo_list(db)
+
+
+@api.get("/tipo_insumo/{tipo_insumo_id}", response_model=List[schemas.Insumo])
+async def read_insumo_list_by_tipo_insumo_id(
+    tipo_insumo_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.INSUMO)),  # noqa: B008
+):
+    return repositories.get_insumo_list_by_tipo_insumo_id(db, tipo_insumo_id)
