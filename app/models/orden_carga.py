@@ -129,6 +129,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.flete.gestor_carga_nombre
 
     @hybrid_property
+    def flete_numero_lote(self):
+        return self.flete.numero_lote
+
+    @hybrid_property
     def flete_origen_nombre(self):
         return self.flete.origen_nombre
 

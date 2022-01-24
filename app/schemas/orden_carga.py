@@ -41,6 +41,7 @@ class OrdenCarga(OrdenCargaForm):
     flete_destino_nombre: str
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
+    flete_numero_lote: str
     flete_origen_nombre: str
     flete_producto_descripcion: str
     flete_remitente_nombre: str
@@ -108,6 +109,7 @@ class OrdenCargaList(OrdenCargaForm):
     flete_destino_nombre: str
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
+    flete_numero_lote: str
     flete_origen_nombre: str
     flete_producto_descripcion: str
     flete_remitente_nombre: str
