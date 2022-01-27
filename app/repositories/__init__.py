@@ -92,6 +92,7 @@ from .flete_anticipo import (  # noqa
     edit_flete_anticipo,
     get_flete_anticipo_by,
     get_flete_anticipo_by_id,
+    get_flete_anticipo_list_by_flete_id,
 )
 from .flete_complemento import (  # noqa
     create_flete_complemento,
@@ -150,8 +151,17 @@ from .insumo import (  # noqa
     get_insumo_list,
     get_insumo_list_by_tipo_insumo_id,
 )
-from .insumo_punto_venta import get_insumo_punto_venta_list_by_insumo_id  # noqa
-from .insumo_punto_venta_precio import get_last_insumo_punto_venta_precio  # noqa
+from .insumo_punto_venta import (  # noqa
+    get_insumo_punto_venta_by_id,
+    get_insumo_punto_venta_by_insumo_id_and_moneda_id_and_punto_venta_id,
+    get_insumo_punto_venta_list_by_gestor_carga_id,
+    get_insumo_punto_venta_list_by_insumo_id,
+    get_insumo_punto_venta_list_by_insumo_id_and_punto_venta_id,
+    get_insumo_punto_venta_list_by_tipo_insumo_id,
+)
+from .insumo_punto_venta_precio import (  # noqa
+    get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id,
+)
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
 from .marca_camion import get_marca_camion_by_descripcion, get_marca_camion_list  # noqa
 from .marca_semi import get_marca_semi_by_descripcion, get_marca_semi_list  # noqa

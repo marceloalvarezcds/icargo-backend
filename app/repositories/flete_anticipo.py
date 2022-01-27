@@ -1,22 +1,37 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
+from sqlalchemy.sql.expression import null  # type: ignore
 
 from app.models import FleteAnticipo
 from app.schemas import FleteAnticipoForm
 
+null_value = null()
+
+
+def get_flete_anticipo_list_by_flete_id(
+    db: Session, flete_id: int
+) -> List[FleteAnticipo]:
+    return (
+        db.query(FleteAnticipo)
+        .filter(
+            FleteAnticipo.flete_id == flete_id,
+        )
+        .order_by(FleteAnticipo.created_at)
+        .all()
+    )
+
 
 def get_flete_anticipo_by(
-    db: Session,
-    tipo_id: int,
-    flete_id: int,
+    db: Session, tipo_id: int, flete_id: int, tipo_insumo_id: Optional[int] = null_value
 ) -> Optional[FleteAnticipo]:
     return (
         db.query(FleteAnticipo)
         .filter(
             FleteAnticipo.tipo_id == tipo_id,
             FleteAnticipo.flete_id == flete_id,
+            FleteAnticipo.tipo_insumo_id == tipo_insumo_id,
         )
         .first()
     )
@@ -26,7 +41,7 @@ def get_flete_anticipo_by_id(
     db: Session,
     id: int,
 ) -> Optional[FleteAnticipo]:
-    return db.query(FleteAnticipo).filter(FleteAnticipo.id == id).first()
+    return db.query(FleteAnticipo).get(id)
 
 
 def create_flete_anticipo(

@@ -47,6 +47,10 @@ class InsumoPuntoVentaPrecio(AuditMixin, Base):
         return self.insumo_punto_venta.gestor_carga_nombre
 
     @hybrid_property
+    def insumo_id(self):
+        return self.insumo_punto_venta.insumo_id
+
+    @hybrid_property
     def insumo_descripcion(self):
         return self.insumo_punto_venta.insumo_descripcion
 

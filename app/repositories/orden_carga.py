@@ -112,6 +112,7 @@ def aceptar_orden_carga(
     db: Session,
     modified_by: str,
 ) -> OrdenCarga:
+    obj.anticipos_liberados = True
     obj.fecha_aceptado = datetime.now()
     return change_orden_carga_status(obj, db, EstadoEnum.ACEPTADO, modified_by)
 

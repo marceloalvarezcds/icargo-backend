@@ -22,6 +22,7 @@ class InsumoPuntoVentaPrecioForm(BaseModel):
 class InsumoPuntoVentaPrecio(BaseModel):
     id: int
     precio: Decimal
+    fecha_inicio: Date
     fecha_fin: Optional[Date] = None
 
     class Config:

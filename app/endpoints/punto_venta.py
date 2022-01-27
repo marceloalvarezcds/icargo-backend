@@ -21,6 +21,22 @@ async def read_punto_venta_list(
     return repositories.get_punto_venta_list(db, proveedor_id)
 
 
+@api.get(
+    "/insumo/{insumo_id}/proveedor/{proveedor_id}",
+    response_model=List[schemas.PuntoVentaList],
+)
+async def read_punto_venta_list_by_insumo_id(
+    insumo_id: int,
+    proveedor_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.PUNTO_VENTA)),  # noqa: B008
+):
+    return services.get_punto_venta_list_by_insumo_id_and_proveedor_id(
+        db, insumo_id, proveedor_id, current_user.gestor_carga_id
+    )
+
+
 @api.get("/reports/{proveedor_id}")
 async def punto_venta_reports(
     proveedor_id: int,

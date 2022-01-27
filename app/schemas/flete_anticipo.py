@@ -21,3 +21,6 @@ class FleteAnticipo(FleteAnticipoForm):
     tipo: TipoAnticipo
     tipo_insumo: Optional[TipoInsumo] = None
     flete_id: int
+
+    class Config:
+        orm_mode = True

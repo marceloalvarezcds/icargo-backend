@@ -58,7 +58,7 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
     canola = get_producto_by_descripcion(db, "Canola")
 
     efectivo = get_tipo_anticipo_by_descripcion(db, "EFECTIVO")
-    tipo_insumo = get_tipo_anticipo_by_descripcion(db, "TIPO DE INSUMO")
+    tipo_insumo = get_tipo_anticipo_by_descripcion(db, "INSUMOS")
 
     combustible = get_tipo_insumo_by_descripcion(db, "COMBUSTIBLE")
     lubricantes = get_tipo_insumo_by_descripcion(db, "LUBRICANTES")

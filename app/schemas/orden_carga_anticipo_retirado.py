@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from .date_model import Date
 
 
-class OrdenCargaAnticipoRetiradoBaseModel(BaseModel):
+class OrdenCargaAnticipoRetiradoForm(BaseModel):
     flete_anticipo_id: int
     orden_carga_id: int
     punto_venta_id: int
@@ -19,16 +19,14 @@ class OrdenCargaAnticipoRetiradoBaseModel(BaseModel):
     unidad_id: Optional[int] = None
     cantidad_retirada: Optional[Decimal] = None
     precio_unitario: Optional[Decimal] = None
-
-
-class OrdenCargaAnticipoRetiradoForm(OrdenCargaAnticipoRetiradoBaseModel):
+    # campos auxiliares
     tipo_anticipo_id: int
     tipo_insumo_id: Optional[int] = None
     insumo_id: Optional[int] = None
     proveedor_id: int
 
 
-class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
+class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoForm):
     id: int
     gestor_carga_id: int
     gestor_carga_nombre: str
@@ -46,7 +44,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     punto_venta_pais_nombre: str
     tipo_anticipo_descripcion: str
     tipo_comprobante_descripcion: str
-    tipo_insumo_descripcion: str
+    tipo_insumo_descripcion: Optional[str] = None
     unidad_abreviatura: Optional[str] = None
     unidad_descripcion: Optional[str] = None
     # Auditoría
