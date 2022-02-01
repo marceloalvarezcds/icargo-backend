@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.models import OrdenCargaAnticipoRetirado
 
+from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
+
 
 def create_orden_carga_anticipo_retirado(
     db: Session,
@@ -14,6 +16,7 @@ def create_orden_carga_anticipo_retirado(
         db, data.flete_anticipo_id, data.orden_carga_id, data.punto_venta_id
     ):
         raise HTTPException(status_code=409, detail="El Anticipo ya existe")
+    update_orden_carga_anticipo_saldo_by_form(db, data, modified_by)
     return repositories.create_orden_carga_anticipo_retirado(
         db,
         data,
@@ -42,6 +45,7 @@ def edit_orden_carga_anticipo_retirado(
     if exists and exists.id != id:
         raise HTTPException(status_code=409, detail="El Anticipo ya existe")
     to_edit_obj = get_orden_carga_anticipo_retirado_by_id(db, id)
+    update_orden_carga_anticipo_saldo_by_form(db, data, modified_by)
     return repositories.edit_orden_carga_anticipo_retirado(
         to_edit_obj,
         db,

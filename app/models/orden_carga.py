@@ -68,9 +68,7 @@ class OrdenCarga(AuditMixin, Base):
     anticipos = relationship("OrdenCargaAnticipoRetirado", back_populates="orden_carga")
     complementos = relationship("OrdenCargaComplemento", back_populates="orden_carga")
     descuentos = relationship("OrdenCargaDescuento", back_populates="orden_carga")
-    saldos = relationship(
-        "OrdenCargaAnticipoSaldo", uselist=False, back_populates="orden_carga"
-    )
+    saldos = relationship("OrdenCargaAnticipoSaldo", back_populates="orden_carga")
     remisiones_origen = relationship(
         "OrdenCargaRemisionOrigen", back_populates="orden_carga"
     )
@@ -117,6 +115,14 @@ class OrdenCarga(AuditMixin, Base):
         return self.estado
 
     @hybrid_property
+    def flete_anticipo_maximo(self):
+        return self.flete.anticipo_maximo
+
+    @hybrid_property
+    def flete_anticipos(self):
+        return self.flete.anticipos
+
+    @hybrid_property
     def flete_destino_nombre(self):
         return self.flete.destino_nombre
 
@@ -129,8 +135,16 @@ class OrdenCarga(AuditMixin, Base):
         return self.flete.gestor_carga_nombre
 
     @hybrid_property
+    def flete_limite_credito(self):
+        return (self.flete_anticipo_maximo / Decimal(100)) * self.flete_proyectado
+
+    @hybrid_property
     def flete_numero_lote(self):
         return self.flete.numero_lote
+
+    @hybrid_property
+    def flete_monto_efectivo(self):
+        return (self.flete.porcentaje_efectivo / Decimal(100)) * self.flete_proyectado
 
     @hybrid_property
     def flete_origen_nombre(self):
@@ -141,12 +155,20 @@ class OrdenCarga(AuditMixin, Base):
         return self.flete.producto_descripcion
 
     @hybrid_property
+    def flete_proyectado(self):
+        return self.flete_tarifa * self.cantidad_nominada
+
+    @hybrid_property
     def flete_remitente_nombre(self):
         return self.flete.remitente_nombre
 
     @hybrid_property
     def flete_remitente_numero_documento(self):
         return self.flete.remitente.numero_documento
+
+    @hybrid_property
+    def flete_tarifa(self):
+        return self.flete.condicion_propietario_tarifa
 
     @hybrid_property
     def flete_tipo(self):

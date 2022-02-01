@@ -192,6 +192,13 @@ from .orden_carga_anticipo_retirado import (  # noqa
     get_orden_carga_anticipo_retirado_by,
     get_orden_carga_anticipo_retirado_by_id,
 )
+from .orden_carga_anticipo_saldo import (  # noqa
+    create_orden_carga_anticipo_saldo,
+    delete_orden_carga_anticipo_saldo,
+    edit_orden_carga_anticipo_saldo,
+    get_orden_carga_anticipo_saldo_by,
+    get_orden_carga_anticipo_saldo_by_id,
+)
 from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,
     delete_orden_carga_complemento,

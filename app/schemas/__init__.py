@@ -52,6 +52,10 @@ from .orden_carga_anticipo_retirado import (  # noqa
     OrdenCargaAnticipoRetirado,
     OrdenCargaAnticipoRetiradoForm,
 )
+from .orden_carga_anticipo_saldo import (  # noqa
+    OrdenCargaAnticipoSaldo,
+    OrdenCargaAnticipoSaldoForm,
+)
 from .orden_carga_complemento import (  # noqa
     OrdenCargaComplemento,
     OrdenCargaComplementoForm,

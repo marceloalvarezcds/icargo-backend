@@ -53,6 +53,7 @@ def create_orden_carga_anticipo_retirado(
         unidad_id=data.unidad_id,
         cantidad_retirada=data.cantidad_retirada,
         precio_unitario=data.precio_unitario,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)

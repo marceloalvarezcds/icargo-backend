@@ -10,6 +10,7 @@ from app.config import REPORTS_FOLDER
 from app.enums import EstadoEnum
 from app.models import Flete, OrdenCarga
 
+from .orden_carga_anticipo_saldo import get_orden_carga_by_id
 from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete
 
@@ -40,13 +41,6 @@ def create_orden_carga(
         modified_by,
     )
     create_complementos_and_descuentos(db, obj, flete, modified_by)
-    return obj
-
-
-def get_orden_carga_by_id(db: Session, id: int) -> OrdenCarga:
-    obj = repositories.get_orden_carga_by_id(db, id)
-    if not obj:
-        raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
     return obj
 
 

@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
@@ -35,6 +36,15 @@ def get_tipo_insumo_list_by_flete_id(db: Session, flete_id: int) -> List[TipoIns
             id_list.append(item.id)
             filtered_list.append(item)
     return filtered_list
+
+
+def get_flete_anticipo_by_id(db: Session, id: int) -> FleteAnticipo:
+    obj = repositories.get_flete_anticipo_by_id(db, id)
+    if not obj:
+        raise HTTPException(
+            status_code=404, detail="Complemento de Flete no encontrado"
+        )
+    return obj
 
 
 def update_flete_anticipo_list(

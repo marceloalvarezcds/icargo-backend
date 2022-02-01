@@ -33,6 +33,12 @@ class FleteAnticipo(AuditMixin, Base):
     )
 
     @hybrid_property
+    def concepto(self):
+        return (
+            self.tipo_insumo_descripcion if self.tipo_insumo else self.tipo_descripcion
+        )
+
+    @hybrid_property
     def tipo_descripcion(self):
         return self.tipo.descripcion
 

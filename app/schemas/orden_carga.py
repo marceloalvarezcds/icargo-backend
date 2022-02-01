@@ -8,7 +8,9 @@ from app.enums.tipo_flete import TipoFleteEnum
 
 from .centro_operativo import CentroOperativo
 from .date_model import Date
+from .flete_anticipo import FleteAnticipo
 from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
+from .orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from .orden_carga_complemento import OrdenCargaComplemento
 from .orden_carga_descuento import OrdenCargaDescuento
 from .orden_carga_remision_destino import OrdenCargaRemisionDestino
@@ -38,14 +40,19 @@ class OrdenCarga(OrdenCargaForm):
     # Datos de semi
     semi_placa: str
     # Datos de fletes
+    flete_anticipo_maximo: Decimal
     flete_destino_nombre: str
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
+    flete_limite_credito: Decimal
     flete_numero_lote: str
+    flete_monto_efectivo: Decimal
     flete_origen_nombre: str
     flete_producto_descripcion: str
+    flete_proyectado: Decimal
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
+    flete_tarifa: Decimal
     flete_tipo: TipoFleteEnum
     gestor_carga_id: int
     gestor_carga_nombre: str
@@ -78,7 +85,9 @@ class OrdenCarga(OrdenCargaForm):
     fecha_cargado: Optional[Date] = None
     fecha_descargado: Optional[Date] = None
     # Relaciones Listas
+    saldos: List[OrdenCargaAnticipoSaldo]
     anticipos: List[OrdenCargaAnticipoRetirado]
+    flete_anticipos: List[FleteAnticipo]
     complementos: List[OrdenCargaComplemento]
     descuentos: List[OrdenCargaDescuento]
     remisiones_destino: List[OrdenCargaRemisionDestino]

@@ -4,6 +4,10 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.models import OrdenCargaComplemento
 
+from .orden_carga_anticipo_saldo import (
+    update_orden_carga_anticipo_saldo_by_orden_carga_id,
+)
+
 
 def create_orden_carga_complemento(
     db: Session,
@@ -21,11 +25,15 @@ def create_orden_carga_complemento(
         data.flete_id,
     ):
         raise HTTPException(status_code=409, detail="El Complemento ya existe")
-    return repositories.create_orden_carga_complemento(
+    complemento = repositories.create_orden_carga_complemento(
         db,
         data,
         modified_by,
     )
+    update_orden_carga_anticipo_saldo_by_orden_carga_id(
+        db, data.orden_carga_id, modified_by
+    )
+    return complemento
 
 
 def get_orden_carga_complemento_by_id(db: Session, id: int) -> OrdenCargaComplemento:
@@ -54,12 +62,16 @@ def edit_orden_carga_complemento(
     if exists and exists.id != id:
         raise HTTPException(status_code=409, detail="El Complemento ya existe")
     to_edit_obj = get_orden_carga_complemento_by_id(db, id)
-    return repositories.edit_orden_carga_complemento(
+    complemento = repositories.edit_orden_carga_complemento(
         to_edit_obj,
         db,
         data,
         modified_by,
     )
+    update_orden_carga_anticipo_saldo_by_orden_carga_id(
+        db, data.orden_carga_id, modified_by
+    )
+    return complemento
 
 
 def delete_orden_carga_complemento(
