@@ -12,6 +12,8 @@ def get_orden_carga_anticipo_retirado_by(
     flete_anticipo_id: int,
     orden_carga_id: int,
     punto_venta_id: int,
+    tipo_comprobante_id: int,
+    numero_comprobante: str,
 ) -> Optional[OrdenCargaAnticipoRetirado]:
     return (
         db.query(OrdenCargaAnticipoRetirado)
@@ -19,6 +21,8 @@ def get_orden_carga_anticipo_retirado_by(
             OrdenCargaAnticipoRetirado.flete_anticipo_id == flete_anticipo_id,
             OrdenCargaAnticipoRetirado.orden_carga_id == orden_carga_id,
             OrdenCargaAnticipoRetirado.punto_venta_id == punto_venta_id,
+            OrdenCargaAnticipoRetirado.tipo_comprobante_id == tipo_comprobante_id,
+            OrdenCargaAnticipoRetirado.numero_comprobante == numero_comprobante,
         )
         .first()
     )

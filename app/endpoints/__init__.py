@@ -26,6 +26,7 @@ from app.endpoints import (
     moneda,
     orden_carga,
     orden_carga_anticipo_retirado,
+    orden_carga_anticipo_saldo,
     orden_carga_complemento,
     orden_carga_descuento,
     orden_carga_remision_destino,
@@ -112,6 +113,11 @@ api.include_router(
     orden_carga_anticipo_retirado.api,
     prefix="/orden_carga_anticipo_retirado",
     tags=["orden_carga_anticipo_retirado"],
+)
+api.include_router(
+    orden_carga_anticipo_saldo.api,
+    prefix="/orden_carga_anticipo_saldo",
+    tags=["orden_carga_anticipo_saldo"],
 )
 api.include_router(
     orden_carga_complemento.api,

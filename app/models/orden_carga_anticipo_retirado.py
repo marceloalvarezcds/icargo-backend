@@ -28,7 +28,13 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     """
 
     __table_args__ = (
-        UniqueConstraint("flete_anticipo_id", "orden_carga_id", "punto_venta_id"),
+        UniqueConstraint(
+            "flete_anticipo_id",
+            "orden_carga_id",
+            "punto_venta_id",
+            "tipo_comprobante_id",
+            "numero_comprobante",
+        ),
     )
     id = Column(Integer, primary_key=True)
     flete_anticipo_id = Column(Integer, ForeignKey("flete_anticipo.id"))

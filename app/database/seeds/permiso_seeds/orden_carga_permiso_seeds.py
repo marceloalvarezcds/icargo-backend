@@ -21,6 +21,12 @@ def orden_carga_admin_permiso_seeds(db: Session, user: User):
         permiso_seeds(db, a.REPORTE, m.ORDEN_CARGA, True, "Reporte de Orden de Carga")
     )
 
+    permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_ANTICIPO_RETIRADO))
+    permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_ANTICIPO_RETIRADO))
+
+    permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_ANTICIPO_SALDO))
+    permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_ANTICIPO_SALDO))
+
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_COMPLEMENTO))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_COMPLEMENTO))
 
@@ -41,6 +47,7 @@ def orden_carga_permiso_seeds(db: Session, user: User):
     permiso_generico_seeds(db, user)
     permiso_orden_carga_seeds(db, user)
     permiso_orden_carga_anticipo_retirado_seeds(db, user)
+    permiso_orden_carga_anticipo_saldo_seeds(db, user)
     permiso_orden_carga_complemento_seeds(db, user)
     permiso_orden_carga_descuento_seeds(db, user)
     permiso_orden_carga_remision_destino_seeds(db, user)
@@ -95,6 +102,17 @@ def permiso_orden_carga_anticipo_retirado_seeds(db: Session, user: User):
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.ORDEN_CARGA_ANTICIPO_RETIRADO))
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_ANTICIPO_RETIRADO))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_ANTICIPO_RETIRADO))
+    user.permisos.extend(permisos)
+    db.commit()
+
+
+def permiso_orden_carga_anticipo_saldo_seeds(db: Session, user: User):
+    permisos = []
+    permisos.append(permiso_seeds(db, a.CREAR, m.ORDEN_CARGA_ANTICIPO_SALDO))
+    permisos.append(permiso_seeds(db, a.EDITAR, m.ORDEN_CARGA_ANTICIPO_SALDO))
+    permisos.append(permiso_seeds(db, a.ELIMINAR, m.ORDEN_CARGA_ANTICIPO_SALDO))
+    permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_ANTICIPO_SALDO))
+    permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_ANTICIPO_SALDO))
     user.permisos.extend(permisos)
     db.commit()
 

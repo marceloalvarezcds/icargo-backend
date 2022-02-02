@@ -13,7 +13,7 @@ api = APIRouter()
     "/tipo/{tipo_id}/flete/{flete_id}",
     response_model=schemas.FleteAnticipo,
 )
-async def read_get_flete_anticipo_by_tipo_id_and_flete_id(
+async def read_flete_anticipo_by_tipo_id_and_flete_id(
     tipo_id: int,
     flete_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -26,7 +26,7 @@ async def read_get_flete_anticipo_by_tipo_id_and_flete_id(
     "/tipo/{tipo_id}/flete/{flete_id}/tipo_insumo/{tipo_insumo_id}",
     response_model=schemas.FleteAnticipo,
 )
-async def read_get_flete_anticipo_by_tipo_id_and_flete_id_and_tipo_insumo_id(
+async def read_flete_anticipo_by_tipo_id_and_flete_id_and_tipo_insumo_id(
     tipo_id: int,
     flete_id: int,
     tipo_insumo_id: int,

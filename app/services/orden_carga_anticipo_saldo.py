@@ -136,6 +136,7 @@ def update_orden_carga_anticipo_saldo(
 def update_orden_carga_anticipo_saldo_by_form(
     db: Session,
     data: schemas.OrdenCargaAnticipoRetiradoForm,
+    last_monto_retirado: Decimal,
     modified_by: str,
 ) -> Optional[schemas.OrdenCargaAnticipoSaldo]:
     flete_anticipo = get_flete_anticipo_by_id(db, data.flete_anticipo_id)
@@ -144,11 +145,12 @@ def update_orden_carga_anticipo_saldo_by_form(
         orden_carga.complementos,
         flete_anticipo.tipo_descripcion == enums.TipoAnticipoEnum.EFECTIVO.value,
     )
+    monto_retirado = data.monto_retirado - last_monto_retirado
     return update_orden_carga_anticipo_saldo(
         db,
         flete_anticipo,
         orden_carga,
-        data.monto_retirado,
+        monto_retirado,
         total_complemento,
         modified_by,
     )
