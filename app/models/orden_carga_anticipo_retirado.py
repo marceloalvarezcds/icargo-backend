@@ -67,6 +67,10 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     )  # No se usa para calcular los movimientos, solo para cargar por el momento
 
     @hybrid_property
+    def concepto(self):
+        return self.flete_anticipo.concepto
+
+    @hybrid_property
     def gestor_carga_id(self):
         return self.orden_carga.gestor_carga_id
 

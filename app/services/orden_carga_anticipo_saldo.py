@@ -54,6 +54,29 @@ def get_orden_carga_anticipo_saldo_by_id(
     return obj
 
 
+def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
+    db: Session,
+    flete_anticipo_id: int,
+    orden_carga_id: int,
+) -> Decimal:
+    exists = repositories.get_orden_carga_anticipo_saldo_by(
+        db, flete_anticipo_id, orden_carga_id
+    )
+    if exists:
+        return exists.saldo
+    else:
+        flete_anticipo = get_flete_anticipo_by_id(db, flete_anticipo_id)
+        orden_carga = get_orden_carga_by_id(db, orden_carga_id)
+        total_complemento = get_total_complemento(
+            orden_carga.complementos,
+            flete_anticipo.tipo_descripcion == enums.TipoAnticipoEnum.EFECTIVO.value,
+        )
+        total_anticipo = orden_carga.flete_proyectado * (
+            flete_anticipo.porcentaje / Decimal(100)
+        )
+        return total_anticipo + total_complemento
+
+
 def get_total_complemento(complementos: List[OrdenCargaComplemento], es_efectivo: bool):
     if es_efectivo:
         return sum(x.propietario_monto for x in complementos)
@@ -117,7 +140,7 @@ def update_orden_carga_anticipo_saldo(
             schema,
             modified_by,
         )
-    saldo = total_anticipo - total_retirado
+    saldo = total_disponible - total_retirado
     schema = schemas.OrdenCargaAnticipoSaldoForm(
         flete_anticipo_id=flete_anticipo_id,
         orden_carga_id=orden_carga_id,

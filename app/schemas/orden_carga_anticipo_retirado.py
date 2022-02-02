@@ -28,6 +28,7 @@ class OrdenCargaAnticipoRetiradoForm(BaseModel):
 
 class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoForm):
     id: int
+    concepto: str
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
