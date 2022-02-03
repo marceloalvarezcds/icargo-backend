@@ -25,9 +25,14 @@ class OrdenCargaForm(BaseModel):
     comentarios: Optional[str] = None
 
 
-class OrdenCargaEditForm(OrdenCargaForm):
-    origen_id: int
-    destino_id: int
+class OrdenCargaEditForm(BaseModel):
+    camion_id: Optional[int] = None
+    semi_id: Optional[int] = None
+    flete_id: Optional[int] = None
+    cantidad_nominada: Optional[Decimal] = None
+    comentarios: Optional[str] = None
+    origen_id: Optional[int] = None
+    destino_id: Optional[int] = None
 
 
 class OrdenCarga(OrdenCargaForm):
@@ -41,12 +46,14 @@ class OrdenCarga(OrdenCargaForm):
     semi_placa: str
     # Datos de fletes
     flete_anticipo_maximo: Decimal
+    flete_destino_id: int
     flete_destino_nombre: str
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
     flete_limite_credito: Decimal
     flete_numero_lote: str
     flete_monto_efectivo: Decimal
+    flete_origen_id: int
     flete_origen_nombre: str
     flete_producto_descripcion: str
     flete_proyectado: Decimal

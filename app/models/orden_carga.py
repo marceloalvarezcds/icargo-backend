@@ -123,6 +123,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.flete.anticipos
 
     @hybrid_property
+    def flete_destino_id(self):
+        return self.flete.destino_id
+
+    @hybrid_property
     def flete_destino_nombre(self):
         return self.flete.destino_nombre
 
@@ -145,6 +149,10 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_monto_efectivo(self):
         return (self.flete.porcentaje_efectivo / Decimal(100)) * self.flete_proyectado
+
+    @hybrid_property
+    def flete_origen_id(self):
+        return self.flete.origen_id
 
     @hybrid_property
     def flete_origen_nombre(self):

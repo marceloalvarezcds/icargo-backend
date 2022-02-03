@@ -55,19 +55,25 @@ def edit_orden_carga(
     gestor_carga_id: int,
     modified_by: str,
 ) -> OrdenCarga:
-    if data.camion_id and data.semi_id and data.flete_id:
+    if data.camion_id:
         obj.camion_id = data.camion_id
+    if data.semi_id:
         obj.semi_id = data.semi_id
+    if data.flete_id:
         obj.flete_id = data.flete_id
+    if data.cantidad_nominada:
         obj.cantidad_nominada = data.cantidad_nominada
-        obj.comentarios = data.comentarios
+    if data.origen_id:
         obj.origen_id = data.origen_id
+    if data.destino_id:
         obj.destino_id = data.destino_id
-        obj.gestor_carga_id = gestor_carga_id
-        obj.modified_by = modified_by
-        obj.modified_at = datetime.now()
-        db.commit()
-        db.refresh(obj)
+    if data.comentarios:
+        obj.comentarios = data.comentarios
+    obj.gestor_carga_id = gestor_carga_id
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
     return obj
 
 
