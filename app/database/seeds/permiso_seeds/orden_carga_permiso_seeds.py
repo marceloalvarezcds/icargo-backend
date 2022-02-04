@@ -39,6 +39,11 @@ def orden_carga_admin_permiso_seeds(db: Session, user: User):
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_REMISION_ORIGEN))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_REMISION_ORIGEN))
 
+    permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_REMISION_RESULTADO))
+    permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_REMISION_RESULTADO))
+
+    permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_REMISION_RESULTADO_GESTOR))
+
     user.permisos.extend(permisos)
     db.commit()
 
@@ -52,6 +57,12 @@ def orden_carga_permiso_seeds(db: Session, user: User):
     permiso_orden_carga_descuento_seeds(db, user)
     permiso_orden_carga_remision_destino_seeds(db, user)
     permiso_orden_carga_remision_origen_seeds(db, user)
+    permiso_orden_carga_remision_resultado_seeds(db, user)
+
+
+def orden_carga_gestor_permiso_seeds(db: Session, user: User):
+    orden_carga_permiso_seeds(db, user)
+    permiso_orden_carga_remision_resultado_gestor_seeds(db, user)
 
 
 def permiso_generico_seeds(db: Session, user: User):
@@ -157,5 +168,20 @@ def permiso_orden_carga_remision_origen_seeds(db: Session, user: User):
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.ORDEN_CARGA_REMISION_ORIGEN))
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_REMISION_ORIGEN))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_REMISION_ORIGEN))
+    user.permisos.extend(permisos)
+    db.commit()
+
+
+def permiso_orden_carga_remision_resultado_seeds(db: Session, user: User):
+    permisos = []
+    permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_REMISION_RESULTADO))
+    permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_REMISION_RESULTADO))
+    user.permisos.extend(permisos)
+    db.commit()
+
+
+def permiso_orden_carga_remision_resultado_gestor_seeds(db: Session, user: User):
+    permisos = []
+    permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_REMISION_RESULTADO_GESTOR))
     user.permisos.extend(permisos)
     db.commit()

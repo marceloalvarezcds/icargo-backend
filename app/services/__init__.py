@@ -102,6 +102,7 @@ from .orden_carga import (  # noqa
     edit_orden_carga,
     finalizar_orden_carga,
     get_orden_carga_by_id,
+    get_orden_carga_detail,
     get_orden_carga_reports,
     liquidar_orden_carga,
 )

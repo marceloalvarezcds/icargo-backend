@@ -45,6 +45,8 @@ class PermisoModeloEnum(Enum):
     ORDEN_CARGA_DESCUENTO = "orden_carga_descuento"
     ORDEN_CARGA_REMISION_DESTINO = "orden_carga_remision_destino"
     ORDEN_CARGA_REMISION_ORIGEN = "orden_carga_remision_origen"
+    ORDEN_CARGA_REMISION_RESULTADO = "orden_carga_remision_resultado"
+    ORDEN_CARGA_REMISION_RESULTADO_GESTOR = "orden_carga_remision_resultado_gestor"
     PAIS = "pais"
     PERMISO = "permiso"
     PRODUCTO = "producto"

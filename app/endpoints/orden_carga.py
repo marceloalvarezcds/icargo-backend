@@ -32,9 +32,10 @@ async def orden_carga_reports(
 async def read_orden_carga_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.get_orden_carga_by_id(db, id)
+    return services.get_orden_carga_detail(db, id, current_user)
 
 
 @api.post("/", response_model=schemas.OrdenCarga)
@@ -47,7 +48,7 @@ async def add_new_orden_carga(
     return services.create_orden_carga(
         db,
         data,  # type: ignore
-        current_user.gestor_carga_id,
+        current_user,
         current_user.username,
     )
 
@@ -64,7 +65,7 @@ async def edit_orden_carga(
         id,
         db,
         data,  # type: ignore
-        current_user.gestor_carga_id,
+        current_user,
         current_user.username,
     )
 

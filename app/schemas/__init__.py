@@ -69,6 +69,7 @@ from .orden_carga_remision_origen import (  # noqa
     OrdenCargaRemisionOrigen,
     OrdenCargaRemisionOrigenForm,
 )
+from .orden_carga_remision_resultado import OrdenCargaRemisionResultado  # noqa
 from .pais import Pais  # noqa
 from .permiso import Permiso  # noqa
 from .producto import Producto  # noqa

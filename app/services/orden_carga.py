@@ -8,11 +8,25 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
 from app.enums import EstadoEnum
-from app.models import Flete, OrdenCarga
+from app.models import Flete, OrdenCarga, User
+from app.utils.meta_inspect import get_dict
 
 from .orden_carga_anticipo_saldo import get_orden_carga_by_id
 from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete
+from .orden_carga_remision_resultado import (
+    get_orden_carga_remision_resultado_list_by_orden_carga,
+)
+
+
+def get_orden_carga_with_resultado(
+    model: OrdenCarga, current_user: User
+) -> schemas.OrdenCarga:
+    obj_dict = get_dict(model, ignore_keys=["orden_carga"], for_json=False)
+    obj_dict[
+        "remisiones_resultado"
+    ] = get_orden_carga_remision_resultado_list_by_orden_carga(model, current_user)
+    return schemas.OrdenCarga.parse_obj(obj_dict)
 
 
 def create_complementos_and_descuentos(
@@ -27,7 +41,7 @@ def create_complementos_and_descuentos(
 def create_orden_carga(
     db: Session,
     data: schemas.OrdenCargaForm,
-    gestor_carga_id: int,
+    current_user: User,
     modified_by: str,
 ) -> schemas.OrdenCarga:
     flete = repositories.get_flete_by_id(db, data.flete_id)
@@ -37,33 +51,41 @@ def create_orden_carga(
         db,
         data,
         flete,
-        gestor_carga_id,
+        current_user.gestor_carga_id,
         modified_by,
     )
     create_complementos_and_descuentos(db, obj, flete, modified_by)
-    return obj
+    return get_orden_carga_with_resultado(obj, current_user)
 
 
 def edit_orden_carga(
     id: int,
     db: Session,
     data: schemas.OrdenCargaEditForm,
-    gestor_carga_id: int,
+    current_user: User,
     modified_by: str,
 ) -> schemas.OrdenCarga:
     to_edit_obj = get_orden_carga_by_id(db, id)
-    return repositories.edit_orden_carga(
+    obj = repositories.edit_orden_carga(
         to_edit_obj,
         db,
         data,
-        gestor_carga_id,
+        current_user.gestor_carga_id,
         modified_by,
     )
+    return get_orden_carga_with_resultado(obj, current_user)
 
 
 def delete_orden_carga(db: Session, id: int, modified_by: str) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     return repositories.delete_orden_carga(obj, db, modified_by)
+
+
+def get_orden_carga_detail(
+    db: Session, id: int, current_user: User
+) -> schemas.OrdenCarga:
+    obj = get_orden_carga_by_id(db, id)
+    return get_orden_carga_with_resultado(obj, current_user)
 
 
 def change_orden_carga_anticipos_liberados(

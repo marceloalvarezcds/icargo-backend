@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
 from app.enums.tipo_flete import TipoFleteEnum
+from app.schemas.orden_carga_remision_resultado import OrdenCargaRemisionResultado
 
 from .centro_operativo import CentroOperativo
 from .date_model import Date
@@ -99,6 +100,7 @@ class OrdenCarga(OrdenCargaForm):
     descuentos: List[OrdenCargaDescuento]
     remisiones_destino: List[OrdenCargaRemisionDestino]
     remisiones_origen: List[OrdenCargaRemisionOrigen]
+    remisiones_resultado: List[OrdenCargaRemisionResultado]
     cantidad_destino: Decimal
     cantidad_origen: Decimal
     # Auditoría

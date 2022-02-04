@@ -4,6 +4,7 @@ from app.database.seeds.permiso_seeds import (
     entities_permiso_seeds,
     flete_permiso_seeds,
     flota_permiso_seeds,
+    orden_carga_gestor_permiso_seeds,
     orden_carga_permiso_seeds,
 )
 from app.enums import CodigoRolEnum
@@ -42,4 +43,7 @@ def user_seeds(
         entities_permiso_seeds(db, usuario)
         flete_permiso_seeds(db, usuario)
         flota_permiso_seeds(db, usuario)
-        orden_carga_permiso_seeds(db, usuario)
+        if "suplente" in username:
+            orden_carga_permiso_seeds(db, usuario)
+        else:
+            orden_carga_gestor_permiso_seeds(db, usuario)
