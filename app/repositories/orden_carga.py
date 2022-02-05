@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
+from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
 from app.models import Flete, OrdenCarga
@@ -11,10 +12,17 @@ from app.schemas.orden_carga import OrdenCargaEditForm
 from .orden_carga_estado_historial import create_orden_carga_estado_historial
 
 
-def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
+def get_orden_carga_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: int
+) -> List[OrdenCarga]:
     return (
         db.query(OrdenCarga)
-        .filter(OrdenCarga.estado != EstadoEnum.ELIMINADO.value)
+        .filter(
+            and_(
+                OrdenCarga.gestor_carga_id == gestor_carga_id,
+                OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
         .order_by(OrdenCarga.created_by)
         .all()
     )

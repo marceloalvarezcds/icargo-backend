@@ -182,7 +182,7 @@ from .orden_carga import (  # noqa
     edit_orden_carga,
     finalizar_orden_carga,
     get_orden_carga_by_id,
-    get_orden_carga_list,
+    get_orden_carga_list_by_gestor_carga_id,
     liquidar_orden_carga,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
