@@ -4,7 +4,6 @@ from typing import List
 from sqlalchemy import (  # type: ignore
     Boolean,
     Column,
-    DateTime,
     ForeignKey,
     Integer,
     Numeric,
@@ -50,22 +49,8 @@ class OrdenCarga(AuditMixin, Base):
     destino_id = Column(Integer, ForeignKey("centro_operativo.id"))
     destino = relationship(CentroOperativo, uselist=False, foreign_keys=[destino_id])
     # FIN Tramo de OC
-    # Historial de estados
-    fecha_aceptado = Column(DateTime)
-    fecha_cancelado = Column(DateTime)
-    fecha_conciliado = Column(DateTime)
-    fecha_contabilizado = Column(DateTime)
-    fecha_en_proceso = Column(DateTime)  # <- Misma fecha que estado ARRIBADO_A_CARGA
-    fecha_finalizado = Column(DateTime)
-    fecha_liquidado = Column(DateTime)
-    fecha_nuevo = Column(DateTime)
-    fecha_pendiente = Column(DateTime)
-    # Historial de estados de OC
-    fecha_arribado_a_cargar = Column(DateTime)
-    fecha_arribado_a_descargar = Column(DateTime)
-    fecha_cargado = Column(DateTime)
-    fecha_descargado = Column(DateTime)
     # Relaciones Listas
+    historial = relationship("OrdenCargaEstadoHistorial", back_populates="orden_carga")
     anticipos = relationship("OrdenCargaAnticipoRetirado", back_populates="orden_carga")
     complementos = relationship("OrdenCargaComplemento", back_populates="orden_carga")
     descuentos = relationship("OrdenCargaDescuento", back_populates="orden_carga")

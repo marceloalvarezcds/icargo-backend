@@ -217,6 +217,7 @@ from .orden_carga_descuento import (  # noqa
     get_orden_carga_descuento_by_id,
 )
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete  # noqa
+from .orden_carga_estado_historial import create_orden_carga_estado_historial  # noqa
 from .orden_carga_remision_destino import (  # noqa
     create_orden_carga_remision_destino,
     delete_orden_carga_remision_destino,

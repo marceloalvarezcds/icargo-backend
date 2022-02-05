@@ -61,6 +61,7 @@ from .orden_carga_complemento import (  # noqa
     OrdenCargaComplementoForm,
 )
 from .orden_carga_descuento import OrdenCargaDescuento, OrdenCargaDescuentoForm  # noqa
+from .orden_carga_estado_historial import OrdenCargaEstadoHistorial  # noqa
 from .orden_carga_remision_destino import (  # noqa
     OrdenCargaRemisionDestino,
     OrdenCargaRemisionDestinoForm,

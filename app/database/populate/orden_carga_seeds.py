@@ -18,7 +18,6 @@ from app.services import (
 
 
 def orden_carga_seeds(db: Session, user: Optional[User]):
-    modified_by = "system"
     if user:
         fletes = get_flete_list_by_gestor_carga_id(db, user.gestor_carga_id)
         for flete in fletes:
@@ -41,7 +40,6 @@ def orden_carga_seeds(db: Session, user: Optional[User]):
                             comentarios=f"Comentario {nro_comentario}",
                         ),
                         user,
-                        modified_by,
                     )
 
 

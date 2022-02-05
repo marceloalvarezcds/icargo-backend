@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
 from app.enums.tipo_flete import TipoFleteEnum
-from app.schemas.orden_carga_remision_resultado import OrdenCargaRemisionResultado
 
 from .centro_operativo import CentroOperativo
 from .date_model import Date
@@ -14,8 +13,10 @@ from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 from .orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from .orden_carga_complemento import OrdenCargaComplemento
 from .orden_carga_descuento import OrdenCargaDescuento
+from .orden_carga_estado_historial import OrdenCargaEstadoHistorial
 from .orden_carga_remision_destino import OrdenCargaRemisionDestino
 from .orden_carga_remision_origen import OrdenCargaRemisionOrigen
+from .orden_carga_remision_resultado import OrdenCargaRemisionResultado
 
 
 class OrdenCargaForm(BaseModel):
@@ -77,22 +78,8 @@ class OrdenCarga(OrdenCargaForm):
     destino_id: int
     destino: CentroOperativo
     # FIN Tramo de OC
-    # Historial de estados
-    fecha_aceptado: Optional[Date] = None
-    fecha_cancelado: Optional[Date] = None
-    fecha_conciliado: Optional[Date] = None
-    fecha_contabilizado: Optional[Date] = None
-    fecha_en_proceso: Optional[Date] = None
-    fecha_finalizado: Optional[Date] = None
-    fecha_liquidado: Optional[Date] = None
-    fecha_nuevo: Optional[Date] = None
-    fecha_pendiente: Optional[Date] = None
-    # Historial de estados de OC
-    fecha_arribado_a_cargar: Optional[Date] = None
-    fecha_arribado_a_descargar: Optional[Date] = None
-    fecha_cargado: Optional[Date] = None
-    fecha_descargado: Optional[Date] = None
     # Relaciones Listas
+    historial: List[OrdenCargaEstadoHistorial]
     saldos: List[OrdenCargaAnticipoSaldo]
     anticipos: List[OrdenCargaAnticipoRetirado]
     flete_anticipos: List[FleteAnticipo]

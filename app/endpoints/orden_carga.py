@@ -49,7 +49,6 @@ async def add_new_orden_carga(
         db,
         data,  # type: ignore
         current_user,
-        current_user.username,
     )
 
 
@@ -66,7 +65,6 @@ async def edit_orden_carga(
         db,
         data,  # type: ignore
         current_user,
-        current_user.username,
     )
 
 
@@ -77,7 +75,7 @@ async def delete_orden_carga(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.ELIMINAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.delete_orden_carga(db, id, current_user.username)
+    return services.delete_orden_carga(db, id, current_user)
 
 
 @api.get("/{id}/aceptar", response_model=schemas.OrdenCarga)
@@ -87,7 +85,7 @@ def aceptar_orden_carga_by_id(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.aceptar_orden_carga(db, id, current_user.username)
+    return services.aceptar_orden_carga(db, id, current_user)
 
 
 @api.get("/{id}/cancelar", response_model=schemas.OrdenCarga)
@@ -97,7 +95,7 @@ def cancelar_orden_carga_by_id(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.cancelar_orden_carga(db, id, current_user.username)
+    return services.cancelar_orden_carga(db, id, current_user)
 
 
 @api.get("/{id}/conciliar", response_model=schemas.OrdenCarga)
@@ -107,7 +105,7 @@ def conciliar_orden_carga_by_id(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.conciliar_orden_carga(db, id, current_user.username)
+    return services.conciliar_orden_carga(db, id, current_user)
 
 
 @api.get("/{id}/contabilizar", response_model=schemas.OrdenCarga)
@@ -117,7 +115,7 @@ def contabilizar_orden_carga_by_id(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.contabilizar_orden_carga(db, id, current_user.username)
+    return services.contabilizar_orden_carga(db, id, current_user)
 
 
 @api.get("/{id}/arribado_a_cargar", response_model=schemas.OrdenCarga)
@@ -127,7 +125,7 @@ def arribado_a_cargar_orden_carga_by_id(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.arribado_a_cargar_orden_carga(db, id, current_user.username)
+    return services.arribado_a_cargar_orden_carga(db, id, current_user)
 
 
 @api.get("/{id}/arribado_a_descargar", response_model=schemas.OrdenCarga)
@@ -137,7 +135,7 @@ def arribado_a_descargar_orden_carga_by_id(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.arribado_a_descargar_orden_carga(db, id, current_user.username)
+    return services.arribado_a_descargar_orden_carga(db, id, current_user)
 
 
 @api.get("/{id}/cargar", response_model=schemas.OrdenCarga)
@@ -147,7 +145,7 @@ def cargar_orden_carga_by_id(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.cargar_orden_carga(db, id, current_user.username)
+    return services.cargar_orden_carga(db, id, current_user)
 
 
 @api.get("/{id}/descargar", response_model=schemas.OrdenCarga)
@@ -157,7 +155,7 @@ def descargar_orden_carga_by_id(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.descargar_orden_carga(db, id, current_user.username)
+    return services.descargar_orden_carga(db, id, current_user)
 
 
 @api.get("/{id}/finalizar", response_model=schemas.OrdenCarga)
@@ -167,7 +165,7 @@ def finalizar_orden_carga_by_id(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.finalizar_orden_carga(db, id, current_user.username)
+    return services.finalizar_orden_carga(db, id, current_user)
 
 
 @api.get("/{id}/liquidar", response_model=schemas.OrdenCarga)
@@ -177,7 +175,7 @@ def liquidar_orden_carga_by_id(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.liquidar_orden_carga(db, id, current_user.username)
+    return services.liquidar_orden_carga(db, id, current_user)
 
 
 @api.get("/{id}/modify_advance_release", response_model=schemas.OrdenCarga)
@@ -187,6 +185,4 @@ def modify_advance_release(
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.change_orden_carga_anticipos_liberados(
-        db, id, current_user.username
-    )
+    return services.change_orden_carga_anticipos_liberados(db, id, current_user)

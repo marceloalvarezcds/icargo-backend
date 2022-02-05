@@ -8,6 +8,8 @@ from app.models import Flete, OrdenCarga
 from app.schemas import OrdenCargaForm
 from app.schemas.orden_carga import OrdenCargaEditForm
 
+from .orden_carga_estado_historial import create_orden_carga_estado_historial
+
 
 def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
     return (
@@ -38,13 +40,13 @@ def create_orden_carga(
         origen_id=flete.origen_id,
         destino_id=flete.destino_id,
         gestor_carga_id=gestor_carga_id,
-        fecha_nuevo=datetime.now(),
         created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)
     db.commit()
     db.refresh(obj)
+    create_orden_carga_estado_historial(db, obj.id, EstadoEnum.NUEVO, modified_by)
     return obj
 
 
@@ -119,7 +121,7 @@ def aceptar_orden_carga(
     modified_by: str,
 ) -> OrdenCarga:
     obj.anticipos_liberados = True
-    obj.fecha_aceptado = datetime.now()
+    create_orden_carga_estado_historial(db, obj.id, EstadoEnum.ACEPTADO, modified_by)
     return change_orden_carga_status(obj, db, EstadoEnum.ACEPTADO, modified_by)
 
 
@@ -128,7 +130,7 @@ def cancelar_orden_carga(
     db: Session,
     modified_by: str,
 ) -> OrdenCarga:
-    obj.fecha_cancelado = datetime.now()
+    create_orden_carga_estado_historial(db, obj.id, EstadoEnum.CANCELADO, modified_by)
     return change_orden_carga_status(obj, db, EstadoEnum.CANCELADO, modified_by)
 
 
@@ -137,7 +139,7 @@ def conciliar_orden_carga(
     db: Session,
     modified_by: str,
 ) -> OrdenCarga:
-    obj.fecha_conciliado = datetime.now()
+    create_orden_carga_estado_historial(db, obj.id, EstadoEnum.CONCILIADO, modified_by)
     return change_orden_carga_status(obj, db, EstadoEnum.CONCILIADO, modified_by)
 
 
@@ -146,7 +148,9 @@ def contabilizar_orden_carga(
     db: Session,
     modified_by: str,
 ) -> OrdenCarga:
-    obj.fecha_contabilizado = datetime.now()
+    create_orden_carga_estado_historial(
+        db, obj.id, EstadoEnum.CONTABILIZADO, modified_by
+    )
     return change_orden_carga_status(obj, db, EstadoEnum.CONTABILIZADO, modified_by)
 
 
@@ -156,7 +160,9 @@ def arribado_a_cargar_orden_carga(
     modified_by: str,
 ) -> OrdenCarga:
     obj.orden_carga_estado = OrdenCargaEstadoEnum.ARRIBADO_A_CARGAR
-    obj.fecha_arribado_a_cargar = datetime.now()
+    create_orden_carga_estado_historial(
+        db, obj.id, OrdenCargaEstadoEnum.ARRIBADO_A_CARGAR, modified_by
+    )
     return change_orden_carga_status(obj, db, EstadoEnum.EN_PROCESO, modified_by)
 
 
@@ -167,7 +173,9 @@ def arribado_a_descargar_orden_carga(
 ) -> OrdenCarga:
     obj.estado = EstadoEnum.EN_PROCESO
     obj.orden_carga_estado = OrdenCargaEstadoEnum.ARRIBADO_A_DESCARGAR
-    obj.fecha_arribado_a_descargar = datetime.now()
+    create_orden_carga_estado_historial(
+        db, obj.id, OrdenCargaEstadoEnum.ARRIBADO_A_DESCARGAR, modified_by
+    )
     return change_orden_carga_status(obj, db, EstadoEnum.EN_PROCESO, modified_by)
 
 
@@ -178,7 +186,9 @@ def cargar_orden_carga(
 ) -> OrdenCarga:
     obj.estado = EstadoEnum.EN_PROCESO
     obj.orden_carga_estado = OrdenCargaEstadoEnum.CARGADO
-    obj.fecha_cargado = datetime.now()
+    create_orden_carga_estado_historial(
+        db, obj.id, OrdenCargaEstadoEnum.CARGADO, modified_by
+    )
     return change_orden_carga_status(obj, db, EstadoEnum.EN_PROCESO, modified_by)
 
 
@@ -189,7 +199,9 @@ def descargar_orden_carga(
 ) -> OrdenCarga:
     obj.estado = EstadoEnum.EN_PROCESO
     obj.orden_carga_estado = OrdenCargaEstadoEnum.DESCARGADO
-    obj.fecha_descargado = datetime.now()
+    create_orden_carga_estado_historial(
+        db, obj.id, OrdenCargaEstadoEnum.DESCARGADO, modified_by
+    )
     return change_orden_carga_status(obj, db, EstadoEnum.EN_PROCESO, modified_by)
 
 
@@ -198,7 +210,7 @@ def finalizar_orden_carga(
     db: Session,
     modified_by: str,
 ) -> OrdenCarga:
-    obj.fecha_finalizado = datetime.now()
+    create_orden_carga_estado_historial(db, obj.id, EstadoEnum.FINALIZADO, modified_by)
     return change_orden_carga_status(obj, db, EstadoEnum.FINALIZADO, modified_by)
 
 
@@ -207,5 +219,5 @@ def liquidar_orden_carga(
     db: Session,
     modified_by: str,
 ) -> OrdenCarga:
-    obj.fecha_liquidado = datetime.now()
+    create_orden_carga_estado_historial(db, obj.id, EstadoEnum.LIQUIDADO, modified_by)
     return change_orden_carga_status(obj, db, EstadoEnum.LIQUIDADO, modified_by)
