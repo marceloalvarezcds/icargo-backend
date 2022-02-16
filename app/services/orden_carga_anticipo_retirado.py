@@ -1,9 +1,13 @@
+import os
 from decimal import Decimal
 
 from fastapi import HTTPException
+from jinja2 import Template
 from sqlalchemy.orm import Session  # type: ignore
+from xhtml2pdf import pisa  # type: ignore
 
 from app import repositories, schemas
+from app.config import REPORTS_FOLDER, templateEnv
 from app.models import OrdenCargaAnticipoRetirado
 
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
@@ -22,7 +26,10 @@ def create_orden_carga_anticipo_retirado(
         data.tipo_comprobante_id,
         data.numero_comprobante,
     ):
-        raise HTTPException(status_code=409, detail="El Anticipo ya existe")
+        raise HTTPException(
+            status_code=409,
+            detail=f"El Anticipo con comporbante {data.numero_comprobante} ya existe",
+        )
     update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
     return repositories.create_orden_carga_anticipo_retirado(
         db,
@@ -55,7 +62,10 @@ def edit_orden_carga_anticipo_retirado(
         data.numero_comprobante,
     )
     if exists and exists.id != id:
-        raise HTTPException(status_code=409, detail="El Anticipo ya existe")
+        raise HTTPException(
+            status_code=409,
+            detail=f"El Anticipo con comporbante {data.numero_comprobante} ya existe",
+        )
     to_edit_obj = get_orden_carga_anticipo_retirado_by_id(db, id)
     update_orden_carga_anticipo_saldo_by_form(
         db, data, to_edit_obj.monto_retirado, modified_by
@@ -72,3 +82,23 @@ def delete_orden_carga_anticipo_retirado(
     db: Session, id: int, modified_by: str
 ) -> schemas.OrdenCargaAnticipoRetirado:
     return repositories.delete_orden_carga_anticipo_retirado(db, id, modified_by)
+
+
+def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
+    obj = repositories.get_orden_carga_anticipo_retirado_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Anticipo no encontrado")
+    OUTPUT_FILENAME = f"anticipo_{id}.pdf"
+    TEMPLATE_FILENAME = "pdf_anticipo.html"
+    template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
+    source_html = template.render()
+    pdf_file = open(os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME), "w+b")
+    pisa_status = pisa.CreatePDF(
+        src=source_html,  # the HTML to convert
+        dest=pdf_file,  # file handle to receive result
+    )
+    # close output file
+    pdf_file.close()
+    if pisa_status.err != 0:
+        raise HTTPException(status_code=404, detail="Error al generar el PDF")
+    return OUTPUT_FILENAME
