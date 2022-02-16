@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app.models import User
 from app.repositories import (
     get_flete_list_by_gestor_carga_id,
+    get_orden_carga_by_id,
     get_user_list_by_gestor_carga_id,
 )
 from app.schemas import OrdenCargaForm
@@ -44,7 +45,9 @@ def orden_carga_seeds(db: Session, user: Optional[User]):
 
 
 def orden_carga_list_seeds(db: Session):
-    users1 = get_user_list_by_gestor_carga_id(db, 1)
-    users2 = get_user_list_by_gestor_carga_id(db, 2)
-    orden_carga_seeds(db, users1[0])
-    orden_carga_seeds(db, users2[0])
+    orden_carga = get_orden_carga_by_id(db, 1)
+    if not orden_carga:
+        users1 = get_user_list_by_gestor_carga_id(db, 1)
+        users2 = get_user_list_by_gestor_carga_id(db, 2)
+        orden_carga_seeds(db, users1[0])
+        orden_carga_seeds(db, users2[0])
