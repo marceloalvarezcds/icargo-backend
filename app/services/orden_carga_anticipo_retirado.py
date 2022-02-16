@@ -1,8 +1,12 @@
+from decimal import Decimal
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.models import OrdenCargaAnticipoRetirado
+
+from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
 
 
 def create_orden_carga_anticipo_retirado(
@@ -11,9 +15,15 @@ def create_orden_carga_anticipo_retirado(
     modified_by: str,
 ) -> schemas.OrdenCargaAnticipoRetirado:
     if repositories.get_orden_carga_anticipo_retirado_by(
-        db, data.flete_anticipo_id, data.orden_carga_id, data.punto_venta_id
+        db,
+        data.flete_anticipo_id,
+        data.orden_carga_id,
+        data.punto_venta_id,
+        data.tipo_comprobante_id,
+        data.numero_comprobante,
     ):
         raise HTTPException(status_code=409, detail="El Anticipo ya existe")
+    update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
     return repositories.create_orden_carga_anticipo_retirado(
         db,
         data,
@@ -37,11 +47,19 @@ def edit_orden_carga_anticipo_retirado(
     modified_by: str,
 ) -> schemas.OrdenCargaAnticipoRetirado:
     exists = repositories.get_orden_carga_anticipo_retirado_by(
-        db, data.flete_anticipo_id, data.orden_carga_id, data.punto_venta_id
+        db,
+        data.flete_anticipo_id,
+        data.orden_carga_id,
+        data.punto_venta_id,
+        data.tipo_comprobante_id,
+        data.numero_comprobante,
     )
     if exists and exists.id != id:
         raise HTTPException(status_code=409, detail="El Anticipo ya existe")
     to_edit_obj = get_orden_carga_anticipo_retirado_by_id(db, id)
+    update_orden_carga_anticipo_saldo_by_form(
+        db, data, to_edit_obj.monto_retirado, modified_by
+    )
     return repositories.edit_orden_carga_anticipo_retirado(
         to_edit_obj,
         db,

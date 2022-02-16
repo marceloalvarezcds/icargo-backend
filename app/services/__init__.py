@@ -41,6 +41,10 @@ from .flete import (  # noqa
     get_flete_detail_by_id,
     get_flete_reports,
 )
+from .flete_anticipo import (  # noqa
+    get_tipo_anticipo_list_by_flete_id,
+    get_tipo_insumo_list_by_flete_id,
+)
 from .flete_destinatario import get_destinatario_list_by  # noqa
 from .gestor_carga import (  # noqa
     create_gestor_carga,
@@ -73,6 +77,16 @@ from .gestor_carga_remitente import (  # noqa
     create_gestor_carga_remitente,
     edit_gestor_carga_remitente,
 )
+from .insumo_punto_venta import (  # noqa
+    get_insumo_list_by_tipo_insumo_id_and_gestor_carga_id,
+    get_moneda_list_by_insumo_id_and_punto_venta_id,
+    get_proveedor_list_by_insumo_id,
+    get_punto_venta_list_by_insumo_id_and_proveedor_id,
+    get_tipo_insumo_list_by_flete_id_and_gestor_carga_id,
+)
+from .insumo_punto_venta_precio import (  # noqa
+    get_insumo_punto_venta_precio_by_insumo_id_and_moneda_id_and_punto_venta_id,
+)
 from .orden_carga import (  # noqa
     aceptar_orden_carga,
     arribado_a_cargar_orden_carga,
@@ -88,6 +102,7 @@ from .orden_carga import (  # noqa
     edit_orden_carga,
     finalizar_orden_carga,
     get_orden_carga_by_id,
+    get_orden_carga_detail,
     get_orden_carga_reports,
     liquidar_orden_carga,
 )
@@ -96,6 +111,9 @@ from .orden_carga_anticipo_retirado import (  # noqa
     delete_orden_carga_anticipo_retirado,
     edit_orden_carga_anticipo_retirado,
     get_orden_carga_anticipo_retirado_by_id,
+)
+from .orden_carga_anticipo_saldo import (  # noqa
+    get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id,
 )
 from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,

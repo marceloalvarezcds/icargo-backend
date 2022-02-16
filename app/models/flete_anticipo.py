@@ -26,11 +26,15 @@ class FleteAnticipo(AuditMixin, Base):
     flete_id = Column(Integer, ForeignKey("flete.id"))
     flete = relationship(Flete, uselist=False, back_populates="anticipos")
     anticipos = relationship(
-        "OrdenCargaAnticipoRetirado", uselist=False, back_populates="flete_anticipo"
+        "OrdenCargaAnticipoRetirado", back_populates="flete_anticipo"
     )
-    saldos = relationship(
-        "OrdenCargaAnticipoSaldo", uselist=False, back_populates="flete_anticipo"
-    )
+    saldos = relationship("OrdenCargaAnticipoSaldo", back_populates="flete_anticipo")
+
+    @hybrid_property
+    def concepto(self):
+        return (
+            self.tipo_insumo_descripcion if self.tipo_insumo else self.tipo_descripcion
+        )
 
     @hybrid_property
     def tipo_descripcion(self):

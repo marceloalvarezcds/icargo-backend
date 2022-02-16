@@ -1,10 +1,21 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.models import OrdenCargaRemisionOrigen
 from app.schemas import OrdenCargaRemisionOrigenForm
+
+
+def get_orden_carga_remision_origen_list_by_orden_carga_id(
+    db: Session, orden_carga_id: int
+) -> List[OrdenCargaRemisionOrigen]:
+    return (
+        db.query(OrdenCargaRemisionOrigen)
+        .filter(OrdenCargaRemisionOrigen.orden_carga_id == orden_carga_id)
+        .order_by(OrdenCargaRemisionOrigen.created_by)
+        .all()
+    )
 
 
 def get_orden_carga_remision_origen_by(
@@ -56,10 +67,11 @@ def edit_orden_carga_remision_origen(
     obj.numero_documento = data.numero_documento
     obj.cantidad = data.cantidad
     obj.unidad_id = data.unidad_id
-    obj.foto_documento = foto_documento_url
     obj.orden_carga_id = data.orden_carga_id
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
+    if foto_documento_url:
+        obj.foto_documento = foto_documento_url
     db.commit()
     db.refresh(obj)
     return obj

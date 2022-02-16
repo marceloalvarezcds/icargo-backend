@@ -92,6 +92,7 @@ from .flete_anticipo import (  # noqa
     edit_flete_anticipo,
     get_flete_anticipo_by,
     get_flete_anticipo_by_id,
+    get_flete_anticipo_list_by_flete_id,
 )
 from .flete_complemento import (  # noqa
     create_flete_complemento,
@@ -145,7 +146,22 @@ from .gestor_carga_remitente import (  # noqa
     edit_gestor_carga_remitente,
     get_gestor_carga_remitente_by,
 )
-from .insumo import get_insumo_by_descripcion, get_insumo_list  # noqa
+from .insumo import (  # noqa
+    get_insumo_by_descripcion,
+    get_insumo_list,
+    get_insumo_list_by_tipo_insumo_id,
+)
+from .insumo_punto_venta import (  # noqa
+    get_insumo_punto_venta_by_id,
+    get_insumo_punto_venta_by_insumo_id_and_moneda_id_and_punto_venta_id,
+    get_insumo_punto_venta_list_by_gestor_carga_id,
+    get_insumo_punto_venta_list_by_insumo_id,
+    get_insumo_punto_venta_list_by_insumo_id_and_punto_venta_id,
+    get_insumo_punto_venta_list_by_tipo_insumo_id,
+)
+from .insumo_punto_venta_precio import (  # noqa
+    get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id,
+)
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
 from .marca_camion import get_marca_camion_by_descripcion, get_marca_camion_list  # noqa
 from .marca_semi import get_marca_semi_by_descripcion, get_marca_semi_list  # noqa
@@ -166,7 +182,7 @@ from .orden_carga import (  # noqa
     edit_orden_carga,
     finalizar_orden_carga,
     get_orden_carga_by_id,
-    get_orden_carga_list,
+    get_orden_carga_list_by_gestor_carga_id,
     liquidar_orden_carga,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
@@ -175,6 +191,13 @@ from .orden_carga_anticipo_retirado import (  # noqa
     edit_orden_carga_anticipo_retirado,
     get_orden_carga_anticipo_retirado_by,
     get_orden_carga_anticipo_retirado_by_id,
+)
+from .orden_carga_anticipo_saldo import (  # noqa
+    create_orden_carga_anticipo_saldo,
+    delete_orden_carga_anticipo_saldo,
+    edit_orden_carga_anticipo_saldo,
+    get_orden_carga_anticipo_saldo_by,
+    get_orden_carga_anticipo_saldo_by_id,
 )
 from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,
@@ -194,6 +217,7 @@ from .orden_carga_descuento import (  # noqa
     get_orden_carga_descuento_by_id,
 )
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete  # noqa
+from .orden_carga_estado_historial import create_orden_carga_estado_historial  # noqa
 from .orden_carga_remision_destino import (  # noqa
     create_orden_carga_remision_destino,
     delete_orden_carga_remision_destino,
@@ -207,6 +231,7 @@ from .orden_carga_remision_origen import (  # noqa
     edit_orden_carga_remision_origen,
     get_orden_carga_remision_origen_by,
     get_orden_carga_remision_origen_by_id,
+    get_orden_carga_remision_origen_list_by_orden_carga_id,
 )
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .permiso import get_permiso_by, get_permiso_list  # noqa

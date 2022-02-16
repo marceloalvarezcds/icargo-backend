@@ -4,6 +4,7 @@ from .flete_permiso_seeds import flete_admin_permiso_seeds, flete_permiso_seeds 
 from .flota_permiso_seeds import flota_admin_permiso_seeds, flota_permiso_seeds  # noqa
 from .orden_carga_permiso_seeds import (  # noqa
     orden_carga_admin_permiso_seeds,
+    orden_carga_gestor_permiso_seeds,
     orden_carga_permiso_seeds,
 )
 from .permiso_seeds import permiso_seeds  # noqa

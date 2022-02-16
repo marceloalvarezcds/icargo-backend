@@ -16,6 +16,10 @@ from sqlalchemy.sql.schema import Table  # type: ignore
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums import EstadoEnum, TipoFleteEnum
+from app.utils import (
+    get_flete_anticipo_efectivo,
+    get_porcentaje_maximo_by_flete_anticipo_list,
+)
 
 from .centro_operativo import CentroOperativo
 from .centro_operativo_contacto_gestor_carga import CentroOperativoContactoGestorCarga
@@ -159,6 +163,10 @@ class Flete(AuditMixin, Base):
     # FIN Emisión de Órdenes
 
     @hybrid_property
+    def anticipo_maximo(self):
+        return get_porcentaje_maximo_by_flete_anticipo_list(self.anticipos)
+
+    @hybrid_property
     def condicion_gestor_cuenta_moneda_nombre(self):
         return self.condicion_gestor_cuenta_moneda.nombre
 
@@ -197,6 +205,11 @@ class Flete(AuditMixin, Base):
     @hybrid_property
     def merma_propietario_unidad_descripcion(self):
         return self.merma_propietario_unidad.descripcion
+
+    @hybrid_property
+    def porcentaje_efectivo(self):
+        anticipo_efectivo = get_flete_anticipo_efectivo(self.anticipos)
+        return anticipo_efectivo.porcentaje if anticipo_efectivo else 0
 
     @hybrid_property
     def origen_nombre(self):

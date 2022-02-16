@@ -28,7 +28,13 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     """
 
     __table_args__ = (
-        UniqueConstraint("flete_anticipo_id", "orden_carga_id", "punto_venta_id"),
+        UniqueConstraint(
+            "flete_anticipo_id",
+            "orden_carga_id",
+            "punto_venta_id",
+            "tipo_comprobante_id",
+            "numero_comprobante",
+        ),
     )
     id = Column(Integer, primary_key=True)
     flete_anticipo_id = Column(Integer, ForeignKey("flete_anticipo.id"))
@@ -61,12 +67,24 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     )  # No se usa para calcular los movimientos, solo para cargar por el momento
 
     @hybrid_property
+    def concepto(self):
+        return self.flete_anticipo.concepto
+
+    @hybrid_property
     def gestor_carga_id(self):
         return self.orden_carga.gestor_carga_id
 
     @hybrid_property
     def gestor_carga_nombre(self):
         return self.orden_carga.gestor_carga_nombre
+
+    @hybrid_property
+    def gestor_carga_moneda_nombre(self):
+        return self.orden_carga.gestor_carga_moneda_nombre
+
+    @hybrid_property
+    def insumo_id(self):
+        return self.insumo_punto_venta_precio.insumo_id
 
     @hybrid_property
     def insumo_descripcion(self):
@@ -97,16 +115,44 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         return self.insumo_punto_venta_precio.insumo_unidad_descripcion
 
     @hybrid_property
-    def punto_venta_nombre(self):
-        return self.punto_venta.nombre
-
-    @hybrid_property
     def moneda_nombre(self):
         return self.moneda.nombre
 
     @hybrid_property
+    def proveedor_id(self):
+        return self.punto_venta.proveedor_id
+
+    @hybrid_property
+    def proveedor_nombre(self):
+        return self.punto_venta.proveedor_nombre
+
+    @hybrid_property
+    def punto_venta_nombre(self):
+        return self.punto_venta.nombre
+
+    @hybrid_property
+    def punto_venta_pais_nombre(self):
+        return self.punto_venta.pais_nombre
+
+    @hybrid_property
+    def tipo_anticipo_id(self):
+        return self.flete_anticipo.tipo_id
+
+    @hybrid_property
+    def tipo_anticipo_descripcion(self):
+        return self.flete_anticipo.tipo_descripcion
+
+    @hybrid_property
     def tipo_comprobante_descripcion(self):
         return self.tipo_comprobante.descripcion
+
+    @hybrid_property
+    def tipo_insumo_id(self):
+        return self.flete_anticipo.tipo_insumo_id
+
+    @hybrid_property
+    def tipo_insumo_descripcion(self):
+        return self.flete_anticipo.tipo_insumo_descripcion
 
     @hybrid_property
     def unidad_abreviatura(self):

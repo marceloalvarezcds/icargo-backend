@@ -52,11 +52,16 @@ from .orden_carga_anticipo_retirado import (  # noqa
     OrdenCargaAnticipoRetirado,
     OrdenCargaAnticipoRetiradoForm,
 )
+from .orden_carga_anticipo_saldo import (  # noqa
+    OrdenCargaAnticipoSaldo,
+    OrdenCargaAnticipoSaldoForm,
+)
 from .orden_carga_complemento import (  # noqa
     OrdenCargaComplemento,
     OrdenCargaComplementoForm,
 )
 from .orden_carga_descuento import OrdenCargaDescuento, OrdenCargaDescuentoForm  # noqa
+from .orden_carga_estado_historial import OrdenCargaEstadoHistorial  # noqa
 from .orden_carga_remision_destino import (  # noqa
     OrdenCargaRemisionDestino,
     OrdenCargaRemisionDestinoForm,
@@ -65,6 +70,7 @@ from .orden_carga_remision_origen import (  # noqa
     OrdenCargaRemisionOrigen,
     OrdenCargaRemisionOrigenForm,
 )
+from .orden_carga_remision_resultado import OrdenCargaRemisionResultado  # noqa
 from .pais import Pais  # noqa
 from .permiso import Permiso  # noqa
 from .producto import Producto  # noqa

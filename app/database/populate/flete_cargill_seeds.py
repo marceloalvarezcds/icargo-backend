@@ -17,6 +17,7 @@ from app.repositories import (
     get_tipo_carga_by_descripcion,
     get_tipo_concepto_complemento_by_descripcion,
     get_tipo_concepto_descuento_by_descripcion,
+    get_tipo_insumo_by_descripcion,
     get_unidad_by_descripcion,
 )
 from app.schemas import (
@@ -48,9 +49,10 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
     ganado = get_producto_by_descripcion(db, "Ganado")
 
     efectivo = get_tipo_anticipo_by_descripcion(db, "EFECTIVO")
-    combustible = get_tipo_anticipo_by_descripcion(db, "COMBUSTIBLE")
-    lubricantes = get_tipo_anticipo_by_descripcion(db, "LUBRICANTES")
-    otros = get_tipo_anticipo_by_descripcion(db, "OTROS")
+    tipo_insumo = get_tipo_anticipo_by_descripcion(db, "INSUMOS")
+
+    combustible = get_tipo_insumo_by_descripcion(db, "COMBUSTIBLE")
+    lubricantes = get_tipo_insumo_by_descripcion(db, "LUBRICANTES")
 
     seca = get_tipo_carga_by_descripcion(db, "SECA")
     liquida = get_tipo_carga_by_descripcion(db, "LÍQUIDA")
@@ -79,7 +81,7 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
         and efectivo
         and combustible
         and lubricantes
-        and otros
+        and tipo_insumo
         and seca
         and liquida
         and peaje
@@ -176,8 +178,10 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             porcentaje=Decimal(10),
                         ),
                         FleteAnticipoForm(
-                            tipo_id=combustible.id,
-                            tipo_descripcion=combustible.descripcion,
+                            tipo_id=tipo_insumo.id,
+                            tipo_descripcion=tipo_insumo.descripcion,
+                            tipo_insumo_id=combustible.id,
+                            tipo_insumo_descripcion=combustible.descripcion,
                             porcentaje=Decimal(10),
                         ),
                     ],
@@ -308,18 +312,17 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             porcentaje=Decimal(10),
                         ),
                         FleteAnticipoForm(
-                            tipo_id=combustible.id,
-                            tipo_descripcion=combustible.descripcion,
+                            tipo_id=tipo_insumo.id,
+                            tipo_descripcion=tipo_insumo.descripcion,
+                            tipo_insumo_id=combustible.id,
+                            tipo_insumo_descripcion=combustible.descripcion,
                             porcentaje=Decimal(10),
                         ),
                         FleteAnticipoForm(
-                            tipo_id=lubricantes.id,
-                            tipo_descripcion=lubricantes.descripcion,
-                            porcentaje=Decimal(10),
-                        ),
-                        FleteAnticipoForm(
-                            tipo_id=otros.id,
-                            tipo_descripcion=otros.descripcion,
+                            tipo_id=tipo_insumo.id,
+                            tipo_descripcion=tipo_insumo.descripcion,
+                            tipo_insumo_id=lubricantes.id,
+                            tipo_insumo_descripcion=lubricantes.descripcion,
                             porcentaje=Decimal(10),
                         ),
                     ],

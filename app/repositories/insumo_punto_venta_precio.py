@@ -1,32 +1,35 @@
+from datetime import datetime
 from typing import Optional
 
 from sqlalchemy.orm import Session  # type: ignore
-from sqlalchemy.sql.elements import and_  # type: ignore
+from sqlalchemy.sql.elements import and_, or_  # type: ignore
+from sqlalchemy.sql.expression import null  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import InsumoPuntoVenta, InsumoPuntoVentaPrecio
+from app.models import InsumoPuntoVentaPrecio
 
 
-def get_last_insumo_punto_venta_precio(
+def get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id(
     db: Session,
-    insumo_id: int,
-    punto_venta_id: int,
-    gestor_carga_id: int,
+    insumo_punto_venta_id: int,
 ) -> Optional[InsumoPuntoVentaPrecio]:
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return (
         db.query(InsumoPuntoVentaPrecio)
         .filter(
             and_(
                 InsumoPuntoVentaPrecio.estado != EstadoEnum.ELIMINADO.value,
-                InsumoPuntoVentaPrecio.insumo_punto_venta.has(
-                    and_(
-                        InsumoPuntoVenta.insumo_id == insumo_id,
-                        InsumoPuntoVenta.punto_venta_id == punto_venta_id,
-                        InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
-                    )
+                InsumoPuntoVentaPrecio.insumo_punto_venta_id == insumo_punto_venta_id,
+                InsumoPuntoVentaPrecio.fecha_inicio <= now,
+                or_(
+                    InsumoPuntoVentaPrecio.fecha_fin == null(),
+                    InsumoPuntoVentaPrecio.fecha_fin >= now,
                 ),
-            )
+            ),
         )
-        .order_by(InsumoPuntoVentaPrecio.fecha_inicio.desc())
+        .order_by(
+            InsumoPuntoVentaPrecio.fecha_inicio.desc(),
+            InsumoPuntoVentaPrecio.fecha_fin.desc(),
+        )
         .first()
     )

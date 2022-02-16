@@ -57,11 +57,12 @@ def edit_orden_carga_remision_destino(
     obj.numero_documento = data.numero_documento
     obj.cantidad = data.cantidad
     obj.unidad_id = data.unidad_id
-    obj.foto_documento = foto_documento_url
     obj.numero_documento_origen = data.numero_documento_origen
     obj.orden_carga_id = data.orden_carga_id
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
+    if foto_documento_url:
+        obj.foto_documento = foto_documento_url
     db.commit()
     db.refresh(obj)
     return obj

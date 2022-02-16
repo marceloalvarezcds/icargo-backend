@@ -14,8 +14,11 @@ from app.endpoints import (
     ente_emisor_automotor,
     ente_emisor_transporte,
     flete,
+    flete_anticipo,
     gestor_carga,
     insumo,
+    insumo_punto_venta,
+    insumo_punto_venta_precio,
     localidad,
     login,
     marca_camion,
@@ -23,6 +26,7 @@ from app.endpoints import (
     moneda,
     orden_carga,
     orden_carga_anticipo_retirado,
+    orden_carga_anticipo_saldo,
     orden_carga_complemento,
     orden_carga_descuento,
     orden_carga_remision_destino,
@@ -43,6 +47,7 @@ from app.endpoints import (
     tipo_concepto_complemento,
     tipo_concepto_descuento,
     tipo_documento,
+    tipo_insumo,
     tipo_persona,
     tipo_registro,
     tipo_semi,
@@ -85,8 +90,19 @@ api.include_router(
     tags=["ente_emisor_transporte"],
 )
 api.include_router(flete.api, prefix="/flete", tags=["flete"])
+api.include_router(
+    flete_anticipo.api, prefix="/flete_anticipo", tags=["flete_anticipo"]
+)
 api.include_router(gestor_carga.api, prefix="/gestor_carga", tags=["gestor_carga"])
 api.include_router(insumo.api, prefix="/insumo", tags=["insumo"])
+api.include_router(
+    insumo_punto_venta.api, prefix="/insumo_punto_venta", tags=["insumo_punto_venta"]
+)
+api.include_router(
+    insumo_punto_venta_precio.api,
+    prefix="/insumo_punto_venta_precio",
+    tags=["insumo_punto_venta_precio"],
+)
 api.include_router(localidad.api, prefix="/localidad", tags=["localidad"])
 api.include_router(login.api, prefix="/login", tags=["login"])
 api.include_router(marca_camion.api, prefix="/marca_camion", tags=["marca_camion"])
@@ -97,6 +113,11 @@ api.include_router(
     orden_carga_anticipo_retirado.api,
     prefix="/orden_carga_anticipo_retirado",
     tags=["orden_carga_anticipo_retirado"],
+)
+api.include_router(
+    orden_carga_anticipo_saldo.api,
+    prefix="/orden_carga_anticipo_saldo",
+    tags=["orden_carga_anticipo_saldo"],
 )
 api.include_router(
     orden_carga_complemento.api,
@@ -148,6 +169,7 @@ api.include_router(
 api.include_router(
     tipo_documento.api, prefix="/tipo_documento", tags=["tipo_documento"]
 )
+api.include_router(tipo_insumo.api, prefix="/tipo_insumo", tags=["tipo_insumo"])
 api.include_router(tipo_persona.api, prefix="/tipo_persona", tags=["tipo_persona"])
 api.include_router(tipo_registro.api, prefix="/tipo_registro", tags=["tipo_registro"])
 api.include_router(tipo_semi.api, prefix="/tipo_semi", tags=["tipo_semi"])
