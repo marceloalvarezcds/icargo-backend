@@ -203,7 +203,6 @@ from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,
     delete_orden_carga_complemento,
     edit_orden_carga_complemento,
-    get_orden_carga_complemento_by,
     get_orden_carga_complemento_by_id,
 )
 from .orden_carga_complemento_flete import (  # noqa
@@ -213,7 +212,6 @@ from .orden_carga_descuento import (  # noqa
     create_orden_carga_descuento,
     delete_orden_carga_descuento,
     edit_orden_carga_descuento,
-    get_orden_carga_descuento_by,
     get_orden_carga_descuento_by_id,
 )
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete  # noqa

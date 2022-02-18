@@ -14,17 +14,6 @@ def create_orden_carga_complemento(
     data: schemas.OrdenCargaComplementoForm,
     modified_by: str,
 ) -> schemas.OrdenCargaComplemento:
-    if repositories.get_orden_carga_complemento_by(
-        db,
-        data.concepto.id,
-        data.propietario_moneda.id,
-        data.propietario_monto,
-        data.remitente_moneda.id if data.remitente_moneda else None,
-        data.remitente_monto,
-        data.orden_carga_id,
-        data.flete_id,
-    ):
-        raise HTTPException(status_code=409, detail="El Complemento ya existe")
     complemento = repositories.create_orden_carga_complemento(
         db,
         data,
@@ -49,18 +38,6 @@ def edit_orden_carga_complemento(
     data: schemas.OrdenCargaComplementoForm,
     modified_by: str,
 ) -> schemas.OrdenCargaComplemento:
-    exists = repositories.get_orden_carga_complemento_by(
-        db,
-        data.concepto.id,
-        data.propietario_moneda.id,
-        data.propietario_monto,
-        data.remitente_moneda.id if data.remitente_moneda else None,
-        data.remitente_monto,
-        data.orden_carga_id,
-        data.flete_id,
-    )
-    if exists and exists.id != id:
-        raise HTTPException(status_code=409, detail="El Complemento ya existe")
     to_edit_obj = get_orden_carga_complemento_by_id(db, id)
     complemento = repositories.edit_orden_carga_complemento(
         to_edit_obj,

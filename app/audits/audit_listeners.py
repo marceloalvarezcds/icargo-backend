@@ -1,6 +1,9 @@
 from sqlalchemy import event  # type: ignore
 
-from app.audits.audit_functions import create_audit_database
+from app.audits.audit_functions import (
+    create_audit_database,
+    create_audit_database_for_update,
+)
 
 from .audit_mixin import AuditMixin
 
@@ -12,7 +15,7 @@ def after_insert(_, db_conn, target):
 
 @event.listens_for(AuditMixin, "after_update", propagate=True)
 def after_update(_, db_conn, target):
-    create_audit_database(db_conn, target, action="update")
+    create_audit_database_for_update(db_conn, target)
 
 
 @event.listens_for(AuditMixin, "after_delete", propagate=True)

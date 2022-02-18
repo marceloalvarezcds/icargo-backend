@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
 from app.enums.tipo_flete import TipoFleteEnum
 
+from .audit_database import AuditDatabase
 from .centro_operativo import CentroOperativo
 from .date_model import Date
 from .flete_anticipo import FleteAnticipo
@@ -66,6 +67,14 @@ class OrdenCarga(OrdenCargaForm):
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
+    # Historial de Estados
+    is_aceptado: bool
+    is_cancelado: bool
+    is_conciliado: bool
+    is_contabilizado: bool
+    is_en_proceso: bool
+    is_finalizado: bool
+    is_liquidado: bool
     # Campos para la edición
     estado: EstadoEnum
     orden_carga_estado: OrdenCargaEstadoEnum
@@ -79,6 +88,7 @@ class OrdenCarga(OrdenCargaForm):
     destino: CentroOperativo
     # FIN Tramo de OC
     # Relaciones Listas
+    auditorias: List[AuditDatabase]
     historial: List[OrdenCargaEstadoHistorial]
     saldos: List[OrdenCargaAnticipoSaldo]
     anticipos: List[OrdenCargaAnticipoRetirado]

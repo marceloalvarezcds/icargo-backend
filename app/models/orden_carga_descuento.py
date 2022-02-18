@@ -9,7 +9,6 @@ from sqlalchemy import (  # type: ignore
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
@@ -25,16 +24,6 @@ class OrdenCargaDescuento(AuditMixin, Base):
     Defines the orden carga - descuento model
     """
 
-    __table_args__ = (
-        UniqueConstraint(
-            "concepto_id",
-            "propietario_moneda_id",
-            "propietario_monto",
-            "proveedor_moneda_id",
-            "proveedor_monto",
-            "orden_carga_id",
-        ),
-    )
     id = Column(Integer, primary_key=True)
     concepto_id = Column(Integer, ForeignKey("tipo_concepto_descuento.id"))
     concepto = relationship(TipoConceptoDescuento, uselist=False)

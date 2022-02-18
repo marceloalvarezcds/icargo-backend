@@ -1,36 +1,10 @@
 from datetime import datetime
-from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.models import OrdenCargaDescuento
 from app.schemas import OrdenCargaDescuentoForm
-
-
-def get_orden_carga_descuento_by(
-    db: Session,
-    concepto_id: int,
-    propietario_moneda_id: Optional[int],
-    propietario_monto: Optional[Decimal],
-    proveedor_moneda_id: Optional[int],
-    proveedor_monto: Optional[Decimal],
-    orden_carga_id: int,
-    flete_id: Optional[int],
-) -> Optional[OrdenCargaDescuento]:
-    return (
-        db.query(OrdenCargaDescuento)
-        .filter(
-            OrdenCargaDescuento.concepto_id == concepto_id,
-            OrdenCargaDescuento.propietario_moneda_id == propietario_moneda_id,
-            OrdenCargaDescuento.propietario_monto == propietario_monto,
-            OrdenCargaDescuento.proveedor_moneda_id == proveedor_moneda_id,
-            OrdenCargaDescuento.proveedor_monto == proveedor_monto,
-            OrdenCargaDescuento.orden_carga_id == orden_carga_id,
-            OrdenCargaDescuento.flete_id == flete_id,
-        )
-        .first()
-    )
 
 
 def get_orden_carga_descuento_by_id(
