@@ -10,17 +10,6 @@ def create_orden_carga_descuento(
     data: schemas.OrdenCargaDescuentoForm,
     modified_by: str,
 ) -> schemas.OrdenCargaDescuento:
-    if repositories.get_orden_carga_descuento_by(
-        db,
-        data.concepto.id,
-        data.propietario_moneda.id,
-        data.propietario_monto,
-        data.proveedor_moneda.id if data.proveedor_moneda else None,
-        data.proveedor_monto,
-        data.orden_carga_id,
-        data.flete_id,
-    ):
-        raise HTTPException(status_code=409, detail="El Descuento ya existe")
     return repositories.create_orden_carga_descuento(
         db,
         data,
@@ -41,18 +30,6 @@ def edit_orden_carga_descuento(
     data: schemas.OrdenCargaDescuentoForm,
     modified_by: str,
 ) -> schemas.OrdenCargaDescuento:
-    exists = repositories.get_orden_carga_descuento_by(
-        db,
-        data.concepto.id,
-        data.propietario_moneda.id,
-        data.propietario_monto,
-        data.proveedor_moneda.id if data.proveedor_moneda else None,
-        data.proveedor_monto,
-        data.orden_carga_id,
-        data.flete_id,
-    )
-    if exists and exists.id != id:
-        raise HTTPException(status_code=409, detail="El Descuento ya existe")
     to_edit_obj = get_orden_carga_descuento_by_id(db, id)
     return repositories.edit_orden_carga_descuento(
         to_edit_obj,

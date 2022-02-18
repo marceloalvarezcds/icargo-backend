@@ -94,6 +94,7 @@ def permiso_generico_seeds(db: Session, user: User):
 def permiso_orden_carga_seeds(db: Session, user: User):
     permisos = []
     permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.ORDEN_CARGA))
+    permisos.append(permiso_seeds(db, a.CONCILIAR, m.ORDEN_CARGA))
     permisos.append(permiso_seeds(db, a.CREAR, m.ORDEN_CARGA))
     permisos.append(permiso_seeds(db, a.EDITAR, m.ORDEN_CARGA))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.ORDEN_CARGA))

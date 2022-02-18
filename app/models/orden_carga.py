@@ -17,7 +17,11 @@ from sqlalchemy.orm import relationship  # type: ignore
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums import EstadoEnum
-from app.schemas import OrdenCargaComplemento, OrdenCargaDescuento
+from app.schemas import (
+    OrdenCargaComplemento,
+    OrdenCargaDescuento,
+    OrdenCargaEstadoHistorial,
+)
 
 from .camion import Camion
 from .centro_operativo import CentroOperativo
@@ -179,6 +183,34 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def gestor_carga_moneda_nombre(self):
         return self.gestor_carga.moneda_nombre
+
+    @hybrid_property
+    def is_aceptado(self):
+        return self.find_estado_in_historial(EstadoEnum.ACEPTADO)
+
+    @hybrid_property
+    def is_cancelado(self):
+        return self.find_estado_in_historial(EstadoEnum.CANCELADO)
+
+    @hybrid_property
+    def is_conciliado(self):
+        return self.find_estado_in_historial(EstadoEnum.CONCILIADO)
+
+    @hybrid_property
+    def is_contabilizado(self):
+        return self.find_estado_in_historial(EstadoEnum.CONTABILIZADO)
+
+    @hybrid_property
+    def is_en_proceso(self):
+        return self.find_estado_in_historial(EstadoEnum.EN_PROCESO)
+
+    @hybrid_property
+    def is_finalizado(self):
+        return self.find_estado_in_historial(EstadoEnum.FINALIZADO)
+
+    @hybrid_property
+    def is_liquidado(self):
+        return self.find_estado_in_historial(EstadoEnum.LIQUIDADO)
 
     @hybrid_property
     def nro_tickets(self):
@@ -343,3 +375,10 @@ class OrdenCarga(AuditMixin, Base):
         for remision in remisiones:
             total += remision.cantidad
         return total
+
+    def find_estado_in_historial(self, estado: EstadoEnum) -> bool:
+        lista: List[OrdenCargaEstadoHistorial] = self.historial
+        for x in lista:
+            if x.estado == estado.value:
+                return True
+        return False

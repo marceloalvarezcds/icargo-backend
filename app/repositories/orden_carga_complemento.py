@@ -1,39 +1,10 @@
 from datetime import datetime
-from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy.orm import Session  # type: ignore
-from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.models import OrdenCargaComplemento
 from app.schemas import OrdenCargaComplementoForm
-
-
-def get_orden_carga_complemento_by(
-    db: Session,
-    concepto_id: int,
-    propietario_moneda_id: Optional[int],
-    propietario_monto: Optional[Decimal],
-    remitente_moneda_id: Optional[int],
-    remitente_monto: Optional[Decimal],
-    orden_carga_id: int,
-    flete_id: Optional[int],
-) -> Optional[OrdenCargaComplemento]:
-    return (
-        db.query(OrdenCargaComplemento)
-        .filter(
-            and_(
-                OrdenCargaComplemento.concepto_id == concepto_id,
-                OrdenCargaComplemento.propietario_moneda_id == propietario_moneda_id,
-                OrdenCargaComplemento.propietario_monto == propietario_monto,
-                OrdenCargaComplemento.remitente_moneda_id == remitente_moneda_id,
-                OrdenCargaComplemento.remitente_monto == remitente_monto,
-                OrdenCargaComplemento.orden_carga_id == orden_carga_id,
-                OrdenCargaComplemento.flete_id == flete_id,
-            )
-        )
-        .first()
-    )
 
 
 def get_orden_carga_complemento_by_id(
