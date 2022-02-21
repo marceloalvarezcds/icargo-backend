@@ -19,6 +19,15 @@ async def read_orden_carga_anticipo_retirado_by_id(
     return services.get_orden_carga_anticipo_retirado_by_id(db, id)
 
 
+@api.get("/{id}/pdf")
+async def read_orden_carga_anticipo_retirado_pdf_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA_ANTICIPO_RETIRADO)),  # noqa: B008
+):
+    return services.get_orden_carga_anticipo_retirado_pdf_by_id(db, id)
+
+
 @api.post("/", response_model=schemas.OrdenCargaAnticipoRetirado)
 async def add_new_orden_carga_anticipo_retirado(
     db: Session = Depends(get_db_session),  # noqa: B008

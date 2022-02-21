@@ -1,11 +1,16 @@
 import os
 from typing import List, Union
 
+import jinja2
 from decouple import config as environ  # type: ignore
 from pydantic import AnyHttpUrl, BaseSettings, validator  # type: ignore
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 REPORTS_FOLDER = os.path.join(dir_path, "reports")
+
+TEMPLATES_FOLDER = os.path.join(dir_path, "templates")
+templateLoader = jinja2.FileSystemLoader(searchpath=TEMPLATES_FOLDER)
+templateEnv = jinja2.Environment(loader=templateLoader)
 
 if not os.path.exists(REPORTS_FOLDER):
     os.mkdir(REPORTS_FOLDER)
