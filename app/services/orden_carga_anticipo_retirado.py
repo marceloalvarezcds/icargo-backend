@@ -3,11 +3,11 @@ from decimal import Decimal
 
 from fastapi import HTTPException
 from jinja2 import Template
+from pdfkit import from_string  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
-from xhtml2pdf import pisa  # type: ignore
 
 from app import repositories, schemas
-from app.config import REPORTS_FOLDER, templateEnv
+from app.config import LOGO_IMAGE_URI, REPORTS_FOLDER, templateEnv
 from app.models import OrdenCargaAnticipoRetirado
 
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
@@ -88,17 +88,50 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
     obj = repositories.get_orden_carga_anticipo_retirado_by_id(db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Anticipo no encontrado")
+    orden_carga = repositories.get_orden_carga_by_id(db, obj.orden_carga_id)
+    if not orden_carga:
+        raise HTTPException(status_code=404, detail="Anticipo no encontrado")
+    gestor_carga = repositories.get_gestor_carga_by_id(db, orden_carga.gestor_carga_id)
+    if not gestor_carga:
+        raise HTTPException(status_code=404, detail="Anticipo no encontrado")
+    usuario = repositories.get_by_username(db, obj.created_by)
+    usuario_nombre = (
+        f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
+    )
     OUTPUT_FILENAME = f"anticipo_{id}.pdf"
     TEMPLATE_FILENAME = "pdf_anticipo.html"
     template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
-    source_html = template.render()
-    pdf_file = open(os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME), "w+b")
-    pisa_status = pisa.CreatePDF(
-        src=source_html,  # the HTML to convert
-        dest=pdf_file,  # file handle to receive result
-    )
-    # close output file
-    pdf_file.close()
-    if pisa_status.err != 0:
-        raise HTTPException(status_code=404, detail="Error al generar el PDF")
+    data = {
+        "id": id,
+        "orden_carga_id": orden_carga.id,
+        "flete_id": orden_carga.flete_id,
+        "gestor_carga_logo": gestor_carga.logo,
+        "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_direccion": gestor_carga.direccion,
+        "anticipo_fecha": obj.created_at.strftime("%Y-%m-%d / %H:%M:%S"),
+        "anticipo_usuario": usuario_nombre,
+        "propietario_nombre": orden_carga.camion_propietario_nombre,
+        "chofer_nombre": orden_carga.camion_chofer_nombre,
+        "chofer_numero_documento": orden_carga.camion_chofer_numero_documento,
+        "chofer_telefono": orden_carga.camion.chofer.telefono,
+        "camion_placa": orden_carga.camion_placa,
+        "proveedor_nombre": obj.proveedor_nombre,
+        "proveedor_numero_documento": obj.punto_venta.proveedor.numero_documento,
+        "proveedor_direccion": obj.punto_venta.proveedor.direccion,
+        "insumo_descripcion": obj.insumo_descripcion
+        if obj.insumo_descripcion
+        else "Viático",
+        "insumo_precio": obj.insumo_precio if obj.insumo_precio else 1,
+        "insumo_unidad": obj.insumo_unidad_abreviatura
+        if obj.insumo_unidad_abreviatura
+        else "",
+        "monto": "{:,.2f}".format(obj.monto_retirado)
+        .replace(".", "#")
+        .replace(",", ".")
+        .replace("#", ","),
+        "unidad": obj.unidad_abreviatura if obj.unidad_abreviatura else "",
+    }
+    source_html = template.render(logo=LOGO_IMAGE_URI, times=range(2), **data)
+    pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
+    from_string(source_html, pdf_filename)
     return OUTPUT_FILENAME

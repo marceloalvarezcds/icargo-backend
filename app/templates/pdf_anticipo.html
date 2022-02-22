@@ -1,307 +1,275 @@
 <!DOCTYPE html>
 <html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Anticipos</title>
+    <meta name="generator" content="BCL easyConverter SDK 5.0.252" />
+    <meta name="title" content="2022 01 21 Anticipos icargo" />
+    <style type="text/css">
+      @page {
+        size: legal portrait;
+        margin: 2cm;
+      }
 
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>Anticipos</title>
-  <meta name="generator" content="BCL easyConverter SDK 5.0.252">
-  <meta name="title" content="2022 01 21 Anticipos icargo">
-  <style type="text/css">
-    @page {
-      size: legal portrait;
-      margin: 2cm;
-    }
+      body {
+        margin: 0px;
+        padding: 0px;
+        overflow: auto;
+      }
 
-    body {
-      margin: 0px;
-      padding: 0px;
-      overflow: auto;
-    }
+      .boxes {
+        display: flex;
+        margin-top: 10px;
+      }
 
-    #page_1 {
-      margin: 0px;
-      padding: 0px;
-    }
+      .box {
+        border: 2px solid #d1d3d4;
+        box-sizing: border-box;
+        padding: 8px 0 7px 0;
+        margin-right: 8px;
+        width: calc((100% / 3) - 5px);
+      }
 
-    .boxes {
-      margin-top: 1cm;
-      width: 100%;
-      height: 150px;
-    }
+      .box:last-of-type {
+        margin-right: 0;
+      }
 
-    .boxes td {
-      vertical-align: top;
-      border: 0;
-    }
+      .box p {
+        border: 0;
+      }
 
-    .box {
-      border: 1px solid #d1d3d4;
-      box-sizing: border-box;
-      height: 140px;
-    }
+      .dashed {
+        border: 1px dashed;
+        margin: 20px 0;
+      }
 
-    .box p {
-      border: 0;
-    }
+      .firma-container {
+        display: flex;
+        margin-top: 100px;
+      }
 
-    .ft0 {
-      font: bold 27px 'Georgia';
-      color: #939598;
-      line-height: 31px;
-    }
+      .firma {
+        border-top: 2px solid #444;
+        margin: auto;
+        width: 400px;
+      }
 
-    .ft1 {
-      font: bold 29px 'Georgia';
-      line-height: 34px;
-    }
+      .firma p {
+        text-align: center;
+        line-height: 35px;
+      }
 
-    .ft2 {
-      font: bold 51px 'Georgia';
-      color: #3399ff;
-      line-height: 59px;
-    }
+      .ft0 {
+        font: bold 18px "Georgia";
+        color: #939598;
+      }
 
-    .ft3 {
-      font: bold 24px 'Georgia';
-      line-height: 29px;
-    }
+      .ft1 {
+        font: bold 20px "Georgia";
+      }
 
-    .ft4 {
-      font: 24px 'Georgia';
-      line-height: 29px;
-    }
+      .ft2 {
+        font: bold 34px "Georgia";
+        color: #3399ff;
+        line-height: 40px;
+      }
 
-    .ft5 {
-      font: bold 26px 'Georgia';
-      color: #939598;
-      line-height: 30px;
-    }
+      .ft3 {
+        font: bold 16px "Georgia";
+      }
 
-    .ft6 {
-      font: 1px 'Georgia';
-      line-height: 15px;
-    }
+      .ft4 {
+        font: 16px "Georgia";
+      }
 
-    .ft7 {
-      font: 1px 'Georgia';
-      line-height: 16px;
-    }
+      .ft5 {
+        font: bold 18px "Georgia";
+        color: #939598;
+      }
 
-    .ft8 {
-      font: 1px 'Georgia';
-      line-height: 1px;
-    }
+      .ft6 {
+        font: bold 18px "Georgia";
+      }
 
-    .ft9 {
-      font: 1px 'Georgia';
-      line-height: 28px;
-    }
+      .ft7 {
+        font: bold 24px "Georgia";
+        color: #3399ff;
+        line-height: 28px;
+      }
 
-    .ft10 {
-      font: bold 27px 'Georgia';
-      line-height: 31px;
-    }
+      .ft8 {
+        font: 11px "Georgia";
+        line-height: 16px;
+      }
 
-    .ft11 {
-      font: 25px 'Georgia';
-      line-height: 30px;
-    }
+      .ft0,
+      .ft1,
+      .ft3,
+      .ft4,
+      .ft5,
+      .ft6 {
+        line-height: 25px;
+      }
 
-    .ft12 {
-      font: bold 37px 'Georgia';
-      color: #3399ff;
-      line-height: 43px;
-    }
+      .logo-container {
+        border: 2px solid #d1d3d4;
+        display: flex;
+        align-items: center;
+        margin-top: 8px;
+      }
 
-    .ft13 {
-      font: 17px 'Georgia';
-      line-height: 25px;
-    }
+      .logo-container .logo {
+        width: 430px;
+        height: 120px;
+      }
 
-    .ft14 {
-      font: 17px 'Georgia';
-      line-height: 26px;
-    }
+      .logo-container img {
+        margin: auto;
+        width: auto;
+        height: 120px;
+      }
 
-    p {
-      padding-left: 16px;
-      padding-right: 16px;
-      margin-top: 0px;
-      margin-bottom: 0px;
-      text-align: left;
-      white-space: nowrap;
-    }
+      .logo-container p {
+        flex: 1;
+        white-space: normal;
+      }
 
-    .p0 {
-      width: 123px;
-      text-align: center;
-      white-space: normal;
-    }
+      p {
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        text-align: left;
+        white-space: nowrap;
+      }
 
-    .p2 {
-      padding-left: 568px;
-      padding-right: 37px;
-      margin-top: 59px;
-      white-space: normal;
-    }
+      .p0 {
+        text-align: center;
+        white-space: normal;
+      }
 
-    td {
-      padding: 0px;
-      margin: 0px;
-    }
+      .table0 {
+        display: flex;
+        font: 24px "Georgia";
+      }
 
-    .table0 {
-      font: 24px 'Georgia';
-      width: 100%;
-    }
+      .table0 .td {
+        border-top: 2px solid #d1d3d4;
+        border-right: 2px solid #d1d3d4;
+        border-bottom: 2px solid #d1d3d4;
+        padding: 24px 12px 12px 12px;
+      }
 
-    .table0 .td0 {
-      border-left: #d1d3d4 1px solid;
-      border-right: #d1d3d4 1px solid;
-      border-top: #d1d3d4 1px solid;
-      border-bottom: #d1d3d4 1px solid;
-    }
+      .table0 .td:first-of-type {
+        border-left: 2px solid #d1d3d4;
+        width: 143px;
+      }
 
-    .table0 .td1 {
-      border-right: #d1d3d4 1px solid;
-      border-top: #d1d3d4 1px solid;
-    }
+      .table0 .td.middle {
+        flex: 1;
+      }
 
-    .table0 .td2 {
-      border-right: #d1d3d4 1px solid;
-      border-top: #d1d3d4 1px solid;
-    }
+      .table0 .td:last-of-type {
+        width: 366px;
+      }
+    </style>
+  </head>
 
-    .table0 .td3 {
-      border-right: #d1d3d4 1px solid;
-    }
-
-    .table0 .td4 {
-      border-right: #d1d3d4 1px solid;
-    }
-
-    .table0 .td5 {
-      border-right: #d1d3d4 1px solid;
-    }
-
-    .table0 .td6 {
-      border-right: #d1d3d4 1px solid;
-      border-bottom: #d1d3d4 1px solid;
-    }
-
-    .table0 .td7 {
-      border-right: #d1d3d4 1px solid;
-      border-bottom: #d1d3d4 1px solid;
-    }
-  </style>
-</head>
-
-<body>
-  <div id="page_1">
-    <table class="table0">
-      <tr>
-        <td rowspan="4" class="td0">
+  <body>
+    {% for x in times %}
+    <div>
+      <div class="table0">
+        <div class="td">
+          {% if gestor_carga_logo %}
+          <img src="{{gestor_carga_logo}}" />
+          {% else %}
           <p class="p0 ft0">
             LOGO
             <span class="ft5">Gestora Carga</span>
           </p>
-        </td>
-        <td class="td1">
-          <p class="ft1">TRANSRED</p>
-        </td>
-        <td rowspan=2 class="td2">
-          <p class="ft2">Anticipo Nro. 15</p>
-        </td>
-      </tr>
-      <tr>
-        <td class="td3">
-          <p class="ft4"><span class="ft3">Dirección: </span>Defensores del Chaco c/ Sta. Teresa</p>
-        </td>
-      </tr>
-      <tr>
-        <td class="td4">
+          {% endif %}
+        </div>
+        <div class="td middle">
+          <p class="ft1">{{gestor_carga_nombre}}</p>
           <p class="ft4">
-            <span class="ft3">Fecha/Hora: </span>
-            <nobr>2022-01-11 /</nobr> 14:39:08
+            <span class="ft3">Dirección: </span>{{gestor_carga_direccion}}
           </p>
-        </td>
-        <td class="td5">
-          <p class="ft3">Orden de carga Nro: <span class="ft4">31</span></p>
-        </td>
-      </tr>
-      <tr>
-        <td class="td6">
-          <p class="ft4"><span class="ft3">Usuario: </span>iCargo Admin</p>
-        </td>
-        <td class="td7">
-          <p class="ft3">Pedido Nro: <span class="ft4">151</span></p>
-        </td>
-      </tr>
-    </table>
-    <table class="boxes">
-      <tr>
-        <td>
-          <div class="box">
-            <p class="ft10">Propietario</p>
-            <p class="ft11">Nombre: Pepito Cárdenas Alfonzo</p>
-          </div>
-        </td>
-        <td>
-          <div class="box">
-            <p class="ft10">Chofer</p>
-            <p class="ft11">Nombre: Pepito Cárdenas Alfonzo</p>
-            <p class="ft11">Cédula de Identidad: 3002334</p>
-            <p class="ft11">Teléfono: 0981123456</p>
-          </div>
-        </td>
-        <td>
-          <div class="box">
-            <p class="ft3">Placa del camión</p>
-            <p class="ft12">ALL120</p>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <div class="box">
-            <p class="ft3">Proveedor</p>
-            <p class="ft4">Nombre: <nobr>Petrochaco Hrias - PC - Hrias</nobr></p>
-            <p class="ft4">Documento: <nobr>000001 - 0</nobr></p>
-            <p class="ft4">Dirección:</p>
-          </div>
-        </td>
-        <td>
-          <div class="box">
-            <p class="ft3">Producto</p>
-            <p class="ft12">Viático</p>
-            <p class="ft12">Precio: 1,00 PYG/Gs.</p>
-          </div>
-        </td>
-        <td>
-          <div class="box">
-            <p class="ft3">Importe</p>
-            <p class="ft12">PYG 50.000,00</p>
-          </div>
-        </td>
-      </tr>
-    </table>
-    <table class="table1">
-      <tr>
-        <td class="tr10">
+          <p class="ft4">
+            <span class="ft3">Fecha/Hora: </span>{{anticipo_fecha}}
+          </p>
+          <p class="ft4">
+            <span class="ft3">Usuario: </span>{{anticipo_usuario}}
+          </p>
+        </div>
+        <div class="td">
+          <p class="ft2">Anticipo Nro. {{id}}</p>
+          <p class="ft3">
+            Orden de carga Nro: <span class="ft4">{{orden_carga_id}}</span>
+          </p>
+          <p class="ft3">Pedido Nro: <span class="ft4">{{flete_id}}</span></p>
+        </div>
+      </div>
+      <div class="boxes">
+        <div class="box">
+          <p class="ft6">Propietario</p>
+          <p class="ft4">Nombre: {{propietario_nombre}}</p>
+        </div>
+        <div class="box">
+          <p class="ft6">Chofer</p>
+          <p class="ft4">Nombre: {{chofer_nombre}}</p>
+          <p class="ft4">Cédula de Identidad: {{chofer_numero_documento}}</p>
+          <p class="ft4">Teléfono: {{chofer_telefono}}</p>
+        </div>
+        <div class="box">
+          <p class="ft3">Placa del camión</p>
+          <p class="ft7">{{camion_placa}}</p>
+        </div>
+      </div>
+      <div class="boxes">
+        <div class="box">
+          <p class="ft3">Proveedor</p>
+          <p class="ft4">Nombre: {{proveedor_nombre}}</p>
+          <p class="ft4">Documento: {{proveedor_numero_documento}}</p>
+          <p class="ft4">Dirección: {{proveedor_direccion}}</p>
+        </div>
+        <div class="box">
+          <p class="ft3">Producto</p>
+          <p class="ft7">{{insumo_descripcion}}</p>
+          <p class="ft7">Precio: {{insumo_precio}} {{insumo_unidad}}</p>
+        </div>
+        <div class="box">
+          <p class="ft3">Importe</p>
+          <p class="ft7">{{unidad}} {{monto}}</p>
+        </div>
+      </div>
+      <div class="firma-container">
+        <div class="firma">
           <p class="ft3">Firma de la Transportadora</p>
-        </td>
-        <td class="tr10">
+        </div>
+        <div class="firma">
           <p class="ft3">Firma del Chofer</p>
-        </td>
-      </tr>
-    </table>
-    <p class="p2 ft13">iCargo es solo una Herramienta de Gestión y no constituye parte alguna en la Cadena de
-      Operaciones, limitándose su aporte solo al Registro, Gestión y Publicación de la información que por ella se
-      administra. Las partes, Gestora de carga y Propietario, asumen total responsabilidad por la Publicación de los
-      Pedidos y por la Emisión de las Ordenes de Carga que consideren apropiadas, dejando indemne a iCargo de
-      cualquier reclamo Judicial y/o <nobr>Extra Judicial</nobr> en cualquier litigio que pudiera surgir entre estas
-      partes
-    </p>
-</body>
-
+        </div>
+      </div>
+      <div class="logo-container">
+        <div class="logo">
+          <img src="{{logo}}" alt="iCargo" />
+        </div>
+        <p class="p1 ft8">
+          iCargo es solo una Herramienta de Gestión y no constituye parte alguna
+          en la Cadena de Operaciones, limitándose su aporte solo al Registro,
+          Gestión y Publicación de la información que por ella se administra.
+          Las partes, Gestora de carga y Propietario, asumen total
+          responsabilidad por la Publicación de los Pedidos y por la Emisión de
+          las Ordenes de Carga que consideren apropiadas, dejando indemne a
+          iCargo de cualquier reclamo Judicial y/o
+          <nobr>Extra Judicial</nobr> en cualquier litigio que pudiera surgir
+          entre estas partes
+        </p>
+      </div>
+      {% if x == 0 %}
+      <div class="dashed"></div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </body>
 </html>

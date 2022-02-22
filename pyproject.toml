@@ -24,9 +24,8 @@ aiofiles = "^0.7.0"
 requests = "^2.26.0"
 simplejson = "^3.17.5"
 orjson = "^3.6.4"
+pdfkit = "^1.0.0"
 Jinja2 = "^3.0.3"
-xhtml2pdf = "^0.2.5"
-reportlab = "^3.6.6"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.910"

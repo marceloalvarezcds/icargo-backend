@@ -8,6 +8,8 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
     ln -s /opt/poetry/bin/poetry && \
     poetry config virtualenvs.create false
 
+RUN apt-get update -y && apt-get install -y wkhtmltopdf
+
 # Copy poetry.lock* in case it doesn't exist in the repo
 COPY ./pyproject.toml ./poetry.lock* /app/
 

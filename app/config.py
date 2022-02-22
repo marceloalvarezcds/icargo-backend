@@ -9,6 +9,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 REPORTS_FOLDER = os.path.join(dir_path, "reports")
 
 TEMPLATES_FOLDER = os.path.join(dir_path, "templates")
+LOGO_IMAGE_URI = os.path.join(TEMPLATES_FOLDER, "logo-icargo.png")
 templateLoader = jinja2.FileSystemLoader(searchpath=TEMPLATES_FOLDER)
 templateEnv = jinja2.Environment(loader=templateLoader)
 
