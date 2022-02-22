@@ -1,4 +1,5 @@
 import os
+from typing import List, cast
 
 from fastapi import HTTPException
 from openpyxl import Workbook  # type: ignore
@@ -9,7 +10,7 @@ from app import repositories, schemas
 from app.config import REPORTS_FOLDER
 from app.enums import EstadoEnum
 from app.models import Flete, OrdenCarga, User
-from app.utils.meta_inspect import get_dict
+from app.schemas.audit_database import AuditDatabase as A
 
 from .audit_database import get_audit_list_by_orden_carga
 from .orden_carga_anticipo_saldo import get_orden_carga_by_id
@@ -23,12 +24,14 @@ from .orden_carga_remision_resultado import (
 def get_orden_carga_with_resultado(
     db: Session, model: OrdenCarga, current_user: User
 ) -> schemas.OrdenCarga:
-    obj_dict = get_dict(model, ignore_keys=["orden_carga"], for_json=False)
-    obj_dict[
-        "remisiones_resultado"
-    ] = get_orden_carga_remision_resultado_list_by_orden_carga(model, current_user)
-    obj_dict["auditorias"] = get_audit_list_by_orden_carga(db, model, current_user)
-    return schemas.OrdenCarga.parse_obj(obj_dict)
+    obj = schemas.OrdenCarga.from_orm(model)
+    obj.remisiones_resultado = get_orden_carga_remision_resultado_list_by_orden_carga(
+        model, current_user
+    )
+    obj.auditorias = cast(
+        List[A], get_audit_list_by_orden_carga(db, model, current_user)
+    )
+    return obj
 
 
 def create_complementos_and_descuentos(
