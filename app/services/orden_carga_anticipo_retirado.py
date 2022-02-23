@@ -101,6 +101,7 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
     OUTPUT_FILENAME = f"anticipo_{id}.pdf"
     TEMPLATE_FILENAME = "pdf_anticipo.html"
     template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
+    logo = f"file://{LOGO_IMAGE_URI}"
     data = {
         "id": id,
         "orden_carga_id": orden_carga.id,
@@ -131,7 +132,7 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
         .replace("#", ","),
         "unidad": obj.unidad_abreviatura if obj.unidad_abreviatura else "",
     }
-    source_html = template.render(logo=LOGO_IMAGE_URI, times=range(2), **data)
+    source_html = template.render(logo=logo, times=range(2), **data)
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
     from_string(source_html, pdf_filename)
     return OUTPUT_FILENAME
