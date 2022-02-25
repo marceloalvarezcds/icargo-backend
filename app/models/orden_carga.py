@@ -18,6 +18,7 @@ from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums import EstadoEnum
 from app.schemas import (
+    OrdenCargaAnticipoRetirado,
     OrdenCargaComplemento,
     OrdenCargaDescuento,
     OrdenCargaEstadoHistorial,
@@ -342,6 +343,14 @@ class OrdenCarga(AuditMixin, Base):
             if self.flete.merma_propietario_es_porcentual
             else self.resultado_propietario_merma_tolerancia
         )
+
+    @hybrid_property
+    def resultado_propietario_total_anticipos_retirados(self):
+        lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
+        total = Decimal(0)
+        for item in lista:
+            total += item.monto_retirado
+        return total
 
     @hybrid_property
     def resultado_propietario_total_complemento(self):

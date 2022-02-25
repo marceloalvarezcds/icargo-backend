@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
 from app.models import OrdenCargaAnticipoRetirado
+from app.utils import number_format
 
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
 
@@ -125,13 +126,10 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
         "insumo_unidad": obj.insumo_unidad_abreviatura
         if obj.insumo_unidad_abreviatura
         else "",
-        "monto": "{:,.2f}".format(obj.monto_retirado)
-        .replace(".", "#")
-        .replace(",", ".")
-        .replace("#", ","),
+        "monto": number_format(obj.monto_retirado),
         "unidad": obj.unidad_abreviatura if obj.unidad_abreviatura else "",
     }
     source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
-    from_string(source_html, pdf_filename)
+    from_string(source_html, pdf_filename, {"page-size": "Legal"})
     return OUTPUT_FILENAME

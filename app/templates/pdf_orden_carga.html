@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Orden de Carga</title>
+    <meta name="generator" content="BCL easyConverter SDK 5.0.252" />
+    <meta name="title" content="2022 01 21 Anticipos icargo" />
+    <style type="text/css">
+      body {
+        margin: 0px;
+        padding: 0px;
+        overflow: auto;
+        font-family: "Georgia";
+      }
+
+      .align-center {
+        align-items: center;
+      }
+
+      .blue {
+        color: #3399ff;
+      }
+
+      .bold {
+        font-weight: bold;
+      }
+
+      .box {
+        border: 2px solid #d1d3d4;
+        box-sizing: border-box;
+      }
+
+      .camion-foto-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .camion-foto {
+        height: 208px;
+        width: 208px;
+      }
+
+      .camion-foto div {
+        text-align: center;
+      }
+
+      .camion-foto img {
+        width: 100%;
+        height: auto;
+      }
+
+      .camion-foto .table {
+        height: 100%;
+      }
+
+      .center {
+        text-align: center;
+      }
+
+      .dashed {
+        border: 1px dashed;
+        margin: 20px 0;
+      }
+
+      .flex1 {
+        flex: 1;
+      }
+
+      .firma-container {
+        display: flex;
+        margin-top: 100px;
+      }
+
+      .firma {
+        border-top: 2px solid #444;
+        margin: auto;
+        width: 400px;
+      }
+
+      .firma p {
+        text-align: center;
+        line-height: 35px;
+      }
+
+      .fs1 {
+        font-size: 34px;
+      }
+
+      .fs2 {
+        font-size: 24px;
+      }
+
+      .fs3 {
+        font-size: 20px;
+      }
+
+      .fs4 {
+        font-size: 18px;
+      }
+
+      .fs5 {
+        font-size: 16px;
+      }
+
+      .fs6 {
+        font-size: 11px;
+      }
+
+      .gestor-logo {
+        width: 208px;
+        height: 208px;
+      }
+
+      .gestor-logo div {
+        text-align: center;
+      }
+
+      .gestor-logo img {
+        width: 100%;
+        height: auto;
+      }
+
+      .gestor-logo .table {
+        height: 100%;
+      }
+
+      .gray {
+        color: #939598;
+      }
+
+      .lh1 {
+        line-height: 40px;
+      }
+
+      .lh2 {
+        line-height: 28px;
+      }
+
+      .lh3 {
+        line-height: 25px;
+      }
+
+      .lh4 {
+        line-height: 16px;
+      }
+
+      .logo-container .logo {
+        width: 430px;
+        height: 120px;
+      }
+
+      .logo-container img {
+        margin: auto;
+        width: auto;
+        height: 120px;
+      }
+
+      .mb10 {
+        margin-bottom: 10px;
+      }
+
+      .mt0 {
+        margin-top: 0;
+      }
+
+      .mt10 {
+        margin-top: 10px;
+      }
+
+      .new-page {
+        page-break-before: always;
+      }
+
+      p {
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-top: 0px;
+        margin-bottom: 0px;
+      }
+
+      .p0 {
+        padding: 0 !important;
+      }
+
+      .py10 {
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      .table {
+        display: flex;
+      }
+
+      .table .box {
+        border-right-width: 0;
+      }
+
+      .table .box:last-of-type {
+        border-right-width: 2px;
+      }
+
+      .table .td {
+        padding: 8px 0 7px 0;
+      }
+
+      .table.gap .box {
+        margin-bottom: 10px;
+        margin-right: 8px;
+        border-right-width: 2px;
+      }
+
+      .table.gap .box:last-of-type {
+        margin-right: 0;
+      }
+
+      .table.gap .nogap .box {
+        margin-top: 0;
+        margin-right: 0;
+        border-right-width: 0;
+      }
+
+      .table.gap .nogap .box:last-of-type {
+        border-right-width: 2px;
+      }
+
+      .table .key {
+        display: inline-block;
+        width: 250px;
+      }
+
+      .table0 .td:last-of-type {
+        width: 400px;
+      }
+    </style>
+  </head>
+
+  <body>
+    {% for x in times %}
+    <div>
+      <div class="table gap">
+        <div class="box td gestor-logo">
+          <div class="table align-center">
+            {% if gestor_carga_logo %}
+            <img src="{{gestor_carga_logo}}" />
+            {% else %}
+            <div class="center fs3 lh3 bold gray flex1">
+              LOGO
+              <div class="fs4">Gestora Carga</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="td flex1 p0">
+          <div class="table nogap table0">
+            <div class="box td flex1">
+              <p class="bold fs3 lh1 mb10">
+                {{gestor_carga_nombre}} - {{gestor_carga_numero_documento}}
+              </p>
+              <p class="fs5 lh3 mb10">
+                <span class="bold">Dirección: </span>{{gestor_carga_direccion}}
+              </p>
+            </div>
+            <div class="box td">
+              <p class="fs5 lh1">
+                <span class="bold">Fecha de impresión: </span>{{fecha}}
+              </p>
+            </div>
+          </div>
+          <div class="table nogap table0">
+            <div class="box td flex1">
+              <p class="fs4 lh3">
+                <span class="bold">Remitente: </span>{{remitente}}
+              </p>
+              <p class="fs4 lh3">
+                <span class="bold">Orden de carga Nro: </span>{{id}}
+              </p>
+              <p class="fs4 lh3">
+                <span class="bold">Flete Nro: </span>{{flete_id}}
+              </p>
+            </div>
+            <div class="box td">
+              <p class="fs5 lh3">
+                <span class="bold">Cantidad nominada: </span>
+                {{cantidad_nominada}}
+              </p>
+              <p class="fs5 lh3">
+                <span class="bold">Producto: </span> {{producto}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="table box">
+        <div class="flex1 td">
+          <p class="fs5 lh3"><span class="bold">Origen: </span>{{origen}}</p>
+          <p class="fs5 lh3">
+            <span class="bold">Ubicación: </span>{{origen_direccion}}
+          </p>
+        </div>
+        <div class="flex1 td">
+          <p class="fs5 lh3"><span class="bold">Destino: </span>{{destino}}</p>
+          <p class="fs5 lh3">
+            <span class="bold">Ubicación: </span>{{destino_direccion}}
+          </p>
+        </div>
+        <div class="flex1 td"></div>
+      </div>
+      <div class="table box mt10">
+        <div class="flex1 td">
+          <p class="fs4 lh3">
+            <span class="bold key">Placa del camión: </span>{{camion_placa}}
+          </p>
+          <p class="fs4 lh3">
+            <span class="bold key">Marca/Tipo: </span>{{camion_marca_tipo}}
+          </p>
+          <p class="fs4 lh3 mb10">
+            <span class="bold key">Color: </span>{{camion_color}}
+          </p>
+          <p class="fs4 lh3">
+            <span class="bold key">Propietario del camión: </span
+            >{{propietario_nombre}}
+          </p>
+          <p class="fs4 lh3 mb10">
+            <span class="bold key">Teléfono: </span>{{propietario_telefono}}
+          </p>
+          <p class="fs4 lh3">
+            <span class="bold key">Placa del Semirremolque: </span
+            >{{semi_placa}}
+          </p>
+          <p class="fs4 lh3">
+            <span class="bold key">Marca/Tipo: </span>{{semi_marca_tipo}}
+          </p>
+          <p class="fs4 lh3 mb10">
+            <span class="bold">Color: </span>{{semi_color}}
+          </p>
+          <p class="fs4 lh3">
+            <span class="bold key">Chofer: </span>{{chofer_nombre}}
+          </p>
+          <p class="fs4 lh3">
+            <span class="bold key">Cédula de Identidad: </span
+            >{{chofer_numero_documento}}
+          </p>
+          <p class="fs4 lh3">
+            <span class="bold key">Teléfono: </span>{{chofer_telefono}}
+          </p>
+        </div>
+        <div class="flex1 td camion-foto-container">
+          <div class="camion-foto box">
+            {% if camion_foto %}
+            <img src="{{camion_foto}}" />
+            {% else %}
+            <div class="center fs4 lh3 bold gray flex1">
+              Imagen
+              <div class="fs4">CAMIÓN</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="box mt10 py10">
+        <p class="fs4 lh3">
+          <span class="bold">Comentarios: </span>{{comentarios}}
+        </p>
+      </div>
+      <div class="box mt10 py10">
+        <p class="fs5 lh4">{{texto_legal}}</p>
+      </div>
+      <div class="firma-container">
+        <div class="firma">
+          <p class="bold fs5 lh3">Firma de la Transportadora</p>
+        </div>
+        <div class="firma">
+          <p class="bold fs5 lh3">Firma del Chofer</p>
+        </div>
+      </div>
+      <div class="logo-container table box align-center mt10">
+        <div class="logo">
+          <img src="{{logo}}" alt="iCargo" />
+        </div>
+        <p class="fs6 lh4 flex1">
+          iCargo es solo una Herramienta de Gestión y no constituye parte alguna
+          en la Cadena de Operaciones, limitándose su aporte solo al Registro,
+          Gestión y Publicación de la información que por ella se administra.
+          Las partes, Gestora de carga y Propietario, asumen total
+          responsabilidad por la Publicación de los Pedidos y por la Emisión de
+          las Ordenes de Carga que consideren apropiadas, dejando indemne a
+          iCargo de cualquier reclamo Judicial y/o Extra-Judicial en cualquier
+          litigio que pudiera surgir entre estas partes
+        </p>
+      </div>
+      {% if x == 0 %}
+      <div class="dashed"></div>
+      <div class="new-page"></div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </body>
+</html>

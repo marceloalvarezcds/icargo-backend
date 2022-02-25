@@ -1,16 +1,20 @@
 import os
+from datetime import datetime
 from typing import List, cast
 
 from fastapi import HTTPException
+from jinja2 import Template
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
+from pdfkit import from_string  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
-from app.config import REPORTS_FOLDER
+from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, STATICS_URL, templateEnv
 from app.enums import EstadoEnum
 from app.models import Flete, OrdenCarga, User
 from app.schemas.audit_database import AuditDatabase as A
+from app.utils import number_format
 
 from .audit_database import get_audit_list_by_orden_carga
 from .orden_carga_anticipo_saldo import get_orden_carga_by_id
@@ -91,6 +95,113 @@ def get_orden_carga_detail(
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     return get_orden_carga_with_resultado(db, obj, current_user)
+
+
+def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
+    obj = repositories.get_orden_carga_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Orden de Carga no encontrada")
+    gestor_carga = repositories.get_gestor_carga_by_id(db, obj.gestor_carga_id)
+    if not gestor_carga:
+        raise HTTPException(status_code=404, detail="Gestor no encontrado")
+    OUTPUT_FILENAME = f"orden_carga_{id}.pdf"
+    TEMPLATE_FILENAME = "pdf_orden_carga.html"
+    template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
+    data = {
+        "id": id,
+        "flete_id": obj.flete_id,
+        "remitente": f"{obj.flete.remitente_nombre} - {obj.flete.remitente.numero_documento}",
+        "cantidad_nominada": number_format(obj.cantidad_nominada),
+        "gestor_carga_direccion": gestor_carga.direccion,
+        "gestor_carga_logo": gestor_carga.logo,
+        "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_numero_documento": gestor_carga.numero_documento,
+        "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
+        "producto": obj.flete_producto_descripcion,
+        "origen": obj.origen_nombre,
+        "origen_direccion": obj.origen.direccion if obj.origen.direccion else "-",
+        "destino": obj.destino_nombre,
+        "destino_direccion": obj.destino.direccion if obj.destino.direccion else "-",
+        "propietario_nombre": obj.camion_propietario_nombre,
+        "propietario_telefono": obj.camion.propietario.telefono,
+        "chofer_nombre": obj.camion_chofer_nombre,
+        "chofer_numero_documento": obj.camion_chofer_numero_documento,
+        "chofer_telefono": obj.camion.chofer.telefono,
+        "camion_foto": obj.camion.foto,
+        "camion_placa": obj.camion_placa,
+        "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",
+        "camion_color": obj.camion.color.descripcion,
+        "semi_placa": obj.semi_placa,
+        "semi_marca_tipo": f"{obj.semi.marca_descripcion}/{obj.semi.tipo_descripcion}",
+        "semi_color": obj.semi.color.descripcion,
+        "comentarios": obj.comentarios if obj.comentarios else "-",
+        "texto_legal": obj.flete.emision_orden_texto_legal
+        if obj.flete.emision_orden_texto_legal
+        else "-",
+    }
+    source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
+    pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
+    from_string(source_html, pdf_filename, {"page-size": "Legal"})
+    return OUTPUT_FILENAME
+
+
+def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
+    obj = repositories.get_orden_carga_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Orden de Carga no encontrada")
+    gestor_carga = repositories.get_gestor_carga_by_id(db, obj.gestor_carga_id)
+    if not gestor_carga:
+        raise HTTPException(status_code=404, detail="Gestor no encontrado")
+    marca_agua_url = f"{STATICS_URL}/marca-de-agua.png"
+    OUTPUT_FILENAME = f"resumen_{id}.pdf"
+    TEMPLATE_FILENAME = "pdf_resumen.html"
+    template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
+    data = {
+        "id": id,
+        "flete_id": obj.flete_id,
+        "gestor_carga_direccion": gestor_carga.direccion,
+        "gestor_carga_logo": gestor_carga.logo,
+        "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_numero_documento": gestor_carga.numero_documento,
+        "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
+        "propietario_nombre": obj.camion_propietario_nombre,
+        "chofer_nombre": obj.camion_chofer_nombre,
+        "camion_placa": obj.camion_placa,
+        "semi_placa": obj.semi_placa,
+        "origen": obj.origen_nombre,
+        "origen_direccion": obj.origen.direccion if obj.origen.direccion else "-",
+        "destino": obj.destino_nombre,
+        "destino_direccion": obj.destino.direccion if obj.destino.direccion else "-",
+        "producto": obj.flete_producto_descripcion,
+        "tarifa_flete": number_format(obj.flete_tarifa),
+        "tasa": f"{obj.flete.condicion_propietario_moneda.simbolo}/{obj.flete.condicion_propietario_unidad.abreviatura}",  # noqa
+        "docs_origen": obj.remisiones,
+        "cantidad_origen": number_format(obj.cantidad_origen),
+        "docs_destino": obj.nro_tickets,
+        "cantidad_destino": number_format(obj.cantidad_destino),
+        "diferencia": number_format(obj.diferencia_origen_destino),
+        "tolerancia": number_format(obj.resultado_propietario_tolerancia_kg),
+        "merma": number_format(obj.resultado_propietario_merma),
+        "total_flete": number_format(obj.flete_proyectado),
+        "complementos": number_format(obj.resultado_propietario_total_complemento),
+        "descuentos": number_format(obj.resultado_propietario_total_descuento),
+        "merma_total": number_format(
+            obj.resultado_propietario_merma_valor_total_moneda_local
+        ),
+        "anticipo": number_format(obj.resultado_propietario_total_anticipos_retirados),
+        "saldo": number_format(
+            obj.resultado_propietario_saldo
+            + obj.resultado_propietario_total_anticipos_retirados
+        ),
+        "marca_agua_url": marca_agua_url,
+        "class_name": "marca-agua" if obj.estado == EstadoEnum.FINALIZADO.value else "",
+    }
+    source_html = template.render(logo=LOGO_IMAGE_URL, **data)
+    pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
+    from_string(
+        source_html, pdf_filename, {"page-size": "Legal", "orientation": "Landscape"}
+    )
+    return OUTPUT_FILENAME
 
 
 def change_orden_carga_anticipos_liberados(
