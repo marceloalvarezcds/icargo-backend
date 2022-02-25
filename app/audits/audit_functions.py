@@ -8,6 +8,12 @@ from .audit_database import AuditDatabase
 from .audit_mixin import AuditMixin
 
 
+def get(value):
+    if isinstance(value, list):
+        return value[0]
+    return value
+
+
 def serialize_value(value):
     if isinstance(value, datetime) or isinstance(value, date):
         return value.isoformat()
@@ -67,8 +73,8 @@ def create_audit_database_for_update(db_conn, target):
             continue
         if key not in changes:
             changes[key] = {}
-        changes[key]["old"] = serialize_value(hist.deleted)
-        changes[key]["new"] = serialize_value(value)
+        changes[key]["old"] = serialize_value(get(hist.deleted))
+        changes[key]["new"] = serialize_value(get(value))
     save_audit_database(
         db_conn,
         target.id,
