@@ -82,6 +82,24 @@ async def delete_orden_carga(
     return services.delete_orden_carga(db, id, current_user)
 
 
+@api.get("/{id}/pdf")
+def read_orden_carga_pdf_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_orden_carga_pdf_by_id(db, id)
+
+
+@api.get("/{id}/pdf/resumen")
+def read_orden_carga_resumen_pdf_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_orden_carga_resumen_pdf_by_id(db, id)
+
+
 @api.get("/{id}/aceptar", response_model=schemas.OrdenCarga)
 def aceptar_orden_carga_by_id(
     id: int,

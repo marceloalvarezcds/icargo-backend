@@ -84,35 +84,67 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
 
     @hybrid_property
     def insumo_id(self):
-        return self.insumo_punto_venta_precio.insumo_id
+        return (
+            self.insumo_punto_venta_precio.insumo_id
+            if self.insumo_punto_venta_precio
+            else None
+        )
 
     @hybrid_property
     def insumo_descripcion(self):
-        return self.insumo_punto_venta_precio.insumo_descripcion
+        return (
+            self.insumo_punto_venta_precio.insumo_descripcion
+            if self.insumo_punto_venta_precio
+            else None
+        )
 
     @hybrid_property
     def insumo_fecha_precio(self):
-        return self.insumo_punto_venta_precio.fecha_precio
+        return (
+            self.insumo_punto_venta_precio.fecha_precio
+            if self.insumo_punto_venta_precio
+            else None
+        )
 
     @hybrid_property
     def insumo_moneda_nombre(self):
-        return self.insumo_punto_venta_precio.moneda_nombre
+        return (
+            self.insumo_punto_venta_precio.moneda_nombre
+            if self.insumo_punto_venta_precio
+            else None
+        )
 
     @hybrid_property
     def insumo_precio(self):
-        return self.insumo_punto_venta_precio.precio
+        return (
+            self.insumo_punto_venta_precio.precio
+            if self.insumo_punto_venta_precio
+            else None
+        )
 
     @hybrid_property
     def insumo_tipo_descripcion(self):
-        return self.insumo_punto_venta_precio.insumo_tipo_descripcion
+        return (
+            self.insumo_punto_venta_precio.insumo_tipo_descripcion
+            if self.insumo_punto_venta_precio
+            else None
+        )
 
     @hybrid_property
     def insumo_unidad_abreviatura(self):
-        return self.insumo_punto_venta_precio.insumo_unidad_abreviatura
+        return (
+            self.insumo_punto_venta_precio.insumo_unidad_abreviatura
+            if self.insumo_punto_venta_precio
+            else None
+        )
 
     @hybrid_property
     def insumo_unidad_descripcion(self):
-        return self.insumo_punto_venta_precio.insumo_unidad_descripcion
+        return (
+            self.insumo_punto_venta_precio.insumo_unidad_descripcion
+            if self.insumo_punto_venta_precio
+            else None
+        )
 
     @hybrid_property
     def moneda_nombre(self):
@@ -156,8 +188,8 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
 
     @hybrid_property
     def unidad_abreviatura(self):
-        return self.unidad.abreviatura
+        return self.unidad.abreviatura if self.unidad else None
 
     @hybrid_property
     def unidad_descripcion(self):
-        return self.unidad.descripcion
+        return self.unidad.descripcion if self.unidad else None

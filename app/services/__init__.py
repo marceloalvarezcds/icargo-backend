@@ -103,7 +103,9 @@ from .orden_carga import (  # noqa
     finalizar_orden_carga,
     get_orden_carga_by_id,
     get_orden_carga_detail,
+    get_orden_carga_pdf_by_id,
     get_orden_carga_reports,
+    get_orden_carga_resumen_pdf_by_id,
     liquidar_orden_carga,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
@@ -111,6 +113,7 @@ from .orden_carga_anticipo_retirado import (  # noqa
     delete_orden_carga_anticipo_retirado,
     edit_orden_carga_anticipo_retirado,
     get_orden_carga_anticipo_retirado_by_id,
+    get_orden_carga_anticipo_retirado_pdf_by_id,
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id,

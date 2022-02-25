@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from pydantic import BaseModel
 
@@ -109,6 +109,12 @@ class OrdenCarga(OrdenCargaForm):
     class Config:
         orm_mode = True
         use_enum_values = True
+
+    @classmethod
+    def from_orm(cls, obj: Any) -> "OrdenCarga":
+        obj.auditorias = []
+        obj.remisiones_resultado = []
+        return super().from_orm(obj)
 
 
 class OrdenCargaList(OrdenCargaForm):

@@ -1,5 +1,3 @@
-from asyncio.log import logger
-from datetime import timedelta
 from typing import List
 
 from sqlalchemy.orm import Session  # type: ignore
@@ -37,9 +35,7 @@ def get_audit_list_by_orden_carga(
             orden_carga_remision_origen_ids = [
                 x.id for x in orden_carga.remisiones_origen
             ]
-            start_date = finalizado.created_at - timedelta(seconds=2)
-            logger.info(f"finalizado.created_at = {finalizado.created_at}")
-            logger.info(f"start_date = {start_date}")
+            start_date = finalizado.created_at
             conditions = [
                 and_(
                     A.table_name == m.ORDEN_CARGA.value,
