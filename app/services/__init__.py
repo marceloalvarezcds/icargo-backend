@@ -1,5 +1,21 @@
 # should be imported to help code editor (vscode) for autocompletion
 from .auth import get_user_from_request, login  # noqa
+from .banco import (  # noqa
+    create_banco,
+    delete_banco,
+    edit_banco,
+    get_banco_by_id,
+    get_banco_list,
+    get_banco_reports,
+)
+from .caja import (  # noqa
+    create_caja,
+    delete_caja,
+    edit_caja,
+    get_caja_by_id,
+    get_caja_list,
+    get_caja_reports,
+)
 from .camion import (  # noqa
     change_camion_status,
     create_camion,

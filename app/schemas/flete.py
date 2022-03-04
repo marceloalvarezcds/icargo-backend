@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -124,6 +124,11 @@ class Flete(FleteFormBaseModel):
     class Config:
         orm_mode = True
         use_enum_values = True
+
+    @classmethod
+    def from_orm(cls, obj: Any) -> "Flete":
+        obj.destinatarios = []
+        return super().from_orm(obj)
 
 
 class FleteList(FleteFormBaseModel):

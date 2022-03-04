@@ -10,7 +10,7 @@ from .audit_mixin import AuditMixin
 
 def get(value):
     if isinstance(value, list):
-        return value[0]
+        return value[0] if len(value) > 0 else value
     return value
 
 

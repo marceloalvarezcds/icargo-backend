@@ -36,3 +36,6 @@ class FleteComplemento(FleteComplementoForm):
     remitente_moneda_nombre: Optional[str] = None
     # FIN Monto a cobrar al Remitente
     flete_id: int
+
+    class Config:
+        orm_mode = True
