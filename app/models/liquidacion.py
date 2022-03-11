@@ -1,0 +1,60 @@
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String  # type: ignore
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
+from sqlalchemy.orm import relationship  # type: ignore
+
+from app.audits.audit_mixin import AuditMixin
+from app.database.base import Base
+from app.enums.estado import EstadoEnum
+
+from .moneda import Moneda
+from .tipo_contraparte import TipoContraparte
+
+
+class Liquidacion(AuditMixin, Base):
+    """
+    Defines the liquidacion model
+    """
+
+    id = Column(Integer, primary_key=True)
+    tipo_contraparte_id = Column(Integer, ForeignKey("tipo_contraparte.id"))
+    tipo_contraparte = relationship(TipoContraparte, uselist=False)
+    contraparte = Column(String(255))
+    contraparte_numero_documento = Column(String(255))
+    fecha_pago_cobro = Column(DateTime)
+    estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
+    moneda_id = Column(Integer, ForeignKey("moneda.id"))
+    moneda = relationship(Moneda, uselist=False)
+    movimientos = relationship("Movimiento", back_populates="liquidacion")
+    instrumentos = relationship("Instrumento", back_populates="liquidacion")
+
+    @hybrid_property
+    def es_cobro(self):
+        return self.movimientos_saldo > 0
+
+    @hybrid_property
+    def instrumentos_saldo(self):
+        return sum(x.saldo_total for x in self.instrumentos)
+
+    @hybrid_property
+    def moneda_nombre(self):
+        return self.moneda.nombre
+
+    @hybrid_property
+    def moneda_simbolo(self):
+        return self.moneda.simbolo
+
+    @hybrid_property
+    def movimientos_saldo(self):
+        return sum(x.saldo for x in self.movimientos)
+
+    @hybrid_property
+    def tipo_contraparte_descripcion(self):
+        return self.tipo_contraparte.descripcion
+
+    @hybrid_property
+    def tipo_operacion_descripcion(self):
+        return "Cobro" if self.es_cobro else "Pago"
+
+    @hybrid_property
+    def url(self):
+        return ""

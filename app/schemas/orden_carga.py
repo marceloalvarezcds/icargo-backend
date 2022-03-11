@@ -10,6 +10,7 @@ from .audit_database import AuditDatabase
 from .centro_operativo import CentroOperativo
 from .date_model import Date
 from .flete_anticipo import FleteAnticipo
+from .movimiento import Movimiento
 from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 from .orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from .orden_carga_complemento import OrdenCargaComplemento
@@ -92,6 +93,7 @@ class OrdenCarga(OrdenCargaForm):
     historial: List[OrdenCargaEstadoHistorial]
     saldos: List[OrdenCargaAnticipoSaldo]
     anticipos: List[OrdenCargaAnticipoRetirado]
+    movimientos: List[Movimiento]
     flete_anticipos: List[FleteAnticipo]
     complementos: List[OrdenCargaComplemento]
     descuentos: List[OrdenCargaDescuento]

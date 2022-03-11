@@ -186,6 +186,17 @@ from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  
 from .marca_camion import get_marca_camion_by_descripcion, get_marca_camion_list  # noqa
 from .marca_semi import get_marca_semi_by_descripcion, get_marca_semi_list  # noqa
 from .moneda import get_moneda_by_simbolo, get_moneda_list  # noqa
+from .movimiento import (  # noqa
+    change_movimiento_status,
+    create_movimiento,
+    delete_movimiento,
+    edit_movimiento,
+    get_movimiento_by_id,
+    get_movimiento_list,
+    get_movimiento_list_by_contraparte,
+    get_movimiento_list_by_gestor_carga_id,
+    get_movimiento_list_by_orden_carga_id,
+)
 from .orden_carga import (  # noqa
     aceptar_orden_carga,
     arribado_a_cargar_orden_carga,
@@ -352,11 +363,24 @@ from .tipo_concepto_descuento import (  # noqa
     get_tipo_concepto_descuento_by_descripcion,
     get_tipo_concepto_descuento_list,
 )
+from .tipo_contraparte import (  # noqa
+    get_tipo_contraparte_by_descripcion,
+    get_tipo_contraparte_list,
+)
+from .tipo_cuenta import get_tipo_cuenta_by_descripcion, get_tipo_cuenta_list  # noqa
 from .tipo_documento import (  # noqa
     get_tipo_documento_by_descripcion,
     get_tipo_documento_list,
 )
+from .tipo_documento_relacionado import (  # noqa
+    get_tipo_documento_relacionado_by_descripcion,
+    get_tipo_documento_relacionado_list,
+)
 from .tipo_insumo import get_tipo_insumo_by_descripcion, get_tipo_insumo_list  # noqa
+from .tipo_movimiento import (  # noqa
+    get_tipo_movimiento_by_descripcion,
+    get_tipo_movimiento_list,
+)
 from .tipo_persona import get_tipo_persona_by_descripcion, get_tipo_persona_list  # noqa
 from .tipo_registro import (  # noqa
     get_tipo_registro_by_descripcion,

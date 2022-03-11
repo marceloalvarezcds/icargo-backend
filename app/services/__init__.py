@@ -103,6 +103,16 @@ from .insumo_punto_venta import (  # noqa
 from .insumo_punto_venta_precio import (  # noqa
     get_insumo_punto_venta_precio_by_insumo_id_and_moneda_id_and_punto_venta_id,
 )
+from .movimiento import (  # noqa
+    create_movimiento,
+    create_movimiento_by_anticipo,
+    create_movimiento_by_conciliacion_oc,
+    delete_movimiento,
+    edit_movimiento,
+    get_movimiento_by_id,
+    get_movimiento_list,
+    get_movimiento_reports,
+)
 from .orden_carga import (  # noqa
     aceptar_orden_carga,
     arribado_a_cargar_orden_carga,

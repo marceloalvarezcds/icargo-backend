@@ -26,6 +26,10 @@ class OrdenCargaRemisionDestino(OrdenCargaRemisionMixin, Base):
     destino = relationship(CentroOperativo, uselist=False)
 
     @hybrid_property
+    def cantidad_kg(self):
+        return self.cantidad * self.unidad.conversion_kg
+
+    @hybrid_property
     def destino_nombre(self):
         return self.destino.nombre
 

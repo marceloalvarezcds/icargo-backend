@@ -17,6 +17,7 @@ from app.schemas.audit_database import AuditDatabase as A
 from app.utils import number_format
 
 from .audit_database import get_audit_list_by_orden_carga
+from .movimiento import create_movimiento_by_conciliacion_oc
 from .orden_carga_anticipo_saldo import get_orden_carga_by_id
 from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete
@@ -174,7 +175,7 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
         "destino_direccion": obj.destino.direccion if obj.destino.direccion else "-",
         "producto": obj.flete_producto_descripcion,
         "tarifa_flete": number_format(obj.flete_tarifa),
-        "tasa": f"{obj.flete.condicion_propietario_moneda.simbolo}/{obj.flete.condicion_propietario_unidad.abreviatura}",  # noqa
+        "tasa": f"{obj.flete_tarifa_unidad}",  # noqa
         "docs_origen": obj.remisiones,
         "cantidad_origen": number_format(obj.cantidad_origen),
         "docs_destino": obj.nro_tickets,
@@ -239,6 +240,9 @@ def conciliar_orden_carga(
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.conciliar_orden_carga(obj, db, current_user.username)
+    create_movimiento_by_conciliacion_oc(
+        db, obj, current_user.gestor_carga_id, current_user.username
+    )
     return get_orden_carga_with_resultado(db, model, current_user)
 
 

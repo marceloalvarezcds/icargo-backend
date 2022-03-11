@@ -11,6 +11,7 @@ from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
 from app.models import OrdenCargaAnticipoRetirado
 from app.utils import number_format
 
+from .movimiento import create_movimiento_by_anticipo
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
 
 
@@ -32,11 +33,15 @@ def create_orden_carga_anticipo_retirado(
             detail=f"El Anticipo con comporbante {data.numero_comprobante} ya existe",
         )
     update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
-    return repositories.create_orden_carga_anticipo_retirado(
+    anticipo = repositories.create_orden_carga_anticipo_retirado(
         db,
         data,
         modified_by,
     )
+    create_movimiento_by_anticipo(
+        db, anticipo, anticipo.orden_carga.gestor_carga_id, modified_by
+    )
+    return anticipo
 
 
 def get_orden_carga_anticipo_retirado_by_id(

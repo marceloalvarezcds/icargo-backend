@@ -44,7 +44,7 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
                 ),
                 total_complemento=orden_carga.resultado_propietario_total_complemento,
                 total_descuento=orden_carga.resultado_propietario_total_descuento,
-                total_anticipo=orden_carga.flete_limite_credito,
+                total_anticipo=orden_carga.resultado_propietario_total_anticipos_retirados,
                 saldo=orden_carga.resultado_propietario_saldo,
             )
         )

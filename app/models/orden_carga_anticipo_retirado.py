@@ -12,6 +12,7 @@ from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
+from app.utils import number_format
 
 from .flete_anticipo import FleteAnticipo
 from .insumo_punto_venta_precio import InsumoPuntoVentaPrecio
@@ -69,6 +70,10 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     @hybrid_property
     def concepto(self):
         return self.flete_anticipo.concepto
+
+    @hybrid_property
+    def detalle(self):
+        return f"PDV: {self.concepto} || Monto: {number_format(self.monto_retirado)}{self.moneda_simbolo} || Fecha: {self.created_at.strftime('%Y-%m-%d / %H:%M:%S')}"  # noqa
 
     @hybrid_property
     def gestor_carga_id(self):
@@ -149,6 +154,10 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     @hybrid_property
     def moneda_nombre(self):
         return self.moneda.nombre
+
+    @hybrid_property
+    def moneda_simbolo(self):
+        return self.moneda.simbolo
 
     @hybrid_property
     def proveedor_id(self):

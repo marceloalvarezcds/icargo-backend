@@ -35,7 +35,7 @@ class Banco(AuditMixin, Base):
     debito = Column(Numeric(38, 10))
     saldo_confirmado = Column(Numeric(38, 10))
     saldo_provisional = Column(Numeric(38, 10))
-    # instrumentos = relationship("Instrumento", back_populates="banco")
+    instrumentos = relationship("Instrumento", back_populates="banco")
 
     @hybrid_property
     def moneda_nombre(self):
