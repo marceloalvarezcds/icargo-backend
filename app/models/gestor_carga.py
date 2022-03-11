@@ -67,6 +67,10 @@ class GestorCarga(AuditMixin, Base):
         return self.moneda.nombre
 
     @hybrid_property
+    def moneda_simbolo(self):
+        return self.moneda.simbolo
+
+    @hybrid_property
     def ciudad_nombre(self):
         return self.ciudad.nombre
 

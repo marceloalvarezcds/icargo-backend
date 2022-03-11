@@ -60,3 +60,7 @@ class RemitenteList(RemitenteBase):
 class Remitente(RemitenteBase):
     contactos: List[RemitenteContactoGestorCargaList] = []
     gestor_carga_remitente: Optional[GestorCargaRemitente] = None
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True

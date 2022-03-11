@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 
 from app.endpoints import (
+    banco,
+    caja,
     camion,
     camion_semi_neto,
     cargo,
@@ -24,6 +26,7 @@ from app.endpoints import (
     marca_camion,
     marca_semi,
     moneda,
+    movimiento,
     orden_carga,
     orden_carga_anticipo_retirado,
     orden_carga_anticipo_saldo,
@@ -57,6 +60,8 @@ from app.endpoints import (
 
 api = APIRouter()
 
+api.include_router(banco.api, prefix="/banco", tags=["banco"])
+api.include_router(caja.api, prefix="/caja", tags=["caja"])
 api.include_router(camion.api, prefix="/camion", tags=["camion"])
 api.include_router(
     camion_semi_neto.api, prefix="/camion_semi_neto", tags=["camion_semi_neto"]
@@ -108,6 +113,7 @@ api.include_router(login.api, prefix="/login", tags=["login"])
 api.include_router(marca_camion.api, prefix="/marca_camion", tags=["marca_camion"])
 api.include_router(marca_semi.api, prefix="/marca_semi", tags=["marca_semi"])
 api.include_router(moneda.api, prefix="/moneda", tags=["moneda"])
+api.include_router(movimiento.api, prefix="/movimiento", tags=["movimiento"])
 api.include_router(orden_carga.api, prefix="/orden_carga", tags=["orden_carga"])
 api.include_router(
     orden_carga_anticipo_retirado.api,

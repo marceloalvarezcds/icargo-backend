@@ -18,6 +18,9 @@ from .tipo_carga_seeds import tipo_carga_seeds
 from .tipo_comprobante_seeds import tipo_comprobante_seeds
 from .tipo_concepto_complemento_seeds import tipo_concepto_complemento_seeds
 from .tipo_concepto_descuento_seeds import tipo_concepto_descuento_seeds
+from .tipo_contraparte_seeds import tipo_contraparte_seeds
+from .tipo_documento_relacionado_seeds import tipo_documento_relacionado_seeds
+from .tipo_instrumento_seeds import tipo_instrumento_seeds
 from .tipo_insumo_seeds import tipo_insumo_seeds
 from .tipo_persona_seeds import tipo_persona_seeds
 from .tipo_registro_seeds import tipo_registro_seeds
@@ -42,6 +45,9 @@ def seeds(db: Session):
     tipo_comprobante_seeds(db)
     tipo_concepto_complemento_seeds(db)
     tipo_concepto_descuento_seeds(db)
+    tipo_contraparte_seeds(db)
+    tipo_documento_relacionado_seeds(db)
+    tipo_instrumento_seeds(db)
     tipo_insumo_seeds(db)
     tipo_persona_seeds(db)
     tipo_registro_seeds(db)

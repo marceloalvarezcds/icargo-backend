@@ -1,5 +1,6 @@
 from .admin_icargo_permiso_seeds import admin_icargo_permiso_seeds  # noqa
 from .entities_permiso_seeds import entities_permiso_seeds  # noqa
+from .estado_cuenta_permiso_seeds import estado_cuenta_permiso_seeds  # noqa
 from .flete_permiso_seeds import flete_admin_permiso_seeds, flete_permiso_seeds  # noqa
 from .flota_permiso_seeds import flota_admin_permiso_seeds, flota_permiso_seeds  # noqa
 from .orden_carga_permiso_seeds import (  # noqa

@@ -10,7 +10,6 @@ from app import repositories, schemas
 from app.config import REPORTS_FOLDER
 from app.enums import EstadoEnum
 from app.models import Flete
-from app.utils.meta_inspect import get_dict
 
 from .flete_anticipo import update_flete_anticipo_list
 from .flete_complemento import update_flete_complemento_list
@@ -22,9 +21,9 @@ from .flete_destinatario import (
 
 
 def get_flete_detail(model: Flete) -> schemas.Flete:
-    obj_dict = get_dict(model, ignore_keys=["flete"], for_json=False)
-    obj_dict["destinatarios"] = get_destinatario_selected_list_by_flete(model)
-    return schemas.Flete.parse_obj(obj_dict)
+    obj = schemas.Flete.from_orm(model)
+    obj.destinatarios = get_destinatario_selected_list_by_flete(model)
+    return obj
 
 
 def create_flete(

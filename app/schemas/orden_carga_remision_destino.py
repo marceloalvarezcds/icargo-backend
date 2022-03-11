@@ -18,6 +18,7 @@ class OrdenCargaRemisionDestinoForm(BaseModel):
 
 class OrdenCargaRemisionDestino(OrdenCargaRemisionDestinoForm):
     id: int
+    cantidad_kg: Decimal
     unidad_abreviatura: str
     unidad_descripcion: str
     destino_nombre: Optional[str] = None

@@ -22,6 +22,10 @@ class OrdenCargaRemisionOrigen(OrdenCargaRemisionMixin, Base):
     unidad = relationship(Unidad, uselist=False)
 
     @hybrid_property
+    def cantidad_kg(self):
+        return self.cantidad * self.unidad.conversion_kg
+
+    @hybrid_property
     def gestor_carga_moneda_nombre(self):
         return self.orden_carga.gestor_carga_moneda_nombre
 

@@ -40,3 +40,6 @@ class FleteDescuento(FleteDescuentoForm):
     proveedor_nombre: Optional[str] = None
     # FIN Monto a pagar al Proveedor
     flete_id: int
+
+    class Config:
+        orm_mode = True

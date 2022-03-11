@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import List
+from typing import List, Union
 
 from sqlalchemy import (  # type: ignore
     Boolean,
@@ -22,13 +22,15 @@ from app.schemas import (
     OrdenCargaComplemento,
     OrdenCargaDescuento,
     OrdenCargaEstadoHistorial,
+    OrdenCargaRemisionDestino,
+    OrdenCargaRemisionOrigen,
 )
+from app.utils import number_format
 
 from .camion import Camion
 from .centro_operativo import CentroOperativo
 from .flete import Flete
 from .gestor_carga import GestorCarga
-from .orden_carga_remision_mixin import OrdenCargaRemisionMixin
 from .semi import Semi
 
 
@@ -57,6 +59,7 @@ class OrdenCarga(AuditMixin, Base):
     # Relaciones Listas
     historial = relationship("OrdenCargaEstadoHistorial", back_populates="orden_carga")
     anticipos = relationship("OrdenCargaAnticipoRetirado", back_populates="orden_carga")
+    movimientos = relationship("Movimiento", back_populates="orden_carga")
     complementos = relationship("OrdenCargaComplemento", back_populates="orden_carga")
     descuentos = relationship("OrdenCargaDescuento", back_populates="orden_carga")
     saldos = relationship("OrdenCargaAnticipoSaldo", back_populates="orden_carga")
@@ -89,11 +92,11 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def cantidad_destino(self):
-        return self.get_remision_cantidad_total(self.remisiones_destino)
+        return self.get_remision_cantidad_total_kg(self.remisiones_destino)
 
     @hybrid_property
     def cantidad_origen(self):
-        return self.get_remision_cantidad_total(self.remisiones_origen)
+        return self.get_remision_cantidad_total_kg(self.remisiones_origen)
 
     @hybrid_property
     def destino_nombre(self):
@@ -124,6 +127,10 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_destino_nombre(self):
         return self.flete.destino_nombre
+
+    @hybrid_property
+    def flete_gestor_carga_detalle(self):
+        return f"P.Dest.: {number_format(self.cantidad_destino)}Kg || Tarifa: {number_format(self.flete_tarifa_gestor_carga)}{self.flete_tarifa_unidad_gestor_carga}."  # noqa
 
     @hybrid_property
     def flete_gestor_carga_id(self):
@@ -158,6 +165,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.flete.producto_descripcion
 
     @hybrid_property
+    def flete_propietario_detalle(self):
+        return f"P.Dest.: {number_format(self.cantidad_destino)}Kg || Tarifa: {number_format(self.flete_tarifa)}{self.flete_tarifa_unidad}."  # noqa
+
+    @hybrid_property
     def flete_proyectado(self):
         return self.flete_tarifa * self.cantidad_nominada
 
@@ -174,6 +185,18 @@ class OrdenCarga(AuditMixin, Base):
         return self.flete.condicion_propietario_tarifa
 
     @hybrid_property
+    def flete_tarifa_gestor_carga(self):
+        return self.flete.condicion_gestor_cuenta_tarifa
+
+    @hybrid_property
+    def flete_tarifa_unidad(self):
+        return f"{self.flete.condicion_propietario_moneda.simbolo}/{self.flete.condicion_propietario_unidad.abreviatura}"  # noqa
+
+    @hybrid_property
+    def flete_tarifa_unidad_gestor_carga(self):
+        return f"{self.flete.condicion_gestor_cuenta_moneda.simbolo}/{self.flete.condicion_gestor_cuenta_unidad.abreviatura}"  # noqa
+
+    @hybrid_property
     def flete_tipo(self):
         return self.flete.tipo_flete
 
@@ -184,6 +207,10 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def gestor_carga_moneda_nombre(self):
         return self.gestor_carga.moneda_nombre
+
+    @hybrid_property
+    def gestor_carga_moneda_simbolo(self):
+        return self.gestor_carga.moneda_simbolo
 
     @hybrid_property
     def is_aceptado(self):
@@ -212,6 +239,14 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def is_liquidado(self):
         return self.find_estado_in_historial(EstadoEnum.LIQUIDADO)
+
+    @hybrid_property
+    def merma_gestor_carga_detalle(self):
+        return f"Dif.: {number_format(self.diferencia_origen_destino)}Kg || Tol.: {number_format(self.resultado_gestor_carga_tolerancia_kg)}Kg || M.: {number_format(self.resultado_gestor_carga_merma)}Kg || Tarifa: {number_format(self.resultado_gestor_carga_merma_valor)}Grs/Kg."  # noqa
+
+    @hybrid_property
+    def merma_propietario_detalle(self):
+        return f"Dif.: {number_format(self.diferencia_origen_destino)}Kg || Tol.: {number_format(self.resultado_propietario_tolerancia_kg)}Kg || M.: {number_format(self.resultado_propietario_merma)}Kg || Tarifa: {number_format(self.resultado_propietario_merma_valor)}Grs/Kg."  # noqa
 
     @hybrid_property
     def nro_tickets(self):
@@ -279,7 +314,7 @@ class OrdenCarga(AuditMixin, Base):
         return (
             (self.resultado_gestor_carga_merma_tolerancia / 100) * self.cantidad_origen
             if self.flete.merma_gestor_cuenta_es_porcentual
-            else self.resultado_gestor_carga_merma_tolerancia
+            else self.flete.merma_gestor_cuenta_tolerancia_kg
         )
 
     @hybrid_property
@@ -308,15 +343,10 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_propietario_merma(self):
-        return (
-            (self.diferencia_origen_destino - self.resultado_propietario_tolerancia_kg)
-            if (
-                self.diferencia_origen_destino
-                - self.resultado_propietario_tolerancia_kg
-            )
-            > 0
-            else 0
+        merma = (
+            self.diferencia_origen_destino - self.resultado_propietario_tolerancia_kg
         )
+        return merma if merma > 0 else 0
 
     @hybrid_property
     def resultado_propietario_saldo(self):
@@ -341,7 +371,7 @@ class OrdenCarga(AuditMixin, Base):
         return (
             (self.resultado_propietario_merma_tolerancia / 100) * self.cantidad_origen
             if self.flete.merma_propietario_es_porcentual
-            else self.resultado_propietario_merma_tolerancia
+            else self.flete.merma_propietario_tolerancia_kg
         )
 
     @hybrid_property
@@ -376,13 +406,13 @@ class OrdenCarga(AuditMixin, Base):
 
     # FIN RESULTADO
 
-    def get_remision_cantidad_total(
+    def get_remision_cantidad_total_kg(
         self,
-        remisiones: List[OrdenCargaRemisionMixin],
+        remisiones: List[Union[OrdenCargaRemisionDestino, OrdenCargaRemisionOrigen]],
     ) -> Decimal:
         total = Decimal(0)
         for remision in remisiones:
-            total += remision.cantidad
+            total += remision.cantidad_kg
         return total
 
     def find_estado_in_historial(self, estado: EstadoEnum) -> bool:

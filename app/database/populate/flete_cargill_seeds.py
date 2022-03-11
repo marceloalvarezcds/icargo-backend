@@ -63,7 +63,6 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
     sistema = get_tipo_concepto_descuento_by_descripcion(db, "Sistema")
     seguro = get_tipo_concepto_descuento_by_descripcion(db, "Seguro")
 
-    toneladas = get_unidad_by_descripcion(db, "Toneladas")
     kilogramos = get_unidad_by_descripcion(db, "Kilogramos")
 
     if (
@@ -88,7 +87,6 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
         and expurgo
         and sistema
         and seguro
-        and toneladas
         and kilogramos
     ):
         destino15_contacto: CentroOperativoContactoGestorCarga = destino15.contactos[0]
@@ -118,32 +116,32 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     distancia=Decimal(500),
                     # FIN Tramo de Fletes
                     # INICIO Cantidad y Flete
-                    condicion_cantidad=Decimal(500),
+                    condicion_cantidad=Decimal(100000),
                     # inicio - Condiciones para el Gestor de Cuenta
                     condicion_gestor_cuenta_moneda_id=pyg.id,
-                    condicion_gestor_cuenta_tarifa=Decimal(500),
-                    condicion_gestor_cuenta_unidad_id=toneladas.id,
+                    condicion_gestor_cuenta_tarifa=Decimal(150),
+                    condicion_gestor_cuenta_unidad_id=kilogramos.id,
                     # fin - Condiciones para el Gestor de Cuenta
                     # inicio - Condiciones para el Propietario
                     condicion_propietario_moneda_id=pyg.id,
-                    condicion_propietario_tarifa=Decimal(500),
-                    condicion_propietario_unidad_id=toneladas.id,
+                    condicion_propietario_tarifa=Decimal(120),
+                    condicion_propietario_unidad_id=kilogramos.id,
                     # fin - Condiciones para el Propietario
                     # FIN Cantidad y Flete
                     # INICIO Mermas de Fletes
                     # inicio - Mermas para el Gestor de Cuenta
                     merma_gestor_cuenta_valor=Decimal(500),
                     merma_gestor_cuenta_moneda_id=pyg.id,
-                    merma_gestor_cuenta_unidad_id=toneladas.id,
-                    merma_gestor_cuenta_es_porcentual=False,
-                    merma_gestor_cuenta_tolerancia=Decimal(500),
+                    merma_gestor_cuenta_unidad_id=kilogramos.id,
+                    merma_gestor_cuenta_es_porcentual=True,
+                    merma_gestor_cuenta_tolerancia=Decimal(15),
                     # fin - Mermas para el Gestor de Cuenta
                     # inicio - Mermas para el Propietario
                     merma_propietario_valor=Decimal(500),
                     merma_propietario_moneda_id=pyg.id,
-                    merma_propietario_unidad_id=toneladas.id,
-                    merma_propietario_es_porcentual=False,
-                    merma_propietario_tolerancia=Decimal(500),
+                    merma_propietario_unidad_id=kilogramos.id,
+                    merma_propietario_es_porcentual=True,
+                    merma_propietario_tolerancia=Decimal(12),
                     # fin - Mermas para el Propietario
                     # FIN Mermas de Fletes
                     # INICIO Emisión de Órdenes
@@ -192,11 +190,11 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             habilitar_cobro_remitente=True,
                             anticipado=True,
                             # INICIO Monto a pagar al Propietario
-                            propietario_monto=Decimal(100),
+                            propietario_monto=Decimal(10000),
                             propietario_moneda_id=pyg.id,
                             # FIN Monto a pagar al Propietario
                             # INICIO Monto a cobrar al Remitente
-                            remitente_monto=Decimal(100),
+                            remitente_monto=Decimal(12000),
                             remitente_moneda_id=pyg.id,
                         )
                     ],
@@ -205,13 +203,13 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             concepto_id=sistema.id,
                             detalle="Flete Descuento Detalle",
                             habilitar_pago_proveedor=True,
-                            anticipado=True,
+                            anticipado=False,
                             # INICIO Monto a cobrar al Propietario
-                            propietario_monto=Decimal(100),
+                            propietario_monto=Decimal(1000),
                             propietario_moneda_id=pyg.id,
                             # FIN Monto a cobrar al Propietario
                             # INICIO Monto a pagar al Proveedor
-                            proveedor_monto=Decimal(100),
+                            proveedor_monto=Decimal(1000),
                             proveedor_moneda_id=pyg.id,
                             proveedor_id=1,
                         ),
@@ -219,13 +217,13 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             concepto_id=seguro.id,
                             detalle="Flete Descuento Detalle",
                             habilitar_pago_proveedor=True,
-                            anticipado=True,
+                            anticipado=False,
                             # INICIO Monto a cobrar al Propietario
-                            propietario_monto=Decimal(100),
+                            propietario_monto=Decimal(5000),
                             propietario_moneda_id=pyg.id,
                             # FIN Monto a cobrar al Propietario
                             # INICIO Monto a pagar al Proveedor
-                            proveedor_monto=Decimal(100),
+                            proveedor_monto=Decimal(5000),
                             proveedor_moneda_id=pyg.id,
                             proveedor_id=1,
                         ),
@@ -252,7 +250,7 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     distancia=Decimal(500),
                     # FIN Tramo de Fletes
                     # INICIO Cantidad y Flete
-                    condicion_cantidad=Decimal(500),
+                    condicion_cantidad=Decimal(100000),
                     # inicio - Condiciones para el Gestor de Cuenta
                     condicion_gestor_cuenta_moneda_id=bop.id,
                     condicion_gestor_cuenta_tarifa=Decimal(500),
@@ -260,24 +258,24 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # fin - Condiciones para el Gestor de Cuenta
                     # inicio - Condiciones para el Propietario
                     condicion_propietario_moneda_id=bop.id,
-                    condicion_propietario_tarifa=Decimal(500),
+                    condicion_propietario_tarifa=Decimal(450),
                     condicion_propietario_unidad_id=kilogramos.id,
                     # fin - Condiciones para el Propietario
                     # FIN Cantidad y Flete
                     # INICIO Mermas de Fletes
                     # inicio - Mermas para el Gestor de Cuenta
-                    merma_gestor_cuenta_valor=Decimal(500),
+                    merma_gestor_cuenta_valor=Decimal(700),
                     merma_gestor_cuenta_moneda_id=bop.id,
                     merma_gestor_cuenta_unidad_id=kilogramos.id,
                     merma_gestor_cuenta_es_porcentual=False,
-                    merma_gestor_cuenta_tolerancia=Decimal(500),
+                    merma_gestor_cuenta_tolerancia=Decimal(120),
                     # fin - Mermas para el Gestor de Cuenta
                     # inicio - Mermas para el Propietario
-                    merma_propietario_valor=Decimal(500),
+                    merma_propietario_valor=Decimal(750),
                     merma_propietario_moneda_id=bop.id,
                     merma_propietario_unidad_id=kilogramos.id,
                     merma_propietario_es_porcentual=False,
-                    merma_propietario_tolerancia=Decimal(500),
+                    merma_propietario_tolerancia=Decimal(100),
                     # fin - Mermas para el Propietario
                     # FIN Mermas de Fletes
                     # INICIO Emisión de Órdenes
@@ -337,7 +335,7 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             propietario_moneda_id=bop.id,
                             # FIN Monto a pagar al Propietario
                             # INICIO Monto a cobrar al Remitente
-                            remitente_monto=Decimal(100),
+                            remitente_monto=Decimal(120),
                             remitente_moneda_id=bop.id,
                         ),
                         FleteComplementoForm(
@@ -350,7 +348,7 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             propietario_moneda_id=bop.id,
                             # FIN Monto a pagar al Propietario
                             # INICIO Monto a cobrar al Remitente
-                            remitente_monto=Decimal(100),
+                            remitente_monto=Decimal(110),
                             remitente_moneda_id=bop.id,
                         ),
                     ],
@@ -359,7 +357,7 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             concepto_id=seguro.id,
                             detalle="Flete Descuento Detalle",
                             habilitar_pago_proveedor=True,
-                            anticipado=True,
+                            anticipado=False,
                             # INICIO Monto a cobrar al Propietario
                             propietario_monto=Decimal(100),
                             propietario_moneda_id=bop.id,
