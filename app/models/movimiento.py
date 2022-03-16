@@ -13,6 +13,7 @@ from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums import EstadoEnum, TipoContraparteEnum, TipoMovimientoEnum
 
+from .chofer import Chofer
 from .gestor_carga import GestorCarga
 from .liquidacion import Liquidacion
 from .moneda import Moneda
@@ -20,6 +21,9 @@ from .orden_carga import OrdenCarga
 from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 from .orden_carga_complemento import OrdenCargaComplemento
 from .orden_carga_descuento import OrdenCargaDescuento
+from .propietario import Propietario
+from .proveedor import Proveedor
+from .remitente import Remitente
 from .tipo_contraparte import TipoContraparte
 from .tipo_cuenta import TipoCuenta
 from .tipo_documento_relacionado import TipoDocumentoRelacionado
@@ -66,6 +70,15 @@ class Movimiento(AuditMixin, Base):
     complemento = relationship(OrdenCargaComplemento, uselist=False)
     descuento_id = Column(Integer, ForeignKey("orden_carga_descuento.id"))
     descuento = relationship(OrdenCargaDescuento, uselist=False)
+    # IDs para referencia a las tablas de las contraparte
+    chofer_id = Column(Integer, ForeignKey("chofer.id"))
+    chofer = relationship(Chofer, uselist=False)
+    propietario_id = Column(Integer, ForeignKey("propietario.id"))
+    propietario = relationship(Propietario, uselist=False)
+    proveedor_id = Column(Integer, ForeignKey("proveedor.id"))
+    proveedor = relationship(Proveedor, uselist=False)
+    remitente_id = Column(Integer, ForeignKey("remitente.id"))
+    remitente = relationship(Remitente, uselist=False)
 
     @hybrid_property
     def credito(self):

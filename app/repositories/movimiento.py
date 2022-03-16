@@ -96,6 +96,11 @@ def create_movimiento(
         # En caso de ser movimiento de complemento o descuento
         complemento_id=data.complemento_id,
         descuento_id=data.descuento_id,
+        # IDs para referencia a las tablas de las contraparte
+        chofer_id=data.chofer_id,
+        propietario_id=data.propietario_id,
+        proveedor_id=data.proveedor_id,
+        remitente_id=data.remitente_id,
         created_by=modified_by,
         modified_by=modified_by,
     )
@@ -130,6 +135,11 @@ def edit_movimiento(
     # En caso de ser movimiento de complemento o descuento
     obj.complemento_id = data.complemento_id
     obj.descuento_id = data.descuento_id
+    # IDs para referencia a las tablas de las contraparte
+    obj.chofer_id = data.chofer_id
+    obj.propietario_id = data.propietario_id
+    obj.proveedor_id = data.proveedor_id
+    obj.remitente_id = data.remitente_id
     obj.gestor_carga_id = gestor_carga_id
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()

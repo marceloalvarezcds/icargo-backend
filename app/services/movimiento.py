@@ -86,6 +86,7 @@ def create_movimiento_by_anticipo(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
             fecha_cambio_moneda=datetime.now(),
             anticipo_id=anticipo.id,
+            proveedor_id=anticipo.punto_venta.proveedor_id,
         ),
         gestor_carga_id,
         modified_by,
@@ -106,6 +107,7 @@ def create_movimiento_by_anticipo(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en anticipos  # noqa
             fecha_cambio_moneda=datetime.now(),
             anticipo_id=anticipo.id,
+            propietario_id=anticipo.orden_carga.camion.propietario_id,
         ),
         gestor_carga_id,
         modified_by,
@@ -157,6 +159,7 @@ def create_movimiento_by_flete(
             moneda_id=orden_carga.flete.condicion_gestor_cuenta_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
+            remitente_id=orden_carga.flete.remitente_id,
         ),
         gestor_carga_id,
         modified_by,
@@ -176,6 +179,7 @@ def create_movimiento_by_flete(
             moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
+            propietario_id=orden_carga.camion.propietario_id,
         ),
         gestor_carga_id,
         modified_by,
@@ -229,6 +233,7 @@ def create_movimiento_by_complemento(
                 tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Complemento  # noqa
                 fecha_cambio_moneda=datetime.now(),
                 complemento_id=complemento.id,
+                remitente_id=complemento.orden_carga.flete.remitente_id,
             ),
             gestor_carga_id,
             modified_by,
@@ -249,6 +254,7 @@ def create_movimiento_by_complemento(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Complemento  # noqa
             fecha_cambio_moneda=datetime.now(),
             complemento_id=complemento.id,
+            propietario_id=complemento.orden_carga.camion.propietario_id,
         ),
         gestor_carga_id,
         modified_by,
@@ -302,6 +308,7 @@ def create_movimiento_by_descuento(
                 tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
                 fecha_cambio_moneda=datetime.now(),
                 descuento_id=descuento.id,
+                proveedor_id=descuento.proveedor_id,
             ),
             gestor_carga_id,
             modified_by,
@@ -322,6 +329,7 @@ def create_movimiento_by_descuento(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
             fecha_cambio_moneda=datetime.now(),
             descuento_id=descuento.id,
+            propietario_id=descuento.orden_carga.camion.propietario_id,
         ),
         gestor_carga_id,
         modified_by,
@@ -373,6 +381,7 @@ def create_movimiento_by_merma(
             moneda_id=orden_carga.flete.condicion_gestor_cuenta_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
+            remitente_id=orden_carga.flete.remitente_id,
         ),
         gestor_carga_id,
         modified_by,
@@ -392,6 +401,7 @@ def create_movimiento_by_merma(
             moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
+            propietario_id=orden_carga.camion.propietario_id,
         ),
         gestor_carga_id,
         modified_by,

@@ -15,12 +15,14 @@ from app.endpoints import (
     contacto,
     ente_emisor_automotor,
     ente_emisor_transporte,
+    estado_cuenta,
     flete,
     flete_anticipo,
     gestor_carga,
     insumo,
     insumo_punto_venta,
     insumo_punto_venta_precio,
+    liquidacion,
     localidad,
     login,
     marca_camion,
@@ -94,6 +96,7 @@ api.include_router(
     prefix="/ente_emisor_transporte",
     tags=["ente_emisor_transporte"],
 )
+api.include_router(estado_cuenta.api, prefix="/estado_cuenta", tags=["estado_cuenta"])
 api.include_router(flete.api, prefix="/flete", tags=["flete"])
 api.include_router(
     flete_anticipo.api, prefix="/flete_anticipo", tags=["flete_anticipo"]
@@ -108,6 +111,7 @@ api.include_router(
     prefix="/insumo_punto_venta_precio",
     tags=["insumo_punto_venta_precio"],
 )
+api.include_router(liquidacion.api, prefix="/liquidacion", tags=["liquidacion"])
 api.include_router(localidad.api, prefix="/localidad", tags=["localidad"])
 api.include_router(login.api, prefix="/login", tags=["login"])
 api.include_router(marca_camion.api, prefix="/marca_camion", tags=["marca_camion"])

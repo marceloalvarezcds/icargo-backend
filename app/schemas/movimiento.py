@@ -33,6 +33,11 @@ class MovimientoForm(BaseModel):
     # En caso de ser movimiento de complemento o descuento
     complemento_id: Optional[int]
     descuento_id: Optional[int]
+    # IDs para referencia a las tablas de las contraparte
+    chofer_id: Optional[int]
+    propietario_id: Optional[int]
+    proveedor_id: Optional[int]
+    remitente_id: Optional[int]
 
 
 class Movimiento(MovimientoForm):

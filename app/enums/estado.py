@@ -6,6 +6,7 @@ class EstadoEnum(Enum):
     ACEPTADO = "Aceptado"
     CANCELADO = "Cancelado"
     CONCILIADO = "Conciliado"
+    CONFIRMADO = "Confirmado"
     CONTABILIZADO = "Contabilizado"
     ELIMINADO = "Eliminado"
     EN_PROCESO = "En Proceso"

@@ -1,0 +1,130 @@
+from datetime import datetime
+from typing import List, Optional
+
+from sqlalchemy.orm import Session  # type: ignore
+from sqlalchemy.sql.elements import and_  # type: ignore
+
+from app.enums import EstadoEnum
+from app.models import Liquidacion
+from app.schemas import LiquidacionForm
+
+
+def get_liquidacion_list(db: Session) -> List[Liquidacion]:
+    return (
+        db.query(Liquidacion)
+        .filter(Liquidacion.estado != EstadoEnum.ELIMINADO.value)
+        .order_by(Liquidacion.contraparte, Liquidacion.created_at)
+        .all()
+    )
+
+
+def get_liquidacion_list_by_contraparte(
+    db: Session, contraparte: str, gestor_carga_id: int
+) -> Optional[Liquidacion]:
+    return (
+        db.query(Liquidacion)
+        .filter(
+            and_(
+                Liquidacion.contraparte == contraparte,
+                Liquidacion.gestor_carga_id == gestor_carga_id,
+            )
+        )
+        .order_by(Liquidacion.contraparte, Liquidacion.created_at)
+        .all()
+    )
+
+
+def get_liquidacion_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: int
+) -> List[Liquidacion]:
+    return (
+        db.query(Liquidacion)
+        .filter(
+            and_(
+                Liquidacion.gestor_carga_id == gestor_carga_id,
+                Liquidacion.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(Liquidacion.contraparte, Liquidacion.created_at)
+        .all()
+    )
+
+
+def get_liquidacion_by_id(db: Session, id: int) -> Optional[Liquidacion]:
+    return db.query(Liquidacion).get(id)
+
+
+def create_liquidacion(
+    db: Session,
+    data: LiquidacionForm,
+    gestor_carga_id: int,
+    modified_by: str,
+) -> Liquidacion:
+    obj = Liquidacion(
+        tipo_contraparte_id=data.tipo_contraparte_id,
+        contraparte=data.contraparte,
+        contraparte_numero_documento=data.contraparte_numero_documento,
+        moneda_id=data.moneda_id,
+        # IDs para referencia a las tablas de las contraparte
+        chofer_id=data.chofer_id,
+        gestor_carga_id=gestor_carga_id,
+        propietario_id=data.propietario_id,
+        proveedor_id=data.proveedor_id,
+        remitente_id=data.remitente_id,
+        # Lista
+        movimientos=data.movimientos,
+        created_by=modified_by,
+        modified_by=modified_by,
+    )
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+def edit_liquidacion(
+    obj: Liquidacion,
+    db: Session,
+    data: LiquidacionForm,
+    gestor_carga_id: int,
+    modified_by: str,
+) -> Liquidacion:
+    obj.tipo_contraparte_id = data.tipo_contraparte_id
+    obj.contraparte = data.contraparte
+    obj.contraparte_numero_documento = data.contraparte_numero_documento
+    obj.moneda_id = data.moneda_id
+    # IDs para referencia a las tablas de las contraparte
+    obj.chofer_id = data.chofer_id
+    obj.propietario_id = data.propietario_id
+    obj.proveedor_id = data.proveedor_id
+    obj.remitente_id = data.remitente_id
+    obj.gestor_carga_id = gestor_carga_id
+    # Lista
+    obj.movimientos = data.movimientos
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+def change_liquidacion_status(
+    obj: Liquidacion,
+    db: Session,
+    status: EstadoEnum,
+    modified_by: str,
+) -> Liquidacion:
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+def delete_liquidacion(
+    obj: Liquidacion,
+    db: Session,
+    modified_by: str,
+) -> Liquidacion:
+    return change_liquidacion_status(obj, db, EstadoEnum.ELIMINADO, modified_by)

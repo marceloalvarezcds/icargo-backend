@@ -19,6 +19,12 @@ def estado_cuenta_permiso_seeds(db: Session, user: User):
 def permiso_generico_seeds(db: Session, user: User):
     permisos = []
     permisos.append(
+        permiso_seeds(db, a.LISTAR, m.ESTADO_CUENTA, True, "Listar Estado de cuenta")
+    )
+    permisos.append(
+        permiso_seeds(db, a.REPORTE, m.ESTADO_CUENTA, True, "Reporte Estado de cuenta")
+    )
+    permisos.append(
         permiso_seeds(
             db, a.LISTAR, m.TIPO_CONTRAPARTE, True, "Listar Tipo de contraparte"
         )
