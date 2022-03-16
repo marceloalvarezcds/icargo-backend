@@ -21,6 +21,7 @@ from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
 from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa
 from .ente_emisor_transporte import EnteEmisorTransporte  # noqa
+from .estado_cuenta import EstadoCuenta  # noqa
 from .flete import Flete, FleteForm, FleteList  # noqa
 from .flete_anticipo import FleteAnticipo, FleteAnticipoForm  # noqa
 from .flete_complemento import FleteComplemento, FleteComplementoForm  # noqa
@@ -41,6 +42,7 @@ from .insumo_punto_venta_precio import (  # noqa
     InsumoPuntoVentaPrecioForm,
     InsumoPuntoVentaPrecioList,
 )
+from .liquidacion import Liquidacion, LiquidacionForm  # noqa
 from .localidad import Localidad  # noqa
 from .marca_camion import MarcaCamion  # noqa
 from .marca_semi import MarcaSemi  # noqa

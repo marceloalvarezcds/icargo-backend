@@ -6,7 +6,12 @@ from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums.estado import EstadoEnum
 
+from .chofer import Chofer
+from .gestor_carga import GestorCarga
 from .moneda import Moneda
+from .propietario import Propietario
+from .proveedor import Proveedor
+from .remitente import Remitente
 from .tipo_contraparte import TipoContraparte
 
 
@@ -24,12 +29,28 @@ class Liquidacion(AuditMixin, Base):
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
     moneda = relationship(Moneda, uselist=False)
+    # IDs para referencia a las tablas de las contraparte
+    chofer_id = Column(Integer, ForeignKey("chofer.id"))
+    chofer = relationship(Chofer, uselist=False)
+    gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
+    gestor_carga = relationship(GestorCarga, uselist=False)
+    propietario_id = Column(Integer, ForeignKey("propietario.id"))
+    propietario = relationship(Propietario, uselist=False)
+    proveedor_id = Column(Integer, ForeignKey("proveedor.id"))
+    proveedor = relationship(Proveedor, uselist=False)
+    remitente_id = Column(Integer, ForeignKey("remitente.id"))
+    remitente = relationship(Remitente, uselist=False)
+    # Listas
     movimientos = relationship("Movimiento", back_populates="liquidacion")
     instrumentos = relationship("Instrumento", back_populates="liquidacion")
 
     @hybrid_property
     def es_cobro(self):
         return self.movimientos_saldo > 0
+
+    @hybrid_property
+    def esta_pagado(self):
+        return not self.saldo_residual > 0
 
     @hybrid_property
     def instrumentos_saldo(self):
@@ -46,6 +67,10 @@ class Liquidacion(AuditMixin, Base):
     @hybrid_property
     def movimientos_saldo(self):
         return sum(x.saldo for x in self.movimientos)
+
+    @hybrid_property
+    def saldo_residual(self):
+        return self.movimientos_saldo - self.instrumentos_saldo
 
     @hybrid_property
     def tipo_contraparte_descripcion(self):

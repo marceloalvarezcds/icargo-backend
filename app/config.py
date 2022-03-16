@@ -23,6 +23,9 @@ dbuser = str(environ("DATABASE_USER", "test"))
 dbpasw = str(environ("DATABASE_PASS", "test"))
 dbname = str(environ("DATABASE_NAME", "test"))
 dbtype = str(environ("DATABASE_TYPE", "postgresql"))
+DATABASE_INITIALIZE_WITHOUT_SEEDS = (
+    str(environ("DATABASE_INITIALIZE_WITHOUT_SEEDS", "false")) == "true"
+)
 
 # 60 minutes * 24 hours * 8 days = 8 days
 ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
