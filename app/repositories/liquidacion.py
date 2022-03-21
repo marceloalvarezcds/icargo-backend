@@ -71,8 +71,7 @@ def create_liquidacion(
         propietario_id=data.propietario_id,
         proveedor_id=data.proveedor_id,
         remitente_id=data.remitente_id,
-        # Lista
-        movimientos=data.movimientos,
+        estado=EstadoEnum.EN_PROCESO.value,
         created_by=modified_by,
         modified_by=modified_by,
     )
@@ -99,8 +98,6 @@ def edit_liquidacion(
     obj.proveedor_id = data.proveedor_id
     obj.remitente_id = data.remitente_id
     obj.gestor_carga_id = gestor_carga_id
-    # Lista
-    obj.movimientos = data.movimientos
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()

@@ -22,6 +22,20 @@ def get_estado_cuenta_list(
     return EstadoCuenta.result_of_query_to_list(results)
 
 
+def get_estado_cuenta_by_contraparte(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+) -> Optional[EstadoCuenta]:
+    result = repositories.get_estado_cuenta_by_contraparte(
+        db, tipo_contraparte_id, contraparte, contraparte_numero_documento
+    )
+    if result:
+        return EstadoCuenta.from_orm_row(result)
+    return None
+
+
 def get_estado_cuenta_reports(db: Session) -> str:
     datalist = get_estado_cuenta_list(db)
     wb = Workbook()

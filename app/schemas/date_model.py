@@ -22,6 +22,8 @@ class Date(BaseModel):
             return v
         if validate(v, "%Y-%m-%dT%H:%M:%S.%fZ"):
             return datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%fZ").date() if v else None
+        if validate(v, "%Y-%m-%dT%H:%M:%S.%f"):
+            return datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%f").date() if v else None
         if validate(v, "%Y-%m-%dT%H:%M:%S"):
             return datetime.strptime(v, "%Y-%m-%dT%H:%M:%S").date() if v else None
         raise ValueError(f"La fecha {v} es inválida")

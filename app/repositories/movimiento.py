@@ -19,13 +19,43 @@ def get_movimiento_list(db: Session) -> List[Movimiento]:
 
 
 def get_movimiento_list_by_contraparte(
-    db: Session, contraparte: str, gestor_carga_id: int
-) -> Optional[Movimiento]:
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+) -> List[Movimiento]:
     return (
         db.query(Movimiento)
         .filter(
             and_(
+                Movimiento.tipo_contraparte_id == tipo_contraparte_id,
                 Movimiento.contraparte == contraparte,
+                Movimiento.contraparte_numero_documento == contraparte_numero_documento,
+                Movimiento.estado == estado,
+            )
+        )
+        .order_by(Movimiento.contraparte, Movimiento.liquidacion_id)
+        .all()
+    )
+
+
+def get_movimiento_list_by_contraparte_and_gestor_carga_id(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+    gestor_carga_id: int,
+) -> List[Movimiento]:
+    return (
+        db.query(Movimiento)
+        .filter(
+            and_(
+                Movimiento.tipo_contraparte_id == tipo_contraparte_id,
+                Movimiento.contraparte == contraparte,
+                Movimiento.contraparte_numero_documento == contraparte_numero_documento,
+                Movimiento.estado == estado,
                 Movimiento.gestor_carga_id == gestor_carga_id,
             )
         )
