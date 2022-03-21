@@ -55,11 +55,16 @@ def create_movimiento(
     data: MovimientoForm,
     gestor_carga_id: Optional[int],
     modified_by: str,
-) -> Movimiento:
-    gestor_id = gestor_carga_id if gestor_carga_id else data.gestor_carga_id
-    if not gestor_id:
-        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
-    return repositories.create_movimiento(db, data, gestor_id, modified_by)
+) -> Optional[Movimiento]:
+    # Movimiento no puede tener monto 0
+    if int(data.monto) != 0:
+        gestor_id = gestor_carga_id if gestor_carga_id else data.gestor_carga_id
+        if not gestor_id:
+            raise HTTPException(
+                status_code=409, detail="Debe elegir un Gestor de carga"
+            )
+        return repositories.create_movimiento(db, data, gestor_id, modified_by)
+    return None
 
 
 def create_movimiento_by_anticipo(
@@ -67,7 +72,7 @@ def create_movimiento_by_anticipo(
     anticipo: OrdenCargaAnticipoRetirado,
     gestor_carga_id: Optional[int],
     modified_by: str,
-) -> Movimiento:
+) -> Optional[Movimiento]:
     propietario_contraparte = repositories.get_tipo_contraparte_by_descripcion(
         db, "Propietario"
     )
@@ -141,7 +146,7 @@ def create_movimiento_by_flete(
     orden_carga: OrdenCarga,
     gestor_carga_id: Optional[int],
     modified_by: str,
-) -> Movimiento:
+) -> Optional[Movimiento]:
     propietario_contraparte = repositories.get_tipo_contraparte_by_descripcion(
         db, "Propietario"
     )
@@ -213,7 +218,7 @@ def create_movimiento_by_complemento(
     complemento: OrdenCargaComplemento,
     gestor_carga_id: Optional[int],
     modified_by: str,
-) -> Movimiento:
+) -> Optional[Movimiento]:
     propietario_contraparte = repositories.get_tipo_contraparte_by_descripcion(
         db, "Propietario"
     )
@@ -288,7 +293,7 @@ def create_movimiento_by_descuento(
     descuento: OrdenCargaDescuento,
     gestor_carga_id: Optional[int],
     modified_by: str,
-) -> Movimiento:
+) -> Optional[Movimiento]:
     propietario_contraparte = repositories.get_tipo_contraparte_by_descripcion(
         db, "Propietario"
     )
@@ -363,7 +368,7 @@ def create_movimiento_by_merma(
     orden_carga: OrdenCarga,
     gestor_carga_id: Optional[int],
     modified_by: str,
-) -> Movimiento:
+) -> Optional[Movimiento]:
     propietario_contraparte = repositories.get_tipo_contraparte_by_descripcion(
         db, "Propietario"
     )
