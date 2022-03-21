@@ -42,7 +42,7 @@ from .insumo_punto_venta_precio import (  # noqa
     InsumoPuntoVentaPrecioForm,
     InsumoPuntoVentaPrecioList,
 )
-from .liquidacion import Liquidacion, LiquidacionForm  # noqa
+from .liquidacion import Liquidacion, LiquidacionCreateForm, LiquidacionForm  # noqa
 from .localidad import Localidad  # noqa
 from .marca_camion import MarcaCamion  # noqa
 from .marca_semi import MarcaSemi  # noqa

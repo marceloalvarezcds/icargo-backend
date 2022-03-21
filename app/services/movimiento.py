@@ -28,6 +28,28 @@ def get_movimiento_list(
     return repositories.get_movimiento_list(db)
 
 
+def get_movimiento_list_by_estado_cuenta(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+    gestor_carga_id: Optional[int],
+) -> List[Movimiento]:
+    if gestor_carga_id:
+        return repositories.get_movimiento_list_by_contraparte_and_gestor_carga_id(
+            db,
+            tipo_contraparte_id,
+            contraparte,
+            contraparte_numero_documento,
+            estado,
+            gestor_carga_id,
+        )
+    return repositories.get_movimiento_list_by_contraparte(
+        db, tipo_contraparte_id, contraparte, contraparte_numero_documento, estado
+    )
+
+
 def create_movimiento(
     db: Session,
     data: MovimientoForm,

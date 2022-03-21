@@ -8,10 +8,9 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
 from app.config import REPORTS_FOLDER
-from app.enums import TipoContraparteEnum
-from app.models import Liquidacion
-from app.models.movimiento import Movimiento
-from app.schemas import LiquidacionForm
+from app.enums import EstadoEnum, TipoContraparteEnum
+from app.models import Liquidacion, Movimiento
+from app.schemas import LiquidacionCreateForm, LiquidacionForm
 
 
 def get_liquidacion_list(
@@ -36,15 +35,22 @@ def create_liquidacion(
 
 def create_liquidacion_pendiente(
     db: Session,
-    data: List[Movimiento],
+    data: LiquidacionCreateForm,
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Movimiento:
-    if len(data) == 0:
+    mList = data.movimientos
+    if len(mList) == 0:
         raise HTTPException(
             status_code=409, detail="Debe elegir al menos un movimiento"
         )
-    movimiento = data[0]
+    movimientos: List[Movimiento] = []
+    for m in mList:
+        mov = repositories.get_movimiento_by_id(db, m.id)
+        if mov:
+            mov.estado = EstadoEnum.EN_PROCESO.value
+            movimientos.append(mov)
+    movimiento = movimientos[0]
     gestor_id = gestor_carga_id if gestor_carga_id else movimiento.gestor_carga_id
     if not gestor_id:
         raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
@@ -60,7 +66,7 @@ def create_liquidacion_pendiente(
         remitente_id = movimiento.remitente_id
     else:
         propietario_id = movimiento.propietario_id
-    return create_liquidacion(
+    liquidacion = create_liquidacion(
         db,
         LiquidacionForm(
             tipo_contraparte_id=movimiento.tipo_contraparte_id,
@@ -73,12 +79,13 @@ def create_liquidacion_pendiente(
             propietario_id=propietario_id,
             proveedor_id=proveedor_id,
             remitente_id=remitente_id,
-            # Lista
-            movimientos=data,
         ),
         gestor_id,
         modified_by,
     )
+    liquidacion.movimientos = movimientos
+    db.commit()
+    return liquidacion
 
 
 def get_liquidacion_by_id(db: Session, id: int) -> Liquidacion:

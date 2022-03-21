@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 
 from app.enums import EstadoEnum
 
@@ -13,7 +13,7 @@ from .tipo_documento_relacionado import TipoDocumentoRelacionado
 from .tipo_movimiento import TipoMovimiento
 
 
-class MovimientoForm(BaseModel):
+class MovimientoForm(BaseModel, extra=Extra.allow):
     gestor_carga_id: Optional[int]
     liquidacion_id: Optional[int]
     orden_carga_id: Optional[int]

@@ -106,7 +106,7 @@ class Movimiento(AuditMixin, Base):
 
     @hybrid_property
     def debito(self):
-        return self.monto if self.monto < 0 else 0
+        return self.monto * -1 if self.monto < 0 else 0
 
     @hybrid_property
     def destino_nombre(self):

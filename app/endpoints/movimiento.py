@@ -29,6 +29,29 @@ async def read_movimiento_list_by_gestor_carga_id(
     return services.get_movimiento_list(db, current_user.gestor_carga_id)
 
 
+@api.get(
+    "/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/estado/{estado}",  # noqa
+    response_model=List[schemas.Movimiento],
+)
+async def read_movimiento_list_by_estado_cuenta(
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_movimiento_list_by_estado_cuenta(
+        db,
+        tipo_contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        estado,
+        current_user.gestor_carga_id,
+    )
+
+
 @api.get("/orden_carga/{orden_carga_id}", response_model=List[schemas.Movimiento])
 async def read_movimiento_list_by_orden_carga_id(
     orden_carga_id: int,  # noqa: B008
