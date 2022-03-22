@@ -115,7 +115,9 @@ from .liquidacion import (  # noqa
     edit_liquidacion,
     get_liquidacion_by_id,
     get_liquidacion_list,
+    get_liquidacion_list_by_estado_cuenta,
     get_liquidacion_reports,
+    get_liquidacion_reports_by_estado_cuenta,
 )
 from .movimiento import (  # noqa
     create_movimiento,

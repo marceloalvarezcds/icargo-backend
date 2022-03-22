@@ -195,6 +195,7 @@ from .liquidacion import (  # noqa
     get_liquidacion_by_id,
     get_liquidacion_list,
     get_liquidacion_list_by_contraparte,
+    get_liquidacion_list_by_contraparte_and_gestor_carga_id,
     get_liquidacion_list_by_gestor_carga_id,
 )
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
