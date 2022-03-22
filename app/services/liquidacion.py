@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional
+from typing import List, Optional, cast
 
 from fastapi import HTTPException  # type: ignore
 from openpyxl import Workbook  # type: ignore
@@ -132,11 +132,15 @@ def edit_liquidacion(
 
 
 def delete_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
-    co = get_liquidacion_by_id(db, id)
-    return repositories.delete_liquidacion(co, db, modified_by)
+    obj = get_liquidacion_by_id(db, id)
+    for mov in cast(List[Movimiento], obj.movimientos):
+        mov.estado = EstadoEnum.PENDIENTE.value
+    db.commit()
+    obj.movimientos = []
+    return repositories.delete_liquidacion(obj, db, modified_by)
 
 
-def get_reports(db: Session, datalist: List[Liquidacion]) -> str:
+def get_reports(datalist: List[Liquidacion]) -> str:
     wb = Workbook()
     ws = wb.active
 
@@ -255,7 +259,7 @@ def get_reports(db: Session, datalist: List[Liquidacion]) -> str:
 
 def get_liquidacion_reports(db: Session) -> str:
     datalist = repositories.get_liquidacion_list(db)
-    return get_reports(db, datalist)
+    return get_reports(datalist)
 
 
 def get_liquidacion_reports_by_estado_cuenta(
@@ -274,4 +278,4 @@ def get_liquidacion_reports_by_estado_cuenta(
         estado,
         gestor_carga_id,
     )
-    return get_reports(db, datalist)
+    return get_reports(datalist)
