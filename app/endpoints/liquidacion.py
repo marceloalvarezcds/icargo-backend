@@ -20,6 +20,29 @@ async def read_liquidacion_list(
     return repositories.get_liquidacion_list(db)
 
 
+@api.get(
+    "/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/estado/{estado}",  # noqa
+    response_model=List[schemas.Liquidacion],
+)
+async def read_liquidacion_list_by_estado_cuenta(
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.LIQUIDACION)),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_liquidacion_list_by_estado_cuenta(
+        db,
+        tipo_contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        estado,
+        current_user.gestor_carga_id,
+    )
+
+
 @api.get("/gestor_carga_id", response_model=List[schemas.Liquidacion])
 async def read_liquidacion_list_by_gestor_carga_id(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -35,6 +58,28 @@ async def liquidacion_reports(
     _: bool = Depends(Permiso(a.REPORTE, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.get_liquidacion_reports(db)
+
+
+@api.get(
+    "/reports/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/estado/{estado}"  # noqa
+)
+async def liquidacion_reports_by_estado_cuenta(
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.LIQUIDACION)),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_liquidacion_reports_by_estado_cuenta(
+        db,
+        tipo_contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        estado,
+        current_user.gestor_carga_id,
+    )
 
 
 @api.get("/{id}", response_model=schemas.Liquidacion)

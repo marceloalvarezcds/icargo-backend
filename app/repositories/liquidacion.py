@@ -19,13 +19,45 @@ def get_liquidacion_list(db: Session) -> List[Liquidacion]:
 
 
 def get_liquidacion_list_by_contraparte(
-    db: Session, contraparte: str, gestor_carga_id: int
-) -> Optional[Liquidacion]:
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+) -> List[Liquidacion]:
     return (
         db.query(Liquidacion)
         .filter(
             and_(
+                Liquidacion.tipo_contraparte_id == tipo_contraparte_id,
                 Liquidacion.contraparte == contraparte,
+                Liquidacion.contraparte_numero_documento
+                == contraparte_numero_documento,
+                Liquidacion.estado == estado,
+            )
+        )
+        .order_by(Liquidacion.contraparte, Liquidacion.created_at)
+        .all()
+    )
+
+
+def get_liquidacion_list_by_contraparte_and_gestor_carga_id(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+    gestor_carga_id: int,
+) -> List[Liquidacion]:
+    return (
+        db.query(Liquidacion)
+        .filter(
+            and_(
+                Liquidacion.tipo_contraparte_id == tipo_contraparte_id,
+                Liquidacion.contraparte == contraparte,
+                Liquidacion.contraparte_numero_documento
+                == contraparte_numero_documento,
+                Liquidacion.estado == estado,
                 Liquidacion.gestor_carga_id == gestor_carga_id,
             )
         )

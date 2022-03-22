@@ -45,12 +45,20 @@ class Liquidacion(AuditMixin, Base):
     instrumentos = relationship("Instrumento", back_populates="liquidacion")
 
     @hybrid_property
+    def credito(self):
+        return self.movimientos_saldo if self.movimientos_saldo > 0 else 0
+
+    @hybrid_property
     def es_cobro(self):
         return self.movimientos_saldo > 0
 
     @hybrid_property
     def esta_pagado(self):
         return not self.saldo_residual > 0
+
+    @hybrid_property
+    def debito(self):
+        return self.movimientos_saldo * -1 if self.movimientos_saldo < 0 else 0
 
     @hybrid_property
     def instrumentos_saldo(self):
@@ -67,6 +75,10 @@ class Liquidacion(AuditMixin, Base):
     @hybrid_property
     def movimientos_saldo(self):
         return sum(x.saldo for x in self.movimientos)
+
+    @hybrid_property
+    def saldo(self):
+        return self.credito - self.debito
 
     @hybrid_property
     def saldo_residual(self):

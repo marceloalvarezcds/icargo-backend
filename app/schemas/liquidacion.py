@@ -29,20 +29,32 @@ class LiquidacionForm(BaseModel):
 
 
 class Liquidacion(LiquidacionForm):
+    id: int
     tipo_contraparte: TipoContraparte
     fecha_pago_cobro: Optional[Date]
     estado: EstadoEnum
     moneda: Moneda
     movimientos: List[Movimiento]
     # instrumentos: List[Instrumento]
+    # Campos calculados
+    credito: Decimal
     es_cobro: bool
+    esta_pagado: bool
+    debito: Decimal
     instrumentos_saldo: Optional[Decimal]
     moneda_nombre: str
     moneda_simbolo: str
     movimientos_saldo: Decimal
+    saldo: Decimal
+    saldo_residual: Decimal
     tipo_contraparte_descripcion: str
     tipo_operacion_descripcion: str
     url: str
+    # Auditoría
+    created_by: str
+    created_at: Date
+    modified_by: str
+    modified_at: Date
 
     class Config:
         orm_mode = True

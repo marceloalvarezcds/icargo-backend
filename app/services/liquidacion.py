@@ -21,6 +21,28 @@ def get_liquidacion_list(
     return repositories.get_liquidacion_list(db)
 
 
+def get_liquidacion_list_by_estado_cuenta(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+    gestor_carga_id: Optional[int],
+) -> List[Liquidacion]:
+    if gestor_carga_id:
+        return repositories.get_liquidacion_list_by_contraparte_and_gestor_carga_id(
+            db,
+            tipo_contraparte_id,
+            contraparte,
+            contraparte_numero_documento,
+            estado,
+            gestor_carga_id,
+        )
+    return repositories.get_liquidacion_list_by_contraparte(
+        db, tipo_contraparte_id, contraparte, contraparte_numero_documento, estado
+    )
+
+
 def create_liquidacion(
     db: Session,
     data: LiquidacionForm,
@@ -114,8 +136,7 @@ def delete_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
     return repositories.delete_liquidacion(co, db, modified_by)
 
 
-def get_liquidacion_reports(db: Session) -> str:
-    datalist = repositories.get_liquidacion_list(db)
+def get_reports(db: Session, datalist: List[Liquidacion]) -> str:
     wb = Workbook()
     ws = wb.active
 
@@ -184,10 +205,10 @@ def get_liquidacion_reports(db: Session) -> str:
         value_cell.value = item.id
 
         value_cell = ws.cell(row=row + 2, column=2)
-        value_cell.value = item.created_by
+        value_cell.value = item.created_at
 
         value_cell = ws.cell(row=row + 2, column=3)
-        value_cell.value = item.created_at
+        value_cell.value = item.created_by
 
         value_cell = ws.cell(row=row + 2, column=4)
         value_cell.value = item.tipo_contraparte_descripcion
@@ -230,3 +251,27 @@ def get_liquidacion_reports(db: Session) -> str:
     # Save the file
     wb.save(os.path.join(REPORTS_FOLDER, filename))
     return filename
+
+
+def get_liquidacion_reports(db: Session) -> str:
+    datalist = repositories.get_liquidacion_list(db)
+    return get_reports(db, datalist)
+
+
+def get_liquidacion_reports_by_estado_cuenta(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+    gestor_carga_id: Optional[int],
+) -> str:
+    datalist = get_liquidacion_list_by_estado_cuenta(
+        db,
+        tipo_contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        estado,
+        gestor_carga_id,
+    )
+    return get_reports(db, datalist)
