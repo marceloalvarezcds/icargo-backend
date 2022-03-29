@@ -1,5 +1,7 @@
 from .estado import EstadoEnum  # noqa
 from .flete_destinatario import FleteDestinatarioEnum  # noqa
+from .liquidacion_etapa import LiquidacionEtapaEnum  # noqa
+from .movimiento_estado import MovimientoEstadoEnum  # noqa
 from .operacion_estado import OperacionEstadoEnum  # noqa
 from .orden_carga_estado import OrdenCargaEstadoEnum  # noqa
 from .permiso import PermisoAccionEnum, PermisoModeloEnum  # noqa

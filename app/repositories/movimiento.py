@@ -4,7 +4,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
 
-from app.enums import EstadoEnum
+from app.enums import MovimientoEstadoEnum
 from app.models import Movimiento
 from app.schemas import MovimientoForm
 
@@ -12,7 +12,7 @@ from app.schemas import MovimientoForm
 def get_movimiento_list(db: Session) -> List[Movimiento]:
     return (
         db.query(Movimiento)
-        .filter(Movimiento.estado != EstadoEnum.ELIMINADO.value)
+        .filter(Movimiento.estado != MovimientoEstadoEnum.ELIMINADO.value)
         .order_by(Movimiento.contraparte, Movimiento.liquidacion_id)
         .all()
     )
@@ -72,7 +72,7 @@ def get_movimiento_list_by_gestor_carga_id(
         .filter(
             and_(
                 Movimiento.gestor_carga_id == gestor_carga_id,
-                Movimiento.estado != EstadoEnum.ELIMINADO.value,
+                Movimiento.estado != MovimientoEstadoEnum.ELIMINADO.value,
             )
         )
         .order_by(Movimiento.contraparte, Movimiento.liquidacion_id)
@@ -88,7 +88,7 @@ def get_movimiento_list_by_orden_carga_id(
         .filter(
             and_(
                 Movimiento.orden_carga_id == orden_carga_id,
-                Movimiento.estado != EstadoEnum.ELIMINADO.value,
+                Movimiento.estado != MovimientoEstadoEnum.ELIMINADO.value,
             )
         )
         .order_by(Movimiento.contraparte, Movimiento.liquidacion_id)
@@ -181,7 +181,7 @@ def edit_movimiento(
 def change_movimiento_status(
     obj: Movimiento,
     db: Session,
-    status: EstadoEnum,
+    status: MovimientoEstadoEnum,
     modified_by: str,
 ) -> Movimiento:
     obj.estado = status.value
@@ -197,4 +197,6 @@ def delete_movimiento(
     db: Session,
     modified_by: str,
 ) -> Movimiento:
-    return change_movimiento_status(obj, db, EstadoEnum.ELIMINADO, modified_by)
+    return change_movimiento_status(
+        obj, db, MovimientoEstadoEnum.ELIMINADO, modified_by
+    )

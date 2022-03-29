@@ -2,7 +2,9 @@ from enum import Enum
 
 
 class PermisoAccionEnum(Enum):
+    ACEPTAR = "aceptar"
     CAMBIAR_ESTADO = "cambiar_estado"
+    CANCELAR = "cancelar"
     CONCILIAR = "conciliar"
     CREAR = "crear"
     EDITAR = "editar"
@@ -10,8 +12,10 @@ class PermisoAccionEnum(Enum):
     LISTAR = "listar"
     MODIFICAR_CONTACTOS = "modificar_contactos"
     MODIFICAR_ALIAS = "modificar_alias"
-    VER = "ver"
+    PASAR_A_REVISION = "pasar_a_revision"
+    RECHAZAR = "rechazar"
     REPORTE = "reporte"
+    VER = "ver"
 
 
 class PermisoModeloEnum(Enum):

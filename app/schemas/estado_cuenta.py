@@ -15,6 +15,10 @@ class EstadoCuenta(BaseModel):
     en_proceso: Decimal
     confirmado: Decimal
     finalizado: Decimal
+    cantidad_pendiente: int
+    cantidad_en_proceso: int
+    cantidad_confirmado: int
+    cantidad_finalizado: int
     q: str
 
     @classmethod

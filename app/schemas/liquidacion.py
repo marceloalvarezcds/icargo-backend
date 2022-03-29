@@ -4,6 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel, validator
 
 from app.enums.estado import EstadoEnum
+from app.enums.liquidacion_etapa import LiquidacionEtapaEnum
 
 from .date_model import Date
 from .moneda import Moneda
@@ -33,7 +34,9 @@ class Liquidacion(LiquidacionForm):
     tipo_contraparte: TipoContraparte
     fecha_pago_cobro: Optional[Date]
     estado: EstadoEnum
+    etapa: LiquidacionEtapaEnum
     moneda: Moneda
+    comentarios: Optional[str]
     movimientos: List[Movimiento]
     # instrumentos: List[Instrumento]
     # Campos calculados

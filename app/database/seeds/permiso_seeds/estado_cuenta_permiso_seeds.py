@@ -7,6 +7,21 @@ from app.models import User
 from .permiso_seeds import permiso_seeds
 
 
+def estado_cuenta_gestor_permiso_seeds(db: Session, user: User):
+    permiso_generico_seeds(db, user)
+    permiso_banco_seeds(db, user)
+    permiso_caja_seeds(db, user)
+    permiso_instrumento_seeds(db, user)
+    permiso_movimiento_seeds(db, user)
+    permiso_liquidacion_seeds(db, user)
+    permisos = []
+    permisos.append(permiso_seeds(db, a.ACEPTAR, m.LIQUIDACION))
+    permisos.append(permiso_seeds(db, a.CANCELAR, m.LIQUIDACION))
+    permisos.append(permiso_seeds(db, a.RECHAZAR, m.LIQUIDACION))
+    user.permisos.extend(permisos)
+    db.commit()
+
+
 def estado_cuenta_permiso_seeds(db: Session, user: User):
     permiso_generico_seeds(db, user)
     permiso_banco_seeds(db, user)
@@ -14,6 +29,10 @@ def estado_cuenta_permiso_seeds(db: Session, user: User):
     permiso_instrumento_seeds(db, user)
     permiso_movimiento_seeds(db, user)
     permiso_liquidacion_seeds(db, user)
+    permisos = []
+    permisos.append(permiso_seeds(db, a.PASAR_A_REVISION, m.LIQUIDACION))
+    user.permisos.extend(permisos)
+    db.commit()
 
 
 def permiso_generico_seeds(db: Session, user: User):

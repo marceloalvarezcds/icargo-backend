@@ -128,7 +128,7 @@ def upgrade():
         sa.Column("contraparte_numero_documento", sa.String(length=255), nullable=True),
         sa.Column("fecha_pago_cobro", sa.DateTime(), nullable=True),
         sa.Column(
-            "estado", sa.String(length=255), server_default="Activo", nullable=True
+            "estado", sa.String(length=255), server_default="En Revisión", nullable=True
         ),
         sa.Column("moneda_id", sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(

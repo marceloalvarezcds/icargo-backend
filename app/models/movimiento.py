@@ -11,7 +11,7 @@ from sqlalchemy.orm import relationship  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
-from app.enums import EstadoEnum, TipoContraparteEnum, TipoMovimientoEnum
+from app.enums import MovimientoEstadoEnum, TipoContraparteEnum, TipoMovimientoEnum
 
 from .chofer import Chofer
 from .gestor_carga import GestorCarga
@@ -43,7 +43,7 @@ class Movimiento(AuditMixin, Base):
     liquidacion = relationship(Liquidacion, uselist=False, back_populates="movimientos")
     orden_carga_id = Column(Integer, ForeignKey("orden_carga.id"))
     orden_carga = relationship(OrdenCarga, uselist=False)
-    estado = Column(String(255), server_default=EstadoEnum.PENDIENTE.value)
+    estado = Column(String(255), server_default=MovimientoEstadoEnum.PENDIENTE.value)
     tipo_contraparte_id = Column(Integer, ForeignKey("tipo_contraparte.id"))
     tipo_contraparte = relationship(TipoContraparte, uselist=False)
     contraparte = Column(String(255))
