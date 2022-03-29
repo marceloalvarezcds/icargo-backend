@@ -1,9 +1,9 @@
 from decimal import Decimal
 from typing import Optional
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
 
-from app.enums import EstadoEnum
+from app.enums import MovimientoEstadoEnum
 
 from .date_model import Date
 from .moneda import Moneda
@@ -13,7 +13,7 @@ from .tipo_documento_relacionado import TipoDocumentoRelacionado
 from .tipo_movimiento import TipoMovimiento
 
 
-class MovimientoForm(BaseModel, extra=Extra.allow):
+class MovimientoForm(BaseModel):
     gestor_carga_id: Optional[int]
     liquidacion_id: Optional[int]
     orden_carga_id: Optional[int]
@@ -43,7 +43,7 @@ class MovimientoForm(BaseModel, extra=Extra.allow):
 class Movimiento(MovimientoForm):
     id: int
     gestor_carga_id: int
-    estado: EstadoEnum
+    estado: MovimientoEstadoEnum
     tipo_contraparte: TipoContraparte
     tipo_documento_relacionado: TipoDocumentoRelacionado
     cuenta: TipoCuenta

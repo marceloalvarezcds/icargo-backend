@@ -8,6 +8,7 @@ from sqlalchemy import (  # type: ignore
     text,
 )
 from sqlalchemy.dialects.postgresql import TIMESTAMP  # type: ignore
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.sql import func  # type: ignore
 from sqlalchemy.sql.schema import Table  # type: ignore
@@ -64,3 +65,7 @@ class User(AuditMixin, Base):
     gestor_carga = relationship(GestorCarga, uselist=False)
     roles = relationship(Rol, secondary=user_rol_table)
     permisos = relationship(Permiso, secondary=user_permiso_table)
+
+    @hybrid_property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"

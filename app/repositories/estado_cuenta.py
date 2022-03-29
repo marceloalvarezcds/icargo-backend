@@ -21,17 +21,42 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
                 else_=literal_column("0"),
             ).label("pendiente"),
             case(
-                (Liquidacion.estado == EstadoEnum.EN_PROCESO.value, Movimiento.monto),
+                (Liquidacion.etapa == EstadoEnum.EN_PROCESO.value, Movimiento.monto),
                 else_=literal_column("0"),
             ).label("en_proceso"),
             case(
-                (Liquidacion.estado == EstadoEnum.CONFIRMADO.value, Movimiento.monto),
+                (Liquidacion.etapa == EstadoEnum.CONFIRMADO.value, Movimiento.monto),
                 else_=literal_column("0"),
             ).label("confirmado"),
             case(
-                (Liquidacion.estado == EstadoEnum.FINALIZADO.value, Movimiento.monto),
+                (Liquidacion.etapa == EstadoEnum.FINALIZADO.value, Movimiento.monto),
                 else_=literal_column("0"),
             ).label("finalizado"),
+            case(
+                (Movimiento.liquidacion_id == null(), literal_column("1")),
+                else_=literal_column("0"),
+            ).label("cantidad_pendiente"),
+            case(
+                (
+                    Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
+                    literal_column("1"),
+                ),
+                else_=literal_column("0"),
+            ).label("cantidad_en_proceso"),
+            case(
+                (
+                    Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
+                    literal_column("1"),
+                ),
+                else_=literal_column("0"),
+            ).label("cantidad_confirmado"),
+            case(
+                (
+                    Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+                    literal_column("1"),
+                ),
+                else_=literal_column("0"),
+            ).label("cantidad_finalizado"),
         )
         .join(Movimiento.tipo_contraparte)
         .outerjoin(Movimiento.liquidacion)
@@ -49,6 +74,10 @@ def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
             func.sum(table.c.en_proceso).label("en_proceso"),
             func.sum(table.c.confirmado).label("confirmado"),
             func.sum(table.c.finalizado).label("finalizado"),
+            func.sum(table.c.cantidad_pendiente).label("cantidad_pendiente"),
+            func.sum(table.c.cantidad_en_proceso).label("cantidad_en_proceso"),
+            func.sum(table.c.cantidad_confirmado).label("cantidad_confirmado"),
+            func.sum(table.c.cantidad_finalizado).label("cantidad_finalizado"),
         )
         .group_by(
             table.c.contraparte,

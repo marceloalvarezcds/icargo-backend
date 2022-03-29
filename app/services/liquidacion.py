@@ -1,16 +1,19 @@
 import os
-from typing import List, Optional, cast
+from datetime import datetime
+from typing import List, Optional
 
 from fastapi import HTTPException  # type: ignore
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import repositories
+from app import repositories, schemas
 from app.config import REPORTS_FOLDER
 from app.enums import EstadoEnum, TipoContraparteEnum
-from app.models import Liquidacion, Movimiento
+from app.enums.liquidacion_etapa import LiquidacionEtapaEnum
+from app.models import Liquidacion, Movimiento, User
 from app.schemas import LiquidacionCreateForm, LiquidacionForm
+from app.utils.gestor_carga import get_gestor_carga_by_params
 
 
 def get_liquidacion_list(
@@ -26,7 +29,7 @@ def get_liquidacion_list_by_estado_cuenta(
     tipo_contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
-    estado: str,
+    etapa: str,
     gestor_carga_id: Optional[int],
 ) -> List[Liquidacion]:
     if gestor_carga_id:
@@ -35,11 +38,11 @@ def get_liquidacion_list_by_estado_cuenta(
             tipo_contraparte_id,
             contraparte,
             contraparte_numero_documento,
-            estado,
+            etapa,
             gestor_carga_id,
         )
     return repositories.get_liquidacion_list_by_contraparte(
-        db, tipo_contraparte_id, contraparte, contraparte_numero_documento, estado
+        db, tipo_contraparte_id, contraparte, contraparte_numero_documento, etapa
     )
 
 
@@ -49,9 +52,7 @@ def create_liquidacion(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Liquidacion:
-    gestor_id = gestor_carga_id if gestor_carga_id else data.gestor_carga_id
-    if not gestor_id:
-        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+    gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
     return repositories.create_liquidacion(db, data, gestor_id, modified_by)
 
 
@@ -61,21 +62,9 @@ def create_liquidacion_pendiente(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Movimiento:
-    mList = data.movimientos
-    if len(mList) == 0:
-        raise HTTPException(
-            status_code=409, detail="Debe elegir al menos un movimiento"
-        )
-    movimientos: List[Movimiento] = []
-    for m in mList:
-        mov = repositories.get_movimiento_by_id(db, m.id)
-        if mov:
-            mov.estado = EstadoEnum.EN_PROCESO.value
-            movimientos.append(mov)
+    movimientos = get_movimiento_list_by_liquidacion_create_form(db, data)
     movimiento = movimientos[0]
-    gestor_id = gestor_carga_id if gestor_carga_id else movimiento.gestor_carga_id
-    if not gestor_id:
-        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+    gestor_id = get_gestor_carga_by_params(movimiento, gestor_carga_id)
     chofer_id = None
     propietario_id = None
     proveedor_id = None
@@ -124,20 +113,92 @@ def edit_liquidacion(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Liquidacion:
-    gestor_id = gestor_carga_id if gestor_carga_id else data.gestor_carga_id
-    if not gestor_id:
-        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+    gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
     to_edit_obj = get_liquidacion_by_id(db, id)
     return repositories.edit_liquidacion(to_edit_obj, db, data, gestor_id, modified_by)
 
 
 def delete_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
     obj = get_liquidacion_by_id(db, id)
-    for mov in cast(List[Movimiento], obj.movimientos):
-        mov.estado = EstadoEnum.PENDIENTE.value
-    db.commit()
+    change_movimiento_list_status(
+        db, obj.movimientos, EstadoEnum.PENDIENTE, modified_by
+    )
     obj.movimientos = []
     return repositories.delete_liquidacion(obj, db, modified_by)
+
+
+def add_movimientos(
+    id: int,
+    db: Session,
+    data: LiquidacionCreateForm,
+    modified_by: str,
+) -> Liquidacion:
+    to_edit_obj = get_liquidacion_by_id(db, id)
+    new_movimientos = get_movimiento_list_by_liquidacion_create_form(db, data)
+    change_movimiento_list_status(
+        db, new_movimientos, EstadoEnum.EN_PROCESO, modified_by
+    )
+    old_movimientos = to_edit_obj.movimientos
+    to_edit_obj.movimientos = [*old_movimientos, *new_movimientos]
+    to_edit_obj.modified_by = modified_by
+    to_edit_obj.modified_at = datetime.now()
+    db.commit()
+    return to_edit_obj
+
+
+def remove_movimiento(
+    id: int,
+    db: Session,
+    data: schemas.Movimiento,
+    modified_by: str,
+) -> Liquidacion:
+    to_edit_obj = get_liquidacion_by_id(db, id)
+    movimiento_to_remove = get_movimiento_by_schema(db, data)
+    movimiento_to_remove.estado = EstadoEnum.PENDIENTE.value
+    movimiento_to_remove.modified_by = modified_by
+    movimiento_to_remove.modified_at = datetime.now()
+    db.commit()
+    old_movimientos: List[Movimiento] = to_edit_obj.movimientos
+    new_movimientos = list(filter(lambda x: x.id != data.id, old_movimientos))
+    to_edit_obj.movimientos = new_movimientos
+    to_edit_obj.modified_by = modified_by
+    to_edit_obj.modified_at = datetime.now()
+    db.commit()
+    return to_edit_obj
+
+
+def aceptar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
+    obj = get_liquidacion_by_id(db, id)
+    change_movimiento_list_status(
+        db, obj.movimientos, EstadoEnum.CONFIRMADO, modified_by
+    )
+    obj.etapa = LiquidacionEtapaEnum.CONFIRMADO.value
+    return repositories.change_liquidacion_status(
+        obj, db, EstadoEnum.CONFIRMADO, modified_by
+    )
+
+
+def cancelar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
+    obj = get_liquidacion_by_id(db, id)
+    change_movimiento_list_status(
+        db, obj.movimientos, EstadoEnum.PENDIENTE, modified_by
+    )
+    obj.movimientos = []
+    return repositories.change_liquidacion_status(
+        obj, db, EstadoEnum.CANCELADO, modified_by
+    )
+
+
+def rechazar_liquidacion(
+    db: Session, id: int, comentario: str, user: User
+) -> Liquidacion:
+    return change_liquidacion_status(db, id, comentario, EstadoEnum.RECHAZADO, user)
+
+
+def en_revision_liquidacion(
+    db: Session, id: int, comentario: str, user: User
+) -> Liquidacion:
+    return change_liquidacion_status(db, id, comentario, EstadoEnum.EN_REVISION, user)
 
 
 def get_reports(datalist: List[Liquidacion]) -> str:
@@ -257,6 +318,31 @@ def get_reports(datalist: List[Liquidacion]) -> str:
     return filename
 
 
+def change_liquidacion_status(
+    db: Session, id: int, comentario: str, estado: EstadoEnum, user: User
+) -> Liquidacion:
+    obj = get_liquidacion_by_id(db, id)
+    if comentario:
+        if not obj.comentarios:
+            obj.comentarios = ""
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        comentarios = "".join([f"<li>{c}</li>" for c in comentario.split(".")])
+        obj.comentarios += (
+            f"<strong>{user.full_name} ({date}): </strong><ul>{comentarios}</ul>"
+        )
+    return repositories.change_liquidacion_status(obj, db, estado, user.modified_by)
+
+
+def change_movimiento_list_status(
+    db: Session, movimientos: List[Movimiento], estado: EstadoEnum, modified_by: str
+):
+    for mov in movimientos:
+        mov.estado = estado.value
+        mov.modified_by = modified_by
+        mov.modified_at = datetime.now()
+    db.commit()
+
+
 def get_liquidacion_reports(db: Session) -> str:
     datalist = repositories.get_liquidacion_list(db)
     return get_reports(datalist)
@@ -267,7 +353,7 @@ def get_liquidacion_reports_by_estado_cuenta(
     tipo_contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
-    estado: str,
+    etapa: str,
     gestor_carga_id: Optional[int],
 ) -> str:
     datalist = get_liquidacion_list_by_estado_cuenta(
@@ -275,7 +361,31 @@ def get_liquidacion_reports_by_estado_cuenta(
         tipo_contraparte_id,
         contraparte,
         contraparte_numero_documento,
-        estado,
+        etapa,
         gestor_carga_id,
     )
     return get_reports(datalist)
+
+
+def get_movimiento_by_schema(db: Session, movimiento: schemas.Movimiento) -> Movimiento:
+    obj = repositories.get_movimiento_by_id(db, movimiento.id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Movimiento no encontrado")
+    return obj
+
+
+def get_movimiento_list_by_liquidacion_create_form(
+    db: Session, data: LiquidacionCreateForm
+) -> List[Movimiento]:
+    mList = data.movimientos
+    if len(mList) == 0:
+        raise HTTPException(
+            status_code=409, detail="Debe elegir al menos un movimiento"
+        )
+    movimientos: List[Movimiento] = []
+    for m in mList:
+        mov = get_movimiento_by_schema(db, m)
+        if mov:
+            mov.estado = EstadoEnum.EN_PROCESO.value
+            movimientos.append(mov)
+    return movimientos

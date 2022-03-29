@@ -1,10 +1,17 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String  # type: ignore
+from sqlalchemy import (  # type: ignore
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
-from app.enums.estado import EstadoEnum
+from app.enums import EstadoEnum, LiquidacionEtapaEnum
 
 from .chofer import Chofer
 from .gestor_carga import GestorCarga
@@ -26,9 +33,11 @@ class Liquidacion(AuditMixin, Base):
     contraparte = Column(String(255))
     contraparte_numero_documento = Column(String(255))
     fecha_pago_cobro = Column(DateTime)
-    estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
+    estado = Column(String(255), server_default=EstadoEnum.EN_REVISION.value)
+    etapa = Column(String(255), server_default=LiquidacionEtapaEnum.EN_PROCESO.value)
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
     moneda = relationship(Moneda, uselist=False)
+    comentarios = Column(Text)
     # IDs para referencia a las tablas de las contraparte
     chofer_id = Column(Integer, ForeignKey("chofer.id"))
     chofer = relationship(Chofer, uselist=False)

@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum
+from app.enums.liquidacion_etapa import LiquidacionEtapaEnum
 from app.models import Liquidacion
 from app.schemas import LiquidacionForm
 
@@ -23,7 +24,7 @@ def get_liquidacion_list_by_contraparte(
     tipo_contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
-    estado: str,
+    etapa: str,
 ) -> List[Liquidacion]:
     return (
         db.query(Liquidacion)
@@ -33,7 +34,8 @@ def get_liquidacion_list_by_contraparte(
                 Liquidacion.contraparte == contraparte,
                 Liquidacion.contraparte_numero_documento
                 == contraparte_numero_documento,
-                Liquidacion.estado == estado,
+                Liquidacion.etapa == etapa,
+                Liquidacion.estado != EstadoEnum.ELIMINADO.value,
             )
         )
         .order_by(Liquidacion.contraparte, Liquidacion.created_at)
@@ -46,7 +48,7 @@ def get_liquidacion_list_by_contraparte_and_gestor_carga_id(
     tipo_contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
-    estado: str,
+    etapa: str,
     gestor_carga_id: int,
 ) -> List[Liquidacion]:
     return (
@@ -57,8 +59,9 @@ def get_liquidacion_list_by_contraparte_and_gestor_carga_id(
                 Liquidacion.contraparte == contraparte,
                 Liquidacion.contraparte_numero_documento
                 == contraparte_numero_documento,
-                Liquidacion.estado == estado,
+                Liquidacion.etapa == etapa,
                 Liquidacion.gestor_carga_id == gestor_carga_id,
+                Liquidacion.estado != EstadoEnum.ELIMINADO.value,
             )
         )
         .order_by(Liquidacion.contraparte, Liquidacion.created_at)
@@ -103,7 +106,8 @@ def create_liquidacion(
         propietario_id=data.propietario_id,
         proveedor_id=data.proveedor_id,
         remitente_id=data.remitente_id,
-        estado=EstadoEnum.EN_PROCESO.value,
+        estado=EstadoEnum.EN_REVISION.value,
+        etapa=LiquidacionEtapaEnum.EN_PROCESO.value,
         created_by=modified_by,
         modified_by=modified_by,
     )

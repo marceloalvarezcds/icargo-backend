@@ -21,14 +21,14 @@ async def read_liquidacion_list(
 
 
 @api.get(
-    "/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/estado/{estado}",  # noqa
+    "/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}",  # noqa
     response_model=List[schemas.Liquidacion],
 )
 async def read_liquidacion_list_by_estado_cuenta(
     tipo_contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
-    estado: str,
+    etapa: str,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.LIQUIDACION)),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
@@ -38,7 +38,7 @@ async def read_liquidacion_list_by_estado_cuenta(
         tipo_contraparte_id,
         contraparte,
         contraparte_numero_documento,
-        estado,
+        etapa,
         current_user.gestor_carga_id,
     )
 
@@ -61,13 +61,13 @@ async def liquidacion_reports(
 
 
 @api.get(
-    "/reports/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/estado/{estado}"  # noqa
+    "/reports/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}"  # noqa
 )
 async def liquidacion_reports_by_estado_cuenta(
     tipo_contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
-    estado: str,
+    etapa: str,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.REPORTE, m.LIQUIDACION)),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
@@ -77,7 +77,7 @@ async def liquidacion_reports_by_estado_cuenta(
         tipo_contraparte_id,
         contraparte,
         contraparte_numero_documento,
-        estado,
+        etapa,
         current_user.gestor_carga_id,
     )
 
@@ -124,3 +124,69 @@ async def delete_liquidacion(
     _: bool = Depends(Permiso(a.ELIMINAR, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.delete_liquidacion(db, id, current_user.username)
+
+
+@api.patch("/{id}/add_movimientos", response_model=schemas.Liquidacion)
+async def add_movimientos(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.LiquidacionCreateForm] = Form(...),  # type: ignore  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
+    __: bool = Depends(Permiso(a.EDITAR, m.LIQUIDACION)),  # noqa: B008
+):
+    return services.add_movimientos(id, db, data, current_user.username)  # type: ignore
+
+
+@api.patch("/{id}/remove_movimiento", response_model=schemas.Liquidacion)
+async def remove_movimiento(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.Movimiento] = Form(...),  # type: ignore  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
+    __: bool = Depends(Permiso(a.EDITAR, m.LIQUIDACION)),  # noqa: B008
+):
+    return services.remove_movimiento(id, db, data, current_user.username)  # type: ignore
+
+
+@api.get("/{id}/aceptar", response_model=schemas.Liquidacion)
+async def aceptar_liquidacion(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.ACEPTAR, m.LIQUIDACION)),  # noqa: B008
+):
+    return services.aceptar_liquidacion(db, id, current_user.username)
+
+
+@api.get("/{id}/cancelar", response_model=schemas.Liquidacion)
+async def cancelar_liquidacion(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CANCELAR, m.LIQUIDACION)),  # noqa: B008
+):
+    return services.cancelar_liquidacion(db, id, current_user.username)
+
+
+@api.patch("/{id}/rechazar", response_model=schemas.Liquidacion)
+async def rechazar_liquidacion(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[str] = Form(...),  # type: ignore  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.RECHAZAR, m.LIQUIDACION)),  # noqa: B008
+):
+    return services.rechazar_liquidacion(db, id, data, current_user)
+
+
+@api.patch("/{id}/en_revision", response_model=schemas.Liquidacion)
+async def en_revision_liquidacion(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[str] = Form(...),  # type: ignore  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.PASAR_A_REVISION, m.LIQUIDACION)),  # noqa: B008
+):
+    return services.en_revision_liquidacion(db, id, data, current_user)
