@@ -23,8 +23,8 @@ class FleteFormBaseModel(BaseModel):
     producto_id: int
     tipo_carga_id: int
     numero_lote: Optional[str]
-    publicado: bool
-    es_subasta: bool
+    publicado: Optional[bool] = False
+    es_subasta: Optional[bool] = False
     # INICIO Tramo de Fletes
     origen_id: int
     origen_indicacion: Optional[str]
@@ -50,14 +50,14 @@ class FleteFormBaseModel(BaseModel):
     merma_gestor_cuenta_valor: Decimal
     merma_gestor_cuenta_moneda_id: int
     merma_gestor_cuenta_unidad_id: int
-    merma_gestor_cuenta_es_porcentual: bool = False
+    merma_gestor_cuenta_es_porcentual: Optional[bool] = False
     merma_gestor_cuenta_tolerancia: Decimal
     # fin - Mermas para el Gestor de Cuenta
     # inicio - Mermas para el Propietario
     merma_propietario_valor: Decimal
     merma_propietario_moneda_id: int
     merma_propietario_unidad_id: int
-    merma_propietario_es_porcentual: bool = False
+    merma_propietario_es_porcentual: Optional[bool] = False
     merma_propietario_tolerancia: Decimal
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes

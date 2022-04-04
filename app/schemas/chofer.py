@@ -26,7 +26,7 @@ class ChoferBaseModel(BaseModel):
     foto_documento_frente: Optional[str] = None
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
-    es_propietario: bool = False
+    es_propietario: Optional[bool] = False
     # Datos del Propietario
     pais_origen_id: Optional[int] = None
     foto_documento_frente_propietario: Optional[str] = None
