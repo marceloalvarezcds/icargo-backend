@@ -1,13 +1,12 @@
 from decimal import Decimal
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, validator
 
 from app.enums.estado import EstadoEnum
 
 from .date_model import Date
-
-# from .instrumento import Instrumento
+from .instrumento import Instrumento
 
 
 class BancoForm(BaseModel):
@@ -22,7 +21,7 @@ class Banco(BancoForm):
     id: int
     gestor_carga_id: int
     estado: EstadoEnum
-    # instrumentos: List[Instrumento]
+    instrumentos: List[Instrumento]
     # Campos calculados
     moneda_nombre: str
     moneda_simbolo: str

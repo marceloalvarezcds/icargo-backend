@@ -94,7 +94,7 @@ async def read_liquidacion_by_id(
 @api.post("/", response_model=schemas.Liquidacion)
 async def add_new_liquidacion(
     db: Session = Depends(get_db_session),  # noqa: B008
-    data: Json[schemas.LiquidacionCreateForm] = Form(...),  # type: ignore  # noqa: B008
+    data: Json[schemas.LiquidacionAddMovimientosForm] = Form(...),  # type: ignore  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.LIQUIDACION)),  # noqa: B008
 ):
@@ -130,7 +130,7 @@ async def delete_liquidacion(
 async def add_movimientos(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    data: Json[schemas.LiquidacionCreateForm] = Form(...),  # type: ignore  # noqa: B008
+    data: Json[schemas.LiquidacionAddMovimientosForm] = Form(...),  # type: ignore  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
     __: bool = Depends(Permiso(a.EDITAR, m.LIQUIDACION)),  # noqa: B008
@@ -190,3 +190,15 @@ async def en_revision_liquidacion(
     _: bool = Depends(Permiso(a.PASAR_A_REVISION, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.en_revision_liquidacion(db, id, data, current_user)
+
+
+@api.patch("/{id}/add_instrumentos", response_model=schemas.Liquidacion)
+async def add_instrumentos(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.LiquidacionAddInstrumentosForm] = Form(...),  # type: ignore  # noqa
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.INSTRUMENTO)),  # noqa: B008
+    __: bool = Depends(Permiso(a.EDITAR, m.LIQUIDACION)),  # noqa: B008
+):
+    return services.add_instrumentos(id, db, data, current_user.username)  # type: ignore

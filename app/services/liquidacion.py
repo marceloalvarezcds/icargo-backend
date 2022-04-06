@@ -9,11 +9,16 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
-from app.enums import EstadoEnum, TipoContraparteEnum
-from app.enums.liquidacion_etapa import LiquidacionEtapaEnum
-from app.models import Liquidacion, Movimiento, User
-from app.schemas import LiquidacionCreateForm, LiquidacionForm
+from app.enums import LiquidacionEstadoEnum, LiquidacionEtapaEnum, TipoContraparteEnum
+from app.models import Instrumento, Liquidacion, Movimiento, User
+from app.schemas import (
+    LiquidacionAddInstrumentosForm,
+    LiquidacionAddMovimientosForm,
+    LiquidacionForm,
+)
 from app.utils.gestor_carga import get_gestor_carga_by_params
+
+from .instrumento import create_instrumento
 
 
 def get_liquidacion_list(
@@ -58,7 +63,7 @@ def create_liquidacion(
 
 def create_liquidacion_pendiente(
     db: Session,
-    data: LiquidacionCreateForm,
+    data: LiquidacionAddMovimientosForm,
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Movimiento:
@@ -102,7 +107,7 @@ def create_liquidacion_pendiente(
 def get_liquidacion_by_id(db: Session, id: int) -> Liquidacion:
     obj = repositories.get_liquidacion_by_id(db, id)
     if not obj:
-        raise HTTPException(status_code=404, detail="Liquidacion no encontrado")
+        raise HTTPException(status_code=404, detail="Liquidación no encontrada")
     return obj
 
 
@@ -121,7 +126,7 @@ def edit_liquidacion(
 def delete_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
     obj = get_liquidacion_by_id(db, id)
     change_movimiento_list_status(
-        db, obj.movimientos, EstadoEnum.PENDIENTE, modified_by
+        db, obj.movimientos, LiquidacionEstadoEnum.PENDIENTE, modified_by
     )
     obj.movimientos = []
     return repositories.delete_liquidacion(obj, db, modified_by)
@@ -130,13 +135,13 @@ def delete_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
 def add_movimientos(
     id: int,
     db: Session,
-    data: LiquidacionCreateForm,
+    data: LiquidacionAddMovimientosForm,
     modified_by: str,
 ) -> Liquidacion:
     to_edit_obj = get_liquidacion_by_id(db, id)
     new_movimientos = get_movimiento_list_by_liquidacion_create_form(db, data)
     change_movimiento_list_status(
-        db, new_movimientos, EstadoEnum.EN_PROCESO, modified_by
+        db, new_movimientos, LiquidacionEstadoEnum.EN_PROCESO, modified_by
     )
     old_movimientos = to_edit_obj.movimientos
     to_edit_obj.movimientos = [*old_movimientos, *new_movimientos]
@@ -154,7 +159,7 @@ def remove_movimiento(
 ) -> Liquidacion:
     to_edit_obj = get_liquidacion_by_id(db, id)
     movimiento_to_remove = get_movimiento_by_schema(db, data)
-    movimiento_to_remove.estado = EstadoEnum.PENDIENTE.value
+    movimiento_to_remove.estado = LiquidacionEstadoEnum.PENDIENTE.value
     movimiento_to_remove.modified_by = modified_by
     movimiento_to_remove.modified_at = datetime.now()
     db.commit()
@@ -170,35 +175,64 @@ def remove_movimiento(
 def aceptar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
     obj = get_liquidacion_by_id(db, id)
     change_movimiento_list_status(
-        db, obj.movimientos, EstadoEnum.CONFIRMADO, modified_by
+        db, obj.movimientos, LiquidacionEstadoEnum.CONFIRMADO, modified_by
     )
     obj.etapa = LiquidacionEtapaEnum.CONFIRMADO.value
     return repositories.change_liquidacion_status(
-        obj, db, EstadoEnum.CONFIRMADO, modified_by
+        obj, db, LiquidacionEstadoEnum.SALDO_ABIERTO, modified_by
     )
 
 
 def cancelar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
     obj = get_liquidacion_by_id(db, id)
     change_movimiento_list_status(
-        db, obj.movimientos, EstadoEnum.PENDIENTE, modified_by
+        db, obj.movimientos, LiquidacionEstadoEnum.PENDIENTE, modified_by
     )
     obj.movimientos = []
     return repositories.change_liquidacion_status(
-        obj, db, EstadoEnum.CANCELADO, modified_by
+        obj, db, LiquidacionEstadoEnum.CANCELADO, modified_by
     )
 
 
 def rechazar_liquidacion(
     db: Session, id: int, comentario: str, user: User
 ) -> Liquidacion:
-    return change_liquidacion_status(db, id, comentario, EstadoEnum.RECHAZADO, user)
+    return change_liquidacion_status(
+        db, id, comentario, LiquidacionEstadoEnum.RECHAZADO, user
+    )
 
 
 def en_revision_liquidacion(
     db: Session, id: int, comentario: str, user: User
 ) -> Liquidacion:
-    return change_liquidacion_status(db, id, comentario, EstadoEnum.EN_REVISION, user)
+    return change_liquidacion_status(
+        db, id, comentario, LiquidacionEstadoEnum.EN_REVISION, user
+    )
+
+
+def add_instrumentos(
+    id: int,
+    db: Session,
+    data: LiquidacionAddInstrumentosForm,
+    modified_by: str,
+) -> Liquidacion:
+    saldo_residual = 0  # TODO: obtener de lo que viene del front
+    if int(saldo_residual) == 0:
+        obj = get_liquidacion_by_id(db, id)
+        get_instrumento_list_by_liquidacion_create_form(db, id, data, modified_by)
+        obj.modified_by = modified_by
+        obj.modified_at = datetime.now()
+        db.commit()
+        db.refresh(obj)
+        obj = repositories.change_liquidacion_status(
+            obj, db, LiquidacionEstadoEnum.SALDO_CERRADO, modified_by
+        )
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail="La suma de los instrumentos debe ser igual al Valor de la operación",
+        )
+    return obj
 
 
 def get_reports(datalist: List[Liquidacion]) -> str:
@@ -319,7 +353,7 @@ def get_reports(datalist: List[Liquidacion]) -> str:
 
 
 def change_liquidacion_status(
-    db: Session, id: int, comentario: str, estado: EstadoEnum, user: User
+    db: Session, id: int, comentario: str, estado: LiquidacionEstadoEnum, user: User
 ) -> Liquidacion:
     obj = get_liquidacion_by_id(db, id)
     if comentario:
@@ -334,7 +368,10 @@ def change_liquidacion_status(
 
 
 def change_movimiento_list_status(
-    db: Session, movimientos: List[Movimiento], estado: EstadoEnum, modified_by: str
+    db: Session,
+    movimientos: List[Movimiento],
+    estado: LiquidacionEstadoEnum,
+    modified_by: str,
 ):
     for mov in movimientos:
         mov.estado = estado.value
@@ -375,7 +412,7 @@ def get_movimiento_by_schema(db: Session, movimiento: schemas.Movimiento) -> Mov
 
 
 def get_movimiento_list_by_liquidacion_create_form(
-    db: Session, data: LiquidacionCreateForm
+    db: Session, data: LiquidacionAddMovimientosForm
 ) -> List[Movimiento]:
     mList = data.movimientos
     if len(mList) == 0:
@@ -386,6 +423,21 @@ def get_movimiento_list_by_liquidacion_create_form(
     for m in mList:
         mov = get_movimiento_by_schema(db, m)
         if mov:
-            mov.estado = EstadoEnum.EN_PROCESO.value
+            mov.estado = LiquidacionEstadoEnum.EN_PROCESO.value
             movimientos.append(mov)
     return movimientos
+
+
+def get_instrumento_list_by_liquidacion_create_form(
+    db: Session, id: int, data: LiquidacionAddInstrumentosForm, modified_by: str
+) -> List[Instrumento]:
+    iList = data.instrumentos
+    if len(iList) == 0:
+        raise HTTPException(
+            status_code=409, detail="Debe elegir al menos un instrumento"
+        )
+    instrumentos: List[Instrumento] = []
+    for i in iList:
+        instrumento = create_instrumento(db, id, i, modified_by)
+        instrumentos.append(instrumento)
+    return instrumentos

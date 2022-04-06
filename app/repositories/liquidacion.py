@@ -4,8 +4,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
 
-from app.enums import EstadoEnum
-from app.enums.liquidacion_etapa import LiquidacionEtapaEnum
+from app.enums import LiquidacionEstadoEnum, LiquidacionEtapaEnum
 from app.models import Liquidacion
 from app.schemas import LiquidacionForm
 
@@ -13,7 +12,7 @@ from app.schemas import LiquidacionForm
 def get_liquidacion_list(db: Session) -> List[Liquidacion]:
     return (
         db.query(Liquidacion)
-        .filter(Liquidacion.estado != EstadoEnum.ELIMINADO.value)
+        .filter(Liquidacion.estado != LiquidacionEstadoEnum.ELIMINADO.value)
         .order_by(Liquidacion.contraparte, Liquidacion.created_at)
         .all()
     )
@@ -35,7 +34,7 @@ def get_liquidacion_list_by_contraparte(
                 Liquidacion.contraparte_numero_documento
                 == contraparte_numero_documento,
                 Liquidacion.etapa == etapa,
-                Liquidacion.estado != EstadoEnum.ELIMINADO.value,
+                Liquidacion.estado != LiquidacionEstadoEnum.ELIMINADO.value,
             )
         )
         .order_by(Liquidacion.contraparte, Liquidacion.created_at)
@@ -61,7 +60,7 @@ def get_liquidacion_list_by_contraparte_and_gestor_carga_id(
                 == contraparte_numero_documento,
                 Liquidacion.etapa == etapa,
                 Liquidacion.gestor_carga_id == gestor_carga_id,
-                Liquidacion.estado != EstadoEnum.ELIMINADO.value,
+                Liquidacion.estado != LiquidacionEstadoEnum.ELIMINADO.value,
             )
         )
         .order_by(Liquidacion.contraparte, Liquidacion.created_at)
@@ -77,7 +76,7 @@ def get_liquidacion_list_by_gestor_carga_id(
         .filter(
             and_(
                 Liquidacion.gestor_carga_id == gestor_carga_id,
-                Liquidacion.estado != EstadoEnum.ELIMINADO.value,
+                Liquidacion.estado != LiquidacionEstadoEnum.ELIMINADO.value,
             )
         )
         .order_by(Liquidacion.contraparte, Liquidacion.created_at)
@@ -106,7 +105,7 @@ def create_liquidacion(
         propietario_id=data.propietario_id,
         proveedor_id=data.proveedor_id,
         remitente_id=data.remitente_id,
-        estado=EstadoEnum.EN_REVISION.value,
+        estado=LiquidacionEstadoEnum.EN_REVISION.value,
         etapa=LiquidacionEtapaEnum.EN_PROCESO.value,
         created_by=modified_by,
         modified_by=modified_by,
@@ -144,7 +143,7 @@ def edit_liquidacion(
 def change_liquidacion_status(
     obj: Liquidacion,
     db: Session,
-    status: EstadoEnum,
+    status: LiquidacionEstadoEnum,
     modified_by: str,
 ) -> Liquidacion:
     obj.estado = status.value
@@ -160,4 +159,6 @@ def delete_liquidacion(
     db: Session,
     modified_by: str,
 ) -> Liquidacion:
-    return change_liquidacion_status(obj, db, EstadoEnum.ELIMINADO, modified_by)
+    return change_liquidacion_status(
+        obj, db, LiquidacionEstadoEnum.ELIMINADO, modified_by
+    )

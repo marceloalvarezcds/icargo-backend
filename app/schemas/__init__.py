@@ -34,7 +34,8 @@ from .gestor_carga_propietario import GestorCargaPropietario  # noqa
 from .gestor_carga_proveedor import GestorCargaProveedor  # noqa
 from .gestor_carga_punto_venta import GestorCargaPuntoVenta  # noqa
 from .gestor_carga_remitente import GestorCargaRemitente  # noqa
-from .instrumento import Instrumento, InstrumentoForm  # noqa
+from .instrumento import Instrumento, InstrumentoForm, InstrumentoSaldoForm  # noqa
+from .instrumento_via import InstrumentoVia  # noqa
 from .insumo import Insumo, InsumoForm  # noqa
 from .insumo_punto_venta import InsumoPuntoVenta  # noqa
 from .insumo_punto_venta_precio import (  # noqa
@@ -42,7 +43,12 @@ from .insumo_punto_venta_precio import (  # noqa
     InsumoPuntoVentaPrecioForm,
     InsumoPuntoVentaPrecioList,
 )
-from .liquidacion import Liquidacion, LiquidacionCreateForm, LiquidacionForm  # noqa
+from .liquidacion import (  # noqa
+    Liquidacion,
+    LiquidacionAddInstrumentosForm,
+    LiquidacionAddMovimientosForm,
+    LiquidacionForm,
+)
 from .localidad import Localidad  # noqa
 from .marca_camion import MarcaCamion  # noqa
 from .marca_semi import MarcaSemi  # noqa

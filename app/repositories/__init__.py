@@ -1,5 +1,6 @@
 # should be imported to help code editor (vscode) for autocompletion
 from .banco import (  # noqa
+    change_banco_saldos,
     change_banco_status,
     create_banco,
     delete_banco,
@@ -10,6 +11,7 @@ from .banco import (  # noqa
     get_banco_list_by_gestor_carga_id,
 )
 from .caja import (  # noqa
+    change_caja_saldos,
     change_caja_status,
     create_caja,
     delete_caja,
@@ -170,6 +172,20 @@ from .gestor_carga_remitente import (  # noqa
     create_gestor_carga_remitente,
     edit_gestor_carga_remitente,
     get_gestor_carga_remitente_by,
+)
+from .instrumento import (  # noqa
+    change_instrumento_operacion_estado,
+    change_instrumento_status,
+    create_instrumento,
+    delete_instrumento,
+    edit_instrumento,
+    get_instrumento_by_id,
+    get_instrumento_list,
+)
+from .instrumento_via import (  # noqa
+    get_instrumento_via_by_descripcion,
+    get_instrumento_via_by_id,
+    get_instrumento_via_list,
 )
 from .insumo import (  # noqa
     get_insumo_by_descripcion,
@@ -396,6 +412,7 @@ from .tipo_documento_relacionado import (  # noqa
 from .tipo_instrumento import (  # noqa
     get_tipo_instrumento_by_descripcion,
     get_tipo_instrumento_list,
+    get_tipo_instrumento_list_by_via_id,
 )
 from .tipo_insumo import get_tipo_insumo_by_descripcion, get_tipo_insumo_list  # noqa
 from .tipo_movimiento import (  # noqa

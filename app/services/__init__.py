@@ -98,6 +98,15 @@ from .gestor_carga_remitente import (  # noqa
     create_gestor_carga_remitente,
     edit_gestor_carga_remitente,
 )
+from .instrumento import (  # noqa
+    confirmar_instrumento,
+    create_instrumento,
+    delete_instrumento,
+    edit_instrumento,
+    get_instrumento_by_id,
+    get_instrumento_reports,
+    rechazar_instrumento,
+)
 from .insumo_punto_venta import (  # noqa
     get_insumo_list_by_tipo_insumo_id_and_gestor_carga_id,
     get_moneda_list_by_insumo_id_and_punto_venta_id,
@@ -110,6 +119,7 @@ from .insumo_punto_venta_precio import (  # noqa
 )
 from .liquidacion import (  # noqa
     aceptar_liquidacion,
+    add_instrumentos,
     add_movimientos,
     cancelar_liquidacion,
     create_liquidacion,
@@ -243,4 +253,5 @@ from .semi import (  # noqa
     get_semi_by_id,
     get_semi_reports,
 )
+from .tipo_instrumento import get_tipo_instrumento_via_banco  # noqa
 from .user import create_user  # noqa

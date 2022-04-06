@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
@@ -93,6 +94,20 @@ def change_caja_status(
     modified_by: str,
 ) -> Caja:
     obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+def change_caja_saldos(
+    obj: Caja,
+    db: Session,
+    saldo: Decimal,
+    modified_by: str,
+) -> Caja:
+    obj.saldo_confirmado = saldo
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()

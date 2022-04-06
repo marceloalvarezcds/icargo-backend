@@ -18,6 +18,7 @@ def estado_cuenta_gestor_permiso_seeds(db: Session, user: User):
     permisos.append(permiso_seeds(db, a.ACEPTAR, m.LIQUIDACION))
     permisos.append(permiso_seeds(db, a.CANCELAR, m.LIQUIDACION))
     permisos.append(permiso_seeds(db, a.RECHAZAR, m.LIQUIDACION))
+    permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.INSTRUMENTO))
     user.permisos.extend(permisos)
     db.commit()
 
@@ -45,6 +46,9 @@ def permiso_generico_seeds(db: Session, user: User):
     )
     permisos.append(
         permiso_seeds(db, a.VER, m.ESTADO_CUENTA, True, "Ver Estado de cuenta")
+    )
+    permisos.append(
+        permiso_seeds(db, a.LISTAR, m.INSTRUMENTO_VIA, True, "Listar Instrumento via")
     )
     permisos.append(
         permiso_seeds(

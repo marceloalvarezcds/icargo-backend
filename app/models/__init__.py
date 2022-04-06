@@ -31,6 +31,7 @@ from .gestor_carga_proveedor import GestorCargaProveedor  # noqa
 from .gestor_carga_punto_venta import GestorCargaPuntoVenta  # noqa
 from .gestor_carga_remitente import GestorCargaRemitente  # noqa
 from .instrumento import Instrumento  # noqa
+from .instrumento_via import InstrumentoVia  # noqa
 from .insumo import Insumo  # noqa
 from .insumo_punto_venta import InsumoPuntoVenta  # noqa
 from .insumo_punto_venta_precio import InsumoPuntoVentaPrecio  # noqa
