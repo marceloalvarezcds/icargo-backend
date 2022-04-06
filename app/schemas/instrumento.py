@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -7,39 +8,60 @@ from app.enums import EstadoEnum, OperacionEstadoEnum
 from .date_model import Date
 
 
-class InstrumentoForm(BaseModel):
-    caja_id: int
-    banco_id: int
-    liquidacion_id: int
-    tipo_operacion_id: int
-    moneda_id: int
+class InstrumentoFormBaseModel(BaseModel):
+    via_id: int
+    caja_id: Optional[int]
+    banco_id: Optional[int]
+    fecha_instrumento: Date
+    numero_referencia: Optional[str] = None
+    comentario: Optional[str] = None
+    # Solo para cheque
+    cheque_es_diferido: Optional[bool] = False
+    cheque_fecha_vencimiento: Optional[Date] = None
+
+
+class InstrumentoForm(InstrumentoFormBaseModel):
+    tipo_instrumento_id: Optional[int]
+    liquidacion_id: Optional[int]
+    monto: Decimal
+
+
+class InstrumentoSaldoForm(InstrumentoForm):
+    operacion_estado: OperacionEstadoEnum
+    # Saldos
     credito: Decimal
     debito: Decimal
+    saldo_confirmado: Decimal
     # Datos mostrados solo para Banco
-    fecha_instrumento: Date
-    tipo_instrumento_id: int
-    operacion_numero_documento: str
-    operacion_descripcion: str
-    operacion_fecha: Date
+    provision: Decimal
+    saldo_provisional: Decimal
 
 
-class Instrumento(InstrumentoForm):
+class Instrumento(InstrumentoSaldoForm):
     id: int
-    url: str
+    liquidacion_id: int
     estado: EstadoEnum
+    tipo_instrumento_id: int
     # Datos mostrados solo para Banco
-    operacion_estado: OperacionEstadoEnum
+    provision_rechazada: Optional[Decimal]
     # Datos calculados
     contraparte: str
     contraparte_numero_documento: str
+    cuenta_descripcion: str
+    moneda_id: int
     moneda_nombre: str
     moneda_simbolo: str
-    saldo_confirmado: Decimal
-    saldo_provisional: Decimal
-    saldo_total: Decimal
+    saldo_total: Optional[Decimal]
     tipo_contraparte_descripcion: str
     tipo_instrumento_descripcion: str
     tipo_operacion_descripcion: str
+    url: str
+    via_descripcion: str
+    # Auditoría
+    created_by: str
+    created_at: Date
+    modified_by: str
+    modified_at: Date
 
     class Config:
         orm_mode = True

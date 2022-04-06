@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
@@ -85,6 +86,22 @@ def edit_banco(
     obj.nombre = data.nombre
     obj.moneda_id = data.moneda_id
     obj.gestor_carga_id = gestor_carga_id
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+def change_banco_saldos(
+    obj: Banco,
+    db: Session,
+    saldo_confirmado: Decimal,
+    saldo_provisional: Decimal,
+    modified_by: str,
+) -> Banco:
+    obj.saldo_confirmado = saldo_confirmado
+    obj.saldo_provisional = saldo_provisional
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()

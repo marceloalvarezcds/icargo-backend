@@ -29,10 +29,10 @@ class Caja(AuditMixin, Base):
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
     moneda = relationship(Moneda, uselist=False)
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
-    credito = Column(Numeric(38, 10))
-    debito = Column(Numeric(38, 10))
     saldo_confirmado = Column(Numeric(38, 10))
-    instrumentos = relationship("Instrumento", back_populates="caja")
+    instrumentos = relationship(
+        "Instrumento", back_populates="caja", order_by="Instrumento.modified_by"
+    )
 
     @hybrid_property
     def moneda_nombre(self):

@@ -1,6 +1,6 @@
 from enum import Enum
 
 
-class TipoCuentaEnum(Enum):
+class InstrumentoViaEnum(Enum):
     BANCO = "Banco"
     CAJA = "Caja"

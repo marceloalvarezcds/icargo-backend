@@ -19,6 +19,8 @@ from app.endpoints import (
     flete,
     flete_anticipo,
     gestor_carga,
+    instrumento,
+    instrumento_via,
     insumo,
     insumo_punto_venta,
     insumo_punto_venta_precio,
@@ -52,6 +54,7 @@ from app.endpoints import (
     tipo_concepto_complemento,
     tipo_concepto_descuento,
     tipo_documento,
+    tipo_instrumento,
     tipo_insumo,
     tipo_persona,
     tipo_registro,
@@ -102,6 +105,10 @@ api.include_router(
     flete_anticipo.api, prefix="/flete_anticipo", tags=["flete_anticipo"]
 )
 api.include_router(gestor_carga.api, prefix="/gestor_carga", tags=["gestor_carga"])
+api.include_router(instrumento.api, prefix="/instrumento", tags=["instrumento"])
+api.include_router(
+    instrumento_via.api, prefix="/instrumento_via", tags=["instrumento_via"]
+)
 api.include_router(insumo.api, prefix="/insumo", tags=["insumo"])
 api.include_router(
     insumo_punto_venta.api, prefix="/insumo_punto_venta", tags=["insumo_punto_venta"]
@@ -178,6 +185,9 @@ api.include_router(
 )
 api.include_router(
     tipo_documento.api, prefix="/tipo_documento", tags=["tipo_documento"]
+)
+api.include_router(
+    tipo_instrumento.api, prefix="/tipo_instrumento", tags=["tipo_instrumento"]
 )
 api.include_router(tipo_insumo.api, prefix="/tipo_insumo", tags=["tipo_insumo"])
 api.include_router(tipo_persona.api, prefix="/tipo_persona", tags=["tipo_persona"])

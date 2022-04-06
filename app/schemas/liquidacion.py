@@ -3,17 +3,21 @@ from typing import List, Optional
 
 from pydantic import BaseModel, validator
 
-from app.enums.estado import EstadoEnum
-from app.enums.liquidacion_etapa import LiquidacionEtapaEnum
+from app.enums import LiquidacionEstadoEnum, LiquidacionEtapaEnum
 
 from .date_model import Date
+from .instrumento import Instrumento, InstrumentoForm
 from .moneda import Moneda
 from .movimiento import Movimiento
 from .tipo_contraparte import TipoContraparte
 
 
-class LiquidacionCreateForm(BaseModel):
+class LiquidacionAddMovimientosForm(BaseModel):
     movimientos: List[Movimiento]
+
+
+class LiquidacionAddInstrumentosForm(BaseModel):
+    instrumentos: List[InstrumentoForm]
 
 
 class LiquidacionForm(BaseModel):
@@ -33,23 +37,23 @@ class Liquidacion(LiquidacionForm):
     id: int
     tipo_contraparte: TipoContraparte
     fecha_pago_cobro: Optional[Date]
-    estado: EstadoEnum
+    estado: LiquidacionEstadoEnum
     etapa: LiquidacionEtapaEnum
     moneda: Moneda
     comentarios: Optional[str]
     movimientos: List[Movimiento]
-    # instrumentos: List[Instrumento]
+    instrumentos: List[Instrumento]
     # Campos calculados
     credito: Decimal
     es_cobro: bool
-    esta_pagado: bool
+    esta_pagado: Optional[bool] = False
     debito: Decimal
     instrumentos_saldo: Optional[Decimal]
     moneda_nombre: str
     moneda_simbolo: str
     movimientos_saldo: Decimal
     saldo: Decimal
-    saldo_residual: Decimal
+    saldo_residual: Optional[Decimal] = Decimal(0)
     tipo_contraparte_descripcion: str
     tipo_operacion_descripcion: str
     url: str

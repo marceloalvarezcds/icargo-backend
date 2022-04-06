@@ -11,7 +11,7 @@ from sqlalchemy.orm import relationship  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
-from app.enums import EstadoEnum, LiquidacionEtapaEnum
+from app.enums import LiquidacionEstadoEnum, LiquidacionEtapaEnum
 
 from .chofer import Chofer
 from .gestor_carga import GestorCarga
@@ -33,7 +33,7 @@ class Liquidacion(AuditMixin, Base):
     contraparte = Column(String(255))
     contraparte_numero_documento = Column(String(255))
     fecha_pago_cobro = Column(DateTime)
-    estado = Column(String(255), server_default=EstadoEnum.EN_REVISION.value)
+    estado = Column(String(255), server_default=LiquidacionEstadoEnum.EN_REVISION.value)
     etapa = Column(String(255), server_default=LiquidacionEtapaEnum.EN_PROCESO.value)
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
     moneda = relationship(Moneda, uselist=False)
@@ -51,7 +51,9 @@ class Liquidacion(AuditMixin, Base):
     remitente = relationship(Remitente, uselist=False)
     # Listas
     movimientos = relationship("Movimiento", back_populates="liquidacion")
-    instrumentos = relationship("Instrumento", back_populates="liquidacion")
+    instrumentos = relationship(
+        "Instrumento", back_populates="liquidacion", order_by="Instrumento.modified_by"
+    )
 
     @hybrid_property
     def credito(self):
@@ -71,7 +73,7 @@ class Liquidacion(AuditMixin, Base):
 
     @hybrid_property
     def instrumentos_saldo(self):
-        return sum(x.saldo_total for x in self.instrumentos)
+        return sum(x.monto for x in self.instrumentos)
 
     @hybrid_property
     def moneda_nombre(self):

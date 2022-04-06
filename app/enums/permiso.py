@@ -40,6 +40,7 @@ class PermisoModeloEnum(Enum):
     FLETE_DESCUENTO = "flete_descuento"
     GESTOR_CARGA = "gestor_carga"
     INSTRUMENTO = "instrumento"
+    INSTRUMENTO_VIA = "instrumento_via"
     INSUMO = "insumo"
     INSUMO_PUNTO_VENTA = "insumo_punto_venta"
     INSUMO_PUNTO_VENTA_PRECIO = "insumo_punto_venta_precio"
