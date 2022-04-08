@@ -50,9 +50,14 @@ class Liquidacion(AuditMixin, Base):
     remitente_id = Column(Integer, ForeignKey("remitente.id"))
     remitente = relationship(Remitente, uselist=False)
     # Listas
-    movimientos = relationship("Movimiento", back_populates="liquidacion")
+    movimientos = relationship(
+        "Movimiento", back_populates="liquidacion", order_by="Movimiento.created_at"
+    )
     instrumentos = relationship(
-        "Instrumento", back_populates="liquidacion", order_by="Instrumento.modified_by"
+        "Instrumento", back_populates="liquidacion", order_by="Instrumento.modified_at"
+    )
+    facturas = relationship(
+        "Factura", back_populates="liquidacion", order_by="Factura.modified_at"
     )
 
     @hybrid_property

@@ -11,6 +11,7 @@ def estado_cuenta_gestor_permiso_seeds(db: Session, user: User):
     permiso_generico_seeds(db, user)
     permiso_banco_seeds(db, user)
     permiso_caja_seeds(db, user)
+    permiso_factura_seeds(db, user)
     permiso_instrumento_seeds(db, user)
     permiso_movimiento_seeds(db, user)
     permiso_liquidacion_seeds(db, user)
@@ -27,6 +28,7 @@ def estado_cuenta_permiso_seeds(db: Session, user: User):
     permiso_generico_seeds(db, user)
     permiso_banco_seeds(db, user)
     permiso_caja_seeds(db, user)
+    permiso_factura_seeds(db, user)
     permiso_instrumento_seeds(db, user)
     permiso_movimiento_seeds(db, user)
     permiso_liquidacion_seeds(db, user)
@@ -58,6 +60,7 @@ def permiso_generico_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.LISTAR, m.TIPO_CUENTA, True, "Listar Tipo de cuenta")
     )
+    permisos.append(permiso_seeds(db, a.LISTAR, m.TIPO_IVA, True, "Listar Tipo de IVA"))
     permisos.append(
         permiso_seeds(
             db,
@@ -112,6 +115,17 @@ def permiso_caja_seeds(db: Session, user: User):
             True,
         )
     )
+    user.permisos.extend(permisos)
+    db.commit()
+
+
+def permiso_factura_seeds(db: Session, user: User):
+    permisos = []
+    permisos.append(permiso_seeds(db, a.CREAR, m.FACTURA, True))
+    permisos.append(permiso_seeds(db, a.EDITAR, m.FACTURA, True))
+    permisos.append(permiso_seeds(db, a.ELIMINAR, m.FACTURA, True))
+    permisos.append(permiso_seeds(db, a.LISTAR, m.FACTURA, True))
+    permisos.append(permiso_seeds(db, a.VER, m.FACTURA, True))
     user.permisos.extend(permisos)
     db.commit()
 

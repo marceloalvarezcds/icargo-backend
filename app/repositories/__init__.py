@@ -102,6 +102,15 @@ from .estado_cuenta import (  # noqa
     get_estado_cuenta_list,
     get_estado_cuenta_list_by_gestor_carga_id,
 )
+from .factura import (  # noqa
+    change_factura_status,
+    create_factura,
+    delete_factura,
+    edit_factura,
+    get_factura_by,
+    get_factura_by_id,
+    get_factura_list_by_liquidacion_id,
+)
 from .flete import (  # noqa
     change_flete_public_status,
     change_flete_status,
@@ -415,6 +424,7 @@ from .tipo_instrumento import (  # noqa
     get_tipo_instrumento_list_by_via_id,
 )
 from .tipo_insumo import get_tipo_insumo_by_descripcion, get_tipo_insumo_list  # noqa
+from .tipo_iva import get_tipo_iva_by_descripcion, get_tipo_iva_list  # noqa
 from .tipo_movimiento import (  # noqa
     get_tipo_movimiento_by_descripcion,
     get_tipo_movimiento_list,

@@ -23,6 +23,7 @@ from .tipo_contraparte_seeds import tipo_contraparte_seeds
 from .tipo_documento_relacionado_seeds import tipo_documento_relacionado_seeds
 from .tipo_instrumento_seeds import tipo_instrumento_seeds
 from .tipo_insumo_seeds import tipo_insumo_seeds
+from .tipo_iva_seeds import tipo_iva_seeds
 from .tipo_persona_seeds import tipo_persona_seeds
 from .tipo_registro_seeds import tipo_registro_seeds
 from .tipo_semi_seeds import tipo_semi_seeds
@@ -60,3 +61,4 @@ def seeds(db: Session):
     insumo_seeds(db)
     producto_seeds(db)
     tipo_instrumento_seeds(db)
+    tipo_iva_seeds(db)

@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional, Tuple
 
@@ -15,7 +16,13 @@ from app.enums import (
     LiquidacionEtapaEnum,
     OperacionEstadoEnum,
 )
-from app.models import Instrumento, InstrumentoVia, Liquidacion, TipoInstrumento
+from app.models import (
+    Instrumento,
+    InstrumentoVia,
+    Liquidacion,
+    Movimiento,
+    TipoInstrumento,
+)
 from app.schemas import InstrumentoForm, InstrumentoSaldoForm
 
 from .banco import get_banco_by_id
@@ -99,6 +106,19 @@ def get_tipo_instrumento_by_descripcion(
     return obj
 
 
+def change_movimiento_list_status(
+    db: Session,
+    movimientos: List[Movimiento],
+    estado: LiquidacionEtapaEnum,
+    modified_by: str,
+):
+    for mov in movimientos:
+        mov.estado = estado.value
+        mov.modified_by = modified_by
+        mov.modified_at = datetime.now()
+    db.commit()
+
+
 def finalizar_liquidacion(db: Session, liquidacion: Liquidacion, modified_by: str):
     is_saldo_cerrado = int(liquidacion.saldo_residual) == 0
     instrumentos: List[Instrumento] = liquidacion.instrumentos
@@ -109,6 +129,9 @@ def finalizar_liquidacion(db: Session, liquidacion: Liquidacion, modified_by: st
                 is_finalizado = False
     if is_finalizado:
         liquidacion.etapa = LiquidacionEtapaEnum.FINALIZADO.value
+        change_movimiento_list_status(
+            db, liquidacion.movimientos, LiquidacionEtapaEnum.FINALIZADO, modified_by
+        )
         repositories.change_liquidacion_status(
             liquidacion, db, LiquidacionEstadoEnum.FINALIZADO, modified_by
         )
