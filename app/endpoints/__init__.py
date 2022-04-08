@@ -16,6 +16,7 @@ from app.endpoints import (
     ente_emisor_automotor,
     ente_emisor_transporte,
     estado_cuenta,
+    factura,
     flete,
     flete_anticipo,
     gestor_carga,
@@ -56,6 +57,7 @@ from app.endpoints import (
     tipo_documento,
     tipo_instrumento,
     tipo_insumo,
+    tipo_iva,
     tipo_persona,
     tipo_registro,
     tipo_semi,
@@ -100,6 +102,7 @@ api.include_router(
     tags=["ente_emisor_transporte"],
 )
 api.include_router(estado_cuenta.api, prefix="/estado_cuenta", tags=["estado_cuenta"])
+api.include_router(factura.api, prefix="/factura", tags=["factura"])
 api.include_router(flete.api, prefix="/flete", tags=["flete"])
 api.include_router(
     flete_anticipo.api, prefix="/flete_anticipo", tags=["flete_anticipo"]
@@ -190,6 +193,7 @@ api.include_router(
     tipo_instrumento.api, prefix="/tipo_instrumento", tags=["tipo_instrumento"]
 )
 api.include_router(tipo_insumo.api, prefix="/tipo_insumo", tags=["tipo_insumo"])
+api.include_router(tipo_iva.api, prefix="/tipo_iva", tags=["tipo_iva"])
 api.include_router(tipo_persona.api, prefix="/tipo_persona", tags=["tipo_persona"])
 api.include_router(tipo_registro.api, prefix="/tipo_registro", tags=["tipo_registro"])
 api.include_router(tipo_semi.api, prefix="/tipo_semi", tags=["tipo_semi"])

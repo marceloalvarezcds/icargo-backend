@@ -53,6 +53,12 @@ from .estado_cuenta import (  # noqa
     get_estado_cuenta_list,
     get_estado_cuenta_reports,
 )
+from .factura import (  # noqa
+    create_factura,
+    delete_factura,
+    edit_factura,
+    get_factura_by_id,
+)
 from .flete import (  # noqa
     change_flete_public_status,
     change_flete_status,

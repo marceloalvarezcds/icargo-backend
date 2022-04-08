@@ -19,6 +19,7 @@ from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto  # noqa
 from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa
 from .ente_emisor_transporte import EnteEmisorTransporte  # noqa
+from .factura import Factura  # noqa
 from .flete import Flete  # noqa
 from .flete_anticipo import FleteAnticipo  # noqa
 from .flete_complemento import FleteComplemento  # noqa
@@ -75,6 +76,7 @@ from .tipo_documento import TipoDocumento  # noqa
 from .tipo_documento_relacionado import TipoDocumentoRelacionado  # noqa
 from .tipo_instrumento import TipoInstrumento  # noqa
 from .tipo_insumo import TipoInsumo  # noqa
+from .tipo_iva import TipoIva  # noqa
 from .tipo_movimiento import TipoMovimiento  # noqa
 from .tipo_persona import TipoPersona  # noqa
 from .tipo_registro import TipoRegistro  # noqa

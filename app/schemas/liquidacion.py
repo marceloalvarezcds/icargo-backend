@@ -6,6 +6,7 @@ from pydantic import BaseModel, validator
 from app.enums import LiquidacionEstadoEnum, LiquidacionEtapaEnum
 
 from .date_model import Date
+from .factura import Factura
 from .instrumento import Instrumento, InstrumentoForm
 from .moneda import Moneda
 from .movimiento import Movimiento
@@ -43,6 +44,7 @@ class Liquidacion(LiquidacionForm):
     comentarios: Optional[str]
     movimientos: List[Movimiento]
     instrumentos: List[Instrumento]
+    facturas: List[Factura]
     # Campos calculados
     credito: Decimal
     es_cobro: bool
