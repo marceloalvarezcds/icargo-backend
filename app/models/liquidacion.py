@@ -78,7 +78,7 @@ class Liquidacion(AuditMixin, Base):
 
     @hybrid_property
     def instrumentos_saldo(self):
-        return sum(x.monto for x in self.instrumentos)
+        return abs(sum(x.monto for x in self.instrumentos))
 
     @hybrid_property
     def moneda_nombre(self):
@@ -98,7 +98,7 @@ class Liquidacion(AuditMixin, Base):
 
     @hybrid_property
     def saldo_residual(self):
-        return self.movimientos_saldo - self.instrumentos_saldo
+        return abs(self.movimientos_saldo) - self.instrumentos_saldo
 
     @hybrid_property
     def tipo_contraparte_descripcion(self):
