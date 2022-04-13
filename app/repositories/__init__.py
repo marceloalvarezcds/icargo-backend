@@ -89,6 +89,10 @@ from .contacto import (  # noqa
     get_contacto_by_telefono,
     get_contacto_by_telefono_and_email,
 )
+from .contraparte import (  # noqa
+    get_contraparte_by_contraparte_and_tipo_contraparte_id,
+    get_contraparte_list_by_tipo_contraparte_id,
+)
 from .ente_emisor_automotor import (  # noqa
     get_ente_emisor_automotor_by_descripcion,
     get_ente_emisor_automotor_list,
@@ -233,6 +237,7 @@ from .movimiento import (  # noqa
     delete_movimiento,
     edit_movimiento,
     get_movimiento_by_id,
+    get_movimiento_count_by_tipo_documento_relacionado_id,
     get_movimiento_list,
     get_movimiento_list_by_contraparte,
     get_movimiento_list_by_contraparte_and_gestor_carga_id,
@@ -406,6 +411,7 @@ from .tipo_concepto_descuento import (  # noqa
     get_tipo_concepto_descuento_list,
 )
 from .tipo_contraparte import (  # noqa
+    get_tipo_comprobante_by_id,
     get_tipo_contraparte_by_descripcion,
     get_tipo_contraparte_list,
 )

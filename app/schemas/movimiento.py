@@ -20,14 +20,18 @@ class MovimientoForm(BaseModel):
     tipo_contraparte_id: int
     contraparte: str
     contraparte_numero_documento: str
-    tipo_documento_relacionado_id: int
+    tipo_documento_relacionado_id: Optional[int]
     numero_documento_relacionado: Optional[int]
-    cuenta_id: int
-    tipo_movimiento_id: int
+    cuenta_id: Optional[int]
+    tipo_movimiento_id: Optional[int]
+    es_editable: Optional[bool] = False
+    estado: MovimientoEstadoEnum
+    fecha: Optional[Date]
+    detalle: Optional[str]
     monto: Decimal
     moneda_id: int
-    tipo_cambio_moneda: Decimal
-    fecha_cambio_moneda: Date
+    tipo_cambio_moneda: Optional[Decimal]
+    fecha_cambio_moneda: Optional[Date]
     # En caso de ser movimiento de anticipo
     anticipo_id: Optional[int]
     # En caso de ser movimiento de complemento o descuento
@@ -43,22 +47,20 @@ class MovimientoForm(BaseModel):
 class Movimiento(MovimientoForm):
     id: int
     gestor_carga_id: int
-    estado: MovimientoEstadoEnum
     tipo_contraparte: TipoContraparte
     tipo_documento_relacionado: TipoDocumentoRelacionado
     cuenta: TipoCuenta
-    tipo_movimiento: TipoMovimiento
+    tipo_movimiento: Optional[TipoMovimiento]
     moneda: Moneda
     # Campos calculados
     credito: Decimal
-    camion_placa: str
-    chofer_nombre: str
-    chofer_numero_documento: str
+    camion_placa: Optional[str]
+    chofer_nombre: Optional[str]
+    chofer_numero_documento: Optional[str]
     concepto: str
     cuenta_descripcion: str
     debito: Decimal
-    destino_nombre: str
-    detalle: Optional[str]
+    destino_nombre: Optional[str]
     es_cobro: bool
     fecha_pago_cobro: Optional[Date]
     flete_id: Optional[int]

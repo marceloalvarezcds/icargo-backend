@@ -1,17 +1,20 @@
 from sqlalchemy import (  # type: ignore
+    Boolean,
     Column,
     DateTime,
     ForeignKey,
     Integer,
     Numeric,
     String,
+    Text,
+    text,
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
-from app.enums import MovimientoEstadoEnum, TipoContraparteEnum, TipoMovimientoEnum
+from app.enums import MovimientoEstadoEnum
 
 from .chofer import Chofer
 from .gestor_carga import GestorCarga
@@ -57,6 +60,9 @@ class Movimiento(AuditMixin, Base):
     cuenta = relationship(TipoCuenta, uselist=False)
     tipo_movimiento_id = Column(Integer, ForeignKey("tipo_movimiento.id"))
     tipo_movimiento = relationship(TipoMovimiento, uselist=False)  # concepto
+    es_editable = Column(Boolean, server_default=text("false"))
+    fecha = Column(DateTime)
+    detalle = Column(Text)
     monto = Column(Numeric(38, 10))
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
     moneda = relationship(Moneda, uselist=False)
@@ -111,40 +117,6 @@ class Movimiento(AuditMixin, Base):
     @hybrid_property
     def destino_nombre(self):
         return self.orden_carga.destino_nombre
-
-    @hybrid_property
-    def detalle(self):
-        if self.tipo_movimiento_descripcion == TipoMovimientoEnum.ANTICIPO.value:
-            return self.anticipo.detalle
-        elif self.tipo_movimiento_descripcion == TipoMovimientoEnum.FLETE.value:
-            if (
-                self.tipo_contraparte_descripcion
-                == TipoContraparteEnum.PROPIETARIO.value
-            ):
-                return self.orden_carga.flete_propietario_detalle
-            return self.orden_carga.flete_gestor_carga_detalle
-        elif self.tipo_movimiento_descripcion == TipoMovimientoEnum.COMPLEMENTO.value:
-            if (
-                self.tipo_contraparte_descripcion
-                == TipoContraparteEnum.PROPIETARIO.value
-            ):
-                return self.complemento.propietario_detalle
-            return self.complemento.remitente_detalle
-        elif self.tipo_movimiento_descripcion == TipoMovimientoEnum.DESCUENTO.value:
-            if (
-                self.tipo_contraparte_descripcion
-                == TipoContraparteEnum.PROPIETARIO.value
-            ):
-                return self.descuento.propietario_detalle
-            return self.descuento.proveedor_detalle
-        elif self.tipo_movimiento_descripcion == TipoMovimientoEnum.MERMA.value:
-            if (
-                self.tipo_contraparte_descripcion
-                == TipoContraparteEnum.PROPIETARIO.value
-            ):
-                return self.orden_carga.merma_propietario_detalle
-            return self.orden_carga.merma_gestor_carga_detalle
-        return ""
 
     @hybrid_property
     def es_cobro(self):
