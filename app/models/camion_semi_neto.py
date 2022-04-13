@@ -34,6 +34,10 @@ class CamionSemiNeto(AuditMixin, Base):
     estado = Column(String(15), server_default=EstadoEnum.ACTIVO.value)
 
     @hybrid_property
+    def camion_info(self):
+        return self.camion.info
+
+    @hybrid_property
     def camion_placa(self):
         return self.camion.placa
 
@@ -44,6 +48,10 @@ class CamionSemiNeto(AuditMixin, Base):
     @hybrid_property
     def producto_descripcion(self):
         return self.producto.descripcion
+
+    @hybrid_property
+    def semi_info(self):
+        return self.semi.info
 
     @hybrid_property
     def semi_placa(self):

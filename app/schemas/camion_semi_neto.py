@@ -16,7 +16,9 @@ class CamionSemiNetoForm(BaseModel):
 
 class CamionSemiNeto(CamionSemiNetoForm):
     id: int
+    camion_info: str
     camion_placa: str
+    semi_info: str
     semi_placa: str
     producto_descripcion: Optional[str] = None
     gestor_carga_id: int

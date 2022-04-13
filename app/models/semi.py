@@ -105,6 +105,10 @@ class Semi(AuditMixin, Base):
         return self.ciudad_habilitacion_municipal.localidad.nombre
 
     @hybrid_property
+    def info(self):
+        return f"{self.placa} - {self.propietario_nombre}"
+
+    @hybrid_property
     def marca_descripcion(self):
         return self.marca.descripcion
 
