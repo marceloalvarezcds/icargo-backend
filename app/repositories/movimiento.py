@@ -96,6 +96,23 @@ def get_movimiento_list_by_orden_carga_id(
     )
 
 
+def get_movimiento_count_by_tipo_documento_relacionado_id(
+    db: Session, tipo_documento_relacionado_id: int
+) -> int:
+    return (
+        db.query(Movimiento)
+        .filter(
+            and_(
+                Movimiento.tipo_documento_relacionado_id
+                == tipo_documento_relacionado_id,
+                Movimiento.estado != MovimientoEstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(Movimiento.contraparte, Movimiento.liquidacion_id)
+        .count()
+    )
+
+
 def get_movimiento_by_id(db: Session, id: int) -> Optional[Movimiento]:
     return db.query(Movimiento).get(id)
 
@@ -117,6 +134,10 @@ def create_movimiento(
         numero_documento_relacionado=data.numero_documento_relacionado,
         cuenta_id=data.cuenta_id,
         tipo_movimiento_id=data.tipo_movimiento_id,
+        es_editable=data.es_editable,
+        estado=data.estado.value,
+        fecha=data.fecha,
+        detalle=data.detalle,
         monto=data.monto,
         moneda_id=data.moneda_id,
         tipo_cambio_moneda=data.tipo_cambio_moneda,
@@ -156,6 +177,7 @@ def edit_movimiento(
     obj.numero_documento_relacionado = data.numero_documento_relacionado
     obj.cuenta_id = data.cuenta_id
     obj.tipo_movimiento_id = data.tipo_movimiento_id
+    obj.detalle = data.detalle
     obj.monto = data.monto
     obj.moneda_id = data.moneda_id
     obj.tipo_cambio_moneda = data.tipo_cambio_moneda

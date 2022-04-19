@@ -19,6 +19,7 @@ from .ciudad import Ciudad  # noqa
 from .color import Color  # noqa
 from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
+from .contraparte import Contraparte  # noqa
 from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa
 from .ente_emisor_transporte import EnteEmisorTransporte  # noqa
 from .estado_cuenta import EstadoCuenta  # noqa

@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
-from typing import List, Optional
+from decimal import Decimal
+from typing import List, Optional, cast
 
 from fastapi import HTTPException  # type: ignore
 from openpyxl import Workbook  # type: ignore
@@ -9,7 +10,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
 from app.config import REPORTS_FOLDER
-from app.enums import TipoMovimientoEnum
+from app.enums import MovimientoEstadoEnum, TipoContraparteEnum, TipoMovimientoEnum
 from app.models import (
     Movimiento,
     OrdenCarga,
@@ -18,6 +19,7 @@ from app.models import (
     OrdenCargaDescuento,
 )
 from app.schemas import MovimientoForm
+from app.schemas.date_model import Date
 
 
 def get_movimiento_list(
@@ -74,10 +76,10 @@ def create_movimiento_by_anticipo(
     modified_by: str,
 ) -> Optional[Movimiento]:
     propietario_contraparte = repositories.get_tipo_contraparte_by_descripcion(
-        db, "Propietario"
+        db, TipoContraparteEnum.PROPIETARIO.value
     )
     proveedor_contraparte = repositories.get_tipo_contraparte_by_descripcion(
-        db, "Proveedor"
+        db, TipoContraparteEnum.PROVEEDOR.value
     )
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
@@ -108,6 +110,8 @@ def create_movimiento_by_anticipo(
             numero_documento_relacionado=anticipo.orden_carga_id,
             cuenta_id=tipo_cuenta.id,
             tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.PENDIENTE,
+            detalle=anticipo.detalle,
             monto=anticipo.monto_retirado,
             moneda_id=anticipo.moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
@@ -129,6 +133,8 @@ def create_movimiento_by_anticipo(
             numero_documento_relacionado=anticipo.orden_carga_id,
             cuenta_id=tipo_cuenta.id,
             tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.PENDIENTE,
+            detalle=anticipo.detalle,
             monto=-anticipo.monto_retirado,
             moneda_id=anticipo.moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en anticipos  # noqa
@@ -148,10 +154,10 @@ def create_movimiento_by_flete(
     modified_by: str,
 ) -> Optional[Movimiento]:
     propietario_contraparte = repositories.get_tipo_contraparte_by_descripcion(
-        db, "Propietario"
+        db, TipoContraparteEnum.PROPIETARIO.value
     )
     remitente_contraparte = repositories.get_tipo_contraparte_by_descripcion(
-        db, "Remitente"
+        db, TipoContraparteEnum.REMITENTE.value
     )
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
@@ -182,6 +188,8 @@ def create_movimiento_by_flete(
             numero_documento_relacionado=orden_carga.id,
             cuenta_id=tipo_cuenta.id,
             tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.PENDIENTE,
+            detalle=orden_carga.flete_gestor_carga_detalle,
             monto=-orden_carga.resultado_gestor_carga_total_flete,
             moneda_id=orden_carga.flete.condicion_gestor_cuenta_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
@@ -202,6 +210,8 @@ def create_movimiento_by_flete(
             numero_documento_relacionado=orden_carga.id,
             cuenta_id=tipo_cuenta.id,
             tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.PENDIENTE,
+            detalle=orden_carga.flete_propietario_detalle,
             monto=orden_carga.resultado_propietario_total_flete,
             moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
@@ -220,10 +230,10 @@ def create_movimiento_by_complemento(
     modified_by: str,
 ) -> Optional[Movimiento]:
     propietario_contraparte = repositories.get_tipo_contraparte_by_descripcion(
-        db, "Propietario"
+        db, TipoContraparteEnum.PROPIETARIO.value
     )
     remitente_contraparte = repositories.get_tipo_contraparte_by_descripcion(
-        db, "Remitente"
+        db, TipoContraparteEnum.REMITENTE.value
     )
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
@@ -255,6 +265,8 @@ def create_movimiento_by_complemento(
                 numero_documento_relacionado=complemento.orden_carga_id,
                 cuenta_id=tipo_cuenta.id,
                 tipo_movimiento_id=tipo_movimiento.id,
+                estado=MovimientoEstadoEnum.PENDIENTE,
+                detalle=complemento.remitente_detalle,
                 monto=-complemento.remitente_monto,
                 moneda_id=complemento.remitente_moneda_id,
                 tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Complemento  # noqa
@@ -276,6 +288,8 @@ def create_movimiento_by_complemento(
             numero_documento_relacionado=complemento.orden_carga_id,
             cuenta_id=tipo_cuenta.id,
             tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.PENDIENTE,
+            detalle=complemento.propietario_detalle,
             monto=complemento.propietario_monto,
             moneda_id=complemento.propietario_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Complemento  # noqa
@@ -295,10 +309,10 @@ def create_movimiento_by_descuento(
     modified_by: str,
 ) -> Optional[Movimiento]:
     propietario_contraparte = repositories.get_tipo_contraparte_by_descripcion(
-        db, "Propietario"
+        db, TipoContraparteEnum.PROPIETARIO.value
     )
     proveedor_contraparte = repositories.get_tipo_contraparte_by_descripcion(
-        db, "Proveedor"
+        db, TipoContraparteEnum.PROVEEDOR.value
     )
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
@@ -330,6 +344,8 @@ def create_movimiento_by_descuento(
                 numero_documento_relacionado=descuento.orden_carga_id,
                 cuenta_id=tipo_cuenta.id,
                 tipo_movimiento_id=tipo_movimiento.id,
+                estado=MovimientoEstadoEnum.PENDIENTE,
+                detalle=descuento.proveedor_detalle,
                 monto=descuento.proveedor_monto,
                 moneda_id=descuento.proveedor_moneda_id,
                 tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
@@ -351,6 +367,8 @@ def create_movimiento_by_descuento(
             numero_documento_relacionado=descuento.orden_carga_id,
             cuenta_id=tipo_cuenta.id,
             tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.PENDIENTE,
+            detalle=descuento.propietario_detalle,
             monto=-descuento.propietario_monto,
             moneda_id=descuento.propietario_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
@@ -370,10 +388,10 @@ def create_movimiento_by_merma(
     modified_by: str,
 ) -> Optional[Movimiento]:
     propietario_contraparte = repositories.get_tipo_contraparte_by_descripcion(
-        db, "Propietario"
+        db, TipoContraparteEnum.PROPIETARIO.value
     )
     remitente_contraparte = repositories.get_tipo_contraparte_by_descripcion(
-        db, "Remitente"
+        db, TipoContraparteEnum.REMITENTE.value
     )
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
@@ -404,6 +422,8 @@ def create_movimiento_by_merma(
             numero_documento_relacionado=orden_carga.id,
             cuenta_id=tipo_cuenta.id,
             tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.PENDIENTE,
+            detalle=orden_carga.merma_gestor_carga_detalle,
             monto=orden_carga.resultado_gestor_carga_merma_valor_total,
             moneda_id=orden_carga.flete.condicion_gestor_cuenta_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
@@ -424,12 +444,76 @@ def create_movimiento_by_merma(
             numero_documento_relacionado=orden_carga.id,
             cuenta_id=tipo_cuenta.id,
             tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.PENDIENTE,
+            detalle=orden_carga.merma_propietario_detalle,
             monto=-orden_carga.resultado_propietario_merma_valor_total,
             moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             propietario_id=orden_carga.camion.propietario_id,
         ),
+        gestor_carga_id,
+        modified_by,
+    )
+
+
+def create_movimiento_by_tipo_documento_relacionado_otro(
+    db: Session,
+    data: MovimientoForm,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+) -> Optional[Movimiento]:
+    tipo_contraparte = repositories.get_tipo_contraparte_by_descripcion(
+        db, TipoContraparteEnum.OTRO.value
+    )
+    tipo_documento_relacionado = (
+        repositories.get_tipo_documento_relacionado_by_descripcion(db, "Otro")
+    )
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
+        db, TipoMovimientoEnum.OTRO.value
+    )
+    if (
+        not tipo_contraparte
+        or not tipo_documento_relacionado
+        or not tipo_cuenta
+        or not tipo_movimiento
+    ):
+        raise HTTPException(
+            status_code=404,
+            detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
+        )
+    exists = None
+    if data.es_creacion_contraparte:
+        exists = repositories.get_contraparte_by_contraparte_and_tipo_contraparte_id(
+            db, data.contraparte, tipo_contraparte.id
+        )
+    if exists:
+        raise HTTPException(
+            status_code=409,
+            detail=f"La contraparte {data.contraparte} ya existe",
+        )
+    numero_documento_relacionado = (
+        repositories.get_movimiento_count_by_tipo_documento_relacionado_id(
+            db, tipo_documento_relacionado.id
+        )
+        + 1
+    )
+    fecha = cast(Date, datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+    data.tipo_documento_relacionado_id = tipo_documento_relacionado.id
+    data.numero_documento_relacionado = numero_documento_relacionado
+    data.cuenta_id = tipo_cuenta.id
+    data.tipo_movimiento_id = tipo_movimiento.id
+    data.es_editable = True
+    data.tipo_cambio_moneda = Decimal(
+        1
+    )  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+    data.fecha_cambio_moneda = fecha
+    if not data.fecha:
+        data.fecha = fecha
+    return create_movimiento(
+        db,
+        data,
         gestor_carga_id,
         modified_by,
     )

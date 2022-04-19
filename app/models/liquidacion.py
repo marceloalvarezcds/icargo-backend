@@ -11,7 +11,7 @@ from sqlalchemy.orm import relationship  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
-from app.enums import LiquidacionEstadoEnum, LiquidacionEtapaEnum
+from app.enums import EstadoEnum, LiquidacionEstadoEnum, LiquidacionEtapaEnum
 
 from .chofer import Chofer
 from .gestor_carga import GestorCarga
@@ -78,7 +78,13 @@ class Liquidacion(AuditMixin, Base):
 
     @hybrid_property
     def instrumentos_saldo(self):
-        return abs(sum(x.monto for x in self.instrumentos))
+        return abs(
+            sum(
+                x.monto
+                for x in self.instrumentos
+                if x.estado != EstadoEnum.ELIMINADO.value
+            )
+        )
 
     @hybrid_property
     def moneda_nombre(self):
@@ -90,7 +96,9 @@ class Liquidacion(AuditMixin, Base):
 
     @hybrid_property
     def movimientos_saldo(self):
-        return sum(x.saldo for x in self.movimientos)
+        return sum(
+            x.saldo for x in self.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+        )
 
     @hybrid_property
     def saldo(self):
