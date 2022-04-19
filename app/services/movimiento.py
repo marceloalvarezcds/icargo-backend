@@ -483,9 +483,11 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
             status_code=404,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
-    exists = repositories.get_contraparte_by_contraparte_and_tipo_contraparte_id(
-        db, data.contraparte, tipo_contraparte.id
-    )
+    exists = None
+    if data.es_creacion_contraparte:
+        exists = repositories.get_contraparte_by_contraparte_and_tipo_contraparte_id(
+            db, data.contraparte, tipo_contraparte.id
+        )
     if exists:
         raise HTTPException(
             status_code=409,

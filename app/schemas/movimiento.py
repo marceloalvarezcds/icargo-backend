@@ -13,7 +13,7 @@ from .tipo_documento_relacionado import TipoDocumentoRelacionado
 from .tipo_movimiento import TipoMovimiento
 
 
-class MovimientoForm(BaseModel):
+class MovimientoBaseModel(BaseModel):
     gestor_carga_id: Optional[int]
     liquidacion_id: Optional[int]
     orden_carga_id: Optional[int]
@@ -44,7 +44,11 @@ class MovimientoForm(BaseModel):
     remitente_id: Optional[int]
 
 
-class Movimiento(MovimientoForm):
+class MovimientoForm(MovimientoBaseModel):
+    es_creacion_contraparte: Optional[bool] = False
+
+
+class Movimiento(MovimientoBaseModel):
     id: int
     gestor_carga_id: int
     tipo_contraparte: TipoContraparte
