@@ -65,6 +65,7 @@ class Camion(CamionForm):
     chofer: Chofer
     estado: EstadoEnum
     gestor_cuenta_id: int
+    info: str
     # INICIO Habilitaciones del Camión
     # inicio - municipal
     ciudad_habilitacion_municipal: Ciudad
@@ -106,6 +107,7 @@ class CamionList(BaseModel):
     gestor_cuenta_id: int
     gestor_cuenta_nombre: str
     localidad_habilitacion_municipal_nombre: str
+    info: str
     marca_descripcion: str
     oficial_cuenta_nombre: str
     pais_habilitacion_municipal_nombre: str

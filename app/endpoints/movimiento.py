@@ -79,13 +79,13 @@ async def read_movimiento_by_id(
 
 
 @api.post("/", response_model=schemas.Movimiento)
-async def add_new_movimiento(
+async def add_new_movimiento_by_tipo_documento_relacionado_otro(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.MovimientoForm] = Form(...),  # type: ignore  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.MOVIMIENTO)),  # noqa: B008
 ):
-    return services.create_movimiento(
+    return services.create_movimiento_by_tipo_documento_relacionado_otro(
         db, data, current_user.gestor_carga_id, current_user.username  # type: ignore
     )
 

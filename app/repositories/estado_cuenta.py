@@ -17,42 +17,81 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
             Movimiento.tipo_contraparte_id,
             TipoContraparte.descripcion.label("tipo_contraparte_descripcion"),
             case(
-                (Movimiento.liquidacion_id == null(), Movimiento.monto),
+                (
+                    and_(
+                        Movimiento.liquidacion_id == null(),
+                        Movimiento.estado == EstadoEnum.PENDIENTE.value,
+                    ),
+                    Movimiento.monto,
+                ),
                 else_=literal_column("0"),
             ).label("pendiente"),
             case(
-                (Liquidacion.etapa == EstadoEnum.EN_PROCESO.value, Movimiento.monto),
+                (
+                    and_(
+                        Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
+                        Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                    ),
+                    Movimiento.monto,
+                ),
                 else_=literal_column("0"),
             ).label("en_proceso"),
             case(
-                (Liquidacion.etapa == EstadoEnum.CONFIRMADO.value, Movimiento.monto),
+                (
+                    and_(
+                        Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
+                        Movimiento.estado == EstadoEnum.CONFIRMADO.value,
+                    ),
+                    Movimiento.monto,
+                ),
                 else_=literal_column("0"),
             ).label("confirmado"),
             case(
-                (Liquidacion.etapa == EstadoEnum.FINALIZADO.value, Movimiento.monto),
+                (
+                    and_(
+                        Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+                        Movimiento.estado == EstadoEnum.FINALIZADO.value,
+                    ),
+                    Movimiento.monto,
+                ),
                 else_=literal_column("0"),
             ).label("finalizado"),
             case(
-                (Movimiento.liquidacion_id == null(), literal_column("1")),
+                (
+                    and_(
+                        Movimiento.liquidacion_id == null(),
+                        Movimiento.estado == EstadoEnum.PENDIENTE.value,
+                    ),
+                    literal_column("1"),
+                ),
                 else_=literal_column("0"),
             ).label("cantidad_pendiente"),
             case(
                 (
-                    Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
+                    and_(
+                        Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
+                        Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                    ),
                     literal_column("1"),
                 ),
                 else_=literal_column("0"),
             ).label("cantidad_en_proceso"),
             case(
                 (
-                    Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
+                    and_(
+                        Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
+                        Movimiento.estado == EstadoEnum.CONFIRMADO.value,
+                    ),
                     literal_column("1"),
                 ),
                 else_=literal_column("0"),
             ).label("cantidad_confirmado"),
             case(
                 (
-                    Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+                    and_(
+                        Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+                        Movimiento.estado == EstadoEnum.FINALIZADO.value,
+                    ),
                     literal_column("1"),
                 ),
                 else_=literal_column("0"),

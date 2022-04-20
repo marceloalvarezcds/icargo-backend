@@ -25,6 +25,9 @@ from .camion import (  # noqa
     get_camion_reports,
 )
 from .camion_semi_neto import (  # noqa
+    create_camion_semi_neto,
+    delete_camion_semi_neto,
+    edit_camion_semi_neto,
     get_camion_list_by_producto_id,
     get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id,
     get_semi_list_by_camion_id_and_producto_id,
@@ -48,6 +51,7 @@ from .chofer import (  # noqa
     get_chofer_reports,
 )
 from .contacto import get_contacto_by  # noqa
+from .contraparte import get_contraparte_list_by_tipo_contraparte_id  # noqa
 from .estado_cuenta import (  # noqa
     get_estado_cuenta_by_contraparte,
     get_estado_cuenta_list,
@@ -145,6 +149,7 @@ from .movimiento import (  # noqa
     create_movimiento,
     create_movimiento_by_anticipo,
     create_movimiento_by_conciliacion_oc,
+    create_movimiento_by_tipo_documento_relacionado_otro,
     delete_movimiento,
     edit_movimiento,
     get_movimiento_by_id,

@@ -13,6 +13,7 @@ from app.endpoints import (
     color,
     composicion_juridica,
     contacto,
+    contraparte,
     ente_emisor_automotor,
     ente_emisor_transporte,
     estado_cuenta,
@@ -54,6 +55,7 @@ from app.endpoints import (
     tipo_comprobante,
     tipo_concepto_complemento,
     tipo_concepto_descuento,
+    tipo_contraparte,
     tipo_documento,
     tipo_instrumento,
     tipo_insumo,
@@ -91,6 +93,7 @@ api.include_router(
     tags=["composicion_juridica"],
 )
 api.include_router(contacto.api, prefix="/contacto", tags=["contacto"])
+api.include_router(contraparte.api, prefix="/contraparte", tags=["contraparte"])
 api.include_router(
     ente_emisor_automotor.api,
     prefix="/ente_emisor_automotor",
@@ -185,6 +188,9 @@ api.include_router(
     tipo_concepto_descuento.api,
     prefix="/tipo_concepto_descuento",
     tags=["tipo_concepto_descuento"],
+)
+api.include_router(
+    tipo_contraparte.api, prefix="/tipo_contraparte", tags=["tipo_contraparte"]
 )
 api.include_router(
     tipo_documento.api, prefix="/tipo_documento", tags=["tipo_documento"]
