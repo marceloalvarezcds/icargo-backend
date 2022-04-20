@@ -227,7 +227,11 @@ class Flete(AuditMixin, Base):
     @hybrid_property
     def porcentaje_efectivo(self):
         anticipo_efectivo = get_flete_anticipo_efectivo(self.anticipos)
-        return anticipo_efectivo.porcentaje if anticipo_efectivo else 0
+        return (
+            anticipo_efectivo.porcentaje
+            if (anticipo_efectivo and anticipo_efectivo.porcentaje)
+            else 0
+        )
 
     @hybrid_property
     def origen_nombre(self):
