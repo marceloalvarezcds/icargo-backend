@@ -39,6 +39,7 @@ def get_punto_venta_detail(
     obj_dict["tipo_documento"] = obj.tipo_documento
     obj_dict["composicion_juridica"] = obj.composicion_juridica
     obj_dict["ciudad"] = obj.ciudad
+    obj_dict["proveedor_nombre"] = obj.proveedor_nombre
     return schemas.PuntoVenta.parse_obj(obj_dict)
 
 

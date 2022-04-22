@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import List, Union
+from typing import List, Optional, Union
 
 from sqlalchemy import (  # type: ignore
     Boolean,
@@ -111,6 +111,11 @@ class OrdenCarga(AuditMixin, Base):
         if self.estado == EstadoEnum.EN_PROCESO.value:
             return self.orden_carga_estado
         return self.estado
+
+    @hybrid_property
+    def fecha_conciliacion(self):
+        item = self.get_estado_in_historial(EstadoEnum.CONCILIADO)
+        return item.created_at if item else None
 
     @hybrid_property
     def flete_anticipo_maximo(self):
@@ -301,9 +306,20 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_gestor_carga_saldo(self):
         return (
-            self.resultado_gestor_carga_merma_valor_total
+            self.resultado_gestor_carga_total_flete
+            - self.resultado_gestor_carga_merma_valor_total
+        )
+
+    @hybrid_property
+    def resultado_gestor_carga_saldo_total(self):
+        return (
+            self.resultado_gestor_carga_total_flete
             - self.resultado_gestor_carga_total_flete
-        ) + self.resultado_gestor_carga_merma
+            - self.resultado_gestor_carga_merma_valor_total
+            + self.resultado_propietario_merma_valor_total
+        ) + (
+            self.resultado_diferencia_complemento + self.resultado_diferencia_descuento
+        )
 
     @hybrid_property
     def resultado_gestor_carga_tarifa_flete(self):
@@ -352,14 +368,14 @@ class OrdenCarga(AuditMixin, Base):
     def resultado_propietario_saldo(self):
         return (
             (
-                self.resultado_propietario_merma_valor_total
-                - self.resultado_gestor_carga_total_flete
+                self.resultado_propietario_total_flete
+                - self.resultado_propietario_merma_valor_total
             )
             + (
                 self.resultado_propietario_total_descuento
                 - self.resultado_propietario_total_complemento
             )
-            + self.resultado_propietario_merma
+            - self.resultado_propietario_total_anticipos_retirados
         )
 
     @hybrid_property
@@ -377,26 +393,41 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_propietario_total_anticipos_retirados(self):
         lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
-        total = Decimal(0)
-        for item in lista:
-            total += item.monto_retirado
-        return total
+        return sum(x.monto_retirado for x in lista)
 
     @hybrid_property
     def resultado_propietario_total_complemento(self):
         lista: List[OrdenCargaComplemento] = self.complementos
-        total = Decimal(0)
-        for item in lista:
-            total += item.propietario_monto
-        return total
+        return sum(x.propietario_monto for x in lista)
+
+    @hybrid_property
+    def resultado_propietario_total_complemento_a_cobrar(self):
+        lista: List[OrdenCargaComplemento] = self.complementos
+        return sum(x.remitente_monto for x in lista if x.remitente_monto)
+
+    @hybrid_property
+    def resultado_diferencia_complemento(self):
+        return (
+            self.resultado_propietario_total_complemento_a_cobrar
+            - self.resultado_propietario_total_complemento
+        )
 
     @hybrid_property
     def resultado_propietario_total_descuento(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
-        total = Decimal(0)
-        for item in lista:
-            total += item.propietario_monto
-        return total
+        return sum(x.propietario_monto for x in lista)
+
+    @hybrid_property
+    def resultado_propietario_total_descuento_a_pagar(self):
+        lista: List[OrdenCargaDescuento] = self.descuentos
+        return sum(x.proveedor_monto for x in lista if x.proveedor_monto)
+
+    @hybrid_property
+    def resultado_diferencia_descuento(self):
+        return (
+            self.resultado_propietario_total_descuento
+            - self.resultado_propietario_total_descuento_a_pagar
+        )
 
     @hybrid_property
     def resultado_propietario_total_flete(self):
@@ -415,9 +446,14 @@ class OrdenCarga(AuditMixin, Base):
             total += remision.cantidad_kg
         return total
 
-    def find_estado_in_historial(self, estado: EstadoEnum) -> bool:
+    def get_estado_in_historial(
+        self, estado: EstadoEnum
+    ) -> Optional[OrdenCargaEstadoHistorial]:
         lista: List[OrdenCargaEstadoHistorial] = self.historial
         for x in lista:
             if x.estado == estado.value:
-                return True
-        return False
+                return x
+        return None
+
+    def find_estado_in_historial(self, estado: EstadoEnum) -> bool:
+        return self.get_estado_in_historial(estado) is not None

@@ -6,10 +6,18 @@ from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
 from app.models import Flete, OrdenCarga
-from app.schemas import OrdenCargaForm
-from app.schemas.orden_carga import OrdenCargaEditForm
+from app.schemas import OrdenCargaEditForm, OrdenCargaForm
 
 from .orden_carga_estado_historial import create_orden_carga_estado_historial
+
+
+def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter(OrdenCarga.estado != EstadoEnum.ELIMINADO.value)
+        .order_by(OrdenCarga.created_by)
+        .all()
+    )
 
 
 def get_orden_carga_list_by_gestor_carga_id(
