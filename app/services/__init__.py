@@ -73,6 +73,7 @@ from .flete import (  # noqa
     get_flete_reports,
 )
 from .flete_anticipo import (  # noqa
+    get_tipo_anticipo_insumo_list,
     get_tipo_anticipo_list_by_flete_id,
     get_tipo_insumo_list_by_flete_id,
 )

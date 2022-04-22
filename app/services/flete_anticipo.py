@@ -4,8 +4,36 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
+from app.enums import TipoAnticipoEnum
 from app.models import Flete, FleteAnticipo, TipoAnticipo, TipoInsumo
 from app.schemas import FleteAnticipoForm
+
+
+def get_tipo_anticipo_insumo_list(db: Session) -> List[FleteAnticipoForm]:
+    tipo_anticipo_list = repositories.get_tipo_anticipo_list(db)
+    tipo_insumo_list = repositories.get_tipo_insumo_list(db)
+    tipo_anticipo_insumo_list = []
+    for a in tipo_anticipo_list:
+        if a.descripcion == TipoAnticipoEnum.INSUMOS.value:
+            for i in tipo_insumo_list:
+                tipo_anticipo_insumo_list.append(
+                    FleteAnticipoForm(
+                        tipo_id=a.id,
+                        tipo_descripcion=a.descripcion,
+                        tipo_insumo_id=i.id,
+                        tipo_insumo_descripcion=i.descripcion,
+                        concepto=i.descripcion,
+                    )
+                )
+        else:
+            tipo_anticipo_insumo_list.append(
+                FleteAnticipoForm(
+                    tipo_id=a.id,
+                    tipo_descripcion=a.descripcion,
+                    concepto=a.descripcion,
+                )
+            )
+    return tipo_anticipo_insumo_list
 
 
 def get_tipo_anticipo_list_by_flete_id(
