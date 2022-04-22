@@ -113,6 +113,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
     RemitenteContactoGestorCarga,
     RemitenteContactoGestorCargaList,
 )
+from .rentabilidad import Rentabilidad  # noqa
 from .semi import Semi, SemiForm, SemiList  # noqa
 from .semi_clasificacion import SemiClasificacion  # noqa
 from .tipo_anticipo import TipoAnticipo  # noqa

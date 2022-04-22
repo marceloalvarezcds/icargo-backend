@@ -6,6 +6,7 @@ from app.database.seeds.permiso_seeds import (
     estado_cuenta_permiso_seeds,
     flete_permiso_seeds,
     flota_permiso_seeds,
+    listado_permiso_seeds,
     orden_carga_gestor_permiso_seeds,
     orden_carga_permiso_seeds,
 )
@@ -53,3 +54,4 @@ def user_seeds(
         estado_cuenta_permiso_seeds(db, usuario)
     else:
         estado_cuenta_gestor_permiso_seeds(db, usuario)
+        listado_permiso_seeds(db, usuario)

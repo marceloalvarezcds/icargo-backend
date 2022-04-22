@@ -67,6 +67,7 @@ class PermisoModeloEnum(Enum):
     PROVEEDOR = "proveedor"
     PUNTO_VENTA = "punto_venta"
     REMITENTE = "remitente"
+    RENTABILIDAD = "rentabilidad"
     ROL = "rol"
     SEMIRREMOLQUE = "semirremolque"
     SEMI_CLASIFICACION = "semi_clasificacion"
