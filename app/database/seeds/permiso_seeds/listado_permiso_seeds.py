@@ -10,5 +10,6 @@ from .permiso_seeds import permiso_seeds
 def listado_permiso_seeds(db: Session, user: User):
     permisos = []
     permisos.append(permiso_seeds(db, a.LISTAR, m.RENTABILIDAD))
+    permisos.append(permiso_seeds(db, a.REPORTE, m.RENTABILIDAD))
     user.permisos.extend(permisos)
     db.commit()

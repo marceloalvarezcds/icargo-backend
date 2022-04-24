@@ -172,7 +172,7 @@ class Rentabilidad(BaseModel):
             # RESULTADOS
             total_anticipo_retirado=item.resultado_propietario_total_anticipos_retirados,
             saldo_gestor_carga=item.resultado_gestor_carga_saldo_total,
-            saldo_propietario=item.resultado_propietario_saldo,
+            saldo_propietario=item.resultado_propietario_saldo_total,
             # Auditoría
             fecha_conciliacion=item.fecha_conciliacion,
             created_by=item.created_by,

@@ -256,7 +256,7 @@ from .remitente import (  # noqa
     get_remitente_reports,
 )
 from .remitente_contacto import update_remitente_contacto_list  # noqa
-from .rentabilidad import get_rentabilidad_list  # noqa
+from .rentabilidad import get_rentabilidad_list, get_rentabilidad_reports  # noqa
 from .security import create_access_token  # noqa
 from .semi import (  # noqa
     change_semi_status,
