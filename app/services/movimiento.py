@@ -332,7 +332,7 @@ def create_movimiento_by_descuento(
             status_code=404,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
-    if descuento.habilitar_pago_proveedor:
+    if descuento.habilitar_pago_proveedor and descuento.proveedor:
         create_movimiento(
             db,
             MovimientoForm(
