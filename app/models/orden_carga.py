@@ -313,8 +313,8 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_gestor_carga_saldo_total(self):
         return self.resultado_gestor_carga_saldo + (
-            self.resultado_propietario_total_descuento_a_pagar
-            - self.resultado_propietario_total_complemento_a_cobrar
+            self.resultado_propietario_total_complemento_a_cobrar
+            - self.resultado_propietario_total_descuento_a_pagar
         )
 
     @hybrid_property
@@ -368,8 +368,8 @@ class OrdenCarga(AuditMixin, Base):
                 - self.resultado_propietario_merma_valor_total
             )
             + (
-                self.resultado_propietario_total_descuento
-                - self.resultado_propietario_total_complemento
+                self.resultado_propietario_total_complemento
+                - self.resultado_propietario_total_descuento
             )
             - self.resultado_propietario_total_anticipos_retirados
         )

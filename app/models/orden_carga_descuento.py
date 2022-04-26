@@ -89,12 +89,12 @@ class OrdenCargaDescuento(AuditMixin, Base):
 
     @hybrid_property
     def proveedor_moneda_nombre(self):
-        return self.proveedor_moneda.nombre
+        return self.proveedor_moneda.nombre if self.proveedor_moneda else None
 
     @hybrid_property
     def proveedor_moneda_simbolo(self):
-        return self.proveedor_moneda.simbolo
+        return self.proveedor_moneda.simbolo if self.proveedor_moneda else None
 
     @hybrid_property
     def proveedor_nombre(self):
-        return self.proveedor.nombre
+        return self.proveedor.nombre if self.proveedor else None
