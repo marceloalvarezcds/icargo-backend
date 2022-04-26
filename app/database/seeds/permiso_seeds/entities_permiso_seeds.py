@@ -39,6 +39,7 @@ def permiso_generico_seeds(db: Session, user: User):
         )
     )
     permisos.append(permiso_seeds(db, a.VER, m.CONTACTO))
+    permisos.append(permiso_seeds(db, a.EDITAR, m.CONTACTO))
     permisos.append(permiso_seeds(db, a.LISTAR, m.LOCALIDAD))
     permisos.append(permiso_seeds(db, a.LISTAR, m.MONEDA))
     permisos.append(permiso_seeds(db, a.LISTAR, m.PAIS, True, "Listar País"))
