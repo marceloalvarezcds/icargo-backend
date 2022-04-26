@@ -43,13 +43,13 @@ def user_seeds(
         )
         db.add(usuario)
         db.commit()
-        entities_permiso_seeds(db, usuario)
-        flete_permiso_seeds(db, usuario)
-        flota_permiso_seeds(db, usuario)
-        if "suplente" in username:
-            orden_carga_permiso_seeds(db, usuario)
-        else:
-            orden_carga_gestor_permiso_seeds(db, usuario)
+    entities_permiso_seeds(db, usuario)
+    flete_permiso_seeds(db, usuario)
+    flota_permiso_seeds(db, usuario)
+    if "suplente" in username:
+        orden_carga_permiso_seeds(db, usuario)
+    else:
+        orden_carga_gestor_permiso_seeds(db, usuario)
     if "suplente" in username:
         estado_cuenta_permiso_seeds(db, usuario)
     else:

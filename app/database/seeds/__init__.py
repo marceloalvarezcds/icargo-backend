@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from .centro_operativo_clasificacion_seeds import centro_operativo_clasificacion_seeds
 from .color_seeds import color_seeds
+from .composicion_juridica_seeds import composicion_juridica_seeds
 from .ente_emisor_automotor_seeds import ente_emisor_automotor_seeds
 from .ente_emisor_transporte_seeds import ente_emisor_transporte_seeds
 from .instrumento_via_seeds import instrumento_via_seeds
@@ -21,6 +22,7 @@ from .tipo_concepto_complemento_seeds import tipo_concepto_complemento_seeds
 from .tipo_concepto_descuento_seeds import tipo_concepto_descuento_seeds
 from .tipo_contraparte_seeds import tipo_contraparte_seeds
 from .tipo_documento_relacionado_seeds import tipo_documento_relacionado_seeds
+from .tipo_documento_seeds import tipo_documento_seeds
 from .tipo_instrumento_seeds import tipo_instrumento_seeds
 from .tipo_insumo_seeds import tipo_insumo_seeds
 from .tipo_iva_seeds import tipo_iva_seeds
@@ -34,6 +36,7 @@ from .user_seeds import user_seeds
 def seeds(db: Session):
     centro_operativo_clasificacion_seeds(db)
     color_seeds(db)
+    composicion_juridica_seeds(db)
     ente_emisor_transporte_seeds(db)
     instrumento_via_seeds(db)
     marca_camion_seeds(db)
@@ -49,6 +52,7 @@ def seeds(db: Session):
     tipo_concepto_complemento_seeds(db)
     tipo_concepto_descuento_seeds(db)
     tipo_contraparte_seeds(db)
+    tipo_documento_seeds(db)
     tipo_documento_relacionado_seeds(db)
     tipo_insumo_seeds(db)
     tipo_persona_seeds(db)
