@@ -52,6 +52,25 @@ async def read_movimiento_list_by_estado_cuenta(
     )
 
 
+@api.get(
+    "/liquidacion/{liquidacion_id}/etapa/{etapa}",
+    response_model=List[schemas.Movimiento],
+)
+async def read_movimiento_list_by_liquidacion(
+    liquidacion_id: int,
+    etapa: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_movimiento_list_by_liquidacion(
+        db,
+        liquidacion_id,
+        etapa,
+        current_user.gestor_carga_id,
+    )
+
+
 @api.get("/orden_carga/{orden_carga_id}", response_model=List[schemas.Movimiento])
 async def read_movimiento_list_by_orden_carga_id(
     orden_carga_id: int,  # noqa: B008

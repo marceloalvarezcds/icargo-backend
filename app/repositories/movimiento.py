@@ -64,6 +64,44 @@ def get_movimiento_list_by_contraparte_and_gestor_carga_id(
     )
 
 
+def get_movimiento_list_by_liquidacion(
+    db: Session,
+    liquidacion_id: int,
+    estado: str,
+) -> List[Movimiento]:
+    return (
+        db.query(Movimiento)
+        .filter(
+            and_(
+                Movimiento.liquidacion_id == liquidacion_id,
+                Movimiento.estado == estado,
+            )
+        )
+        .order_by(Movimiento.contraparte, Movimiento.liquidacion_id)
+        .all()
+    )
+
+
+def get_movimiento_list_by_liquidacion_and_gestor_carga_id(
+    db: Session,
+    liquidacion_id: int,
+    estado: str,
+    gestor_carga_id: int,
+) -> List[Movimiento]:
+    return (
+        db.query(Movimiento)
+        .filter(
+            and_(
+                Movimiento.liquidacion_id == liquidacion_id,
+                Movimiento.estado == estado,
+                Movimiento.gestor_carga_id == gestor_carga_id,
+            )
+        )
+        .order_by(Movimiento.contraparte, Movimiento.liquidacion_id)
+        .all()
+    )
+
+
 def get_movimiento_list_by_gestor_carga_id(
     db: Session, gestor_carga_id: int
 ) -> List[Movimiento]:

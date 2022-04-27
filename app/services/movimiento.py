@@ -52,6 +52,22 @@ def get_movimiento_list_by_estado_cuenta(
     )
 
 
+def get_movimiento_list_by_liquidacion(
+    db: Session,
+    liquidacion_id: int,
+    estado: str,
+    gestor_carga_id: Optional[int],
+) -> List[Movimiento]:
+    if gestor_carga_id:
+        return repositories.get_movimiento_list_by_liquidacion_and_gestor_carga_id(
+            db,
+            liquidacion_id,
+            estado,
+            gestor_carga_id,
+        )
+    return repositories.get_movimiento_list_by_liquidacion(db, liquidacion_id, estado)
+
+
 def create_movimiento(
     db: Session,
     data: MovimientoForm,

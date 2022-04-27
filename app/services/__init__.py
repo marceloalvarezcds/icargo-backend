@@ -156,6 +156,7 @@ from .movimiento import (  # noqa
     get_movimiento_by_id,
     get_movimiento_list,
     get_movimiento_list_by_estado_cuenta,
+    get_movimiento_list_by_liquidacion,
     get_movimiento_reports,
 )
 from .orden_carga import (  # noqa
