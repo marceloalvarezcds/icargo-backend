@@ -4,6 +4,7 @@ services:
   backend:
     depends_on:
       - db
+      - pictshare
     env_file:
       - .env
     build:
