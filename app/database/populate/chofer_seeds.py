@@ -89,7 +89,7 @@ def chofer_seeds(
 def cargill_chofer_seeds(db: Session, gestor_cuenta: GestorCarga):
     user_list = get_user_list_by_gestor_carga_id(db, gestor_cuenta.id)
     if len(user_list) > 0:
-        oficial_cuenta = get_user_list_by_gestor_carga_id(db, gestor_cuenta.id)[0]
+        oficial_cuenta = user_list[0]
 
         paraguay = get_pais_by_nombre_corto(db, "PY")
 
