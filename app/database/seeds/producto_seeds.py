@@ -1,21 +1,23 @@
-from sqlalchemy.exc import IntegrityError  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.models import Producto
-from app.repositories import get_tipo_carga_by_descripcion
+from app.repositories import get_producto_by_descripcion, get_tipo_carga_by_descripcion
+
+
+def create_producto(db: Session, descripcion: str, tipo_carga_id: int):
+    producto = get_producto_by_descripcion(db, descripcion)
+    if producto is None:
+        producto = Producto(descripcion=descripcion, tipo_carga_id=tipo_carga_id)
+        db.add(producto)
+        db.commit()
 
 
 def producto_seeds(db: Session):
-    try:
-        seca = get_tipo_carga_by_descripcion(db, "SECA")
-        liquida = get_tipo_carga_by_descripcion(db, "LÍQUIDA")
-        if seca and liquida:
-            db.add(Producto(descripcion="Trigo", tipo_carga_id=seca.id))
-            db.add(Producto(descripcion="Soja", tipo_carga_id=seca.id))
-            db.add(Producto(descripcion="Fertilizante a Granel", tipo_carga_id=seca.id))
-            db.add(Producto(descripcion="Canola", tipo_carga_id=seca.id))
-            db.add(Producto(descripcion="Aceite de Soja", tipo_carga_id=liquida.id))
-            db.add(Producto(descripcion="Ganado", tipo_carga_id=seca.id))
-            db.commit()
-    except IntegrityError:
-        db.rollback()
+    seca = get_tipo_carga_by_descripcion(db, "SECA")
+    liquida = get_tipo_carga_by_descripcion(db, "LÍQUIDA")
+    if seca and liquida:
+        create_producto(db, "Trigo en granos", seca.id)
+        create_producto(db, "Soja en granos", seca.id)
+        create_producto(db, "Fertilizante a Granel", seca.id)
+        create_producto(db, "Canola en granos", seca.id)
+        create_producto(db, "Aceite de Soja", liquida.id)

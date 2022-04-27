@@ -48,14 +48,14 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
     remitente4 = get_remitente_by_id(db, 4)
 
     pyg = get_moneda_by_simbolo(db, "PYG")
-    usd = get_moneda_by_simbolo(db, "USD")
-    brl = get_moneda_by_simbolo(db, "BRL")
-    arp = get_moneda_by_simbolo(db, "ARP")
+    # usd = get_moneda_by_simbolo(db, "USD") # TODO
+    # brl = get_moneda_by_simbolo(db, "BRL")
+    # arp = get_moneda_by_simbolo(db, "ARP")
 
-    trigo = get_producto_by_descripcion(db, "Trigo")
-    soja = get_producto_by_descripcion(db, "Soja")
+    trigo = get_producto_by_descripcion(db, "Trigo en granos")
+    soja = get_producto_by_descripcion(db, "Soja en granos")
     fertilizante = get_producto_by_descripcion(db, "Fertilizante a Granel")
-    canola = get_producto_by_descripcion(db, "Canola")
+    canola = get_producto_by_descripcion(db, "Canola en granos")
 
     efectivo = get_tipo_anticipo_by_descripcion(db, "EFECTIVO")
     tipo_insumo = get_tipo_anticipo_by_descripcion(db, "INSUMOS")
@@ -72,9 +72,9 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
     sistema = get_tipo_concepto_descuento_by_descripcion(db, "Sistema")
     seguro = get_tipo_concepto_descuento_by_descripcion(db, "Seguro")
 
-    toneladas = get_unidad_by_descripcion(db, "Toneladas")
+    # toneladas = get_unidad_by_descripcion(db, "Toneladas")  # TODO
     kilogramos = get_unidad_by_descripcion(db, "Kilogramos")
-    litros = get_unidad_by_descripcion(db, "Litros")
+    # litros = get_unidad_by_descripcion(db, "Litros")  # TODO
 
     if (
         gestor_cuenta_id
@@ -91,9 +91,9 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
         and remitente3
         and remitente4
         and pyg
-        and usd
-        and brl
-        and arp
+        # and usd
+        # and brl
+        # and arp
         and trigo
         and soja
         and fertilizante
@@ -108,9 +108,9 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
         and expurgo
         and sistema
         and seguro
-        and toneladas
         and kilogramos
-        and litros
+        # and toneladas
+        # and litros
     ):
         destino3_contacto: CentroOperativoContactoGestorCarga = destino3.contactos[0]
         destino5_contacto: CentroOperativoContactoGestorCarga = destino5.contactos[0]
@@ -307,12 +307,14 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # INICIO Cantidad y Flete
                     condicion_cantidad=Decimal(50000),
                     # inicio - Condiciones para el Gestor de Cuenta
-                    condicion_gestor_cuenta_moneda_id=usd.id,
+                    # condicion_gestor_cuenta_moneda_id=usd.id,
+                    condicion_gestor_cuenta_moneda_id=pyg.id,
                     condicion_gestor_cuenta_tarifa=Decimal(0.2),
                     condicion_gestor_cuenta_unidad_id=kilogramos.id,
                     # fin - Condiciones para el Gestor de Cuenta
                     # inicio - Condiciones para el Propietario
-                    condicion_propietario_moneda_id=usd.id,
+                    # condicion_propietario_moneda_id=usd.id,
+                    condicion_propietario_moneda_id=pyg.id,
                     condicion_propietario_tarifa=Decimal(0.1),
                     condicion_propietario_unidad_id=kilogramos.id,
                     # fin - Condiciones para el Propietario
@@ -320,14 +322,16 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # INICIO Mermas de Fletes
                     # inicio - Mermas para el Gestor de Cuenta
                     merma_gestor_cuenta_valor=Decimal(0.2),
-                    merma_gestor_cuenta_moneda_id=usd.id,
+                    # merma_gestor_cuenta_moneda_id=usd.id,
+                    merma_gestor_cuenta_moneda_id=pyg.id,
                     merma_gestor_cuenta_unidad_id=kilogramos.id,
                     merma_gestor_cuenta_es_porcentual=True,
                     merma_gestor_cuenta_tolerancia=Decimal(12),
                     # fin - Mermas para el Gestor de Cuenta
                     # inicio - Mermas para el Propietario
                     merma_propietario_valor=Decimal(0.3),
-                    merma_propietario_moneda_id=usd.id,
+                    # merma_propietario_moneda_id=usd.id,
+                    merma_propietario_moneda_id=pyg.id,
                     merma_propietario_unidad_id=kilogramos.id,
                     merma_propietario_es_porcentual=True,
                     merma_propietario_tolerancia=Decimal(10),
@@ -380,11 +384,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             anticipado=True,
                             # INICIO Monto a pagar al Propietario
                             propietario_monto=Decimal(7),
-                            propietario_moneda_id=usd.id,
+                            # propietario_moneda_id=usd.id,
+                            propietario_moneda_id=pyg.id,
                             # FIN Monto a pagar al Propietario
                             # INICIO Monto a cobrar al Remitente
                             remitente_monto=Decimal(7.1),
-                            remitente_moneda_id=usd.id,
+                            # remitente_moneda_id=usd.id,
+                            remitente_moneda_id=pyg.id,
                         ),
                         FleteComplementoForm(
                             concepto_id=expurgo.id,
@@ -393,11 +399,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             anticipado=True,
                             # INICIO Monto a pagar al Propietario
                             propietario_monto=Decimal(1),
-                            propietario_moneda_id=usd.id,
+                            # propietario_moneda_id=usd.id,
+                            propietario_moneda_id=pyg.id,
                             # FIN Monto a pagar al Propietario
                             # INICIO Monto a cobrar al Remitente
                             remitente_monto=Decimal(1.2),
-                            remitente_moneda_id=usd.id,
+                            # remitente_moneda_id=usd.id,
+                            remitente_moneda_id=pyg.id,
                         ),
                     ],
                     descuentos=[
@@ -408,11 +416,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             anticipado=True,
                             # INICIO Monto a cobrar al Propietario
                             propietario_monto=Decimal(10),
-                            propietario_moneda_id=usd.id,
+                            # propietario_moneda_id=usd.id,
+                            propietario_moneda_id=pyg.id,
                             # FIN Monto a cobrar al Propietario
                             # INICIO Monto a pagar al Proveedor
                             proveedor_monto=Decimal(11),
-                            proveedor_moneda_id=usd.id,
+                            # proveedor_moneda_id=usd.id,
+                            proveedor_moneda_id=pyg.id,
                             proveedor_id=4,
                         ),
                         FleteDescuentoForm(
@@ -422,11 +432,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             anticipado=True,
                             # INICIO Monto a cobrar al Propietario
                             propietario_monto=Decimal(21),
-                            propietario_moneda_id=usd.id,
+                            # propietario_moneda_id=usd.id,
+                            propietario_moneda_id=pyg.id,
                             # FIN Monto a cobrar al Propietario
                             # INICIO Monto a pagar al Proveedor
                             proveedor_monto=Decimal(22),
-                            proveedor_moneda_id=usd.id,
+                            # proveedor_moneda_id=usd.id,
+                            proveedor_moneda_id=pyg.id,
                             proveedor_id=5,
                         ),
                     ],
@@ -455,28 +467,36 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # INICIO Cantidad y Flete
                     condicion_cantidad=Decimal(100000),
                     # inicio - Condiciones para el Gestor de Cuenta
-                    condicion_gestor_cuenta_moneda_id=brl.id,
+                    # condicion_gestor_cuenta_moneda_id=brl.id,
+                    condicion_gestor_cuenta_moneda_id=pyg.id,
                     condicion_gestor_cuenta_tarifa=Decimal(12),
-                    condicion_gestor_cuenta_unidad_id=toneladas.id,
+                    # condicion_gestor_cuenta_unidad_id=toneladas.id,
+                    condicion_gestor_cuenta_unidad_id=kilogramos.id,
                     # fin - Condiciones para el Gestor de Cuenta
                     # inicio - Condiciones para el Propietario
-                    condicion_propietario_moneda_id=brl.id,
+                    # condicion_propietario_moneda_id=brl.id,
+                    condicion_propietario_moneda_id=pyg.id,
                     condicion_propietario_tarifa=Decimal(10),
-                    condicion_propietario_unidad_id=toneladas.id,
+                    # condicion_propietario_unidad_id=toneladas.id,
+                    condicion_propietario_unidad_id=kilogramos.id,
                     # fin - Condiciones para el Propietario
                     # FIN Cantidad y Flete
                     # INICIO Mermas de Fletes
                     # inicio - Mermas para el Gestor de Cuenta
                     merma_gestor_cuenta_valor=Decimal(50),
-                    merma_gestor_cuenta_moneda_id=brl.id,
-                    merma_gestor_cuenta_unidad_id=toneladas.id,
+                    # merma_gestor_cuenta_moneda_id=brl.id,
+                    merma_gestor_cuenta_moneda_id=pyg.id,
+                    # merma_gestor_cuenta_unidad_id=toneladas.id,
+                    merma_gestor_cuenta_unidad_id=kilogramos.id,
                     merma_gestor_cuenta_es_porcentual=False,
                     merma_gestor_cuenta_tolerancia=Decimal(100),
                     # fin - Mermas para el Gestor de Cuenta
                     # inicio - Mermas para el Propietario
                     merma_propietario_valor=Decimal(60),
-                    merma_propietario_moneda_id=brl.id,
-                    merma_propietario_unidad_id=toneladas.id,
+                    # merma_propietario_moneda_id=brl.id,
+                    merma_propietario_moneda_id=pyg.id,
+                    # merma_propietario_unidad_id=toneladas.id,
+                    merma_propietario_unidad_id=kilogramos.id,
                     merma_propietario_es_porcentual=False,
                     merma_propietario_tolerancia=Decimal(90),
                     # fin - Mermas para el Propietario
@@ -528,11 +548,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             anticipado=True,
                             # INICIO Monto a pagar al Propietario
                             propietario_monto=Decimal(100),
-                            propietario_moneda_id=brl.id,
+                            # propietario_moneda_id=brl.id,
+                            propietario_moneda_id=pyg.id,
                             # FIN Monto a pagar al Propietario
                             # INICIO Monto a cobrar al Remitente
                             remitente_monto=Decimal(120),
-                            remitente_moneda_id=brl.id,
+                            # remitente_moneda_id=brl.id,
+                            remitente_moneda_id=pyg.id,
                         ),
                     ],
                     descuentos=[
@@ -543,11 +565,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             anticipado=False,
                             # INICIO Monto a cobrar al Propietario
                             propietario_monto=Decimal(100),
-                            propietario_moneda_id=brl.id,
+                            # propietario_moneda_id=brl.id,
+                            propietario_moneda_id=pyg.id,
                             # FIN Monto a cobrar al Propietario
                             # INICIO Monto a pagar al Proveedor
                             proveedor_monto=Decimal(100),
-                            proveedor_moneda_id=brl.id,
+                            # proveedor_moneda_id=brl.id,
+                            proveedor_moneda_id=pyg.id,
                             proveedor_id=6,
                         ),
                     ],
@@ -576,28 +600,36 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # INICIO Cantidad y Flete
                     condicion_cantidad=Decimal(100000),
                     # inicio - Condiciones para el Gestor de Cuenta
-                    condicion_gestor_cuenta_moneda_id=arp.id,
+                    # condicion_gestor_cuenta_moneda_id=arp.id,
+                    condicion_gestor_cuenta_moneda_id=pyg.id,
                     condicion_gestor_cuenta_tarifa=Decimal(55),
-                    condicion_gestor_cuenta_unidad_id=toneladas.id,
+                    # condicion_gestor_cuenta_unidad_id=toneladas.id,
+                    condicion_gestor_cuenta_unidad_id=kilogramos.id,
                     # fin - Condiciones para el Gestor de Cuenta
                     # inicio - Condiciones para el Propietario
-                    condicion_propietario_moneda_id=arp.id,
+                    # condicion_propietario_moneda_id=arp.id,
+                    condicion_propietario_moneda_id=pyg.id,
                     condicion_propietario_tarifa=Decimal(50),
-                    condicion_propietario_unidad_id=toneladas.id,
+                    # condicion_propietario_unidad_id=toneladas.id,
+                    condicion_propietario_unidad_id=kilogramos.id,
                     # fin - Condiciones para el Propietario
                     # FIN Cantidad y Flete
                     # INICIO Mermas de Fletes
                     # inicio - Mermas para el Gestor de Cuenta
                     merma_gestor_cuenta_valor=Decimal(100),
-                    merma_gestor_cuenta_moneda_id=arp.id,
-                    merma_gestor_cuenta_unidad_id=toneladas.id,
+                    # merma_gestor_cuenta_moneda_id=arp.id,
+                    merma_gestor_cuenta_moneda_id=pyg.id,
+                    # merma_gestor_cuenta_unidad_id=toneladas.id,
+                    merma_gestor_cuenta_unidad_id=kilogramos.id,
                     merma_gestor_cuenta_es_porcentual=True,
                     merma_gestor_cuenta_tolerancia=Decimal(15),
                     # fin - Mermas para el Gestor de Cuenta
                     # inicio - Mermas para el Propietario
                     merma_propietario_valor=Decimal(110),
-                    merma_propietario_moneda_id=arp.id,
-                    merma_propietario_unidad_id=toneladas.id,
+                    # merma_propietario_moneda_id=arp.id,
+                    merma_propietario_moneda_id=pyg.id,
+                    # merma_propietario_unidad_id=toneladas.id,
+                    merma_propietario_unidad_id=kilogramos.id,
                     merma_propietario_es_porcentual=True,
                     merma_propietario_tolerancia=Decimal(12),
                     # fin - Mermas para el Propietario
@@ -644,11 +676,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             anticipado=True,
                             # INICIO Monto a pagar al Propietario
                             propietario_monto=Decimal(100),
-                            propietario_moneda_id=arp.id,
+                            # propietario_moneda_id=arp.id,
+                            propietario_moneda_id=pyg.id,
                             # FIN Monto a pagar al Propietario
                             # INICIO Monto a cobrar al Remitente
                             remitente_monto=Decimal(100),
-                            remitente_moneda_id=arp.id,
+                            # remitente_moneda_id=arp.id,
+                            remitente_moneda_id=pyg.id,
                         ),
                     ],
                     descuentos=[
@@ -659,11 +693,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             anticipado=True,
                             # INICIO Monto a cobrar al Propietario
                             propietario_monto=Decimal(100),
-                            propietario_moneda_id=arp.id,
+                            # propietario_moneda_id=arp.id,
+                            propietario_moneda_id=pyg.id,
                             # FIN Monto a cobrar al Propietario
                             # INICIO Monto a pagar al Proveedor
                             proveedor_monto=Decimal(100),
-                            proveedor_moneda_id=arp.id,
+                            # proveedor_moneda_id=arp.id,
+                            proveedor_moneda_id=pyg.id,
                             proveedor_id=7,
                         ),
                         FleteDescuentoForm(
@@ -673,11 +709,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                             anticipado=True,
                             # INICIO Monto a cobrar al Propietario
                             propietario_monto=Decimal(100),
-                            propietario_moneda_id=arp.id,
+                            # propietario_moneda_id=arp.id,
+                            propietario_moneda_id=pyg.id,
                             # FIN Monto a cobrar al Propietario
                             # INICIO Monto a pagar al Proveedor
                             proveedor_monto=Decimal(100),
-                            proveedor_moneda_id=arp.id,
+                            # proveedor_moneda_id=arp.id,
+                            proveedor_moneda_id=pyg.id,
                             proveedor_id=8,
                         ),
                     ],

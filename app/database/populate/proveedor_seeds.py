@@ -96,13 +96,12 @@ def proveedor_seeds(
 
 def cargill_proveedor_seeds(db: Session, gestor_carga: GestorCarga):
     sociedad_anonima = get_composicion_juridica_by_nombre(db, "Sociedad Anónima")
-    sociedad_cooperativa = get_composicion_juridica_by_nombre(
-        db, "Sociedad Cooperativa"
-    )
     sociedad_responsabilidad_limitada = get_composicion_juridica_by_nombre(
         db, "Sociedad de Responsabilidad Limitada"
     )
-    uni_personal = get_composicion_juridica_by_nombre(db, "Uni-personal")
+    saci = get_composicion_juridica_by_nombre(
+        db, "Sociedad Anónima Comercial Industrial"
+    )
 
     paraguay = get_pais_by_nombre_corto(db, "PY")
 
@@ -177,7 +176,7 @@ def cargill_proveedor_seeds(db: Session, gestor_carga: GestorCarga):
         tipo_documento=pasaporte,
         numero_documento="p-500500",
         digito_verificador=None,
-        composicion_juridica=sociedad_cooperativa,
+        composicion_juridica=sociedad_anonima,
         telefono="0982555555",
         email="contacto@km-28-cargill-saeca.com",
         pagina_web="km-28-cargill-saeca.com",
@@ -217,7 +216,7 @@ def cargill_proveedor_seeds(db: Session, gestor_carga: GestorCarga):
         tipo_documento=cedula,
         numero_documento="3600600",
         digito_verificador=None,
-        composicion_juridica=uni_personal,
+        composicion_juridica=saci,
         telefono="0982777777",
         email="contacto@cargill-vaqueria.com",
         pagina_web="cargill-vaqueria.com",
@@ -255,13 +254,12 @@ def cargill_proveedor_seeds(db: Session, gestor_carga: GestorCarga):
 
 def multiple_proveedor_seeds(db: Session, gestor_carga: GestorCarga):
     sociedad_anonima = get_composicion_juridica_by_nombre(db, "Sociedad Anónima")
-    sociedad_cooperativa = get_composicion_juridica_by_nombre(
-        db, "Sociedad Cooperativa"
-    )
     sociedad_responsabilidad_limitada = get_composicion_juridica_by_nombre(
         db, "Sociedad de Responsabilidad Limitada"
     )
-    uni_personal = get_composicion_juridica_by_nombre(db, "Uni-personal")
+    saci = get_composicion_juridica_by_nombre(
+        db, "Sociedad Anónima Comercial Industrial"
+    )
 
     paraguay = get_pais_by_nombre_corto(db, "PY")
     argentina = get_pais_by_nombre_corto(db, "AR")
@@ -383,7 +381,7 @@ def multiple_proveedor_seeds(db: Session, gestor_carga: GestorCarga):
         tipo_documento=pasaporte,
         numero_documento="p-100100",
         digito_verificador=None,
-        composicion_juridica=sociedad_cooperativa,
+        composicion_juridica=sociedad_anonima,
         telefono="0981222222",
         email="contacto@gical-km12.com",
         pagina_web="gical-km12.com",
@@ -423,7 +421,7 @@ def multiple_proveedor_seeds(db: Session, gestor_carga: GestorCarga):
         tipo_documento=cedula,
         numero_documento="3200200",
         digito_verificador=None,
-        composicion_juridica=uni_personal,
+        composicion_juridica=saci,
         telefono="0981444444",
         email="contacto@puerto-trociuck.com",
         pagina_web="puerto-trociuck.com",
@@ -463,7 +461,7 @@ def multiple_proveedor_seeds(db: Session, gestor_carga: GestorCarga):
         tipo_documento=ruc,
         numero_documento="800200200",
         digito_verificador="1",
-        composicion_juridica=sociedad_cooperativa,
+        composicion_juridica=sociedad_anonima,
         telefono="0981666666",
         email="contacto@agrofertil-santa-fe.com",
         pagina_web="agrofertil-santa-fe.com",
@@ -503,7 +501,7 @@ def multiple_proveedor_seeds(db: Session, gestor_carga: GestorCarga):
         tipo_documento=pasaporte,
         numero_documento="p-300300",
         digito_verificador=None,
-        composicion_juridica=uni_personal,
+        composicion_juridica=saci,
         telefono="0981888888",
         email="contacto@estancia-yby-pora.com",
         pagina_web="estancia-yby-pora.com",
@@ -543,7 +541,7 @@ def multiple_proveedor_seeds(db: Session, gestor_carga: GestorCarga):
         tipo_documento=cedula,
         numero_documento="3400400",
         digito_verificador=None,
-        composicion_juridica=sociedad_cooperativa,
+        composicion_juridica=sociedad_anonima,
         telefono="0982111111",
         email="contacto@puerto-caiasa.com",
         pagina_web="puerto-caiasa.com",
@@ -583,7 +581,7 @@ def multiple_proveedor_seeds(db: Session, gestor_carga: GestorCarga):
         tipo_documento=ruc,
         numero_documento="800400400",
         digito_verificador="1",
-        composicion_juridica=uni_personal,
+        composicion_juridica=saci,
         telefono="0982333333",
         email="contacto@ldc-pozuelo.com",
         pagina_web="ldc-pozuelo.com",

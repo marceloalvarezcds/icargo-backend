@@ -46,7 +46,7 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
     bop = get_moneda_by_simbolo(db, "BOP")
 
     aceite = get_producto_by_descripcion(db, "Aceite de Soja")
-    ganado = get_producto_by_descripcion(db, "Ganado")
+    trigo = get_producto_by_descripcion(db, "Trigo en granos")
 
     efectivo = get_tipo_anticipo_by_descripcion(db, "EFECTIVO")
     tipo_insumo = get_tipo_anticipo_by_descripcion(db, "INSUMOS")
@@ -76,7 +76,7 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
         and pyg
         and bop
         and aceite
-        and ganado
+        and trigo
         and efectivo
         and combustible
         and lubricantes
@@ -237,7 +237,7 @@ def flete_cargill_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                 db,
                 FleteForm(
                     remitente_id=remitente15.id,
-                    producto_id=ganado.id,
+                    producto_id=trigo.id,
                     tipo_carga_id=liquida.id,
                     numero_lote="1300000",
                     publicado=False,

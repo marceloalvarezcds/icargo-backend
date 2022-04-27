@@ -5,6 +5,7 @@ from .color_seeds import color_seeds
 from .composicion_juridica_seeds import composicion_juridica_seeds
 from .ente_emisor_automotor_seeds import ente_emisor_automotor_seeds
 from .ente_emisor_transporte_seeds import ente_emisor_transporte_seeds
+from .gestor_carga_seeds import gestor_carga_seeds
 from .instrumento_via_seeds import instrumento_via_seeds
 from .insumo_seeds import insumo_seeds
 from .marca_camion_seeds import marca_camion_seeds
@@ -59,6 +60,7 @@ def seeds(db: Session):
     tipo_registro_seeds(db)
     tipo_semi_seeds(db)
     unidad_seeds(db)
+    gestor_carga_seeds(db)
     user_seeds(db)
     ente_emisor_automotor_seeds(db)
     # dependent models

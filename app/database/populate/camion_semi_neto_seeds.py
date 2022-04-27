@@ -40,15 +40,15 @@ def camion_semi_neto_seeds(
 
 
 def camion_neto_seeds(db: Session, camion: Camion, gestor_carga: GestorCarga):
-    trigo = get_producto_by_descripcion(db, "Trigo")
-    soja = get_producto_by_descripcion(db, "Soja")
+    trigo = get_producto_by_descripcion(db, "Trigo en granos")
+    soja = get_producto_by_descripcion(db, "Soja en granos")
     fertilizante = get_producto_by_descripcion(db, "Fertilizante a Granel")
-    canola = get_producto_by_descripcion(db, "Canola")
+    canola = get_producto_by_descripcion(db, "Canola en granos")
     aceite = get_producto_by_descripcion(db, "Aceite de Soja")
-    ganado = get_producto_by_descripcion(db, "Ganado")
 
-    if trigo and soja and fertilizante and canola and aceite and ganado:
-        productos = [trigo, soja, fertilizante, canola, aceite, ganado]
+    if trigo and soja and fertilizante and canola and aceite:
+        productos = [trigo, soja, fertilizante, canola, aceite]
+        cant_productos = len(productos)
         cantidad_semi = randrange(5)
         for _ in range(cantidad_semi):
             semi_id = 0
@@ -60,8 +60,8 @@ def camion_neto_seeds(db: Session, camion: Camion, gestor_carga: GestorCarga):
                 semi = get_semi_by_id(db, semi_id)
                 cantidad_producto = randrange(5)
                 for _ in range(cantidad_producto):
-                    producto_id = randrange(7)
-                    if producto_id == 6:
+                    producto_id = randrange(cant_productos + 1)
+                    if producto_id == cant_productos:
                         producto = None
                     else:
                         producto = productos[producto_id]

@@ -20,5 +20,5 @@ def composicion_juridica_seeds(db: Session):
         db, nombre="Sociedad de Responsabilidad Limitada", nombre_corto="S.R.L."
     )
     create_composicion_juridica(
-        db, nombre="Sociedad Anónima Comercial Industrial.", nombre_corto="S.A.C.I."
+        db, nombre="Sociedad Anónima Comercial Industrial", nombre_corto="S.A.C.I."
     )

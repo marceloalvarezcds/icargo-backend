@@ -151,7 +151,7 @@ class Rentabilidad(BaseModel):
             gestor_carga_flete_total=item.resultado_gestor_carga_total_flete,
             gestor_carga_flete_total_ml=item.resultado_gestor_carga_total_flete,
             # PAGO por MERMA a REMITENTE p/GC
-            merma_gestor_carga_valor=item.id,
+            merma_gestor_carga_valor=item.resultado_gestor_carga_merma_valor,
             merma_gestor_carga_moneda_nombre=item.flete.merma_gestor_cuenta_moneda.nombre,
             merma_gestor_carga_moneda_simbolo=item.flete.merma_gestor_cuenta_moneda.simbolo,
             merma_gestor_carga_unidad_descripcion=item.flete.merma_gestor_cuenta_unidad.descripcion,  # noqa: B950

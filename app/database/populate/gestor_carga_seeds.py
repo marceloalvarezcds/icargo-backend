@@ -40,8 +40,8 @@ def gestor_carga_seeds(db: Session):
     moneda = get_moneda_by_simbolo(db, "PYG")
     tipo_documento = get_tipo_documento_by_descripcion(db, "RUC")
     if tipo_documento:
-        numero_documento1 = "800100100"
-        numero_documento2 = "800200200"
+        numero_documento1 = "80015858"
+        numero_documento2 = "80020020"
 
         gestor_carga1 = get_gestor_carga_by(db, tipo_documento.id, numero_documento1)
 
@@ -51,7 +51,7 @@ def gestor_carga_seeds(db: Session):
                 nombre_corto="TRD",
                 tipo_documento_id=tipo_documento.id,
                 numero_documento=numero_documento1,
-                digito_verificador="1",
+                digito_verificador="0",
                 composicion_juridica_id=composicion_juridica.id
                 if composicion_juridica
                 else None,
