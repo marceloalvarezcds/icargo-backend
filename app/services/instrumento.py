@@ -68,9 +68,9 @@ def get_saldos_by_monto(
     if caja_id and via.descripcion == InstrumentoViaEnum.CAJA.value:
         caja = get_caja_by_id(db, caja_id)
         if liquidacion.tipo_operacion_descripcion == "Cobro":
-            credito = monto
-        else:
             debito = monto
+        else:
+            credito = monto
         saldo_confirmado = (
             credito - debito + (caja.saldo_confirmado if caja.saldo_confirmado else 0)
         )
@@ -78,9 +78,9 @@ def get_saldos_by_monto(
     elif banco_id:
         banco = get_banco_by_id(db, banco_id)
         if liquidacion.tipo_operacion_descripcion == "Cobro":
-            provision = monto
-        else:
             provision = monto * -1
+        else:
+            provision = monto
         saldo_confirmado = banco.saldo_confirmado if banco.saldo_confirmado else 0
         saldo_provisional = provision + (
             banco.saldo_provisional if banco.saldo_provisional else 0
