@@ -8,6 +8,7 @@ from .date_model import Date
 
 class OrdenCargaRemisionOrigenForm(BaseModel):
     numero_documento: str
+    fecha: Date
     cantidad: Decimal
     unidad_id: int
     foto_documento: Optional[str] = None

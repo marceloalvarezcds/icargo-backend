@@ -33,6 +33,7 @@ def create_orden_carga_remision_destino(
 ) -> OrdenCargaRemisionDestino:
     obj = OrdenCargaRemisionDestino(
         numero_documento=data.numero_documento,
+        fecha=data.fecha,
         cantidad=data.cantidad,
         unidad_id=data.unidad_id,
         foto_documento=foto_documento_url,
@@ -55,6 +56,7 @@ def edit_orden_carga_remision_destino(
     modified_by: str,
 ) -> OrdenCargaRemisionDestino:
     obj.numero_documento = data.numero_documento
+    obj.fecha = data.fecha
     obj.cantidad = data.cantidad
     obj.unidad_id = data.unidad_id
     obj.numero_documento_origen = data.numero_documento_origen
