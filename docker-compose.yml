@@ -35,9 +35,31 @@ services:
   pictshare:
     image: hascheksolutions/pictshare:latest
     ports:
-      - "8103:80"
+      - 8103:80
     volumes:
       - pictshare:/usr/share/nginx/html/data
+
+  pgbackups:
+    container_name: Backup
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    volumes:
+      - ./backups:/backups
+    links:
+      - db:db
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASS}
+      - POSTGRES_EXTRA_OPTS=-Z9 --schema=public --blobs
+      - SCHEDULE=@daily
+      - BACKUP_KEEP_DAYS=7
+      - BACKUP_KEEP_WEEKS=4
+      - BACKUP_KEEP_MONTHS=2
+      - HEALTHCHECK_PORT=666
 
 volumes:
   pictshare:

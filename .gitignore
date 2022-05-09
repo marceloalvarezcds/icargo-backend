@@ -105,3 +105,6 @@ celerybeat-schedule
 .mypy_cache/
 
 .idea/*
+
+# Backups
+backups/
