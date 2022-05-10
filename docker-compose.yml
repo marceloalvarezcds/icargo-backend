@@ -12,7 +12,7 @@ services:
       args:
         INSTALL_DEV: ${INSTALL_DEV}
     ports:
-      - 8101:80
+      - ${BACKEND_PORT}:80
     volumes:
       - ./alembic:/app/alembic
       - ./app/reports:/app/app/reports
@@ -20,7 +20,7 @@ services:
   db:
     image: postgres:13.4-buster
     ports:
-      - 8102:5432
+      - ${DATABASE_PORT}:5432
     env_file:
       - .env
     environment:
@@ -35,7 +35,7 @@ services:
   pictshare:
     image: hascheksolutions/pictshare:latest
     ports:
-      - 8103:80
+      - ${PICTSHARE_PORT}:80
     volumes:
       - pictshare:/usr/share/nginx/html/data
 
