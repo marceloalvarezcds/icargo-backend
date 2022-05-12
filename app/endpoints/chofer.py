@@ -56,13 +56,17 @@ async def read_chofer_by_id(
 async def add_new_chofer(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.ChoferForm] = Form(...),  # type: ignore  # noqa: B008
-    foto_documento_frente_file: UploadFile = File(...),  # noqa: B008
-    foto_documento_reverso_file: UploadFile = File(...),  # noqa: B008
-    foto_perfil_file: UploadFile = File(...),  # noqa: B008
-    foto_registro_frente_file: UploadFile = File(...),  # noqa: B008
-    foto_registro_reverso_file: UploadFile = File(...),  # noqa: B008
-    foto_documento_frente_propietario_file: UploadFile = File(None),  # noqa: B008
-    foto_documento_reverso_propietario_file: UploadFile = File(None),  # noqa: B008
+    foto_documento_frente_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_documento_reverso_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_perfil_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_registro_frente_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_registro_reverso_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_documento_frente_propietario_file: Optional[UploadFile] = File(  # noqa: B008
+        None
+    ),
+    foto_documento_reverso_propietario_file: Optional[UploadFile] = File(  # noqa: B008
+        None
+    ),
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.CHOFER)),  # noqa: B008
 ):

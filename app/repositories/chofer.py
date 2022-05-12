@@ -61,11 +61,11 @@ def create_chofer(
     db: Session,
     data: ChoferForm,
     gestor_cuenta_id: Optional[int],
-    foto_documento_frente_url: str,
-    foto_documento_reverso_url: str,
-    foto_perfil_url: str,
-    foto_registro_frente_url: str,
-    foto_registro_reverso_url: str,
+    foto_documento_frente_url: Optional[str],
+    foto_documento_reverso_url: Optional[str],
+    foto_perfil_url: Optional[str],
+    foto_registro_frente_url: Optional[str],
+    foto_registro_reverso_url: Optional[str],
     modified_by: str,
 ) -> Chofer:
     obj = Chofer(

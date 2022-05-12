@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session  # type: ignore
 
+from .cargo_seeds import cargo_seeds
 from .centro_operativo_clasificacion_seeds import centro_operativo_clasificacion_seeds
 from .color_seeds import color_seeds
 from .composicion_juridica_seeds import composicion_juridica_seeds
@@ -35,6 +36,7 @@ from .user_seeds import user_seeds
 
 
 def seeds(db: Session):
+    cargo_seeds(db)
     centro_operativo_clasificacion_seeds(db)
     color_seeds(db)
     composicion_juridica_seeds(db)

@@ -33,9 +33,11 @@ async def upload_image(file: UploadFile) -> PictShareResponse:
     return save_file(file.filename, data, file.content_type)
 
 
-async def upload_and_get_image_url(file: UploadFile) -> str:
-    response = await upload_image(file)
-    return f"{PICTSHARE_API}/{response.hash}"
+async def upload_and_get_image_url(file: Optional[UploadFile]) -> Optional[str]:
+    if file:
+        response = await upload_image(file)
+        return f"{PICTSHARE_API}/{response.hash}"
+    return None
 
 
 async def check_duplicate_images(

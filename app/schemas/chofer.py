@@ -35,7 +35,7 @@ class ChoferBaseModel(BaseModel):
     pais_emisor_registro_id: Optional[int] = None
     localidad_emisor_registro_id: Optional[int] = None
     ciudad_emisor_registro_id: int
-    tipo_registro_id: int
+    tipo_registro_id: Optional[int] = None
     numero_registro: str
     vencimiento_registro: Date
     foto_registro_frente: Optional[str] = None
@@ -44,7 +44,7 @@ class ChoferBaseModel(BaseModel):
     telefono: str
     email: Optional[str] = None
     direccion: Optional[str] = None
-    ciudad_id: int
+    ciudad_id: Optional[str] = None
 
 
 class ChoferForm(ChoferBaseModel):
@@ -101,7 +101,7 @@ class ChoferBase(ChoferBaseModel):
     tipo_registro: Optional[TipoRegistro] = None
     # fin registro
     estado: EstadoEnum
-    ciudad: Ciudad
+    ciudad: Optional[Ciudad] = None
 
     class Config:
         orm_mode = True
@@ -124,7 +124,7 @@ class ChoferList(BaseModel):
     es_propietario: Optional[bool] = False
     estado: EstadoEnum
     direccion: Optional[str] = None
-    ciudad: Ciudad
+    ciudad: Optional[Ciudad] = None
     ciudad_nombre: Optional[str] = None
     localidad_nombre: Optional[str] = None
     pais_nombre: Optional[str] = None

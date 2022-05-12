@@ -7,6 +7,24 @@ from app.models import User
 from .permiso_seeds import permiso_seeds
 
 
+def entities_admin_permiso_seeds(db: Session, user: User):
+    permiso_generico_seeds(db, user)
+    permiso_centro_operativo_seeds(db, user)
+    permiso_gestor_carga_seeds(db, user)
+    permiso_proveedor_seeds(db, user)
+    permiso_punto_venta_seeds(db, user)
+    permiso_remitente_seeds(db, user)
+    permisos = []
+    permisos.append(
+        permiso_seeds(db, a.CREAR, m.GESTOR_CARGA, True, "Crear Gestor de Carga")
+    )
+    permisos.append(
+        permiso_seeds(db, a.ELIMINAR, m.GESTOR_CARGA, True, "Eliminar Gestor de Carga")
+    )
+    user.permisos.extend(permisos)
+    db.commit()
+
+
 def entities_permiso_seeds(db: Session, user: User):
     permiso_generico_seeds(db, user)
     permiso_centro_operativo_seeds(db, user)
@@ -100,13 +118,7 @@ def permiso_centro_operativo_seeds(db: Session, user: User):
 def permiso_gestor_carga_seeds(db: Session, user: User):
     permisos = []
     permisos.append(
-        permiso_seeds(db, a.CREAR, m.GESTOR_CARGA, True, "Crear Gestor de Carga")
-    )
-    permisos.append(
         permiso_seeds(db, a.EDITAR, m.GESTOR_CARGA, True, "Editar Gestor de Carga")
-    )
-    permisos.append(
-        permiso_seeds(db, a.ELIMINAR, m.GESTOR_CARGA, True, "Eliminar Gestor de Carga")
     )
     permisos.append(
         permiso_seeds(db, a.LISTAR, m.GESTOR_CARGA, True, "Listar Gestor de Carga")
