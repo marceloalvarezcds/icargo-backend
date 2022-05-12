@@ -26,7 +26,7 @@ def get_chofer_list_by_gestor_cuenta_id(
         .filter(
             and_(
                 Chofer.gestor_cuenta_id == gestor_cuenta_id,
-                Chofer.estado != EstadoEnum.ELIMINADO.value,
+                Chofer.estado == EstadoEnum.ACTIVO.value,
             )
         )
         .order_by(Chofer.nombre)

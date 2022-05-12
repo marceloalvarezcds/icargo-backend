@@ -26,7 +26,7 @@ def get_propietario_list_by_gestor_cuenta_id(
         .filter(
             and_(
                 Propietario.gestor_cuenta_id == gestor_cuenta_id,
-                Propietario.estado != EstadoEnum.ELIMINADO.value,
+                Propietario.estado == EstadoEnum.ACTIVO.value,
             )
         )
         .order_by(Propietario.nombre)
@@ -59,9 +59,9 @@ def create_propietario(
     db: Session,
     data: PropietarioForm,
     gestor_cuenta_id: Optional[int],
-    foto_documento_frente_url: str,
-    foto_documento_reverso_url: str,
-    foto_perfil_url: str,
+    foto_documento_frente_url: Optional[str],
+    foto_documento_reverso_url: Optional[str],
+    foto_perfil_url: Optional[str],
     chofer: Optional[Chofer],
     modified_by: str,
 ) -> Propietario:
