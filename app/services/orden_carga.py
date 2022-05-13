@@ -134,7 +134,7 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "camion_color": obj.camion.color.descripcion,
         "semi_placa": obj.semi_placa,
         "semi_marca_tipo": f"{obj.semi.marca_descripcion}/{obj.semi.tipo_descripcion}",
-        "semi_color": obj.semi.color.descripcion,
+        "semi_color": obj.semi.color.descripcion if obj.semi.color else "",
         "comentarios": obj.comentarios if obj.comentarios else "-",
         "texto_legal": obj.flete.emision_orden_texto_legal
         if obj.flete.emision_orden_texto_legal
@@ -190,10 +190,7 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
             obj.resultado_propietario_merma_valor_total_moneda_local
         ),
         "anticipo": number_format(obj.resultado_propietario_total_anticipos_retirados),
-        "saldo": number_format(
-            obj.resultado_propietario_saldo
-            + obj.resultado_propietario_total_anticipos_retirados
-        ),
+        "saldo": number_format(obj.resultado_propietario_saldo),
         "marca_agua_url": marca_agua_url,
         "class_name": "marca-agua" if obj.estado == EstadoEnum.FINALIZADO.value else "",
     }

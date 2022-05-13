@@ -71,8 +71,10 @@ def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
             orden_carga.complementos,
             flete_anticipo.tipo_descripcion == enums.TipoAnticipoEnum.EFECTIVO.value,
         )
-        total_anticipo = orden_carga.flete_proyectado * (
-            flete_anticipo.porcentaje / Decimal(100)
+        total_anticipo = (
+            orden_carga.flete_proyectado * (flete_anticipo.porcentaje / Decimal(100))
+            if flete_anticipo.porcentaje
+            else 0
         )
         return total_anticipo + total_complemento
 
@@ -118,8 +120,10 @@ def update_orden_carga_anticipo_saldo(
     exists = repositories.get_orden_carga_anticipo_saldo_by(
         db, flete_anticipo_id, orden_carga_id
     )
-    total_anticipo = orden_carga.flete_proyectado * (
-        flete_anticipo.porcentaje / Decimal(100)
+    total_anticipo = (
+        orden_carga.flete_proyectado * (flete_anticipo.porcentaje / Decimal(100))
+        if flete_anticipo.porcentaje
+        else 0
     )
     total_retirado = monto_retirado
     total_disponible = total_anticipo + total_complemento

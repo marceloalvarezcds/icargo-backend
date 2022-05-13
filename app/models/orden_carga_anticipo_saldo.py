@@ -36,7 +36,7 @@ class OrdenCargaAnticipoSaldo(AuditMixin, Base):
 
     @hybrid_property
     def porcentaje(self):
-        return self.flete_anticipo.porcentaje
+        return self.flete_anticipo.porcentaje if self.flete_anticipo.porcentaje else 0
 
     @hybrid_property
     def total_disponible(self):
