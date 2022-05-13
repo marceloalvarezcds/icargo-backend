@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from pydantic import Json
@@ -39,7 +39,7 @@ async def read_orden_carga_remision_origen_by_id(
 async def add_new_orden_carga_remision_origen(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.OrdenCargaRemisionOrigenForm] = Form(...),  # type: ignore  # noqa: B008
-    foto_documento_file: UploadFile = File(...),  # noqa: B008
+    foto_documento_file: Optional[UploadFile] = File(None),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA_REMISION_ORIGEN)),  # noqa: B008
 ):
@@ -56,7 +56,7 @@ async def edit_orden_carga_remision_origen(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.OrdenCargaRemisionOrigenForm] = Form(...),  # type: ignore  # noqa: B008
-    foto_documento_file: UploadFile = File(None),  # noqa: B008
+    foto_documento_file: Optional[UploadFile] = File(None),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA_REMISION_ORIGEN)),  # noqa: B008
 ):

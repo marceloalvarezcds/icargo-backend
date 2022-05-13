@@ -20,18 +20,18 @@ class Rentabilidad(BaseModel):
     camion_placa: str
     semi_placa: str
     propietario_nombre: str
-    flete_tipo: TipoFleteEnum
+    flete_tipo: Optional[TipoFleteEnum] = None
     producto_descripcion: str
     cantidad_nominada: Decimal
     cantidad_destino: Decimal
     cantidad_origen: Decimal
     diferencia_origen_destino: Decimal
     remitente_nombre: str
-    gestor_carga_pais_id: int
+    gestor_carga_pais_id: Optional[int] = None
     origen_nombre: str
-    origen_pais_id: int
+    origen_pais_id: Optional[int] = None
     destino_nombre: str
-    destino_pais_id: int
+    destino_pais_id: Optional[int] = None
     lugar_carga_nombre: str
     lugar_descarga_nombre: str
     # PAGO FLETE a PROPIETARIO p/GC

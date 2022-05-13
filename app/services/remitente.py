@@ -38,7 +38,7 @@ def get_remitente_detail(
 async def create_remitente(
     db: Session,
     data: schemas.RemitenteForm,
-    file: UploadFile,
+    file: Optional[UploadFile],
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Remitente:

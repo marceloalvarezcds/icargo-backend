@@ -37,13 +37,13 @@ def get_semi_list_by_propietario_id(db: Session, propietario_id: int) -> List[Se
 def create_semi(
     db: Session,
     data: SemiForm,
-    foto_url: str,
-    foto_habilitacion_municipal_frente_url: str,
-    foto_habilitacion_municipal_reverso_url: str,
-    foto_habilitacion_transporte_frente_url: str,
-    foto_habilitacion_transporte_reverso_url: str,
-    foto_habilitacion_automotor_frente_url: str,
-    foto_habilitacion_automotor_reverso_url: str,
+    foto_url: Optional[str],
+    foto_habilitacion_municipal_frente_url: Optional[str],
+    foto_habilitacion_municipal_reverso_url: Optional[str],
+    foto_habilitacion_transporte_frente_url: Optional[str],
+    foto_habilitacion_transporte_reverso_url: Optional[str],
+    foto_habilitacion_automotor_frente_url: Optional[str],
+    foto_habilitacion_automotor_reverso_url: Optional[str],
     modified_by: str,
 ) -> Semi:
     obj = Semi(

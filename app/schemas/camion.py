@@ -20,8 +20,8 @@ from .tipo_camion import TipoCamion
 class CamionForm(BaseModel):
     placa: str
     propietario_id: int
-    chofer_id: int
-    numero_chasis: str
+    chofer_id: Optional[int] = None
+    numero_chasis: Optional[str] = None
     foto: Optional[str] = None
     # INICIO Habilitaciones del Camión
     # inicio - municipal
@@ -62,7 +62,7 @@ class CamionForm(BaseModel):
 class Camion(CamionForm):
     id: int
     propietario: Propietario
-    chofer: Chofer
+    chofer: Optional[Chofer]
     estado: EstadoEnum
     gestor_cuenta_id: int
     info: str
@@ -99,9 +99,9 @@ class CamionList(BaseModel):
     placa: str
     propietario_nombre: str
     propietario_ruc: str
-    chofer_nombre: str
-    chofer_numero_documento: str
-    numero_chasis: str
+    chofer_nombre: Optional[str] = None
+    chofer_numero_documento: Optional[str] = None
+    numero_chasis: Optional[str] = None
     estado: EstadoEnum
     ciudad_habilitacion_municipal_nombre: str
     gestor_cuenta_id: int

@@ -21,8 +21,8 @@ from .unidad import Unidad
 class FleteFormBaseModel(BaseModel):
     remitente_id: int
     producto_id: int
-    tipo_carga_id: int
-    numero_lote: Optional[str]
+    tipo_carga_id: Optional[int] = None
+    numero_lote: Optional[str] = None
     publicado: Optional[bool] = False
     es_subasta: Optional[bool] = False
     # INICIO Tramo de Fletes
@@ -64,7 +64,7 @@ class FleteFormBaseModel(BaseModel):
     vigencia_anticipos: Date
     # INICIO Emisión de Órdenes
     emision_orden_texto_legal: str
-    emision_orden_detalle: str
+    emision_orden_detalle: Optional[str] = None
     # FIN Emisión de Órdenes
 
 
@@ -81,7 +81,7 @@ class Flete(FleteFormBaseModel):
     id: int
     remitente: Remitente
     producto: Producto
-    tipo_carga: TipoCarga
+    tipo_carga: Optional[TipoCarga] = None
     publicado_descripcion: str
     estado: EstadoEnum
     gestor_carga_id: int
@@ -115,7 +115,7 @@ class Flete(FleteFormBaseModel):
     anticipos: List[FleteAnticipo]
     complementos: List[FleteComplemento]
     descuentos: List[FleteDescuento]
-    tipo_flete: TipoFleteEnum
+    tipo_flete: Optional[TipoFleteEnum] = None
     created_by: str
     created_at: Date
     modified_by: str
@@ -135,7 +135,7 @@ class FleteList(FleteFormBaseModel):
     id: int
     remitente_nombre: str
     producto_descripcion: str
-    tipo_carga_descripcion: str
+    tipo_carga_descripcion: Optional[str] = None
     publicado_descripcion: str
     estado: EstadoEnum
     gestor_carga_nombre: str
@@ -163,7 +163,7 @@ class FleteList(FleteFormBaseModel):
     merma_propietario_unidad_descripcion: str
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
-    tipo_flete: TipoFleteEnum
+    tipo_flete: Optional[TipoFleteEnum] = None
     created_by: str
     created_at: Date
     modified_by: str

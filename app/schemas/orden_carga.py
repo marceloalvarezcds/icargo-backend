@@ -50,21 +50,21 @@ class OrdenCarga(OrdenCargaForm):
     semi_placa: str
     # Datos de fletes
     flete_anticipo_maximo: Decimal
-    flete_destino_id: int
-    flete_destino_nombre: str
+    flete_destino_id: Optional[int] = None
+    flete_destino_nombre: Optional[str] = None
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
     flete_limite_credito: Decimal
     flete_numero_lote: str
     flete_monto_efectivo: Decimal
-    flete_origen_id: int
-    flete_origen_nombre: str
+    flete_origen_id: Optional[int] = None
+    flete_origen_nombre: Optional[str] = None
     flete_producto_descripcion: str
     flete_proyectado: Decimal
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
     flete_tarifa: Decimal
-    flete_tipo: TipoFleteEnum
+    flete_tipo: Optional[TipoFleteEnum] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
@@ -83,10 +83,10 @@ class OrdenCarga(OrdenCargaForm):
     anticipos_liberados: bool
     anticipos_liberados_descripcion: str
     # INICIO Tramo de OC
-    origen_id: int
-    origen: CentroOperativo
-    destino_id: int
-    destino: CentroOperativo
+    origen_id: Optional[int] = None
+    origen: Optional[CentroOperativo] = None
+    destino_id: Optional[int] = None
+    destino: Optional[CentroOperativo] = None
     # FIN Tramo de OC
     # Relaciones Listas
     auditorias: List[AuditDatabase]
@@ -129,15 +129,15 @@ class OrdenCargaList(OrdenCargaForm):
     # Datos de semi
     semi_placa: str
     # Datos de fletes
-    flete_destino_nombre: str
+    flete_destino_nombre: Optional[str] = None
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
     flete_numero_lote: str
-    flete_origen_nombre: str
+    flete_origen_nombre: Optional[str] = None
     flete_producto_descripcion: str
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
-    flete_tipo: TipoFleteEnum
+    flete_tipo: Optional[TipoFleteEnum] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
@@ -148,10 +148,10 @@ class OrdenCargaList(OrdenCargaForm):
     anticipos_liberados: bool
     anticipos_liberados_descripcion: str
     # INICIO Tramo de OC
-    origen_id: int
-    origen_nombre: str
-    destino_id: int
-    destino_nombre: str
+    origen_id: Optional[int] = None
+    origen_nombre: Optional[str] = None
+    destino_id: Optional[int] = None
+    destino_nombre: Optional[str] = None
     # FIN Tramo de OC
     cantidad_destino: Decimal
     cantidad_origen: Decimal

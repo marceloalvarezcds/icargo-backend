@@ -19,7 +19,7 @@ class RemitenteBaseModel(BaseModel):
     tipo_documento_id: int
     numero_documento: str
     digito_verificador: Optional[str] = None
-    composicion_juridica_id: int
+    composicion_juridica_id: Optional[int] = None
     telefono: str
     email: Optional[str] = None
     pagina_web: Optional[str] = None
@@ -38,7 +38,7 @@ class RemitenteForm(RemitenteBaseModel):
 class RemitenteBase(RemitenteBaseModel):
     id: int
     tipo_documento: TipoDocumento
-    composicion_juridica: ComposicionJuridica
+    composicion_juridica: Optional[ComposicionJuridica] = None
     logo: Optional[str] = None
     estado: EstadoEnum
     ciudad: Optional[Ciudad] = None

@@ -43,7 +43,7 @@ def get_centro_operativo_detail(
 async def create_centro_operativo(
     db: Session,
     data: schemas.CentroOperativoForm,
-    file: UploadFile,
+    file: Optional[UploadFile],
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.CentroOperativo:

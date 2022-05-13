@@ -55,7 +55,7 @@ async def read_centro_operativo_by_id(
 async def add_new_centro_operativo(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.CentroOperativoForm] = Form(...),  # type: ignore  # noqa: B008
-    file: UploadFile = File(...),  # noqa: B008
+    file: Optional[UploadFile] = File(None),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.CENTRO_OPERATIVO)),  # noqa: B008
 ):

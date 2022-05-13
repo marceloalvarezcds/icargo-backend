@@ -42,7 +42,7 @@ def get_gestor_carga_by_id(db: Session, id: int) -> Optional[GestorCarga]:
 def create_gestor_carga(
     db: Session,
     data: GestorCargaForm,
-    logo_url: str,
+    logo_url: Optional[str],
     modified_by: str,
 ) -> GestorCarga:
     obj = GestorCarga(

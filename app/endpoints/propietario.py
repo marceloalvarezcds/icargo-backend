@@ -56,9 +56,9 @@ async def read_propietario_by_id(
 async def add_new_propietario(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.PropietarioForm] = Form(...),  # type: ignore  # noqa: B008
-    foto_documento_frente_file: UploadFile = File(...),  # noqa: B008
-    foto_documento_reverso_file: UploadFile = File(...),  # noqa: B008
-    foto_perfil_file: UploadFile = File(...),  # noqa: B008
+    foto_documento_frente_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_documento_reverso_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_perfil_file: Optional[UploadFile] = File(None),  # noqa: B008
     foto_documento_frente_chofer_file: Optional[UploadFile] = File(None),  # noqa: B008
     foto_documento_reverso_chofer_file: Optional[UploadFile] = File(None),  # noqa: B008
     foto_registro_frente_file: Optional[UploadFile] = File(None),  # noqa: B008

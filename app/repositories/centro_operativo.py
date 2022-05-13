@@ -38,7 +38,7 @@ def get_centro_operativo_list_by_gestor_cuenta_id(
 
 
 def get_centro_operativo_by(
-    db: Session, nombre: str, clasificacion_id: int, ciudad_id: int
+    db: Session, nombre: str, clasificacion_id: int, ciudad_id: Optional[int]
 ) -> Optional[CentroOperativo]:
     return (
         db.query(CentroOperativo)
@@ -60,7 +60,7 @@ def get_centro_operativo_by_id(db: Session, id: int) -> Optional[CentroOperativo
 def create_centro_operativo(
     db: Session,
     data: CentroOperativoForm,
-    logo_url: str,
+    logo_url: Optional[str],
     modified_by: str,
 ) -> CentroOperativo:
     obj = CentroOperativo(

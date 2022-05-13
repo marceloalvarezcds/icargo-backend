@@ -60,7 +60,7 @@ def get_remitente_by_id(db: Session, id: int) -> Optional[Remitente]:
 def create_remitente(
     db: Session,
     data: RemitenteForm,
-    logo_url: str,
+    logo_url: Optional[str],
     modified_by: str,
 ) -> Remitente:
     obj = Remitente(

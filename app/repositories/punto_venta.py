@@ -47,7 +47,7 @@ def get_punto_venta_by_id(db: Session, id: int) -> Optional[PuntoVenta]:
 def create_punto_venta(
     db: Session,
     data: PuntoVentaForm,
-    logo_url: str,
+    logo_url: Optional[str],
     modified_by: str,
 ) -> PuntoVenta:
     obj = PuntoVenta(

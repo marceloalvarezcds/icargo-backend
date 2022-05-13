@@ -66,13 +66,27 @@ async def read_semi_by_id(
 async def add_new_semi(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.SemiForm] = Form(...),  # type: ignore  # noqa: B008
-    foto_file: UploadFile = File(...),  # noqa: B008
-    foto_habilitacion_municipal_frente_file: UploadFile = File(...),  # noqa: B008
-    foto_habilitacion_municipal_reverso_file: UploadFile = File(...),  # noqa: B008
-    foto_habilitacion_transporte_frente_file: UploadFile = File(...),  # noqa: B008
-    foto_habilitacion_transporte_reverso_file: UploadFile = File(...),  # noqa: B008
-    foto_habilitacion_automotor_frente_file: UploadFile = File(...),  # noqa: B008
-    foto_habilitacion_automotor_reverso_file: UploadFile = File(...),  # noqa: B008
+    foto_file: Optional[UploadFile] = File(None),  # noqa: B008
+    foto_habilitacion_municipal_frente_file: Optional[UploadFile] = File(  # noqa: B008
+        None
+    ),
+    foto_habilitacion_municipal_reverso_file: Optional[UploadFile] = File(  # noqa: B008
+        None
+    ),
+    foto_habilitacion_transporte_frente_file: Optional[UploadFile] = File(  # noqa: B008
+        None
+    ),
+    foto_habilitacion_transporte_reverso_file: Optional[
+        UploadFile
+    ] = File(  # noqa: B008
+        None
+    ),
+    foto_habilitacion_automotor_frente_file: Optional[UploadFile] = File(  # noqa: B008
+        None
+    ),
+    foto_habilitacion_automotor_reverso_file: Optional[UploadFile] = File(  # noqa: B008
+        None
+    ),
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.SEMIRREMOLQUE)),  # noqa: B008
 ):
@@ -110,8 +124,12 @@ async def edit_semi(
     ] = File(  # noqa: B008
         None
     ),
-    foto_habilitacion_automotor_frente_file: UploadFile = File(None),  # noqa: B008
-    foto_habilitacion_automotor_reverso_file: UploadFile = File(None),  # noqa: B008
+    foto_habilitacion_automotor_frente_file: Optional[UploadFile] = File(  # noqa: B008
+        None
+    ),
+    foto_habilitacion_automotor_reverso_file: Optional[UploadFile] = File(  # noqa: B008
+        None
+    ),
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.SEMIRREMOLQUE)),  # noqa: B008
 ):

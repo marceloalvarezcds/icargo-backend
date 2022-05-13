@@ -21,7 +21,7 @@ from .tipo_semi import TipoSemi
 class SemiForm(BaseModel):
     placa: str
     propietario_id: int
-    numero_chasis: str
+    numero_chasis: Optional[str] = None
     foto: Optional[str] = None
     # INICIO Habilitaciones del Camión
     # inicio - municipal
@@ -52,7 +52,7 @@ class SemiForm(BaseModel):
     clasificacion_id: int
     tipo_id: int
     tipo_carga_id: int
-    color_id: int
+    color_id: Optional[int] = None
     anho: int
     # FIN Detalles del Camión
     # INICIO Capacidad del Camión
@@ -89,7 +89,7 @@ class Semi(SemiForm):
     clasificacion: SemiClasificacion
     tipo: TipoSemi
     tipo_carga: TipoCarga
-    color: Color
+    color: Optional[Color] = None
     # FIN Detalles del Camión
     created_by: str
     created_at: datetime
@@ -106,7 +106,7 @@ class SemiList(BaseModel):
     placa: str
     propietario_nombre: str
     propietario_ruc: str
-    numero_chasis: str
+    numero_chasis: Optional[str] = None
     estado: EstadoEnum
     ciudad_habilitacion_municipal_nombre: str
     clasificacion_descripcion: str

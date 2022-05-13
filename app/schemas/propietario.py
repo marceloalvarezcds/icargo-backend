@@ -21,7 +21,7 @@ class PropietarioBaseModel(BaseModel):
     nombre: str
     tipo_persona_id: int
     ruc: str
-    digito_verificador: str
+    digito_verificador: Optional[str] = None
     pais_origen_id: int
     fecha_nacimiento: Optional[Date] = None
     oficial_cuenta_id: int

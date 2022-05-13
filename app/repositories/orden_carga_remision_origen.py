@@ -39,7 +39,7 @@ def get_orden_carga_remision_origen_by_id(
 def create_orden_carga_remision_origen(
     db: Session,
     data: OrdenCargaRemisionOrigenForm,
-    foto_documento_url: str,
+    foto_documento_url: Optional[str],
     modified_by: str,
 ) -> OrdenCargaRemisionOrigen:
     obj = OrdenCargaRemisionOrigen(

@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import Optional
 
 from fastapi import HTTPException, UploadFile  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
@@ -13,7 +13,7 @@ from .pictshare import upload_and_get_image_url
 async def create_factura(
     db: Session,
     data: FacturaForm,
-    foto_file: UploadFile,
+    foto_file: Optional[UploadFile],
     modified_by: str,
 ) -> Factura:
     if repositories.get_factura_by(
@@ -23,7 +23,7 @@ async def create_factura(
             status_code=409, detail=f"La Factura Nº {data.numero_factura} ya existe"
         )
     foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
-    return repositories.create_factura(db, data, cast(str, foto_url), modified_by)
+    return repositories.create_factura(db, data, foto_url, modified_by)
 
 
 def get_factura_by_id(db: Session, id: int) -> Factura:

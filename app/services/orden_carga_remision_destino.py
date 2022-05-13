@@ -11,7 +11,7 @@ from app.services.pictshare import upload_and_get_image_url
 async def create_orden_carga_remision_destino(
     db: Session,
     data: schemas.OrdenCargaRemisionDestinoForm,
-    foto_documento_file: UploadFile,
+    foto_documento_file: Optional[UploadFile],
     modified_by: str,
 ) -> schemas.OrdenCargaRemisionDestino:
     if repositories.get_orden_carga_remision_destino_by(db, data.numero_documento):

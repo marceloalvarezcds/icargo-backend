@@ -16,7 +16,7 @@ from .pictshare import upload_and_get_image_url
 async def create_gestor_carga(
     db: Session,
     data: schemas.GestorCargaForm,
-    file: UploadFile,
+    file: Optional[UploadFile],
     modified_by: str,
 ) -> schemas.GestorCarga:
     if repositories.get_gestor_carga_by(

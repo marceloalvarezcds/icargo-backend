@@ -1,5 +1,5 @@
 import os
-from typing import Optional, cast
+from typing import Optional
 
 from fastapi import HTTPException, UploadFile  # type: ignore
 from openpyxl import Workbook  # type: ignore
@@ -17,13 +17,13 @@ from .camion_check_files import check_files
 async def create_camion(
     db: Session,
     data: schemas.CamionForm,
-    foto_file: UploadFile,
-    foto_habilitacion_municipal_frente_file: UploadFile,
-    foto_habilitacion_municipal_reverso_file: UploadFile,
-    foto_habilitacion_transporte_frente_file: UploadFile,
-    foto_habilitacion_transporte_reverso_file: UploadFile,
-    foto_habilitacion_automotor_frente_file: UploadFile,
-    foto_habilitacion_automotor_reverso_file: UploadFile,
+    foto_file: Optional[UploadFile],
+    foto_habilitacion_municipal_frente_file: Optional[UploadFile],
+    foto_habilitacion_municipal_reverso_file: Optional[UploadFile],
+    foto_habilitacion_transporte_frente_file: Optional[UploadFile],
+    foto_habilitacion_transporte_reverso_file: Optional[UploadFile],
+    foto_habilitacion_automotor_frente_file: Optional[UploadFile],
+    foto_habilitacion_automotor_reverso_file: Optional[UploadFile],
     modified_by: str,
 ) -> schemas.Camion:
     if repositories.get_camion_by(db, data.placa):
@@ -51,13 +51,13 @@ async def create_camion(
     return repositories.create_camion(
         db,
         data,
-        cast(str, foto_url),
-        cast(str, foto_habilitacion_municipal_frente_url),
-        cast(str, foto_habilitacion_municipal_reverso_url),
-        cast(str, foto_habilitacion_transporte_frente_url),
-        cast(str, foto_habilitacion_transporte_reverso_url),
-        cast(str, foto_habilitacion_automotor_frente_url),
-        cast(str, foto_habilitacion_automotor_reverso_url),
+        foto_url,
+        foto_habilitacion_municipal_frente_url,
+        foto_habilitacion_municipal_reverso_url,
+        foto_habilitacion_transporte_frente_url,
+        foto_habilitacion_transporte_reverso_url,
+        foto_habilitacion_automotor_frente_url,
+        foto_habilitacion_automotor_reverso_url,
         modified_by,
     )
 

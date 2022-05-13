@@ -50,7 +50,7 @@ def get_factura_by_id(db: Session, id: int) -> Optional[Factura]:
 def create_factura(
     db: Session,
     data: FacturaForm,
-    foto_url: str,
+    foto_url: Optional[str],
     modified_by: str,
 ) -> Factura:
     obj = Factura(

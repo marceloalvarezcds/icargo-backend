@@ -38,7 +38,7 @@ def get_proveedor_detail(
 async def create_proveedor(
     db: Session,
     data: schemas.ProveedorForm,
-    file: UploadFile,
+    file: Optional[UploadFile],
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Proveedor:

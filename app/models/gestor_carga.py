@@ -60,7 +60,7 @@ class GestorCarga(AuditMixin, Base):
 
     @hybrid_property
     def composicion_juridica_nombre(self):
-        return self.composicion_juridica.nombre
+        return self.composicion_juridica.nombre if self.composicion_juridica else ""
 
     @hybrid_property
     def moneda_nombre(self):
@@ -72,20 +72,20 @@ class GestorCarga(AuditMixin, Base):
 
     @hybrid_property
     def ciudad_nombre(self):
-        return self.ciudad.nombre
+        return self.ciudad.nombre if self.ciudad else None
 
     @hybrid_property
     def localidad_nombre(self):
-        return self.ciudad.localidad.nombre
+        return self.ciudad.localidad.nombre if self.ciudad else None
 
     @hybrid_property
     def pais_id(self):
-        return self.ciudad.localidad.pais_id
+        return self.ciudad.localidad.pais_id if self.ciudad else None
 
     @hybrid_property
     def pais_nombre(self):
-        return self.ciudad.localidad.pais.nombre
+        return self.ciudad.localidad.pais.nombre if self.ciudad else None
 
     @hybrid_property
     def pais_nombre_corto(self):
-        return self.ciudad.localidad.pais.nombre_corto
+        return self.ciudad.localidad.pais.nombre_corto if self.ciudad else None

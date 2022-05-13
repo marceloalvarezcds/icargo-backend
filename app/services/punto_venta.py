@@ -46,7 +46,7 @@ def get_punto_venta_detail(
 async def create_punto_venta(
     db: Session,
     data: schemas.PuntoVentaForm,
-    file: UploadFile,
+    file: Optional[UploadFile],
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.PuntoVenta:

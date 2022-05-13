@@ -60,7 +60,7 @@ def get_proveedor_by_id(db: Session, id: int) -> Optional[Proveedor]:
 def create_proveedor(
     db: Session,
     data: ProveedorForm,
-    logo_url: str,
+    logo_url: Optional[str],
     modified_by: str,
 ) -> Proveedor:
     obj = Proveedor(

@@ -17,7 +17,7 @@ class GestorCargaForm(BaseModel):
     tipo_documento_id: int
     numero_documento: str
     digito_verificador: Optional[str] = None
-    composicion_juridica_id: int
+    composicion_juridica_id: Optional[int] = None
     moneda_id: int
     telefono: str
     email: Optional[str] = None
@@ -32,7 +32,7 @@ class GestorCargaForm(BaseModel):
 class GestorCarga(GestorCargaForm):
     id: int
     tipo_documento: TipoDocumento
-    composicion_juridica: ComposicionJuridica
+    composicion_juridica: Optional[ComposicionJuridica] = None
     moneda: Moneda
     logo: Optional[str] = None
     estado: EstadoEnum

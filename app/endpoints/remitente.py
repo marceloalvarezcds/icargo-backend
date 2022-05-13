@@ -55,7 +55,7 @@ async def read_remitente_by_id(
 async def add_new_remitente(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.RemitenteForm] = Form(...),  # type: ignore  # noqa: B008
-    file: UploadFile = File(...),  # noqa: B008
+    file: Optional[UploadFile] = File(None),  # noqa: B008
     current_user: models.User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.REMITENTE)),  # noqa: B008
 ):

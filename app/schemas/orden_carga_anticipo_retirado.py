@@ -42,7 +42,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoForm):
     moneda_nombre: str
     proveedor_nombre: str
     punto_venta_nombre: str
-    punto_venta_pais_nombre: str
+    punto_venta_pais_nombre: Optional[str] = None
     tipo_anticipo_descripcion: str
     tipo_comprobante_descripcion: str
     tipo_insumo_descripcion: Optional[str] = None
