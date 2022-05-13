@@ -108,7 +108,9 @@ class Instrumento(AuditMixin, Base):
 
     @hybrid_property
     def tipo_operacion_descripcion(self):
-        return self.liquidacion.tipo_operacion_descripcion
+        return (
+            "Cobro" if self.liquidacion.tipo_operacion_descripcion == "Pago" else "Pago"
+        )
 
     @hybrid_property
     def url(self):

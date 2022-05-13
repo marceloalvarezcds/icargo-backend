@@ -358,7 +358,7 @@ def get_instrumento_reports(db: Session) -> str:
         value_cell.value = item.contraparte_numero_documento
 
         value_cell = ws.cell(row=row + 2, column=5)
-        value_cell.value = item.liquidacion.tipo_operacion_descripcion
+        value_cell.value = item.tipo_operacion_descripcion
 
         value_cell = ws.cell(row=row + 2, column=6)
         value_cell.value = item.moneda_nombre
