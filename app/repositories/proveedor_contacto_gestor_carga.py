@@ -10,6 +10,23 @@ from app.schemas import Cargo
 
 def get_proveedor_contacto_gestor_carga_by(
     db: Session,
+    proveedor_id: int,
+    contacto_id: int,
+    gestor_carga_id: int,
+) -> Optional[ProveedorContactoGestorCarga]:
+    return (
+        db.query(ProveedorContactoGestorCarga)
+        .filter(
+            ProveedorContactoGestorCarga.proveedor_id == proveedor_id,
+            ProveedorContactoGestorCarga.contacto_id == contacto_id,
+            ProveedorContactoGestorCarga.gestor_carga_id == gestor_carga_id,
+        )
+        .first()
+    )
+
+
+def get_proveedor_contacto_gestor_carga_by_cargo_id(
+    db: Session,
     cargo_id: int,
     proveedor_id: int,
     contacto_id: int,
