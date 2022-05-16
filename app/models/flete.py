@@ -251,7 +251,7 @@ class Flete(AuditMixin, Base):
 
     @hybrid_property
     def tipo_carga_descripcion(self):
-        return self.tipo_carga.descripcion
+        return self.tipo_carga.descripcion if self.tipo_carga else None
 
     @hybrid_property
     def tipo_flete(self) -> TipoFleteEnum:

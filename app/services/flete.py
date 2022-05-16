@@ -288,7 +288,7 @@ def get_flete_reports(db: Session) -> str:
         value_cell.value = item.estado
 
         value_cell = ws.cell(row=row + 2, column=9)
-        value_cell.value = item.gestor_cuenta_nombre
+        value_cell.value = item.gestor_carga_nombre
 
         value_cell = ws.cell(row=row + 2, column=10)
         value_cell.value = item.origen_nombre

@@ -254,7 +254,11 @@ def get_propietario_reports(db: Session) -> str:
         value_cell.value = item.direccion if item.direccion else ""
 
         value_cell = ws.cell(row=row + 2, column=8)
-        value_cell.value = f"{item.ciudad.nombre}/{item.ciudad.localidad.nombre}/{item.ciudad.localidad.pais.nombre_corto}"  # noqa
+        value_cell.value = (
+            f"{item.ciudad.nombre}/{item.ciudad.localidad.nombre}/{item.ciudad.localidad.pais.nombre_corto}"  # noqa: B950
+            if item.ciudad
+            else ""
+        )
 
         value_cell = ws.cell(row=row + 2, column=9)
         value_cell.value = item.created_by

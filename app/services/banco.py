@@ -69,90 +69,79 @@ def get_banco_reports(db: Session) -> str:
     datalist = repositories.get_banco_list(db)
     wb = Workbook()
     ws = wb.active
+    i = 0
 
-    title_cell = ws.cell(row=1, column=1)
+    title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "ID"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=2)
+    title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Nombre de Cuenta"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=3)
+    title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Titular"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=4)
+    title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Banco"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=5)
-    title_cell.value = "Crédito"
-    title_cell.font = Font(bold=True)
-
-    title_cell = ws.cell(row=1, column=6)
-    title_cell.value = "Débito"
-    title_cell.font = Font(bold=True)
-
-    title_cell = ws.cell(row=1, column=7)
+    title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Saldo"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=8)
+    title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Pendiente"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=9)
+    title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Usuario creación"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=10)
+    title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Fecha creación"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=11)
+    title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Usuario modificación"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=12)
+    title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Fecha modificación"
     title_cell.font = Font(bold=True)
 
     for row, item in enumerate(datalist):
-        value_cell = ws.cell(row=row + 2, column=1)
+        i = 0
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.id
 
-        value_cell = ws.cell(row=row + 2, column=2)
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.numero_cuenta
 
-        value_cell = ws.cell(row=row + 2, column=3)
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.titular
 
-        value_cell = ws.cell(row=row + 2, column=4)
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.nombre
 
-        value_cell = ws.cell(row=row + 2, column=5)
-        value_cell.value = item.credito
-
-        value_cell = ws.cell(row=row + 2, column=6)
-        value_cell.value = item.debito
-
-        value_cell = ws.cell(row=row + 2, column=7)
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.saldo_confirmado
 
-        value_cell = ws.cell(row=row + 2, column=8)
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.saldo_provisional
 
-        value_cell = ws.cell(row=row + 2, column=9)
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.created_by
 
-        value_cell = ws.cell(row=row + 2, column=10)
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.created_at
 
-        value_cell = ws.cell(row=row + 2, column=11)
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.modified_by
 
-        value_cell = ws.cell(row=row + 2, column=12)
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.modified_at
 
     ws.auto_filter.ref = ws.dimensions

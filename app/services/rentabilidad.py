@@ -296,7 +296,7 @@ def get_rentabilidad_reports(db: Session, gestor_carga_id: int) -> str:
         value_cell.value = item.propietario_nombre
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
-        value_cell.value = item.flete_tipo
+        value_cell.value = item.flete_tipo if item.flete_tipo else ""
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.producto_descripcion

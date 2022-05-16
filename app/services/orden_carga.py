@@ -453,7 +453,7 @@ def get_orden_carga_reports(db: Session, gestor_carga_id: int) -> str:
         value_cell.value = item.camion_propietario_nombre
 
         value_cell = ws.cell(row=row + 2, column=15)
-        value_cell.value = item.flete_tipo
+        value_cell.value = item.flete_tipo.value if item.flete_tipo else ""
 
         value_cell = ws.cell(row=row + 2, column=16)
         value_cell.value = item.flete_producto_descripcion

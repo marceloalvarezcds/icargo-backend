@@ -172,7 +172,11 @@ def get_punto_venta_reports(db: Session, proveedor_id: int) -> str:
         value_cell.value = item.direccion if item.direccion else ""
 
         value_cell = ws.cell(row=row + 2, column=7)
-        value_cell.value = f"{item.ciudad.nombre}/{item.ciudad.localidad.nombre}/{item.ciudad.localidad.pais.nombre_corto}"  # noqa
+        value_cell.value = (
+            f"{item.ciudad.nombre}/{item.ciudad.localidad.nombre}/{item.ciudad.localidad.pais.nombre_corto}"  # noqa: B950
+            if item.ciudad
+            else ""
+        )
 
     ws.auto_filter.ref = ws.dimensions
     filename = "punto_venta_reports.xls"
