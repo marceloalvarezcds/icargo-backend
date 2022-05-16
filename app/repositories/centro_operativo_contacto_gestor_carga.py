@@ -10,6 +10,24 @@ from app.schemas import Cargo
 
 def get_centro_operativo_contacto_gestor_carga_by(
     db: Session,
+    centro_operativo_id: int,
+    contacto_id: int,
+    gestor_carga_id: int,
+) -> Optional[CentroOperativoContactoGestorCarga]:
+    return (
+        db.query(CentroOperativoContactoGestorCarga)
+        .filter(
+            CentroOperativoContactoGestorCarga.centro_operativo_id
+            == centro_operativo_id,
+            CentroOperativoContactoGestorCarga.contacto_id == contacto_id,
+            CentroOperativoContactoGestorCarga.gestor_carga_id == gestor_carga_id,
+        )
+        .first()
+    )
+
+
+def get_centro_operativo_contacto_gestor_carga_by_cargo_id(
+    db: Session,
     cargo_id: int,
     centro_operativo_id: int,
     contacto_id: int,

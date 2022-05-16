@@ -43,6 +43,11 @@ def centro_operativo_clasificacion_seeds(db: Session):
                 nombre="Acopio", estado=EstadoEnum.ACTIVO.value
             )
         )
+        db.add(  # Pedido por los de TRD
+            CentroOperativoClasificacion(
+                nombre="Planta de Producción", estado=EstadoEnum.ACTIVO.value
+            )
+        )
         db.commit()
     except IntegrityError:
         db.rollback()

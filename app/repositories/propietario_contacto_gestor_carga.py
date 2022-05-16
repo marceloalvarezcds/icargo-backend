@@ -10,6 +10,23 @@ from app.schemas import Cargo
 
 def get_propietario_contacto_gestor_carga_by(
     db: Session,
+    propietario_id: int,
+    contacto_id: int,
+    gestor_carga_id: int,
+) -> Optional[PropietarioContactoGestorCarga]:
+    return (
+        db.query(PropietarioContactoGestorCarga)
+        .filter(
+            PropietarioContactoGestorCarga.propietario_id == propietario_id,
+            PropietarioContactoGestorCarga.contacto_id == contacto_id,
+            PropietarioContactoGestorCarga.gestor_carga_id == gestor_carga_id,
+        )
+        .first()
+    )
+
+
+def get_propietario_contacto_gestor_carga_by_cargo_id(
+    db: Session,
     cargo_id: int,
     propietario_id: int,
     contacto_id: int,

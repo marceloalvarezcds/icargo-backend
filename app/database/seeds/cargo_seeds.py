@@ -8,6 +8,7 @@ def cargo_seeds(db: Session):
     try:
         db.add(Cargo(descripcion="Gerente"))
         db.add(Cargo(descripcion="Vendedor"))
+        db.add(Cargo(descripcion="Logística"))  # Pedido por los de TRD
         db.commit()
     except IntegrityError:
         db.rollback()
