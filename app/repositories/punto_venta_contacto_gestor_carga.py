@@ -10,6 +10,23 @@ from app.schemas import Cargo
 
 def get_punto_venta_contacto_gestor_carga_by(
     db: Session,
+    punto_venta_id: int,
+    contacto_id: int,
+    gestor_carga_id: int,
+) -> Optional[PuntoVentaContactoGestorCarga]:
+    return (
+        db.query(PuntoVentaContactoGestorCarga)
+        .filter(
+            PuntoVentaContactoGestorCarga.punto_venta_id == punto_venta_id,
+            PuntoVentaContactoGestorCarga.contacto_id == contacto_id,
+            PuntoVentaContactoGestorCarga.gestor_carga_id == gestor_carga_id,
+        )
+        .first()
+    )
+
+
+def get_punto_venta_contacto_gestor_carga_by_cargo_id(
+    db: Session,
     cargo_id: int,
     punto_venta_id: int,
     contacto_id: int,

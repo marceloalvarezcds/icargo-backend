@@ -52,7 +52,7 @@ def edit_contacto(
     contacto = repositories.edit_contacto(obj, db, data, modified_by)
     centro_operativo_contacto_obj = (
         repositories.get_centro_operativo_contacto_gestor_carga_by(
-            db, cargo.id, centro_operativo.id, contacto.id, gestor_carga_id
+            db, centro_operativo.id, contacto.id, gestor_carga_id
         )
     )
     if centro_operativo_contacto_obj:
@@ -87,7 +87,7 @@ def delete_contacto(
 ) -> Contacto:
     contacto = get_contacto_by_id(db, id)
     centro_operativo_contacto_obj = (
-        repositories.get_centro_operativo_contacto_gestor_carga_by(
+        repositories.get_centro_operativo_contacto_gestor_carga_by_cargo_id(
             db, cargo_id, centro_operativo.id, contacto.id, gestor_carga_id
         )
     )

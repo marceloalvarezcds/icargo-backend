@@ -64,6 +64,7 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
     delete_centro_operativo_contacto_gestor_carga,
     edit_centro_operativo_contacto_gestor_carga,
     get_centro_operativo_contacto_gestor_carga_by,
+    get_centro_operativo_contacto_gestor_carga_by_cargo_id,
     get_centro_operativo_contacto_gestor_carga_by_id,
 )
 from .chofer import (  # noqa
@@ -339,6 +340,7 @@ from .propietario_contacto_gestor_carga import (  # noqa
     delete_propietario_contacto_gestor_carga,
     edit_propietario_contacto_gestor_carga,
     get_propietario_contacto_gestor_carga_by,
+    get_propietario_contacto_gestor_carga_by_cargo_id,
 )
 from .proveedor import (  # noqa
     create_proveedor,
@@ -354,6 +356,7 @@ from .proveedor_contacto_gestor_carga import (  # noqa
     delete_proveedor_contacto_gestor_carga,
     edit_proveedor_contacto_gestor_carga,
     get_proveedor_contacto_gestor_carga_by,
+    get_proveedor_contacto_gestor_carga_by_cargo_id,
 )
 from .punto_venta import (  # noqa
     create_punto_venta,
@@ -368,6 +371,7 @@ from .punto_venta_contacto_gestor_carga import (  # noqa
     delete_punto_venta_contacto_gestor_carga,
     edit_punto_venta_contacto_gestor_carga,
     get_punto_venta_contacto_gestor_carga_by,
+    get_punto_venta_contacto_gestor_carga_by_cargo_id,
 )
 from .remitente import (  # noqa
     create_remitente,
@@ -383,6 +387,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
     delete_remitente_contacto_gestor_carga,
     edit_remitente_contacto_gestor_carga,
     get_remitente_contacto_gestor_carga_by,
+    get_remitente_contacto_gestor_carga_by_cargo_id,
     get_remitente_contacto_gestor_carga_by_id,
 )
 from .rol import get_rol_by_codigo, get_rol_list  # noqa

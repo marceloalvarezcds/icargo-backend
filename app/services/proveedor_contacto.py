@@ -51,7 +51,7 @@ def edit_contacto(
     cargo = data.cargo
     contacto = repositories.edit_contacto(obj, db, data, modified_by)
     proveedor_contacto_obj = repositories.get_proveedor_contacto_gestor_carga_by(
-        db, cargo.id, proveedor.id, contacto.id, gestor_carga_id
+        db, proveedor.id, contacto.id, gestor_carga_id
     )
     if proveedor_contacto_obj:
         repositories.edit_proveedor_contacto_gestor_carga(
@@ -84,8 +84,10 @@ def delete_contacto(
     modified_by: str,
 ) -> Contacto:
     contacto = get_contacto_by_id(db, id)
-    proveedor_contacto_obj = repositories.get_proveedor_contacto_gestor_carga_by(
-        db, cargo_id, proveedor.id, contacto.id, gestor_carga_id
+    proveedor_contacto_obj = (
+        repositories.get_proveedor_contacto_gestor_carga_by_cargo_id(
+            db, cargo_id, proveedor.id, contacto.id, gestor_carga_id
+        )
     )
     if proveedor_contacto_obj:
         repositories.delete_proveedor_contacto_gestor_carga(
