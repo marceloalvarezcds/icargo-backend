@@ -2,10 +2,13 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 
-from app.enums import FleteDestinatarioEnum
+from app.enums import FleteDestinatarioCentroOperativoEnum, FleteDestinatarioEnum
 from app.models import (
     CentroOperativoContactoGestorCarga,
     Flete,
+    FleteCentroOperativoContacto,
+    FleteRemitenteContacto,
+    FleteUserContacto,
     RemitenteContactoGestorCarga,
     User,
 )
@@ -26,11 +29,11 @@ def get_destinatario_list_by(
     remitente_id: int,
     origen_id: int,
     destino_id: int,
-    gestor_cuenta_id: Optional[int],
+    gestor_carga_id: Optional[int],
 ) -> List[FleteDestinatario]:
     lista: List[FleteDestinatario] = []
-    if gestor_cuenta_id:
-        users = get_user_list_by_gestor_carga_id(db, gestor_cuenta_id)
+    if gestor_carga_id:
+        users = get_user_list_by_gestor_carga_id(db, gestor_carga_id)
         for item in users:
             lista.append(
                 FleteDestinatario(
@@ -48,7 +51,7 @@ def get_destinatario_list_by(
         origen_contactos: List[CentroOperativoContactoGestorCarga] = origen.contactos
         destino_contactos: List[CentroOperativoContactoGestorCarga] = destino.contactos
         for item in remitente_contactos:
-            if gestor_cuenta_id and item.gestor_carga_id == gestor_cuenta_id:
+            if gestor_carga_id and item.gestor_carga_id == gestor_carga_id:
                 lista.append(
                     FleteDestinatario(
                         id=item.id,
@@ -58,21 +61,23 @@ def get_destinatario_list_by(
                     )
                 )
         for item in origen_contactos:
-            if gestor_cuenta_id and item.gestor_carga_id == gestor_cuenta_id:
+            if gestor_carga_id and item.gestor_carga_id == gestor_carga_id:
                 lista.append(
                     FleteDestinatario(
                         id=item.id,
                         tipo_destinatario=FleteDestinatarioEnum.CENTRO_OPERATIVO,
+                        tipo_centro_operativo=FleteDestinatarioCentroOperativoEnum.ORIGEN,
                         email=item.contacto_email,
                         nombre=f"{item.contacto_nombre} {item.contacto_apellido}",
                     )
                 )
         for item in destino_contactos:
-            if gestor_cuenta_id and item.gestor_carga_id == gestor_cuenta_id:
+            if gestor_carga_id and item.gestor_carga_id == gestor_carga_id:
                 lista.append(
                     FleteDestinatario(
                         id=item.id,
                         tipo_destinatario=FleteDestinatarioEnum.CENTRO_OPERATIVO,
+                        tipo_centro_operativo=FleteDestinatarioCentroOperativoEnum.DESTINO,
                         email=item.contacto_email,
                         nombre=f"{item.contacto_nombre} {item.contacto_apellido}",
                     )
@@ -83,37 +88,38 @@ def get_destinatario_list_by(
 def get_destinatario_selected_list_by_flete(flete: Flete) -> List[FleteDestinatario]:
     lista: List[FleteDestinatario] = []
     cList: List[
-        CentroOperativoContactoGestorCarga
+        FleteCentroOperativoContacto
     ] = flete.emision_orden_centro_operativo_destinatarios
-    rList: List[
-        RemitenteContactoGestorCarga
-    ] = flete.emision_orden_remitente_destinatarios
-    uList: List[User] = flete.emision_orden_user_destinatarios
+    rList: List[FleteRemitenteContacto] = flete.emision_orden_remitente_destinatarios
+    uList: List[FleteUserContacto] = flete.emision_orden_user_destinatarios
     for item in cList:
+        co: CentroOperativoContactoGestorCarga = item.centro_operativo_contacto
         lista.append(
             FleteDestinatario(
-                id=item.id,
+                id=co.id,
                 tipo_destinatario=FleteDestinatarioEnum.CENTRO_OPERATIVO,
-                email=item.contacto_email,
-                nombre=f"{item.contacto_nombre} {item.contacto_apellido}",
+                email=co.contacto_email,
+                nombre=f"{co.contacto_nombre} {co.contacto_apellido}",
             )
         )
     for item in rList:
+        re: RemitenteContactoGestorCarga = item.remitente_contacto
         lista.append(
             FleteDestinatario(
-                id=item.id,
+                id=re.id,
                 tipo_destinatario=FleteDestinatarioEnum.REMITENTE,
-                email=item.contacto_email,
-                nombre=f"{item.contacto_nombre} {item.contacto_apellido}",
+                email=re.contacto_email,
+                nombre=f"{re.contacto_nombre} {re.contacto_apellido}",
             )
         )
     for item in uList:
+        user: User = item.user_contacto
         lista.append(
             FleteDestinatario(
-                id=item.id,
+                id=user.id,
                 tipo_destinatario=FleteDestinatarioEnum.USUARIO,
-                email=item.email,
-                nombre=f"{item.first_name} {item.last_name}",
+                email=user.email,
+                nombre=f"{user.first_name} {user.last_name}",
             )
         )
     return lista
@@ -125,6 +131,7 @@ def update_flete_destinatario_list(
     flete: Flete,
     modified_by: str,
 ):
+    flete_id = flete.id
     flete.emision_orden_centro_operativo_destinatarios = []
     flete.emision_orden_remitente_destinatarios = []
     flete.emision_orden_user_destinatarios = []
@@ -132,15 +139,22 @@ def update_flete_destinatario_list(
         if data.tipo_destinatario == FleteDestinatarioEnum.CENTRO_OPERATIVO.value:
             obj = get_centro_operativo_contacto_gestor_carga_by_id(db, data.id)
             if obj:
-                flete.emision_orden_centro_operativo_destinatarios.append(obj)
+                item = FleteCentroOperativoContacto(
+                    flete_id=flete_id, centro_operativo_contacto_id=obj.id
+                )
+                flete.emision_orden_centro_operativo_destinatarios.append(item)
         elif data.tipo_destinatario == FleteDestinatarioEnum.REMITENTE.value:
             obj = get_remitente_contacto_gestor_carga_by_id(db, data.id)
             if obj:
-                flete.emision_orden_remitente_destinatarios.append(obj)
+                item = FleteRemitenteContacto(
+                    flete_id=flete_id, remitente_contacto_id=obj.id
+                )
+                flete.emision_orden_remitente_destinatarios.append(item)
         elif data.tipo_destinatario == FleteDestinatarioEnum.USUARIO.value:
             obj = get_user_by_id(db, data.id)
             if obj:
-                flete.emision_orden_user_destinatarios.append(obj)
+                item = FleteUserContacto(flete_id=flete_id, user_contacto_id=obj.id)
+                flete.emision_orden_user_destinatarios.append(item)
     update_flete_destinatarios(
         flete,
         db,

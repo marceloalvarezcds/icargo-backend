@@ -11,7 +11,6 @@ from sqlalchemy import (  # type: ignore
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.sql.schema import Table  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
@@ -22,42 +21,12 @@ from app.utils import (
 )
 
 from .centro_operativo import CentroOperativo
-from .centro_operativo_contacto_gestor_carga import CentroOperativoContactoGestorCarga
 from .gestor_carga import GestorCarga
 from .moneda import Moneda
 from .producto import Producto
 from .remitente import Remitente
-from .remitente_contacto_gestor_carga import RemitenteContactoGestorCarga
 from .tipo_carga import TipoCarga
 from .unidad import Unidad
-from .user import User
-
-flete_centro_operativo_contacto_table = Table(
-    "flete_centro_operativo_contacto",
-    Base.metadata,
-    Column("flete_id", ForeignKey("flete.id")),
-    Column(
-        "centro_operativo_contacto_id",
-        ForeignKey("centro_operativo_contacto_gestor_carga.id"),
-    ),
-)
-
-flete_remitente_contacto_table = Table(
-    "flete_remitente_contacto",
-    Base.metadata,
-    Column("flete_id", ForeignKey("flete.id")),
-    Column(
-        "remitente_contacto_id",
-        ForeignKey("remitente_contacto_gestor_carga.id"),
-    ),
-)
-
-flete_user_contacto_table = Table(
-    "flete_user_contacto",
-    Base.metadata,
-    Column("flete_id", ForeignKey("flete.id")),
-    Column("user_contacto_id", ForeignKey("user.id")),
-)
 
 
 class Flete(AuditMixin, Base):
@@ -149,16 +118,19 @@ class Flete(AuditMixin, Base):
     emision_orden_texto_legal = Column(Text)
     emision_orden_detalle = Column(Text)
     emision_orden_centro_operativo_destinatarios = relationship(
-        CentroOperativoContactoGestorCarga,
-        secondary=flete_centro_operativo_contacto_table,
+        "FleteCentroOperativoContacto",
+        cascade="save-update,delete,delete-orphan",
+        back_populates="flete",
     )
     emision_orden_remitente_destinatarios = relationship(
-        RemitenteContactoGestorCarga,
-        secondary=flete_remitente_contacto_table,
+        "FleteRemitenteContacto",
+        cascade="save-update,delete,delete-orphan",
+        back_populates="flete",
     )
     emision_orden_user_destinatarios = relationship(
-        User,
-        secondary=flete_user_contacto_table,
+        "FleteUserContacto",
+        cascade="save-update,delete,delete-orphan",
+        back_populates="flete",
     )
     # FIN Emisión de Órdenes
 

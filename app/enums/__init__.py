@@ -1,5 +1,8 @@
 from .estado import EstadoEnum  # noqa
-from .flete_destinatario import FleteDestinatarioEnum  # noqa
+from .flete_destinatario import (  # noqa
+    FleteDestinatarioCentroOperativoEnum,
+    FleteDestinatarioEnum,
+)
 from .instrumento_via import InstrumentoViaEnum  # noqa
 from .liquidacion_estado import LiquidacionEstadoEnum  # noqa
 from .liquidacion_etapa import LiquidacionEtapaEnum  # noqa

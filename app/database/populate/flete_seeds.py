@@ -183,19 +183,19 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     emision_orden_detalle="Emisión de Órdenes - Detalle",
                     destinatarios=[
                         FleteDestinatario(
-                            id=destino3.id,
+                            id=destino3_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.CENTRO_OPERATIVO,
                             email=destino3_contacto.contacto_email,
                             nombre=f"{destino3_contacto.contacto_nombre} {destino3_contacto.contacto_apellido}",  # noqa: B950
                         ),
                         FleteDestinatario(
-                            id=origen2.id,
+                            id=origen2_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.CENTRO_OPERATIVO,
                             email=origen2_contacto.contacto_email,
                             nombre=f"{origen2_contacto.contacto_nombre} {origen2_contacto.contacto_apellido}",  # noqa: B950
                         ),
                         FleteDestinatario(
-                            id=remitente1.id,
+                            id=remitente1_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.REMITENTE,
                             email=remitente1_contacto.contacto_email,
                             nombre=f"{remitente1_contacto.contacto_nombre} {remitente1_contacto.contacto_apellido}",  # noqa: B950
@@ -342,19 +342,19 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     emision_orden_detalle="Emisión de Órdenes - Detalle",
                     destinatarios=[
                         FleteDestinatario(
-                            id=destino5.id,
+                            id=destino5_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.CENTRO_OPERATIVO,
                             email=destino5_contacto.contacto_email,
                             nombre=f"{destino5_contacto.contacto_nombre} {destino5_contacto.contacto_apellido}",  # noqa: B950
                         ),
                         FleteDestinatario(
-                            id=origen4.id,
+                            id=origen4_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.CENTRO_OPERATIVO,
                             email=origen4_contacto.contacto_email,
                             nombre=f"{origen4_contacto.contacto_nombre} {origen4_contacto.contacto_apellido}",  # noqa: B950
                         ),
                         FleteDestinatario(
-                            id=remitente2.id,
+                            id=remitente2_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.REMITENTE,
                             email=remitente2_contacto.contacto_email,
                             nombre=f"{remitente2_contacto.contacto_nombre} {remitente2_contacto.contacto_apellido}",  # noqa: B950
@@ -506,19 +506,19 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     emision_orden_detalle="Emisión de Órdenes - Detalle",
                     destinatarios=[
                         FleteDestinatario(
-                            id=destino11.id,
+                            id=destino11_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.CENTRO_OPERATIVO,
                             email=destino11_contacto.contacto_email,
                             nombre=f"{destino11_contacto.contacto_nombre} {destino11_contacto.contacto_apellido}",  # noqa: B950
                         ),
                         FleteDestinatario(
-                            id=origen8.id,
+                            id=origen8_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.CENTRO_OPERATIVO,
                             email=origen8_contacto.contacto_email,
                             nombre=f"{origen8_contacto.contacto_nombre} {origen8_contacto.contacto_apellido}",  # noqa: B950
                         ),
                         FleteDestinatario(
-                            id=remitente3.id,
+                            id=remitente3_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.REMITENTE,
                             email=remitente3_contacto.contacto_email,
                             nombre=f"{remitente3_contacto.contacto_nombre} {remitente3_contacto.contacto_apellido}",  # noqa: B950
@@ -639,19 +639,19 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     emision_orden_detalle="Emisión de Órdenes - Detalle",
                     destinatarios=[
                         FleteDestinatario(
-                            id=destino9.id,
+                            id=destino9_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.CENTRO_OPERATIVO,
                             email=destino9_contacto.contacto_email,
                             nombre=f"{destino9_contacto.contacto_nombre} {destino9_contacto.contacto_apellido}",  # noqa: B950
                         ),
                         FleteDestinatario(
-                            id=origen12.id,
+                            id=origen12_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.CENTRO_OPERATIVO,
                             email=origen12_contacto.contacto_email,
                             nombre=f"{origen12_contacto.contacto_nombre} {origen12_contacto.contacto_apellido}",  # noqa: B950
                         ),
                         FleteDestinatario(
-                            id=remitente4.id,
+                            id=remitente4_contacto.id,
                             tipo_destinatario=FleteDestinatarioEnum.REMITENTE,
                             email=remitente4_contacto.contacto_email,
                             nombre=f"{remitente4_contacto.contacto_nombre} {remitente4_contacto.contacto_apellido}",  # noqa: B950
