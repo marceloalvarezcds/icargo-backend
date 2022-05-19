@@ -165,6 +165,7 @@ def remove_movimiento(
 ) -> Liquidacion:
     to_edit_obj = get_liquidacion_by_id(db, id)
     movimiento_to_remove = get_movimiento_by_schema(db, data)
+    movimiento_to_remove.liquidacion_id = None
     movimiento_to_remove.estado = LiquidacionEstadoEnum.PENDIENTE.value
     movimiento_to_remove.modified_by = modified_by
     movimiento_to_remove.modified_at = datetime.now()
