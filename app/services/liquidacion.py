@@ -9,7 +9,12 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
-from app.enums import LiquidacionEstadoEnum, LiquidacionEtapaEnum, TipoContraparteEnum
+from app.enums import (
+    LiquidacionEstadoEnum,
+    LiquidacionEtapaEnum,
+    MovimientoEstadoEnum,
+    TipoContraparteEnum,
+)
 from app.models import Instrumento, Liquidacion, Movimiento, User
 from app.schemas import (
     LiquidacionAddInstrumentosForm,
@@ -125,8 +130,9 @@ def edit_liquidacion(
 
 def delete_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
     obj = get_liquidacion_by_id(db, id)
+    movimientos = repositories.get_movimiento_list_by_liquidacion_id(db, id)
     change_movimiento_list_status(
-        db, obj.movimientos, LiquidacionEstadoEnum.PENDIENTE, modified_by
+        db, movimientos, LiquidacionEstadoEnum.PENDIENTE, modified_by
     )
     obj.movimientos = []
     return repositories.delete_liquidacion(obj, db, modified_by)
@@ -174,8 +180,11 @@ def remove_movimiento(
 
 def aceptar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
     obj = get_liquidacion_by_id(db, id)
+    movimientos = repositories.get_movimiento_list_by_liquidacion(
+        db, id, MovimientoEstadoEnum.EN_PROCESO.value
+    )
     change_movimiento_list_status(
-        db, obj.movimientos, LiquidacionEstadoEnum.CONFIRMADO, modified_by
+        db, movimientos, LiquidacionEstadoEnum.CONFIRMADO, modified_by
     )
     obj.etapa = LiquidacionEtapaEnum.CONFIRMADO.value
     return repositories.change_liquidacion_status(
@@ -185,8 +194,11 @@ def aceptar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
 
 def cancelar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
     obj = get_liquidacion_by_id(db, id)
+    movimientos = repositories.get_movimiento_list_by_liquidacion(
+        db, id, MovimientoEstadoEnum.EN_PROCESO.value
+    )
     change_movimiento_list_status(
-        db, obj.movimientos, LiquidacionEstadoEnum.PENDIENTE, modified_by
+        db, movimientos, LiquidacionEstadoEnum.PENDIENTE, modified_by
     )
     obj.movimientos = []
     return repositories.change_liquidacion_status(
