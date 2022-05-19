@@ -82,6 +82,23 @@ def get_movimiento_list_by_liquidacion(
     )
 
 
+def get_movimiento_list_by_liquidacion_id(
+    db: Session,
+    liquidacion_id: int,
+) -> List[Movimiento]:
+    return (
+        db.query(Movimiento)
+        .filter(
+            and_(
+                Movimiento.liquidacion_id == liquidacion_id,
+                Movimiento.estado != MovimientoEstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(Movimiento.contraparte, Movimiento.liquidacion_id)
+        .all()
+    )
+
+
 def get_movimiento_list_by_liquidacion_and_gestor_carga_id(
     db: Session,
     liquidacion_id: int,

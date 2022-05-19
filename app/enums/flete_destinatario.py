@@ -3,5 +3,10 @@ from enum import Enum
 
 class FleteDestinatarioEnum(Enum):
     CENTRO_OPERATIVO = "centro_operativo"
-    REMITENTE = "remitente"
-    USUARIO = "usuario"
+    REMITENTE = "Remitente"
+    USUARIO = "Usuario"
+
+
+class FleteDestinatarioCentroOperativoEnum(Enum):
+    ORIGEN = "Origen"
+    DESTINO = "Destino"

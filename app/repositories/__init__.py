@@ -250,6 +250,7 @@ from .movimiento import (  # noqa
     get_movimiento_list_by_gestor_carga_id,
     get_movimiento_list_by_liquidacion,
     get_movimiento_list_by_liquidacion_and_gestor_carga_id,
+    get_movimiento_list_by_liquidacion_id,
     get_movimiento_list_by_orden_carga_id,
 )
 from .orden_carga import (  # noqa

@@ -24,6 +24,11 @@ from .flete import Flete  # noqa
 from .flete_anticipo import FleteAnticipo  # noqa
 from .flete_complemento import FleteComplemento  # noqa
 from .flete_descuento import FleteDescuento  # noqa
+from .flete_destinatario import (  # noqa
+    FleteCentroOperativoContacto,
+    FleteRemitenteContacto,
+    FleteUserContacto,
+)
 from .gestor_carga import GestorCarga  # noqa
 from .gestor_carga_centro_operativo import GestorCargaCentroOperativo  # noqa
 from .gestor_carga_chofer import GestorCargaChofer  # noqa
