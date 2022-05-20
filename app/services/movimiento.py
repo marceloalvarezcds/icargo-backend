@@ -572,6 +572,7 @@ def edit_movimiento(
 
 def delete_movimiento(db: Session, id: int, modified_by: str) -> Movimiento:
     co = get_movimiento_by_id(db, id)
+    co.liquidacion_id = None
     return repositories.delete_movimiento(co, db, modified_by)
 
 
