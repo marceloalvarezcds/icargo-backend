@@ -95,6 +95,7 @@ def create_chofer(
         email=data.email,
         direccion=data.direccion,
         ciudad_id=data.ciudad_id,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)
