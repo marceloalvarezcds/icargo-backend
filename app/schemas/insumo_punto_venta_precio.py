@@ -9,14 +9,14 @@ from .rounded_decimal_model import RoundedDecimal
 
 
 class InsumoPuntoVentaPrecioForm(BaseModel):
-    id: Optional[int] = None
-    tipo_id: int
+    tipo_id: Optional[int] = None
     insumo_id: int
-    proveedor_id: int
+    proveedor_id: Optional[int] = None
     punto_venta_id: int
     moneda_id: int
     precio: RoundedDecimal
     fecha_inicio: Date
+    fecha_fin: Optional[Date] = None
 
 
 class InsumoPuntoVentaPrecio(BaseModel):

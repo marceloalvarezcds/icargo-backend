@@ -126,6 +126,7 @@ from .insumo_punto_venta import (  # noqa
     get_tipo_insumo_list_by_flete_id_and_gestor_carga_id,
 )
 from .insumo_punto_venta_precio import (  # noqa
+    create_insumo_punto_venta_precio,
     get_insumo_punto_venta_precio_by_insumo_id_and_moneda_id_and_punto_venta_id,
 )
 from .liquidacion import (  # noqa
