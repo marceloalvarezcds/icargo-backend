@@ -84,6 +84,7 @@ def create_propietario(
         direccion=data.direccion,
         ciudad_id=data.ciudad_id,
         chofer_id=chofer.id if chofer else None,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)

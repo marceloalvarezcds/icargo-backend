@@ -104,6 +104,7 @@ def create_camion(
         bruto=data.bruto,
         tara=data.tara,
         estado=EstadoEnum.PENDIENTE.value,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)

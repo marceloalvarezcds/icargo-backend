@@ -110,6 +110,7 @@ def create_flete(
         # FIN Emisión de Órdenes
         vigencia_anticipos=data.vigencia_anticipos,
         estado=EstadoEnum.ACTIVO.value,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)

@@ -58,6 +58,7 @@ def create_flete_descuento(
         proveedor_moneda_id=data.proveedor_moneda_id,
         proveedor_id=data.proveedor_id,
         # FIN Monto a pagar al Proveedor
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)

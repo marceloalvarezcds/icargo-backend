@@ -76,6 +76,7 @@ def create_centro_operativo(
         longitud=data.longitud,
         clasificacion_id=data.clasificacion_id,
         ciudad_id=data.ciudad_id,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)

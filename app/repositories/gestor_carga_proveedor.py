@@ -34,6 +34,7 @@ def create_gestor_carga_proveedor(
         gestor_carga_id=gestor_carga_id,
         alias=alias,
         estado=EstadoEnum.ACTIVO.value,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)
