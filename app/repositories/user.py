@@ -29,6 +29,7 @@ def create(db: Session, modified_by: str, obj_in: UserCreate, request: Request) 
         is_superuser=obj_in.is_superuser,
         created_ip_address=ip,
         last_ip_address=ip,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(db_obj)

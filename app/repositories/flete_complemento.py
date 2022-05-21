@@ -57,6 +57,7 @@ def create_flete_complemento(
         remitente_monto=data.remitente_monto,
         remitente_moneda_id=data.remitente_moneda_id,
         # FIN Monto a cobrar al Remitente
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)

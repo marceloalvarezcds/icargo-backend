@@ -69,6 +69,7 @@ def create_centro_operativo_contacto_gestor_carga(
         gestor_carga_id=gestor_carga_id,
         alias=alias,
         estado=EstadoEnum.ACTIVO.value,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)

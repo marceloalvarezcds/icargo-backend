@@ -40,6 +40,7 @@ def create_contacto(
         apellido=data.apellido,
         telefono=data.telefono,
         email=data.email,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)

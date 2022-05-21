@@ -80,6 +80,7 @@ def create_proveedor(
         latitud=data.latitud,
         longitud=data.longitud,
         ciudad_id=data.ciudad_id,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)

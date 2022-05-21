@@ -6,7 +6,8 @@ from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from sqlalchemy.sql.expression import null  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import InsumoPuntoVentaPrecio
+from app.models import InsumoPuntoVenta, InsumoPuntoVentaPrecio
+from app.schemas import InsumoPuntoVentaPrecioForm
 
 
 def get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id(
@@ -33,3 +34,24 @@ def get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id(
         )
         .first()
     )
+
+
+def create_insumo_punto_venta_precio_by_insumo_punto_venta(
+    db: Session,
+    obj: InsumoPuntoVenta,
+    data: InsumoPuntoVentaPrecioForm,
+    modified_by: str,
+) -> InsumoPuntoVentaPrecio:
+    obj = InsumoPuntoVentaPrecio(
+        insumo_punto_venta_id=obj.id,
+        precio=data.precio,
+        fecha_inicio=data.fecha_inicio,
+        fecha_fin=data.fecha_fin,
+        estado=EstadoEnum.ACTIVO.value,
+        created_by=modified_by,
+        modified_by=modified_by,
+    )
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj

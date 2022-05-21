@@ -55,6 +55,7 @@ def create_flete_anticipo(
         tipo_id=data.tipo_id,
         tipo_insumo_id=data.tipo_insumo_id,
         porcentaje=data.porcentaje,
+        created_by=modified_by,
         modified_by=modified_by,
     )
     db.add(obj)
