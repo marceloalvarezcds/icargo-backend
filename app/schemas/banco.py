@@ -7,6 +7,7 @@ from app.enums.estado import EstadoEnum
 
 from .date_model import Date
 from .instrumento import Instrumento
+from .rounded_decimal_model import RoundedDecimal
 
 
 class BancoForm(BaseModel):
@@ -25,10 +26,8 @@ class Banco(BancoForm):
     # Campos calculados
     moneda_nombre: str
     moneda_simbolo: str
-    credito: Optional[Decimal]
-    debito: Optional[Decimal]
-    saldo_confirmado: Optional[Decimal]
-    saldo_provisional: Optional[Decimal]
+    saldo_confirmado: Optional[RoundedDecimal]
+    saldo_provisional: Optional[RoundedDecimal]
     # Auditoría
     created_by: str
     created_at: Date
@@ -39,14 +38,6 @@ class Banco(BancoForm):
         orm_mode = True
         use_enum_values = True
         validate_assignment = True
-
-    @validator("credito")
-    def set_credito(cls, credito):
-        return credito or Decimal(0)
-
-    @validator("debito")
-    def set_debito(cls, debito):
-        return debito or Decimal(0)
 
     @validator("saldo_confirmado")
     def set_saldo_confirmado(cls, saldo_confirmado):

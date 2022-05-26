@@ -1,5 +1,4 @@
 from datetime import datetime
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -13,6 +12,7 @@ from .ente_emisor_automotor import EnteEmisorAutomotor
 from .ente_emisor_transporte import EnteEmisorTransporte
 from .marca_semi import MarcaSemi
 from .propietario import Propietario
+from .rounded_decimal_model import RoundedDecimal
 from .semi_clasificacion import SemiClasificacion
 from .tipo_carga import TipoCarga
 from .tipo_semi import TipoSemi
@@ -56,12 +56,12 @@ class SemiForm(BaseModel):
     anho: int
     # FIN Detalles del Camión
     # INICIO Capacidad del Camión
-    bruto: Decimal
-    tara: Decimal
-    largo: Decimal
-    alto: Decimal
-    ancho: Decimal
-    volumen: Decimal
+    bruto: RoundedDecimal
+    tara: RoundedDecimal
+    largo: RoundedDecimal
+    alto: RoundedDecimal
+    ancho: RoundedDecimal
+    volumen: RoundedDecimal
     # FIN Capacidad del Camión
 
 

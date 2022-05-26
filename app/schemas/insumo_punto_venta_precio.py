@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -6,6 +5,7 @@ from pydantic import BaseModel
 from app.enums.estado import EstadoEnum
 
 from .date_model import Date
+from .rounded_decimal_model import RoundedDecimal
 
 
 class InsumoPuntoVentaPrecioForm(BaseModel):
@@ -15,13 +15,13 @@ class InsumoPuntoVentaPrecioForm(BaseModel):
     proveedor_id: int
     punto_venta_id: int
     moneda_id: int
-    precio: Decimal
+    precio: RoundedDecimal
     fecha_inicio: Date
 
 
 class InsumoPuntoVentaPrecio(BaseModel):
     id: int
-    precio: Decimal
+    precio: RoundedDecimal
     fecha_inicio: Date
     fecha_fin: Optional[Date] = None
 

@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Any, List, Optional
 
 from pydantic import BaseModel
@@ -14,6 +13,7 @@ from .flete_destinatario import FleteDestinatario
 from .moneda import Moneda
 from .producto import Producto
 from .remitente import Remitente
+from .rounded_decimal_model import RoundedDecimal
 from .tipo_carga import TipoCarga
 from .unidad import Unidad
 
@@ -30,35 +30,35 @@ class FleteFormBaseModel(BaseModel):
     origen_indicacion: Optional[str]
     destino_id: int
     destino_indicacion: Optional[str]
-    distancia: Optional[Decimal]
+    distancia: Optional[RoundedDecimal]
     # FIN Tramo de Fletes
     # INICIO Cantidad y Flete
-    condicion_cantidad: Decimal
+    condicion_cantidad: RoundedDecimal
     # inicio - Condiciones para el Gestor de Cuenta
     condicion_gestor_cuenta_moneda_id: int
-    condicion_gestor_cuenta_tarifa: Decimal
+    condicion_gestor_cuenta_tarifa: RoundedDecimal
     condicion_gestor_cuenta_unidad_id: int
     # fin - Condiciones para el Gestor de Cuenta
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda_id: int
-    condicion_propietario_tarifa: Decimal
+    condicion_propietario_tarifa: RoundedDecimal
     condicion_propietario_unidad_id: int
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
     # inicio - Mermas para el Gestor de Cuenta
-    merma_gestor_cuenta_valor: Decimal
+    merma_gestor_cuenta_valor: RoundedDecimal
     merma_gestor_cuenta_moneda_id: int
     merma_gestor_cuenta_unidad_id: int
     merma_gestor_cuenta_es_porcentual: Optional[bool] = False
-    merma_gestor_cuenta_tolerancia: Decimal
+    merma_gestor_cuenta_tolerancia: RoundedDecimal
     # fin - Mermas para el Gestor de Cuenta
     # inicio - Mermas para el Propietario
-    merma_propietario_valor: Decimal
+    merma_propietario_valor: RoundedDecimal
     merma_propietario_moneda_id: int
     merma_propietario_unidad_id: int
     merma_propietario_es_porcentual: Optional[bool] = False
-    merma_propietario_tolerancia: Decimal
+    merma_propietario_tolerancia: RoundedDecimal
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
     vigencia_anticipos: Date

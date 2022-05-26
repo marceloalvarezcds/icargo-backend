@@ -1,10 +1,10 @@
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
 
 from .moneda import Moneda
 from .proveedor import Proveedor
+from .rounded_decimal_model import RoundedDecimal
 from .tipo_concepto_descuento import TipoConceptoDescuento
 
 
@@ -15,11 +15,11 @@ class FleteDescuentoForm(BaseModel):
     habilitar_pago_proveedor: Optional[bool] = False
     anticipado: Optional[bool] = False
     # INICIO Monto a cobrar al Propietario
-    propietario_monto: Optional[Decimal] = None
+    propietario_monto: Optional[RoundedDecimal] = None
     propietario_moneda_id: Optional[int] = None
     # FIN Monto a cobrar al Propietario
     # INICIO Monto a pagar al Proveedor
-    proveedor_monto: Optional[Decimal] = None
+    proveedor_monto: Optional[RoundedDecimal] = None
     proveedor_moneda_id: Optional[int] = None
     proveedor_id: Optional[int] = None
     # FIN Monto a pagar al Proveedor

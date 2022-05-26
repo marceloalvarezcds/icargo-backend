@@ -1,9 +1,10 @@
-from decimal import Decimal
 from typing import Dict, List
 from urllib.parse import urlencode
 
 from pydantic import BaseModel
 from sqlalchemy.engine.row import Row  # type: ignore
+
+from .rounded_decimal_model import RoundedDecimal
 
 
 class EstadoCuenta(BaseModel):
@@ -11,10 +12,10 @@ class EstadoCuenta(BaseModel):
     contraparte_numero_documento: str
     tipo_contraparte_id: int
     tipo_contraparte_descripcion: str
-    pendiente: Decimal
-    en_proceso: Decimal
-    confirmado: Decimal
-    finalizado: Decimal
+    pendiente: RoundedDecimal
+    en_proceso: RoundedDecimal
+    confirmado: RoundedDecimal
+    finalizado: RoundedDecimal
     cantidad_pendiente: int
     cantidad_en_proceso: int
     cantidad_confirmado: int

@@ -1,15 +1,15 @@
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
 
 from .date_model import Date
+from .rounded_decimal_model import RoundedDecimal
 
 
 class OrdenCargaRemisionDestinoForm(BaseModel):
     numero_documento: str
     fecha: Date
-    cantidad: Decimal
+    cantidad: RoundedDecimal
     unidad_id: int
     foto_documento: Optional[str] = None
     numero_documento_origen: Optional[str] = None
@@ -19,7 +19,7 @@ class OrdenCargaRemisionDestinoForm(BaseModel):
 
 class OrdenCargaRemisionDestino(OrdenCargaRemisionDestinoForm):
     id: int
-    cantidad_kg: Decimal
+    cantidad_kg: RoundedDecimal
     unidad_abreviatura: str
     unidad_descripcion: str
     destino_nombre: Optional[str] = None

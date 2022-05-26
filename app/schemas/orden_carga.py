@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Any, List, Optional, Union
 
 from pydantic import BaseModel
@@ -19,13 +18,14 @@ from .orden_carga_estado_historial import OrdenCargaEstadoHistorial
 from .orden_carga_remision_destino import OrdenCargaRemisionDestino
 from .orden_carga_remision_origen import OrdenCargaRemisionOrigen
 from .orden_carga_remision_resultado import OrdenCargaRemisionResultado
+from .rounded_decimal_model import RoundedDecimal
 
 
 class OrdenCargaForm(BaseModel):
     camion_id: int
     semi_id: int
     flete_id: int
-    cantidad_nominada: Decimal
+    cantidad_nominada: RoundedDecimal
     comentarios: Optional[str] = None
 
 
@@ -33,7 +33,7 @@ class OrdenCargaEditForm(BaseModel):
     camion_id: Optional[int] = None
     semi_id: Optional[int] = None
     flete_id: Optional[int] = None
-    cantidad_nominada: Optional[Decimal] = None
+    cantidad_nominada: Optional[RoundedDecimal] = None
     comentarios: Optional[str] = None
     origen_id: Optional[int] = None
     destino_id: Optional[int] = None
@@ -49,21 +49,21 @@ class OrdenCarga(OrdenCargaForm):
     # Datos de semi
     semi_placa: str
     # Datos de fletes
-    flete_anticipo_maximo: Decimal
+    flete_anticipo_maximo: RoundedDecimal
     flete_destino_id: Optional[int] = None
     flete_destino_nombre: Optional[str] = None
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
-    flete_limite_credito: Decimal
+    flete_limite_credito: RoundedDecimal
     flete_numero_lote: str
-    flete_monto_efectivo: Decimal
+    flete_monto_efectivo: RoundedDecimal
     flete_origen_id: Optional[int] = None
     flete_origen_nombre: Optional[str] = None
     flete_producto_descripcion: str
-    flete_proyectado: Decimal
+    flete_proyectado: RoundedDecimal
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
-    flete_tarifa: Decimal
+    flete_tarifa: RoundedDecimal
     flete_tipo: Optional[TipoFleteEnum] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
@@ -100,8 +100,8 @@ class OrdenCarga(OrdenCargaForm):
     remisiones_destino: List[OrdenCargaRemisionDestino]
     remisiones_origen: List[OrdenCargaRemisionOrigen]
     remisiones_resultado: List[OrdenCargaRemisionResultado]
-    cantidad_destino: Decimal
-    cantidad_origen: Decimal
+    cantidad_destino: RoundedDecimal
+    cantidad_origen: RoundedDecimal
     # Auditoría
     created_by: str
     created_at: Date
@@ -153,8 +153,8 @@ class OrdenCargaList(OrdenCargaForm):
     destino_id: Optional[int] = None
     destino_nombre: Optional[str] = None
     # FIN Tramo de OC
-    cantidad_destino: Decimal
-    cantidad_origen: Decimal
+    cantidad_destino: RoundedDecimal
+    cantidad_origen: RoundedDecimal
     remisiones: str
     nro_tickets: str
     # Auditoría

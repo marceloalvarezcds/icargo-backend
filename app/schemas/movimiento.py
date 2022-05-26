@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -7,6 +6,7 @@ from app.enums import MovimientoEstadoEnum
 
 from .date_model import Date
 from .moneda import Moneda
+from .rounded_decimal_model import RoundedDecimal
 from .tipo_contraparte import TipoContraparte
 from .tipo_cuenta import TipoCuenta
 from .tipo_documento_relacionado import TipoDocumentoRelacionado
@@ -28,9 +28,9 @@ class MovimientoBaseModel(BaseModel):
     estado: MovimientoEstadoEnum
     fecha: Optional[Date]
     detalle: Optional[str]
-    monto: Decimal
+    monto: RoundedDecimal
     moneda_id: int
-    tipo_cambio_moneda: Optional[Decimal]
+    tipo_cambio_moneda: Optional[RoundedDecimal]
     fecha_cambio_moneda: Optional[Date]
     # En caso de ser movimiento de anticipo
     anticipo_id: Optional[int]
@@ -57,13 +57,13 @@ class Movimiento(MovimientoBaseModel):
     tipo_movimiento: Optional[TipoMovimiento]
     moneda: Moneda
     # Campos calculados
-    credito: Decimal
+    credito: RoundedDecimal
     camion_placa: Optional[str]
     chofer_nombre: Optional[str]
     chofer_numero_documento: Optional[str]
     concepto: str
     cuenta_descripcion: str
-    debito: Decimal
+    debito: RoundedDecimal
     destino_nombre: Optional[str]
     es_cobro: bool
     fecha_pago_cobro: Optional[Date]
@@ -72,14 +72,14 @@ class Movimiento(MovimientoBaseModel):
     liquidacion_fecha: Optional[str]
     moneda_nombre: str
     moneda_simbolo: str
-    monto_ml: Decimal
+    monto_ml: RoundedDecimal
     origen_nombre: Optional[str]
     producto_descripcion: Optional[str]
     propietario_nombre: Optional[str]
     proveedor_nombre: Optional[str]
     remitente_nombre: Optional[str]
     remitente_numero_documento: Optional[str]
-    saldo: Decimal
+    saldo: RoundedDecimal
     semi_placa: Optional[str]
     tipo_contraparte_descripcion: str
     tipo_documento_relacionado_descripcion: str

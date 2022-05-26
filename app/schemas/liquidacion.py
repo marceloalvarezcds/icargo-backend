@@ -10,6 +10,7 @@ from .factura import Factura
 from .instrumento import Instrumento, InstrumentoForm
 from .moneda import Moneda
 from .movimiento import Movimiento
+from .rounded_decimal_model import RoundedDecimal
 from .tipo_contraparte import TipoContraparte
 
 
@@ -46,16 +47,16 @@ class Liquidacion(LiquidacionForm):
     instrumentos: List[Instrumento]
     facturas: List[Factura]
     # Campos calculados
-    credito: Decimal
+    credito: RoundedDecimal
     es_cobro: bool
     esta_pagado: Optional[bool] = False
-    debito: Decimal
-    instrumentos_saldo: Optional[Decimal]
+    debito: RoundedDecimal
+    instrumentos_saldo: Optional[RoundedDecimal]
     moneda_nombre: str
     moneda_simbolo: str
-    movimientos_saldo: Decimal
-    saldo: Decimal
-    saldo_residual: Optional[Decimal] = Decimal(0)
+    movimientos_saldo: RoundedDecimal
+    saldo: RoundedDecimal
+    saldo_residual: Optional[RoundedDecimal] = None
     tipo_contraparte_descripcion: str
     tipo_operacion_descripcion: str
     url: str

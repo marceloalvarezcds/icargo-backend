@@ -1,9 +1,9 @@
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
 
 from .date_model import Date
+from .rounded_decimal_model import RoundedDecimal
 
 
 class OrdenCargaAnticipoRetiradoForm(BaseModel):
@@ -13,12 +13,12 @@ class OrdenCargaAnticipoRetiradoForm(BaseModel):
     tipo_comprobante_id: int
     numero_comprobante: str
     moneda_id: int
-    monto_retirado: Decimal
+    monto_retirado: RoundedDecimal
     observacion: Optional[str] = None
     insumo_punto_venta_precio_id: Optional[int] = None
     unidad_id: Optional[int] = None
-    cantidad_retirada: Optional[Decimal] = None
-    precio_unitario: Optional[Decimal] = None
+    cantidad_retirada: Optional[RoundedDecimal] = None
+    precio_unitario: Optional[RoundedDecimal] = None
     # campos auxiliares
     tipo_anticipo_id: int
     tipo_insumo_id: Optional[int] = None
@@ -35,7 +35,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoForm):
     insumo_descripcion: Optional[str] = None
     insumo_fecha_precio: Optional[Date] = None
     insumo_moneda_nombre: Optional[str] = None
-    insumo_precio: Optional[Decimal] = None
+    insumo_precio: Optional[RoundedDecimal] = None
     insumo_tipo_descripcion: Optional[str] = None
     insumo_unidad_abreviatura: Optional[str] = None
     insumo_unidad_descripcion: Optional[str] = None

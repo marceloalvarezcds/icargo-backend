@@ -1,17 +1,18 @@
 from datetime import datetime
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
 
 from app.enums import EstadoEnum
 
+from .rounded_decimal_model import RoundedDecimal
+
 
 class CamionSemiNetoForm(BaseModel):
     camion_id: int
     semi_id: int
     producto_id: Optional[int] = None
-    neto: Decimal
+    neto: RoundedDecimal
 
 
 class CamionSemiNeto(CamionSemiNetoForm):
