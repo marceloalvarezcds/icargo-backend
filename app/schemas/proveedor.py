@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -10,6 +9,7 @@ from .composicion_juridica import ComposicionJuridica
 from .contacto import ContactoForm
 from .gestor_carga_proveedor import GestorCargaProveedor
 from .proveedor_contacto_gestor_carga import ProveedorContactoGestorCargaList
+from .rounded_decimal_model import RoundedDecimal
 from .tipo_documento import TipoDocumento
 
 
@@ -24,8 +24,8 @@ class ProveedorBaseModel(BaseModel):
     email: Optional[str] = None
     pagina_web: Optional[str] = None
     info_complementaria: Optional[str] = None
-    latitud: Optional[Decimal] = None
-    longitud: Optional[Decimal] = None
+    latitud: Optional[RoundedDecimal] = None
+    longitud: Optional[RoundedDecimal] = None
     direccion: Optional[str] = None
     ciudad_id: Optional[int] = None
 

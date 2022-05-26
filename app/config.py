@@ -32,6 +32,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 
 API_BASE_URL = str(environ("API_BASE_URL", "http://localhost:8101"))
 
+DECIMAL_PRECISION = int(str(environ("DECIMAL_PRECISION", "2")))
+
 STATICS_URL = f"{API_BASE_URL}/{STATICS_FOLDER_NAME}"
 
 LOGO_IMAGE_URL = f"{STATICS_URL}/logo-icargo.png"

@@ -1,9 +1,9 @@
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
 
 from app.enums import EstadoEnum
+from app.schemas.rounded_decimal_model import RoundedDecimal
 
 from .date_model import Date
 
@@ -13,7 +13,7 @@ class FacturaForm(BaseModel):
     moneda_id: int
     iva_id: int
     numero_factura: str
-    monto: Decimal
+    monto: RoundedDecimal
     fecha_vencimiento: Date
 
 

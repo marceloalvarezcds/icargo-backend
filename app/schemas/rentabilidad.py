@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Any, List, Optional
 
 from pydantic import BaseModel
@@ -6,6 +5,7 @@ from pydantic import BaseModel
 from app.enums import EstadoEnum, TipoFleteEnum
 
 from .date_model import Date
+from .rounded_decimal_model import RoundedDecimal
 
 
 class Rentabilidad(BaseModel):
@@ -22,10 +22,10 @@ class Rentabilidad(BaseModel):
     propietario_nombre: str
     flete_tipo: Optional[TipoFleteEnum] = None
     producto_descripcion: str
-    cantidad_nominada: Decimal
-    cantidad_destino: Decimal
-    cantidad_origen: Decimal
-    diferencia_origen_destino: Decimal
+    cantidad_nominada: RoundedDecimal
+    cantidad_destino: RoundedDecimal
+    cantidad_origen: RoundedDecimal
+    diferencia_origen_destino: RoundedDecimal
     remitente_nombre: str
     gestor_carga_pais_id: Optional[int] = None
     origen_nombre: str
@@ -35,55 +35,55 @@ class Rentabilidad(BaseModel):
     lugar_carga_nombre: str
     lugar_descarga_nombre: str
     # PAGO FLETE a PROPIETARIO p/GC
-    condicion_propietario_tarifa: Decimal
+    condicion_propietario_tarifa: RoundedDecimal
     condicion_propietario_moneda_nombre: str
     condicion_propietario_moneda_simbolo: str
     condicion_propietario_unidad_descripcion: str
     condicion_propietario_unidad_abreviatura: str
-    propietario_flete_total: Decimal  # cantidad_destino * tarifa
-    propietario_flete_total_ml: Decimal  # cantidad_destino * tarifa (Moneda Local)
+    propietario_flete_total: RoundedDecimal  # cantidad_destino * tarifa
+    propietario_flete_total_ml: RoundedDecimal  # cantidad_destino * tarifa (Moneda Local)
     # COBRO por MERMA a PROPIETARIO p/GC
-    merma_propietario_valor: Decimal
+    merma_propietario_valor: RoundedDecimal
     merma_propietario_moneda_nombre: str
     merma_propietario_moneda_simbolo: str
     merma_propietario_unidad_descripcion: str
     merma_propietario_unidad_abreviatura: str
     merma_propietario_es_porcentual: bool
-    merma_propietario_tolerancia_original: Decimal
-    merma_propietario_tolerancia: Decimal  # Si es_porcentual entonces (cantidad_origen * tolerancia_original) sino tolerancia_original # noqa
-    merma_propietario_merma: Decimal  # Si (diferencia_origen_destino - tolerancia) > 0 entonces (diferencia_origen_destino - tolerancia) sino 0 # noqa
-    merma_propietario_valor_merma: Decimal  # valor * merma
+    merma_propietario_tolerancia_original: RoundedDecimal
+    merma_propietario_tolerancia: RoundedDecimal  # Si es_porcentual entonces (cantidad_origen * tolerancia_original) sino tolerancia_original # noqa
+    merma_propietario_merma: RoundedDecimal  # Si (diferencia_origen_destino - tolerancia) > 0 entonces (diferencia_origen_destino - tolerancia) sino 0 # noqa
+    merma_propietario_valor_merma: RoundedDecimal  # valor * merma
     # COBRO FLETE a REMITENTE p/GC
-    condicion_gestor_carga_tarifa: Decimal
+    condicion_gestor_carga_tarifa: RoundedDecimal
     condicion_gestor_carga_moneda_nombre: str
     condicion_gestor_carga_moneda_simbolo: str
     condicion_gestor_carga_unidad_descripcion: str
     condicion_gestor_carga_unidad_abreviatura: str
-    gestor_carga_flete_total: Decimal  # cantidad_destino * tarifa
-    gestor_carga_flete_total_ml: Decimal  # cantidad_destino * tarifa (Moneda Local)
+    gestor_carga_flete_total: RoundedDecimal  # cantidad_destino * tarifa
+    gestor_carga_flete_total_ml: RoundedDecimal  # cantidad_destino * tarifa (Moneda Local)
     # PAGO por MERMA a REMITENTE p/GC
-    merma_gestor_carga_valor: Decimal
+    merma_gestor_carga_valor: RoundedDecimal
     merma_gestor_carga_moneda_nombre: str
     merma_gestor_carga_moneda_simbolo: str
     merma_gestor_carga_unidad_descripcion: str
     merma_gestor_carga_unidad_abreviatura: str
     merma_gestor_carga_es_porcentual: bool
-    merma_gestor_carga_tolerancia_original: Decimal
-    merma_gestor_carga_tolerancia: Decimal  # Si es_porcentual entonces (cantidad_origen * tolerancia_original) sino tolerancia_original # noqa
-    merma_gestor_carga_merma: Decimal  # Si (diferencia_origen_destino - tolerancia) > 0 entonces (diferencia_origen_destino - tolerancia) sino 0 # noqa
-    merma_gestor_carga_valor_merma: Decimal  # valor * merma
+    merma_gestor_carga_tolerancia_original: RoundedDecimal
+    merma_gestor_carga_tolerancia: RoundedDecimal  # Si es_porcentual entonces (cantidad_origen * tolerancia_original) sino tolerancia_original # noqa
+    merma_gestor_carga_merma: RoundedDecimal  # Si (diferencia_origen_destino - tolerancia) > 0 entonces (diferencia_origen_destino - tolerancia) sino 0 # noqa
+    merma_gestor_carga_valor_merma: RoundedDecimal  # valor * merma
     # Complementos
-    total_complemento_a_pagar: Decimal
-    total_complemento_a_cobrar: Decimal
-    diferencia_complemento: Decimal
+    total_complemento_a_pagar: RoundedDecimal
+    total_complemento_a_cobrar: RoundedDecimal
+    diferencia_complemento: RoundedDecimal
     # Descuentos
-    total_descuento_a_pagar: Decimal
-    total_descuento_a_cobrar: Decimal
-    diferencia_descuento: Decimal
+    total_descuento_a_pagar: RoundedDecimal
+    total_descuento_a_cobrar: RoundedDecimal
+    diferencia_descuento: RoundedDecimal
     # RESULTADOS
-    total_anticipo_retirado: Decimal
-    saldo_gestor_carga: Decimal
-    saldo_propietario: Decimal
+    total_anticipo_retirado: RoundedDecimal
+    saldo_gestor_carga: RoundedDecimal
+    saldo_propietario: RoundedDecimal
     # Auditoría
     fecha_conciliacion: Optional[Date]
     created_by: str

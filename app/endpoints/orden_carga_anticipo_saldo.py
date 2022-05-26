@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -7,13 +5,14 @@ from app import services
 from app.dependencies import Permiso, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+from app.schemas.rounded_decimal_model import RoundedDecimal
 
 api = APIRouter()
 
 
 @api.get(
     "/flete_anticipo/{flete_anticipo_id}/orden_carga/{orden_carga_id}",
-    response_model=Decimal,
+    response_model=RoundedDecimal,
 )
 async def read_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
     flete_anticipo_id: int,

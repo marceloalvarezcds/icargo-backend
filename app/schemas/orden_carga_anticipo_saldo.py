@@ -1,25 +1,24 @@
-from decimal import Decimal
-
 from pydantic import BaseModel
 
 from .date_model import Date
+from .rounded_decimal_model import RoundedDecimal
 
 
 class OrdenCargaAnticipoSaldoForm(BaseModel):
     flete_anticipo_id: int
     orden_carga_id: int
-    total_anticipo: Decimal
-    total_complemento: Decimal
-    total_retirado: Decimal
-    saldo: Decimal
+    total_anticipo: RoundedDecimal
+    total_complemento: RoundedDecimal
+    total_retirado: RoundedDecimal
+    saldo: RoundedDecimal
 
 
 class OrdenCargaAnticipoSaldo(OrdenCargaAnticipoSaldoForm):
     id: int
-    cantidad_nominada: Decimal
+    cantidad_nominada: RoundedDecimal
     concepto: str
-    porcentaje: Decimal
-    total_disponible: Decimal
+    porcentaje: RoundedDecimal
+    total_disponible: RoundedDecimal
     # Auditoría
     created_by: str
     created_at: Date

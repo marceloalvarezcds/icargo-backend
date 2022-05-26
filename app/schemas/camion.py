@@ -1,5 +1,4 @@
 from datetime import datetime
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -14,6 +13,7 @@ from .ente_emisor_automotor import EnteEmisorAutomotor
 from .ente_emisor_transporte import EnteEmisorTransporte
 from .marca_camion import MarcaCamion
 from .propietario import Propietario
+from .rounded_decimal_model import RoundedDecimal
 from .tipo_camion import TipoCamion
 
 
@@ -54,8 +54,8 @@ class CamionForm(BaseModel):
     anho: int
     # FIN Detalles del Camión
     # INICIO Capacidad del Camión
-    bruto: Decimal
-    tara: Decimal
+    bruto: RoundedDecimal
+    tara: RoundedDecimal
     # FIN Capacidad del Camión
 
 

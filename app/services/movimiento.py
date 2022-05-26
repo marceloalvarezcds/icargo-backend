@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from decimal import Decimal
 from typing import List, Optional, cast
 
 from fastapi import HTTPException  # type: ignore
@@ -20,6 +19,7 @@ from app.models import (
 )
 from app.schemas import MovimientoForm
 from app.schemas.date_model import Date
+from app.schemas.rounded_decimal_model import RoundedDecimal
 
 
 def get_movimiento_list(
@@ -521,7 +521,7 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
     data.cuenta_id = tipo_cuenta.id
     data.tipo_movimiento_id = tipo_movimiento.id
     data.es_editable = True
-    data.tipo_cambio_moneda = Decimal(
+    data.tipo_cambio_moneda = RoundedDecimal(
         1
     )  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
     data.fecha_cambio_moneda = fecha

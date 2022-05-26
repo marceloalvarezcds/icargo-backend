@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -6,6 +5,7 @@ from pydantic import BaseModel
 from app.enums import EstadoEnum, OperacionEstadoEnum
 
 from .date_model import Date
+from .rounded_decimal_model import RoundedDecimal
 
 
 class InstrumentoFormBaseModel(BaseModel):
@@ -23,18 +23,18 @@ class InstrumentoFormBaseModel(BaseModel):
 class InstrumentoForm(InstrumentoFormBaseModel):
     tipo_instrumento_id: Optional[int]
     liquidacion_id: Optional[int]
-    monto: Decimal
+    monto: RoundedDecimal
 
 
 class InstrumentoSaldoForm(InstrumentoForm):
     operacion_estado: OperacionEstadoEnum
     # Saldos
-    credito: Decimal
-    debito: Decimal
-    saldo_confirmado: Decimal
+    credito: RoundedDecimal
+    debito: RoundedDecimal
+    saldo_confirmado: RoundedDecimal
     # Datos mostrados solo para Banco
-    provision: Decimal
-    saldo_provisional: Decimal
+    provision: RoundedDecimal
+    saldo_provisional: RoundedDecimal
 
 
 class Instrumento(InstrumentoSaldoForm):
@@ -43,7 +43,7 @@ class Instrumento(InstrumentoSaldoForm):
     estado: EstadoEnum
     tipo_instrumento_id: int
     # Datos mostrados solo para Banco
-    provision_rechazada: Optional[Decimal]
+    provision_rechazada: Optional[RoundedDecimal]
     # Datos calculados
     contraparte: str
     contraparte_numero_documento: str
@@ -51,7 +51,7 @@ class Instrumento(InstrumentoSaldoForm):
     moneda_id: int
     moneda_nombre: str
     moneda_simbolo: str
-    saldo_total: Optional[Decimal]
+    saldo_total: Optional[RoundedDecimal]
     tipo_contraparte_descripcion: str
     tipo_instrumento_descripcion: str
     tipo_operacion_descripcion: str

@@ -1,20 +1,21 @@
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
 
+from .rounded_decimal_model import RoundedDecimal
+
 
 class OrdenCargaRemisionResultado(BaseModel):
     responsable: str
-    tarifa_flete: Decimal
-    total_flete: Decimal
-    merma_valor: Decimal
-    tolerancia: Decimal
-    tolerancia_kg: Decimal
-    merma: Decimal
-    merma_valor_total: Decimal
-    merma_valor_total_moneda_local: Decimal
-    total_complemento: Optional[Decimal] = None
-    total_descuento: Optional[Decimal] = None
-    total_anticipo: Optional[Decimal] = None
-    saldo: Decimal
+    tarifa_flete: RoundedDecimal
+    total_flete: RoundedDecimal
+    merma_valor: RoundedDecimal
+    tolerancia: RoundedDecimal
+    tolerancia_kg: RoundedDecimal
+    merma: RoundedDecimal
+    merma_valor_total: RoundedDecimal
+    merma_valor_total_moneda_local: RoundedDecimal
+    total_complemento: Optional[RoundedDecimal] = None
+    total_descuento: Optional[RoundedDecimal] = None
+    total_anticipo: Optional[RoundedDecimal] = None
+    saldo: RoundedDecimal
