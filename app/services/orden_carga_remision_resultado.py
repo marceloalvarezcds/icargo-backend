@@ -26,7 +26,8 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
                     merma_valor_total_moneda_local=(
                         orden_carga.resultado_gestor_carga_merma_valor_total_moneda_local
                     ),
-                    saldo=orden_carga.resultado_gestor_carga_saldo,
+                    saldo=orden_carga.resultado_gestor_carga_total_flete,
+                    # resultado_gestor_carga_saldo (calculo anterior),
                 )
             )
         lista.append(
