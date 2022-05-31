@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Form
+from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import models, schemas, services
@@ -23,4 +24,19 @@ async def read_last_insumo_punto_venta_precio(
 ):
     return services.get_insumo_punto_venta_precio_by_insumo_id_and_moneda_id_and_punto_venta_id(
         db, insumo_id, moneda_id, punto_venta_id, current_user.gestor_carga_id
+    )
+
+
+@api.post(
+    "/",
+    response_model=schemas.InsumoPuntoVentaPrecioList,
+)
+async def add_new_insumo_punto_venta_precio(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.InsumoPuntoVentaPrecioForm] = Form(...),  # type: ignore  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.INSUMO_PUNTO_VENTA_PRECIO)),  # noqa: B008
+):
+    return services.create_insumo_punto_venta_precio(
+        db, data, current_user.gestor_carga_id, current_user.username  # type: ignore
     )

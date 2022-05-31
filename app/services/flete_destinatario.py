@@ -127,7 +127,7 @@ def get_destinatario_selected_list_by_flete(flete: Flete) -> List[FleteDestinata
 
 def update_flete_destinatario_list(
     db: Session,
-    dataList: List[FleteDestinatario],
+    dataList: Optional[List[FleteDestinatario]],
     flete: Flete,
     modified_by: str,
 ):
@@ -135,26 +135,27 @@ def update_flete_destinatario_list(
     flete.emision_orden_centro_operativo_destinatarios = []
     flete.emision_orden_remitente_destinatarios = []
     flete.emision_orden_user_destinatarios = []
-    for data in dataList:
-        if data.tipo_destinatario == FleteDestinatarioEnum.CENTRO_OPERATIVO.value:
-            obj = get_centro_operativo_contacto_gestor_carga_by_id(db, data.id)
-            if obj:
-                item = FleteCentroOperativoContacto(
-                    flete_id=flete_id, centro_operativo_contacto_id=obj.id
-                )
-                flete.emision_orden_centro_operativo_destinatarios.append(item)
-        elif data.tipo_destinatario == FleteDestinatarioEnum.REMITENTE.value:
-            obj = get_remitente_contacto_gestor_carga_by_id(db, data.id)
-            if obj:
-                item = FleteRemitenteContacto(
-                    flete_id=flete_id, remitente_contacto_id=obj.id
-                )
-                flete.emision_orden_remitente_destinatarios.append(item)
-        elif data.tipo_destinatario == FleteDestinatarioEnum.USUARIO.value:
-            obj = get_user_by_id(db, data.id)
-            if obj:
-                item = FleteUserContacto(flete_id=flete_id, user_contacto_id=obj.id)
-                flete.emision_orden_user_destinatarios.append(item)
+    if dataList:
+        for data in dataList:
+            if data.tipo_destinatario == FleteDestinatarioEnum.CENTRO_OPERATIVO.value:
+                obj = get_centro_operativo_contacto_gestor_carga_by_id(db, data.id)
+                if obj:
+                    item = FleteCentroOperativoContacto(
+                        flete_id=flete_id, centro_operativo_contacto_id=obj.id
+                    )
+                    flete.emision_orden_centro_operativo_destinatarios.append(item)
+            elif data.tipo_destinatario == FleteDestinatarioEnum.REMITENTE.value:
+                obj = get_remitente_contacto_gestor_carga_by_id(db, data.id)
+                if obj:
+                    item = FleteRemitenteContacto(
+                        flete_id=flete_id, remitente_contacto_id=obj.id
+                    )
+                    flete.emision_orden_remitente_destinatarios.append(item)
+            elif data.tipo_destinatario == FleteDestinatarioEnum.USUARIO.value:
+                obj = get_user_by_id(db, data.id)
+                if obj:
+                    item = FleteUserContacto(flete_id=flete_id, user_contacto_id=obj.id)
+                    flete.emision_orden_user_destinatarios.append(item)
     update_flete_destinatarios(
         flete,
         db,

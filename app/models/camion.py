@@ -79,15 +79,19 @@ class Camion(AuditMixin, Base):
 
     @hybrid_property
     def chofer_nombre(self):
-        return self.chofer.nombre
+        return self.chofer.nombre if self.chofer else None
 
     @hybrid_property
     def chofer_numero_documento(self):
-        return self.chofer.numero_documento
+        return self.chofer.numero_documento if self.chofer else None
 
     @hybrid_property
     def ciudad_habilitacion_municipal_nombre(self):
-        return self.ciudad_habilitacion_municipal.nombre
+        return (
+            self.ciudad_habilitacion_municipal.nombre
+            if self.ciudad_habilitacion_municipal
+            else None
+        )
 
     @hybrid_property
     def gestor_cuenta_id(self):
@@ -98,8 +102,20 @@ class Camion(AuditMixin, Base):
         return self.propietario.gestor_cuenta.nombre
 
     @hybrid_property
+    def localidad_habilitacion_municipal_id(self):
+        return (
+            self.ciudad_habilitacion_municipal.localidad_id
+            if self.ciudad_habilitacion_municipal
+            else None
+        )
+
+    @hybrid_property
     def localidad_habilitacion_municipal_nombre(self):
-        return self.ciudad_habilitacion_municipal.localidad.nombre
+        return (
+            self.ciudad_habilitacion_municipal.localidad.nombre
+            if self.ciudad_habilitacion_municipal
+            else None
+        )
 
     @hybrid_property
     def info(self):
@@ -107,31 +123,55 @@ class Camion(AuditMixin, Base):
 
     @hybrid_property
     def marca_descripcion(self):
-        return self.marca.descripcion
+        return self.marca.descripcion if self.marca else None
 
     @hybrid_property
     def neto(self):
-        return self.bruto - self.tara
+        return (self.bruto if self.bruto else 0) - (self.tara if self.tara else 0)
 
     @hybrid_property
     def oficial_cuenta_nombre(self):
         return self.propietario.oficial_cuenta_nombre
 
     @hybrid_property
+    def pais_habilitacion_municipal_id(self):
+        return (
+            self.ciudad_habilitacion_municipal.localidad.pais_id
+            if self.ciudad_habilitacion_municipal
+            else None
+        )
+
+    @hybrid_property
     def pais_habilitacion_municipal_nombre(self):
-        return self.ciudad_habilitacion_municipal.localidad.pais.nombre
+        return (
+            self.ciudad_habilitacion_municipal.localidad.pais.nombre
+            if self.ciudad_habilitacion_municipal
+            else None
+        )
 
     @hybrid_property
     def pais_habilitacion_municipal_nombre_corto(self):
-        return self.ciudad_habilitacion_municipal.localidad.pais.nombre_corto
+        return (
+            self.ciudad_habilitacion_municipal.localidad.pais.nombre_corto
+            if self.ciudad_habilitacion_municipal
+            else None
+        )
 
     @hybrid_property
     def pais_emisor_placa_nombre(self):
-        return self.ente_emisor_automotor.pais.nombre
+        return (
+            self.ente_emisor_automotor.pais.nombre
+            if self.ente_emisor_automotor
+            else None
+        )
 
     @hybrid_property
     def pais_emisor_placa_nombre_corto(self):
-        return self.ente_emisor_automotor.pais.nombre_corto
+        return (
+            self.ente_emisor_automotor.pais.nombre_corto
+            if self.ente_emisor_automotor
+            else None
+        )
 
     @hybrid_property
     def propietario_nombre(self):
@@ -143,4 +183,4 @@ class Camion(AuditMixin, Base):
 
     @hybrid_property
     def tipo_descripcion(self):
-        return self.tipo.descripcion
+        return self.tipo.descripcion if self.tipo else None

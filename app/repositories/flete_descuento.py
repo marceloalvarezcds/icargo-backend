@@ -48,7 +48,6 @@ def create_flete_descuento(
         concepto_id=data.concepto_id,
         detalle=data.detalle,
         habilitar_pago_proveedor=data.habilitar_pago_proveedor,
-        anticipado=data.anticipado,
         # INICIO Monto a cobrar al Propietario
         propietario_monto=data.propietario_monto,
         propietario_moneda_id=data.propietario_moneda_id,
@@ -75,7 +74,6 @@ def edit_flete_descuento(
     obj.concepto_id = data.concepto_id
     obj.detalle = data.detalle
     obj.habilitar_pago_proveedor = data.habilitar_pago_proveedor
-    obj.anticipado = data.anticipado
     # INICIO Monto a cobrar al Propietario
     obj.propietario_monto = data.propietario_monto
     obj.propietario_moneda_id = data.propietario_moneda_id

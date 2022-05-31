@@ -81,7 +81,11 @@ from .chofer_propietario import (  # noqa
     create_propietario_by_chofer,
     edit_propietario_by_chofer,
 )
-from .ciudad import get_ciudad_by_nombre_and_localidad_id, get_ciudad_list  # noqa
+from .ciudad import (  # noqa
+    get_ciudad_by_nombre_and_localidad_id,
+    get_ciudad_list,
+    get_ciudad_list_by_localidad_id,
+)
 from .color import get_color_by_descripcion, get_color_list  # noqa
 from .composicion_juridica import (  # noqa
     get_composicion_juridica_by_nombre,
@@ -212,6 +216,7 @@ from .insumo import (  # noqa
     get_insumo_list_by_tipo_insumo_id,
 )
 from .insumo_punto_venta import (  # noqa
+    create_insumo_punto_venta,
     get_insumo_punto_venta_by_id,
     get_insumo_punto_venta_by_insumo_id_and_moneda_id_and_punto_venta_id,
     get_insumo_punto_venta_list_by_gestor_carga_id,
@@ -220,6 +225,7 @@ from .insumo_punto_venta import (  # noqa
     get_insumo_punto_venta_list_by_tipo_insumo_id,
 )
 from .insumo_punto_venta_precio import (  # noqa
+    create_insumo_punto_venta_precio_by_insumo_punto_venta,
     get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id,
 )
 from .liquidacion import (  # noqa

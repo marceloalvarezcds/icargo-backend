@@ -15,7 +15,7 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
         if check_permiso(current_user, m.ORDEN_CARGA_REMISION_RESULTADO_GESTOR, a.VER):
             lista.append(
                 OrdenCargaRemisionResultado(
-                    responsable="Gestor de Cuenta",
+                    responsable="Gestor de Carga",
                     tarifa_flete=orden_carga.resultado_gestor_carga_tarifa_flete,
                     total_flete=orden_carga.resultado_gestor_carga_total_flete,
                     merma_valor=orden_carga.resultado_gestor_carga_merma_valor,

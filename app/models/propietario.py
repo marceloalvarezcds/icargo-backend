@@ -78,7 +78,11 @@ class Propietario(AuditMixin, Base):
 
     @hybrid_property
     def oficial_cuenta_nombre(self):
-        return f"{self.oficial_cuenta.first_name} {self.oficial_cuenta.last_name}"
+        return (
+            f"{self.oficial_cuenta.first_name} {self.oficial_cuenta.last_name}"
+            if self.oficial_cuenta
+            else None
+        )
 
     @hybrid_property
     def pais_nombre(self):

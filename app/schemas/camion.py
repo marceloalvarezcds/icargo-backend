@@ -27,35 +27,35 @@ class CamionForm(BaseModel):
     # inicio - municipal
     pais_habilitacion_municipal_id: Optional[int] = None
     localidad_habilitacion_municipal_id: Optional[int] = None
-    ciudad_habilitacion_municipal_id: int
-    numero_habilitacion_municipal: str
-    vencimiento_habilitacion_municipal: Date
+    ciudad_habilitacion_municipal_id: Optional[int] = None
+    numero_habilitacion_municipal: Optional[str] = None
+    vencimiento_habilitacion_municipal: Optional[Date] = None
     foto_habilitacion_municipal_frente: Optional[str] = None
     foto_habilitacion_municipal_reverso: Optional[str] = None
     # fin - municipal
     # inicio - transporte
-    ente_emisor_transporte_id: int
-    numero_habilitacion_transporte: str
-    vencimiento_habilitacion_transporte: Date
+    ente_emisor_transporte_id: Optional[int] = None
+    numero_habilitacion_transporte: Optional[str] = None
+    vencimiento_habilitacion_transporte: Optional[Date] = None
     foto_habilitacion_transporte_frente: Optional[str] = None
     foto_habilitacion_transporte_reverso: Optional[str] = None
     # fin - transporte
     # inicio - automotor
-    ente_emisor_automotor_id: int
+    ente_emisor_automotor_id: Optional[int] = None
     titular_habilitacion_automotor: Optional[str] = None
     foto_habilitacion_automotor_frente: Optional[str] = None
     foto_habilitacion_automotor_reverso: Optional[str] = None
     # fin - automotor
     # FIN Habilitaciones del Camión
     # INICIO Detalles del Camión
-    marca_id: int
-    tipo_id: int
-    color_id: int
-    anho: int
+    marca_id: Optional[int] = None
+    tipo_id: Optional[int] = None
+    color_id: Optional[int] = None
+    anho: Optional[int] = None
     # FIN Detalles del Camión
     # INICIO Capacidad del Camión
-    bruto: RoundedDecimal
-    tara: RoundedDecimal
+    bruto: Optional[RoundedDecimal] = None
+    tara: Optional[RoundedDecimal] = None
     # FIN Capacidad del Camión
 
 
@@ -68,21 +68,26 @@ class Camion(CamionForm):
     info: str
     # INICIO Habilitaciones del Camión
     # inicio - municipal
-    ciudad_habilitacion_municipal: Ciudad
+    ciudad_habilitacion_municipal: Optional[Ciudad] = None
+    localidad_habilitacion_municipal_id: Optional[int] = None
+    localidad_habilitacion_municipal_nombre: Optional[str] = None
+    pais_habilitacion_municipal_id: Optional[int] = None
+    pais_habilitacion_municipal_nombre: Optional[str] = None
+    pais_habilitacion_municipal_nombre_corto: Optional[str] = None
     # fin - municipal
     # inicio - transporte
-    ente_emisor_transporte: EnteEmisorTransporte
+    ente_emisor_transporte: Optional[EnteEmisorTransporte] = None
     # fin - transporte
     # inicio - automotor
-    ente_emisor_automotor: EnteEmisorAutomotor
-    pais_emisor_placa_nombre: str
-    pais_emisor_placa_nombre_corto: str
+    ente_emisor_automotor: Optional[EnteEmisorAutomotor] = None
+    pais_emisor_placa_nombre: Optional[str] = None
+    pais_emisor_placa_nombre_corto: Optional[str] = None
     # fin - automotor
     # FIN Habilitaciones del Camión
     # INICIO Detalles del Camión
-    marca: MarcaCamion
-    tipo: TipoCamion
-    color: Color
+    marca: Optional[MarcaCamion] = None
+    tipo: Optional[TipoCamion] = None
+    color: Optional[Color] = None
     # FIN Detalles del Camión
     created_by: str
     created_at: datetime
@@ -103,18 +108,20 @@ class CamionList(BaseModel):
     chofer_numero_documento: Optional[str] = None
     numero_chasis: Optional[str] = None
     estado: EstadoEnum
-    ciudad_habilitacion_municipal_nombre: str
+    ciudad_habilitacion_municipal_nombre: Optional[str] = None
     gestor_cuenta_id: int
     gestor_cuenta_nombre: str
-    localidad_habilitacion_municipal_nombre: str
+    localidad_habilitacion_municipal_id: Optional[int] = None
+    localidad_habilitacion_municipal_nombre: Optional[str] = None
     info: str
-    marca_descripcion: str
-    oficial_cuenta_nombre: str
-    pais_habilitacion_municipal_nombre: str
-    pais_habilitacion_municipal_nombre_corto: str
-    pais_emisor_placa_nombre: str
-    pais_emisor_placa_nombre_corto: str
-    tipo_descripcion: str
+    marca_descripcion: Optional[str] = None
+    oficial_cuenta_nombre: Optional[str] = None
+    pais_habilitacion_municipal_id: Optional[int] = None
+    pais_habilitacion_municipal_nombre: Optional[str] = None
+    pais_habilitacion_municipal_nombre_corto: Optional[str] = None
+    pais_emisor_placa_nombre: Optional[str] = None
+    pais_emisor_placa_nombre_corto: Optional[str] = None
+    tipo_descripcion: Optional[str] = None
     created_by: str
     created_at: datetime
     modified_by: str

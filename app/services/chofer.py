@@ -248,7 +248,9 @@ def get_chofer_reports(db: Session) -> str:
         value_cell.value = item.tipo_documento.descripcion
 
         value_cell = ws.cell(row=row + 2, column=3)
-        value_cell.value = item.pais_emisor_documento.nombre
+        value_cell.value = (
+            item.pais_emisor_documento.nombre if item.pais_emisor_documento else None
+        )
 
         value_cell = ws.cell(row=row + 2, column=4)
         value_cell.value = item.numero_documento

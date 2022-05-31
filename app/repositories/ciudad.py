@@ -16,10 +16,14 @@ def get_ciudad_by_nombre_and_localidad_id(
     )
 
 
-def get_ciudad_list(db: Session, localidad_id: int) -> List[Ciudad]:
+def get_ciudad_list_by_localidad_id(db: Session, localidad_id: int) -> List[Ciudad]:
     return (
         db.query(Ciudad)
         .filter(Ciudad.localidad_id == localidad_id)
         .order_by(Ciudad.nombre)
         .all()
     )
+
+
+def get_ciudad_list(db: Session) -> List[Ciudad]:
+    return db.query(Ciudad).order_by(Ciudad.nombre).all()

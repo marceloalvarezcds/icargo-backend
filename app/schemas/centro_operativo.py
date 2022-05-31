@@ -18,7 +18,7 @@ class CentroOperativoBaseModel(BaseModel):
     nombre: str
     nombre_corto: Optional[str] = None
     clasificacion_id: int
-    telefono: str
+    telefono: Optional[str] = None
     email: Optional[str] = None
     pagina_web: Optional[str] = None
     latitud: Optional[RoundedDecimal] = None

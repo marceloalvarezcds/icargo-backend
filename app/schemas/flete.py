@@ -63,7 +63,7 @@ class FleteFormBaseModel(BaseModel):
     # FIN Mermas de Fletes
     vigencia_anticipos: Date
     # INICIO Emisión de Órdenes
-    emision_orden_texto_legal: str
+    emision_orden_texto_legal: Optional[str] = None
     emision_orden_detalle: Optional[str] = None
     # FIN Emisión de Órdenes
 
@@ -73,7 +73,7 @@ class FleteForm(FleteFormBaseModel):
     complementos: List[FleteComplementoForm]
     descuentos: List[FleteDescuentoForm]
     # INICIO Emisión de Órdenes
-    destinatarios: List[FleteDestinatario]
+    destinatarios: Optional[List[FleteDestinatario]] = None
     # FIN Emisión de Órdenes
 
 

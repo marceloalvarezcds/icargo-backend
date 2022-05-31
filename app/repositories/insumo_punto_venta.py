@@ -6,8 +6,8 @@ from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from sqlalchemy.sql.expression import null  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import Insumo, InsumoPuntoVenta
-from app.models.insumo_punto_venta_precio import InsumoPuntoVentaPrecio
+from app.models import Insumo, InsumoPuntoVenta, InsumoPuntoVentaPrecio
+from app.schemas import InsumoPuntoVentaPrecioForm
 
 
 def get_insumo_punto_venta_by_id(db: Session, id: int) -> Optional[InsumoPuntoVenta]:
@@ -135,3 +135,24 @@ def get_insumo_punto_venta_by_insumo_id_and_moneda_id_and_punto_venta_id(
         )
         .first()
     )
+
+
+def create_insumo_punto_venta(
+    db: Session,
+    data: InsumoPuntoVentaPrecioForm,
+    gestor_carga_id: int,
+    modified_by: str,
+) -> InsumoPuntoVenta:
+    obj = InsumoPuntoVenta(
+        insumo_id=data.insumo_id,
+        punto_venta_id=data.punto_venta_id,
+        gestor_carga_id=gestor_carga_id,
+        moneda_id=data.moneda_id,
+        estado=EstadoEnum.ACTIVO.value,
+        created_by=modified_by,
+        modified_by=modified_by,
+    )
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj

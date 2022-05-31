@@ -220,10 +220,10 @@ def get_semi_reports(db: Session) -> str:
         value_cell.value = item.numero_chasis
 
         value_cell = ws.cell(row=row + 2, column=7)
-        value_cell.value = item.tipo.descripcion
+        value_cell.value = item.tipo_descripcion
 
         value_cell = ws.cell(row=row + 2, column=8)
-        value_cell.value = item.marca.descripcion
+        value_cell.value = item.marca_descripcion
 
         value_cell = ws.cell(row=row + 2, column=9)
         value_cell.value = item.gestor_cuenta_nombre
