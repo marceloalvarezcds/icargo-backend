@@ -42,8 +42,8 @@ class OrdenCargaEditForm(BaseModel):
 class OrdenCarga(OrdenCargaForm):
     id: int
     # Datos de camion
-    camion_chofer_nombre: str
-    camion_chofer_numero_documento: str
+    camion_chofer_nombre: Optional[str] = None
+    camion_chofer_numero_documento: Optional[str] = None
     camion_placa: str
     camion_propietario_nombre: str
     # Datos de semi
@@ -55,7 +55,7 @@ class OrdenCarga(OrdenCargaForm):
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
     flete_limite_credito: RoundedDecimal
-    flete_numero_lote: str
+    flete_numero_lote: Optional[str] = None
     flete_monto_efectivo: RoundedDecimal
     flete_origen_id: Optional[int] = None
     flete_origen_nombre: Optional[str] = None
@@ -122,8 +122,8 @@ class OrdenCarga(OrdenCargaForm):
 class OrdenCargaList(OrdenCargaForm):
     id: int
     # Datos de camion
-    camion_chofer_nombre: str
-    camion_chofer_numero_documento: str
+    camion_chofer_nombre: Optional[str] = None
+    camion_chofer_numero_documento: Optional[str] = None
     camion_placa: str
     camion_propietario_nombre: str
     # Datos de semi
@@ -132,7 +132,7 @@ class OrdenCargaList(OrdenCargaForm):
     flete_destino_nombre: Optional[str] = None
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
-    flete_numero_lote: str
+    flete_numero_lote: Optional[str] = None
     flete_origen_nombre: Optional[str] = None
     flete_producto_descripcion: str
     flete_remitente_nombre: str

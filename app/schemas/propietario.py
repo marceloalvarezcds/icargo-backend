@@ -22,9 +22,9 @@ class PropietarioBaseModel(BaseModel):
     tipo_persona_id: int
     ruc: str
     digito_verificador: Optional[str] = None
-    pais_origen_id: int
+    pais_origen_id: Optional[int] = None
     fecha_nacimiento: Optional[Date] = None
-    oficial_cuenta_id: int
+    oficial_cuenta_id: Optional[int] = None
     foto_documento_frente: Optional[str] = None
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
@@ -46,15 +46,15 @@ class PropietarioBaseModel(BaseModel):
     foto_registro_reverso: Optional[str] = None
     # fin registro
     # FIN Datos del Chofer
-    telefono: str
+    telefono: Optional[str] = None
     email: Optional[str] = None
     direccion: Optional[str] = None
-    ciudad_id: int
+    ciudad_id: Optional[int] = None
 
 
 class PropietarioForm(PropietarioBaseModel):
-    pais_id: int
-    localidad_id: int
+    pais_id: Optional[int] = None
+    localidad_id: Optional[int] = None
     alias: Optional[str] = None
     contactos: List[ContactoForm]
 
@@ -101,7 +101,7 @@ class PropietarioEditForm(BaseModel):
 class PropietarioBase(PropietarioBaseModel):
     id: int
     tipo_persona: TipoPersona
-    pais_origen: Pais
+    pais_origen: Optional[Pais] = None
     gestor_cuenta_id: int
     gestor_cuenta_nombre: str
     oficial_cuenta_nombre: Optional[str] = None
@@ -116,7 +116,7 @@ class PropietarioBase(PropietarioBaseModel):
     # fin registro
     # FIN Datos del Chofer
     estado: EstadoEnum
-    ciudad: Ciudad
+    ciudad: Optional[Ciudad] = None
     created_by: str
     created_at: datetime
     modified_by: str

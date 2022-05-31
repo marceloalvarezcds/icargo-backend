@@ -1,4 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String  # type: ignore
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
 
@@ -17,3 +18,19 @@ class Ciudad(AuditMixin, Base):
     nombre = Column(String(255))
     localidad_id = Column(Integer, ForeignKey("localidad.id"))
     localidad = relationship(Localidad, back_populates="ciudades", uselist=False)
+
+    @hybrid_property
+    def localidad_nombre(self):
+        return self.localidad.nombre
+
+    @hybrid_property
+    def pais_id(self):
+        return self.localidad.pais_id
+
+    @hybrid_property
+    def pais_nombre(self):
+        return self.localidad.pais.nombre
+
+    @hybrid_property
+    def pais_nombre_corto(self):
+        return self.localidad.pais.nombre_corto

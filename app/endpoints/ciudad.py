@@ -11,10 +11,18 @@ from app.enums import PermisoModeloEnum as m
 api = APIRouter()
 
 
-@api.get("/{localidad_id}", response_model=List[schemas.Ciudad])
+@api.get("/", response_model=List[schemas.Ciudad])
 async def read_ciudad_list(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.CIUDAD)),  # noqa: B008
+):
+    return repositories.get_ciudad_list(db)
+
+
+@api.get("/{localidad_id}", response_model=List[schemas.Ciudad])
+async def read_ciudad_list_by_localidad_id(
     localidad_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.CIUDAD)),  # noqa: B008
 ):
-    return repositories.get_ciudad_list(db, localidad_id)
+    return repositories.get_ciudad_list_by_localidad_id(db, localidad_id)

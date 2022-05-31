@@ -52,9 +52,7 @@ def get_propietario_detail(
     obj_dict["gestor_cuenta_nombre"] = (
         obj.gestor_cuenta.nombre if obj.gestor_cuenta else None
     )
-    obj_dict[
-        "oficial_cuenta_nombre"
-    ] = f"{obj.oficial_cuenta.first_name} {obj.oficial_cuenta.last_name}"
+    obj_dict["oficial_cuenta_nombre"] = obj.oficial_cuenta_nombre
     obj_dict["pais_origen"] = obj.pais_origen
     obj_dict["ciudad"] = obj.ciudad
     # Datos del chofer

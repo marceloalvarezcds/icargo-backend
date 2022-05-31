@@ -54,17 +54,23 @@ def get_chofer_detail(
     obj_dict["gestor_cuenta_nombre"] = (
         obj.gestor_cuenta.nombre if obj.gestor_cuenta else None
     )
-    obj_dict[
-        "oficial_cuenta_nombre"
-    ] = f"{obj.oficial_cuenta.first_name} {obj.oficial_cuenta.last_name}"
+    obj_dict["oficial_cuenta_nombre"] = obj.oficial_cuenta_nombre
     obj_dict["pais_emisor_documento"] = obj.pais_emisor_documento
     obj_dict["ciudad"] = obj.ciudad
     ciudad_emisor_registro = obj.ciudad_emisor_registro
-    localidad_emisor_registro = ciudad_emisor_registro.localidad
-    pais_emisor_registro = ciudad_emisor_registro.localidad.pais
-    obj_dict["pais_emisor_registro_id"] = pais_emisor_registro.id
+    localidad_emisor_registro = (
+        ciudad_emisor_registro.localidad if ciudad_emisor_registro else None
+    )
+    pais_emisor_registro = (
+        localidad_emisor_registro.pais if localidad_emisor_registro else None
+    )
+    obj_dict["pais_emisor_registro_id"] = (
+        pais_emisor_registro.id if pais_emisor_registro else None
+    )
     obj_dict["pais_emisor_registro"] = pais_emisor_registro
-    obj_dict["localidad_emisor_registro_id"] = localidad_emisor_registro.id
+    obj_dict["localidad_emisor_registro_id"] = (
+        localidad_emisor_registro.id if localidad_emisor_registro else None
+    )
     obj_dict["localidad_emisor_registro"] = localidad_emisor_registro
     obj_dict["ciudad_emisor_registro"] = ciudad_emisor_registro
     # Obteniendo los datos del propietario

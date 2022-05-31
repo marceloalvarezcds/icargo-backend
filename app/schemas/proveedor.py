@@ -20,7 +20,7 @@ class ProveedorBaseModel(BaseModel):
     numero_documento: str
     digito_verificador: Optional[str] = None
     composicion_juridica_id: Optional[int] = None
-    telefono: str
+    telefono: Optional[str] = None
     email: Optional[str] = None
     pagina_web: Optional[str] = None
     info_complementaria: Optional[str] = None

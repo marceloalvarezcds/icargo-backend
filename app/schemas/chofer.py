@@ -22,7 +22,7 @@ class ChoferBaseModel(BaseModel):
     ruc: Optional[str] = None
     digito_verificador: Optional[str] = None
     fecha_nacimiento: Optional[Date] = None
-    oficial_cuenta_id: int
+    oficial_cuenta_id: Optional[int] = None
     foto_documento_frente: Optional[str] = None
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
@@ -34,14 +34,14 @@ class ChoferBaseModel(BaseModel):
     # inicio registro
     pais_emisor_registro_id: Optional[int] = None
     localidad_emisor_registro_id: Optional[int] = None
-    ciudad_emisor_registro_id: int
+    ciudad_emisor_registro_id: Optional[int] = None
     tipo_registro_id: Optional[int] = None
-    numero_registro: str
-    vencimiento_registro: Date
+    numero_registro: Optional[str] = None
+    vencimiento_registro: Optional[Date] = None
     foto_registro_frente: Optional[str] = None
     foto_registro_reverso: Optional[str] = None
     # fin registro
-    telefono: str
+    telefono: Optional[str] = None
     email: Optional[str] = None
     direccion: Optional[str] = None
     ciudad_id: Optional[str] = None

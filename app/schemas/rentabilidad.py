@@ -14,9 +14,9 @@ class Rentabilidad(BaseModel):
     flete_id: int
     nro_remisiones: str
     estado_anticipo: str
-    chofer_nombre: str
-    chofer_tipo_documento: str
-    chofer_numero_documento: str
+    chofer_nombre: Optional[str] = None
+    chofer_tipo_documento: Optional[str] = None
+    chofer_numero_documento: Optional[str] = None
     camion_placa: str
     semi_placa: str
     propietario_nombre: str
@@ -104,7 +104,9 @@ class Rentabilidad(BaseModel):
             nro_remisiones=item.remisiones,
             estado_anticipo="Liberados" if item.anticipos_liberados else "Bloqueados",
             chofer_nombre=item.camion_chofer_nombre,
-            chofer_tipo_documento=item.camion.chofer.tipo_documento.descripcion,
+            chofer_tipo_documento=item.camion.chofer.tipo_documento.descripcion
+            if item.camion.chofer
+            else None,
             chofer_numero_documento=item.camion_chofer_numero_documento,
             camion_placa=item.camion_placa,
             semi_placa=item.semi_placa,

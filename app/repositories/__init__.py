@@ -81,7 +81,11 @@ from .chofer_propietario import (  # noqa
     create_propietario_by_chofer,
     edit_propietario_by_chofer,
 )
-from .ciudad import get_ciudad_by_nombre_and_localidad_id, get_ciudad_list  # noqa
+from .ciudad import (  # noqa
+    get_ciudad_by_nombre_and_localidad_id,
+    get_ciudad_list,
+    get_ciudad_list_by_localidad_id,
+)
 from .color import get_color_by_descripcion, get_color_list  # noqa
 from .composicion_juridica import (  # noqa
     get_composicion_juridica_by_nombre,
