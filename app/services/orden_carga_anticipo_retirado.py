@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
 from app.models import OrdenCargaAnticipoRetirado
+from app.schemas.rounded_decimal_model import RoundedDecimal
 from app.utils import number_format
 
 from .movimiento import create_movimiento_by_anticipo
@@ -31,6 +32,10 @@ def create_orden_carga_anticipo_retirado(
         raise HTTPException(
             status_code=409,
             detail=f"El Anticipo con comporbante {data.numero_comprobante} ya existe",
+        )
+    if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
+        data.monto_retirado = RoundedDecimal(
+            data.cantidad_retirada * data.precio_unitario
         )
     update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
     anticipo = repositories.create_orden_carga_anticipo_retirado(
@@ -71,6 +76,10 @@ def edit_orden_carga_anticipo_retirado(
         raise HTTPException(
             status_code=409,
             detail=f"El Anticipo con comporbante {data.numero_comprobante} ya existe",
+        )
+    if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
+        data.monto_retirado = RoundedDecimal(
+            data.cantidad_retirada * data.precio_unitario
         )
     to_edit_obj = get_orden_carga_anticipo_retirado_by_id(db, id)
     update_orden_carga_anticipo_saldo_by_form(

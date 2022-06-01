@@ -185,7 +185,7 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
 
     @hybrid_property
     def tipo_comprobante_descripcion(self):
-        return self.tipo_comprobante.descripcion
+        return self.tipo_comprobante.descripcion if self.tipo_comprobante else None
 
     @hybrid_property
     def tipo_insumo_id(self):
