@@ -12,8 +12,8 @@ def get_orden_carga_anticipo_retirado_by(
     flete_anticipo_id: int,
     orden_carga_id: int,
     punto_venta_id: int,
-    tipo_comprobante_id: int,
-    numero_comprobante: str,
+    tipo_comprobante_id: Optional[int] = None,
+    numero_comprobante: Optional[str] = None,
 ) -> Optional[OrdenCargaAnticipoRetirado]:
     return (
         db.query(OrdenCargaAnticipoRetirado)

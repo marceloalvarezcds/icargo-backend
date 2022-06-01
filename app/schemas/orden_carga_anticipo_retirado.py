@@ -6,12 +6,12 @@ from .date_model import Date
 from .rounded_decimal_model import RoundedDecimal
 
 
-class OrdenCargaAnticipoRetiradoForm(BaseModel):
+class OrdenCargaAnticipoRetiradoBaseModel(BaseModel):
     flete_anticipo_id: int
     orden_carga_id: int
     punto_venta_id: int
-    tipo_comprobante_id: int
-    numero_comprobante: str
+    tipo_comprobante_id: Optional[int] = None
+    numero_comprobante: Optional[str] = None
     moneda_id: int
     monto_retirado: RoundedDecimal
     observacion: Optional[str] = None
@@ -26,7 +26,11 @@ class OrdenCargaAnticipoRetiradoForm(BaseModel):
     proveedor_id: int
 
 
-class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoForm):
+class OrdenCargaAnticipoRetiradoForm(OrdenCargaAnticipoRetiradoBaseModel):
+    es_con_litro: bool = False
+
+
+class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     id: int
     concepto: str
     gestor_carga_id: int
@@ -44,7 +48,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoForm):
     punto_venta_nombre: str
     punto_venta_pais_nombre: Optional[str] = None
     tipo_anticipo_descripcion: str
-    tipo_comprobante_descripcion: str
+    tipo_comprobante_descripcion: Optional[str] = None
     tipo_insumo_descripcion: Optional[str] = None
     unidad_abreviatura: Optional[str] = None
     unidad_descripcion: Optional[str] = None
