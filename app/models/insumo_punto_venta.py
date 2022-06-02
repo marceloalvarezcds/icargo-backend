@@ -41,12 +41,20 @@ class InsumoPuntoVenta(AuditMixin, Base):
     )
 
     @hybrid_property
+    def ciudad_nombre(self):
+        return self.punto_venta.ciudad_nombre
+
+    @hybrid_property
     def gestor_carga_nombre(self):
         return self.gestor_carga.nombre
 
     @hybrid_property
     def insumo_descripcion(self):
         return self.insumo.descripcion
+
+    @hybrid_property
+    def insumo_tipo_id(self):
+        return self.insumo.tipo_id
 
     @hybrid_property
     def insumo_tipo_descripcion(self):
@@ -61,8 +69,28 @@ class InsumoPuntoVenta(AuditMixin, Base):
         return self.insumo.unidad_descripcion
 
     @hybrid_property
+    def localidad_nombre(self):
+        return self.punto_venta.localidad_nombre
+
+    @hybrid_property
     def moneda_nombre(self):
         return self.moneda.nombre
+
+    @hybrid_property
+    def pais_nombre(self):
+        return self.punto_venta.pais_nombre
+
+    @hybrid_property
+    def pais_nombre_corto(self):
+        return self.punto_venta.pais_nombre_corto
+
+    @hybrid_property
+    def proveedor_id(self):
+        return self.punto_venta.proveedor_id
+
+    @hybrid_property
+    def proveedor_nombre(self):
+        return self.punto_venta.proveedor_nombre
 
     @hybrid_property
     def punto_venta_nombre(self):

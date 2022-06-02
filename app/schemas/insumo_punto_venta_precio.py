@@ -33,11 +33,21 @@ class InsumoPuntoVentaPrecio(BaseModel):
 class InsumoPuntoVentaPrecioList(InsumoPuntoVentaPrecio):
     insumo_punto_venta_id: int
     estado: EstadoEnum
+    ciudad_nombre: Optional[str] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
+    insumo_id: int
     insumo_descripcion: str
+    insumo_moneda_id: int
     insumo_moneda_nombre: str
+    insumo_tipo_id: int
     insumo_tipo_descripcion: str
     insumo_unidad_abreviatura: Optional[str] = None
     insumo_unidad_descripcion: Optional[str] = None
+    localidad_nombre: Optional[str] = None
+    pais_nombre: Optional[str] = None
+    pais_nombre_corto: Optional[str] = None
+    proveedor_id: int
+    proveedor_nombre: str
+    punto_venta_id: int
     punto_venta_nombre: str

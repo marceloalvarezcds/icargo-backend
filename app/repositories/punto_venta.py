@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import PuntoVenta
+from app.models import GestorCargaProveedor, Proveedor, PuntoVenta
 from app.schemas import PuntoVentaForm
 
 
@@ -15,6 +15,24 @@ def get_punto_venta_list(db: Session, proveedor_id: int) -> List[PuntoVenta]:
         .filter(
             and_(
                 PuntoVenta.proveedor_id == proveedor_id,
+                PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(PuntoVenta.nombre)
+        .all()
+    )
+
+
+def get_punto_venta_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: int
+) -> List[PuntoVenta]:
+    return (
+        db.query(PuntoVenta)
+        .join(Proveedor)
+        .join(GestorCargaProveedor)
+        .filter(
+            and_(
+                GestorCargaProveedor.gestor_carga_id == gestor_carga_id,
                 PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
             )
         )

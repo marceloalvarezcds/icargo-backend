@@ -39,6 +39,10 @@ class InsumoPuntoVentaPrecio(AuditMixin, Base):
     estado = Column(String(15), server_default=EstadoEnum.ACTIVO.value)
 
     @hybrid_property
+    def ciudad_nombre(self):
+        return self.insumo_punto_venta.ciudad_nombre
+
+    @hybrid_property
     def gestor_carga_id(self):
         return self.insumo_punto_venta.gestor_carga_id
 
@@ -55,8 +59,16 @@ class InsumoPuntoVentaPrecio(AuditMixin, Base):
         return self.insumo_punto_venta.insumo_descripcion
 
     @hybrid_property
+    def insumo_moneda_id(self):
+        return self.insumo_punto_venta.moneda_id
+
+    @hybrid_property
     def insumo_moneda_nombre(self):
         return self.insumo_punto_venta.moneda_nombre
+
+    @hybrid_property
+    def insumo_tipo_id(self):
+        return self.insumo_punto_venta.insumo_tipo_id
 
     @hybrid_property
     def insumo_tipo_descripcion(self):
@@ -69,6 +81,30 @@ class InsumoPuntoVentaPrecio(AuditMixin, Base):
     @hybrid_property
     def insumo_unidad_descripcion(self):
         return self.insumo_punto_venta.insumo_unidad_descripcion
+
+    @hybrid_property
+    def localidad_nombre(self):
+        return self.insumo_punto_venta.localidad_nombre
+
+    @hybrid_property
+    def pais_nombre(self):
+        return self.insumo_punto_venta.pais_nombre
+
+    @hybrid_property
+    def pais_nombre_corto(self):
+        return self.insumo_punto_venta.pais_nombre_corto
+
+    @hybrid_property
+    def proveedor_id(self):
+        return self.insumo_punto_venta.proveedor_id
+
+    @hybrid_property
+    def proveedor_nombre(self):
+        return self.insumo_punto_venta.proveedor_nombre
+
+    @hybrid_property
+    def punto_venta_id(self):
+        return self.insumo_punto_venta.punto_venta_id
 
     @hybrid_property
     def punto_venta_nombre(self):
