@@ -416,6 +416,7 @@ from .semi_clasificacion import (  # noqa
 )
 from .tipo_anticipo import (  # noqa
     get_tipo_anticipo_by_descripcion,
+    get_tipo_anticipo_by_id,
     get_tipo_anticipo_list,
 )
 from .tipo_camion import get_tipo_camion_by_descripcion, get_tipo_camion_list  # noqa
@@ -451,7 +452,11 @@ from .tipo_instrumento import (  # noqa
     get_tipo_instrumento_list,
     get_tipo_instrumento_list_by_via_id,
 )
-from .tipo_insumo import get_tipo_insumo_by_descripcion, get_tipo_insumo_list  # noqa
+from .tipo_insumo import (  # noqa
+    get_tipo_insumo_by_descripcion,
+    get_tipo_insumo_by_id,
+    get_tipo_insumo_list,
+)
 from .tipo_iva import get_tipo_iva_by_descripcion, get_tipo_iva_list  # noqa
 from .tipo_movimiento import (  # noqa
     get_tipo_movimiento_by_descripcion,
