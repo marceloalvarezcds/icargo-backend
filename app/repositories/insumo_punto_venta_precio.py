@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
-from sqlalchemy.orm import Session  # type: ignore
+from sqlalchemy.orm import Query, Session  # type: ignore
+from sqlalchemy.sql import func  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from sqlalchemy.sql.expression import null  # type: ignore
 
@@ -33,6 +34,57 @@ def get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id(
             InsumoPuntoVentaPrecio.fecha_fin.desc(),
         )
         .first()
+    )
+
+
+def get_insumo_punto_venta_precio_max_fecha_query(
+    db: Session, gestor_carga_id: int
+) -> Query:
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return (
+        db.query(
+            InsumoPuntoVenta.punto_venta_id,
+            InsumoPuntoVenta.insumo_id,
+            func.max(InsumoPuntoVentaPrecio.fecha_inicio).label("max_fecha_inicio"),
+        )
+        .select_from(InsumoPuntoVentaPrecio)
+        .join(InsumoPuntoVentaPrecio.insumo_punto_venta)
+        .filter(
+            and_(
+                InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
+                InsumoPuntoVenta.estado != EstadoEnum.ELIMINADO.value,
+                InsumoPuntoVentaPrecio.estado != EstadoEnum.ELIMINADO.value,
+                or_(
+                    InsumoPuntoVentaPrecio.fecha_fin >= now,
+                    InsumoPuntoVentaPrecio.fecha_fin == null(),
+                ),
+            )
+        )
+        .group_by(InsumoPuntoVenta.punto_venta_id, InsumoPuntoVenta.insumo_id)
+    ).subquery()
+
+
+def get_insumo_punto_venta_precio_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: int
+) -> List[InsumoPuntoVentaPrecio]:
+    sub_query = get_insumo_punto_venta_precio_max_fecha_query(db, gestor_carga_id)
+    return (
+        db.query(InsumoPuntoVentaPrecio)
+        .join(InsumoPuntoVentaPrecio.insumo_punto_venta)
+        .join(
+            sub_query,
+            and_(
+                sub_query.c.punto_venta_id == InsumoPuntoVenta.punto_venta_id,
+                sub_query.c.insumo_id == InsumoPuntoVenta.insumo_id,
+                sub_query.c.max_fecha_inicio == InsumoPuntoVentaPrecio.fecha_inicio,
+            ),
+        )
+        .order_by(
+            InsumoPuntoVentaPrecio.fecha_inicio,
+            InsumoPuntoVentaPrecio.fecha_fin,
+            InsumoPuntoVentaPrecio.modified_by,
+        )
+        .all()
     )
 
 

@@ -226,6 +226,7 @@ from .insumo_punto_venta import (  # noqa
 )
 from .insumo_punto_venta_precio import (  # noqa
     create_insumo_punto_venta_precio_by_insumo_punto_venta,
+    get_insumo_punto_venta_precio_list_by_gestor_carga_id,
     get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id,
 )
 from .liquidacion import (  # noqa
@@ -372,6 +373,7 @@ from .punto_venta import (  # noqa
     get_punto_venta_by,
     get_punto_venta_by_id,
     get_punto_venta_list,
+    get_punto_venta_list_by_gestor_carga_id,
 )
 from .punto_venta_contacto_gestor_carga import (  # noqa
     create_punto_venta_contacto_gestor_carga,

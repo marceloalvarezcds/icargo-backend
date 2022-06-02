@@ -14,6 +14,7 @@ def orden_carga_admin_permiso_seeds(db: Session, user: User):
     permisos.append(permiso_seeds(db, a.VER, m.INSUMO))
     permisos.append(permiso_seeds(db, a.VER, m.INSUMO_PUNTO_VENTA))
     permisos.append(permiso_seeds(db, a.VER, m.INSUMO_PUNTO_VENTA_PRECIO))
+    permisos.append(permiso_seeds(db, a.LISTAR, m.INSUMO_PUNTO_VENTA_PRECIO))
 
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA))
@@ -87,6 +88,7 @@ def permiso_generico_seeds(db: Session, user: User):
     permisos.append(permiso_seeds(db, a.VER, m.CAMION_SEMI_NETO))
     permisos.append(permiso_seeds(db, a.VER, m.CONTACTO))
     permisos.append(permiso_seeds(db, a.VER, m.INSUMO_PUNTO_VENTA_PRECIO))
+    permisos.append(permiso_seeds(db, a.LISTAR, m.INSUMO_PUNTO_VENTA_PRECIO))
     user.permisos.extend(permisos)
     db.commit()
 
