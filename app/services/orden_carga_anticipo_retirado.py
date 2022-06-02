@@ -1,5 +1,6 @@
 import os
 from decimal import Decimal
+from typing import cast
 
 from fastapi import HTTPException
 from jinja2 import Template
@@ -8,12 +9,42 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
-from app.models import OrdenCargaAnticipoRetirado
+from app.enums import TipoAnticipoEnum, TipoInsumoEnum
+from app.models import OrdenCargaAnticipoRetirado, TipoAnticipo, TipoInsumo
 from app.schemas.rounded_decimal_model import RoundedDecimal
 from app.utils import number_format
 
 from .movimiento import create_movimiento_by_anticipo
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
+
+
+def get_tipo_anticipo_by_id(db: Session, id: int) -> TipoAnticipo:
+    obj = repositories.get_tipo_anticipo_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Tipo de Anticipo no encontrado")
+    return obj
+
+
+def get_tipo_insumo_by_id(db: Session, id: int) -> TipoInsumo:
+    obj = repositories.get_tipo_insumo_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Tipo de Insumo no encontrado")
+    return obj
+
+
+def get_error_message(db: Session, data: schemas.OrdenCargaAnticipoRetiradoForm) -> str:
+    if data.numero_comprobante:
+        return f"El Anticipo con comporbante {data.numero_comprobante} ya existe"
+    else:
+        tipo_anticipo = get_tipo_anticipo_by_id(db, data.tipo_anticipo_id)
+        if tipo_anticipo.descripcion == TipoAnticipoEnum.EFECTIVO.value:
+            return "Ya existe anticipo de Efectivo para esta OC"
+        else:
+            tipo_insumo = get_tipo_insumo_by_id(db, cast(int, data.tipo_insumo_id))
+            if tipo_insumo.descripcion == TipoInsumoEnum.COMBUSTIBLE.value:
+                return "Ya existe anticipo de Combustible para esta OC en este Punto de Venta"
+            else:
+                return "Ya existe anticipo de Lubricante para esta OC en este Punto de Venta"
 
 
 def create_orden_carga_anticipo_retirado(
@@ -31,7 +62,7 @@ def create_orden_carga_anticipo_retirado(
     ):
         raise HTTPException(
             status_code=409,
-            detail=f"El Anticipo con comporbante {data.numero_comprobante} ya existe",
+            detail=get_error_message(db, data),
         )
     if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
         data.monto_retirado = RoundedDecimal(
@@ -75,7 +106,7 @@ def edit_orden_carga_anticipo_retirado(
     if exists and exists.id != id:
         raise HTTPException(
             status_code=409,
-            detail=f"El Anticipo con comporbante {data.numero_comprobante} ya existe",
+            detail=get_error_message(db, data),
         )
     if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
         data.monto_retirado = RoundedDecimal(

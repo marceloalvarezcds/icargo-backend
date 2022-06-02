@@ -13,5 +13,9 @@ def get_tipo_anticipo_by_descripcion(
     )
 
 
+def get_tipo_anticipo_by_id(db: Session, id: int) -> Optional[TipoAnticipo]:
+    return db.query(TipoAnticipo).get(id)
+
+
 def get_tipo_anticipo_list(db: Session) -> List[TipoAnticipo]:
     return db.query(TipoAnticipo).order_by(TipoAnticipo.descripcion).all()
