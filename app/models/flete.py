@@ -167,6 +167,10 @@ class Flete(AuditMixin, Base):
         return self.merma_gestor_cuenta_moneda.nombre
 
     @hybrid_property
+    def merma_gestor_cuenta_es_porcentual_descripcion(self):
+        return "Si" if self.merma_gestor_cuenta_es_porcentual else "No"
+
+    @hybrid_property
     def merma_gestor_cuenta_tolerancia_kg(self):
         return (
             self.merma_gestor_cuenta_tolerancia
@@ -178,6 +182,10 @@ class Flete(AuditMixin, Base):
     @hybrid_property
     def merma_gestor_cuenta_unidad_descripcion(self):
         return self.merma_gestor_cuenta_unidad.descripcion
+
+    @hybrid_property
+    def merma_propietario_es_porcentual_descripcion(self):
+        return "Si" if self.merma_propietario_es_porcentual else "No"
 
     @hybrid_property
     def merma_propietario_moneda_nombre(self):

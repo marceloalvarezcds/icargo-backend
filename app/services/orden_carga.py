@@ -175,7 +175,7 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
         "destino_direccion": obj.destino.direccion if obj.destino.direccion else "-",
         "producto": obj.flete_producto_descripcion,
         "tarifa_flete": number_format(obj.flete_tarifa),
-        "tasa": f"{obj.flete_tarifa_unidad}",  # noqa
+        "tasa": obj.flete_tarifa_unidad,  # noqa
         "docs_origen": obj.remisiones,
         "cantidad_origen": number_format(obj.cantidad_origen),
         "docs_destino": obj.nro_tickets,

@@ -103,10 +103,12 @@ class Flete(FleteFormBaseModel):
     # inicio - Mermas para el Gestor de Cuenta
     merma_gestor_cuenta_moneda: Moneda
     merma_gestor_cuenta_unidad: Unidad
+    merma_gestor_cuenta_es_porcentual_descripcion: str
     # fin - Mermas para el Gestor de Cuenta
     # inicio - Mermas para el Propietario
     merma_propietario_moneda: Moneda
     merma_propietario_unidad: Unidad
+    merma_propietario_es_porcentual_descripcion: str
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
     # INICIO Emisión de Órdenes
@@ -157,10 +159,12 @@ class FleteList(FleteFormBaseModel):
     # inicio - Mermas para el Gestor de Cuenta
     merma_gestor_cuenta_moneda_nombre: str
     merma_gestor_cuenta_unidad_descripcion: str
+    merma_gestor_cuenta_es_porcentual_descripcion: str
     # fin - Mermas para el Gestor de Cuenta
     # inicio - Mermas para el Propietario
     merma_propietario_moneda_nombre: str
     merma_propietario_unidad_descripcion: str
+    merma_propietario_es_porcentual_descripcion: str
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
     tipo_flete: Optional[TipoFleteEnum] = None
