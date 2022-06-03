@@ -167,7 +167,7 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
         "insumo_descripcion": obj.insumo_descripcion
         if obj.insumo_descripcion
         else "Viático",
-        "insumo_precio": obj.insumo_precio if obj.insumo_precio else 1,
+        "insumo_precio": number_format(obj.insumo_precio) if obj.insumo_precio else 1,
         "insumo_unidad": obj.insumo_unidad_abreviatura
         if obj.insumo_unidad_abreviatura
         else "",
