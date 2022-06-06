@@ -2,10 +2,10 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
-from sqlalchemy.sql.elements import and_  # type: ignore
+from sqlalchemy.sql.elements import and_, not_  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import Chofer
+from app.models import Chofer, Camion
 from app.schemas import ChoferEditForm, ChoferForm
 
 
@@ -27,6 +27,33 @@ def get_chofer_list_by_gestor_cuenta_id(
             and_(
                 Chofer.gestor_cuenta_id == gestor_cuenta_id,
                 Chofer.estado == EstadoEnum.ACTIVO.value,
+            )
+        )
+        .order_by(Chofer.nombre)
+        .all()
+    )
+
+
+def get_chofer_list_without_camion(db: Session, gestor_cuenta_id: int) -> List[Chofer]:
+    sub_query = (
+        db.query(Camion.chofer_id)
+        .distinct(Camion.chofer_id)
+        .join(Camion.chofer)
+        .filter(
+            and_(
+                Chofer.gestor_cuenta_id == gestor_cuenta_id,
+                Chofer.estado == EstadoEnum.ACTIVO.value,
+            )
+        )
+        .subquery()
+    )
+    return (
+        db.query(Chofer)
+        .filter(
+            and_(
+                Chofer.gestor_cuenta_id == gestor_cuenta_id,
+                Chofer.estado == EstadoEnum.ACTIVO.value,
+                not_(Chofer.id.in_(sub_query)),
             )
         )
         .order_by(Chofer.nombre)
