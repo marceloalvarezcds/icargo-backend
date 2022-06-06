@@ -47,7 +47,15 @@ class CamionSemiNeto(AuditMixin, Base):
 
     @hybrid_property
     def producto_descripcion(self):
-        return self.producto.descripcion
+        return self.producto.descripcion if self.producto else None
+
+    @hybrid_property
+    def producto_info(self):
+        return (
+            f"Nº {self.producto.id}: ({self.producto.descripcion})"
+            if self.producto
+            else None
+        )
 
     @hybrid_property
     def semi_info(self):

@@ -76,6 +76,7 @@ from .chofer import (  # noqa
     get_chofer_by_id,
     get_chofer_list,
     get_chofer_list_by_gestor_cuenta_id,
+    get_chofer_list_without_camion,
 )
 from .chofer_propietario import (  # noqa
     create_propietario_by_chofer,

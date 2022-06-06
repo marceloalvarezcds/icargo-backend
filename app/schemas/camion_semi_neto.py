@@ -22,6 +22,7 @@ class CamionSemiNeto(CamionSemiNetoForm):
     semi_info: str
     semi_placa: str
     producto_descripcion: Optional[str] = None
+    producto_info: Optional[str] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
     estado: EstadoEnum
