@@ -27,6 +27,7 @@ def entities_admin_permiso_seeds(db: Session, user: User):
 
 def entities_permiso_seeds(db: Session, user: User):
     permiso_generico_seeds(db, user)
+    permiso_cargo_seeds(db, user)
     permiso_centro_operativo_seeds(db, user)
     permiso_gestor_carga_seeds(db, user)
     permiso_proveedor_seeds(db, user)
@@ -36,7 +37,6 @@ def entities_permiso_seeds(db: Session, user: User):
 
 def permiso_generico_seeds(db: Session, user: User):
     permisos = []
-    permisos.append(permiso_seeds(db, a.LISTAR, m.CARGO))
     permisos.append(
         permiso_seeds(
             db,
@@ -65,6 +65,17 @@ def permiso_generico_seeds(db: Session, user: User):
         permiso_seeds(db, a.LISTAR, m.TIPO_DOCUMENTO, True, "Listar Tipo de Documento")
     )
     permisos.append(permiso_seeds(db, a.VER, m.USER))
+    user.permisos.extend(permisos)
+    db.commit()
+
+
+def permiso_cargo_seeds(db: Session, user: User):
+    permisos = []
+    permisos.append(permiso_seeds(db, a.LISTAR, m.CARGO))
+    permisos.append(permiso_seeds(db, a.VER, m.CARGO))
+    permisos.append(permiso_seeds(db, a.CREAR, m.CARGO))
+    permisos.append(permiso_seeds(db, a.EDITAR, m.CARGO))
+    permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.CARGO))
     user.permisos.extend(permisos)
     db.commit()
 

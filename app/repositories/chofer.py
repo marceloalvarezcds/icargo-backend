@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_, not_  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import Chofer, Camion
+from app.models import Camion, Chofer
 from app.schemas import ChoferEditForm, ChoferForm
 
 
