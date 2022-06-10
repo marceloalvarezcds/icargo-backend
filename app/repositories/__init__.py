@@ -45,7 +45,7 @@ from .camion_semi_neto import (  # noqa
     get_camion_semi_neto_list_by_producto_id,
     get_camion_semi_neto_list_by_producto_id_null,
 )
-from .cargo import get_cargo_by_descripcion, get_cargo_list  # noqa
+from .cargo import get_cargo_by_descripcion  # noqa
 from .centro_operativo import (  # noqa
     create_centro_operativo,
     delete_centro_operativo,
