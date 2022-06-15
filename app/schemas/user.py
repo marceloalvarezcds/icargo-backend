@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr
 
 from app.enums.estado import EstadoEnum
 
+from .date_model import Date
 from .permiso import Permiso
 
 
@@ -48,6 +49,11 @@ class UserInDBBase(UserBase):
     last_seen: Optional[datetime] = None
     created_ip_address: Optional[str] = None
     estado: EstadoEnum
+    # Auditoría
+    created_by: str
+    created_at: Date
+    modified_by: str
+    modified_at: Date
 
     class Config:
         orm_mode = True
