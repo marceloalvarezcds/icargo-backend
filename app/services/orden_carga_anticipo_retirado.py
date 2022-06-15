@@ -16,6 +16,7 @@ from app.utils import number_format
 
 from .movimiento import create_movimiento_by_anticipo
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
+from .user import get_user_by_username
 
 
 def get_tipo_anticipo_by_id(db: Session, id: int) -> TipoAnticipo:
@@ -140,7 +141,7 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
     gestor_carga = repositories.get_gestor_carga_by_id(db, orden_carga.gestor_carga_id)
     if not gestor_carga:
         raise HTTPException(status_code=404, detail="Anticipo no encontrado")
-    usuario = repositories.get_by_username(db, obj.created_by)
+    usuario = get_user_by_username(db, obj.created_by)
     usuario_nombre = (
         f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
     )

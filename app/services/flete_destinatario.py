@@ -12,16 +12,16 @@ from app.models import (
     RemitenteContactoGestorCarga,
     User,
 )
-from app.repositories import get as get_user_by_id
 from app.repositories import (
     get_centro_operativo_by_id,
     get_centro_operativo_contacto_gestor_carga_by_id,
     get_remitente_by_id,
     get_remitente_contacto_gestor_carga_by_id,
-    get_user_list_by_gestor_carga_id,
     update_flete_destinatarios,
 )
 from app.schemas import FleteDestinatario
+
+from .user import get_user_active_list_by_gestor_carga_id, get_user_by_id
 
 
 def get_destinatario_list_by(
@@ -33,7 +33,7 @@ def get_destinatario_list_by(
 ) -> List[FleteDestinatario]:
     lista: List[FleteDestinatario] = []
     if gestor_carga_id:
-        users = get_user_list_by_gestor_carga_id(db, gestor_carga_id)
+        users = get_user_active_list_by_gestor_carga_id(db, gestor_carga_id)
         for item in users:
             lista.append(
                 FleteDestinatario(

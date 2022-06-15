@@ -14,8 +14,8 @@ from app.models import User
 from app.repositories import (
     get_gestor_carga_by,
     get_tipo_documento_by_descripcion,
+    get_user_by_username,
     rol,
-    user,
 )
 from app.utils.security import get_password_hash
 
@@ -25,7 +25,7 @@ from .permiso_seeds import admin_icargo_permiso_seeds
 def user_seeds(db: Session):
     admin_icargo_rol = rol.get_rol_by_codigo(db, CodigoRolEnum.ADMIN_ICARGO.value)
     admin_username = "admin-icargo"
-    admin_user = user.get_by_username(db, admin_username)
+    admin_user = get_user_by_username(db, admin_username)
     if admin_user is None:
         admin_user = User(
             token="",
@@ -43,7 +43,7 @@ def user_seeds(db: Session):
         )
         db.add(admin_user)
         db.commit()
-        admin_icargo_permiso_seeds(db, admin_user)
+    admin_icargo_permiso_seeds(db, admin_user)
 
     tipo_documento = get_tipo_documento_by_descripcion(db, "RUC")
     if tipo_documento:
@@ -56,7 +56,7 @@ def user_seeds(db: Session):
                 db, CodigoRolEnum.ADMIN_GESTOR_CARGA.value
             )
             admin_gestor_username = "admin-transred"
-            admin_gestor_user = user.get_by_username(db, admin_gestor_username)
+            admin_gestor_user = get_user_by_username(db, admin_gestor_username)
             if admin_gestor_user is None:
                 first_name = "Admin"
                 last_name = "Transred"
@@ -89,7 +89,7 @@ def user_seeds(db: Session):
             db, CodigoRolEnum.ADMIN_ICARGO.value
         )
         admin_suplente_username = "admin-suplente"
-        admin_suplente_user = user.get_by_username(db, admin_suplente_username)
+        admin_suplente_user = get_user_by_username(db, admin_suplente_username)
         if admin_suplente_user is None:
             admin_suplente_user = User(
                 token=admin_suplente_username,
@@ -107,4 +107,4 @@ def user_seeds(db: Session):
             )
             db.add(admin_suplente_user)
             db.commit()
-            admin_icargo_permiso_seeds(db, admin_suplente_user)
+        admin_icargo_permiso_seeds(db, admin_suplente_user)

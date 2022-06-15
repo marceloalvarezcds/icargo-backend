@@ -15,6 +15,7 @@ from sqlalchemy.sql.schema import Table  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
+from app.enums.estado import EstadoEnum
 
 from .gestor_carga import GestorCarga
 from .permiso import Permiso
@@ -63,6 +64,7 @@ class User(AuditMixin, Base):
     last_ip_address = Column(String(255))
     gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
     gestor_carga = relationship(GestorCarga, uselist=False)
+    estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     roles = relationship(Rol, secondary=user_rol_table)
     permisos = relationship(Permiso, secondary=user_permiso_table)
 

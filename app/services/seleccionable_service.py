@@ -5,78 +5,91 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums.estado import EstadoEnum
 from app.repositories import seleccionable_repository as repository
-from app.repositories.seleccionable_repository import T
-from app.schemas.seleccionable_base_model import SeleccionableFormBaseModel
+from app.repositories.seleccionable_repository import Model, Schema
 
 
-def get_by_descripcion(Model: type, db: Session, descripcion: str) -> Optional[T]:
-    return repository.get_by_descripcion(Model, db, descripcion)
+def get_by_descripcion(
+    ModelType: type, db: Session, descripcion: str
+) -> Optional[Model]:
+    return repository.get_by_descripcion(ModelType, db, descripcion)
 
 
-def get_by_id(Model: type, db: Session, id: int) -> T:
-    obj: Optional[T] = repository.get_by_id(Model, db, id)
+def get_by_id(ModelType: type, db: Session, id: int) -> Model:
+    obj: Optional[Model] = repository.get_by_id(ModelType, db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Objeto no encontrado")
     return obj
 
 
-def get_list(Model: type, db: Session) -> List[T]:
-    return repository.get_list(Model, db)
+def get_list(ModelType: type, db: Session) -> List[Model]:
+    return repository.get_list(ModelType, db)
 
 
-def get_active_list(Model: type, db: Session) -> List[T]:
-    return repository.get_active_list(Model, db)
+def get_active_list(ModelType: type, db: Session) -> List[Model]:
+    return repository.get_active_list(ModelType, db)
 
 
 def create(
-    Model: type,
+    ModelType: type,
     db: Session,
-    data: SeleccionableFormBaseModel,
+    data: Schema,
     modified_by: str,
     message_error: str,
-) -> T:
-    if repository.get_by_descripcion(Model, db, data.descripcion):
-        raise HTTPException(
-            status_code=409,
-            detail=f"{message_error} con descripción {data.descripcion} ya existe",
-        )
-    return repository.create(Model, db, data, modified_by)
+) -> Model:
+    check_unique(ModelType, db, None, data.descripcion, message_error)
+    return repository.create(ModelType, db, data, modified_by)
 
 
 def edit(
-    Model: type,
+    ModelType: type,
     db: Session,
     id: int,
-    data: SeleccionableFormBaseModel,
+    data: Schema,
     modified_by: str,
     message_error: str,
-) -> T:
-    exists: Optional[T] = repository.get_by_descripcion(Model, db, data.descripcion)
-    if exists and exists.id != id:
-        raise HTTPException(
-            status_code=409,
-            detail=f"{message_error} con descripción {data.descripcion} ya existe",
-        )
-    obj: T = get_by_id(Model, db, id)
+) -> Model:
+    check_unique(ModelType, db, id, data.descripcion, message_error)
+    obj: Model = get_by_id(ModelType, db, id)
     return repository.edit(obj, db, data, modified_by)
 
 
 def change_status(
-    Model: type,
+    ModelType: type,
     db: Session,
     id: int,
     status: EstadoEnum,
     modified_by: str,
-) -> T:
-    obj: T = get_by_id(Model, db, id)
+) -> Model:
+    obj: Model = get_by_id(ModelType, db, id)
     return repository.change_status(obj, db, status, modified_by)
 
 
 def delete(
-    Model: type,
+    ModelType: type,
     db: Session,
     id: int,
     modified_by: str,
-) -> T:
-    obj: T = get_by_id(Model, db, id)
+) -> Model:
+    obj: Model = get_by_id(ModelType, db, id)
     return repository.delete(obj, db, modified_by)
+
+
+def check_unique(
+    ModelType: type,
+    db: Session,
+    id: Optional[int],
+    descripcion: str,
+    message_error: str,
+):
+    exists: Optional[Model] = get_by_descripcion(ModelType, db, descripcion)  # type: ignore
+    if id:
+        if exists and exists.id != id:  # type: ignore
+            raise HTTPException(
+                status_code=409,
+                detail=f"{message_error} con descripción {descripcion} ya existe",
+            )
+    elif exists:
+        raise HTTPException(
+            status_code=409,
+            detail=f"{message_error} con descripción {descripcion} ya existe",
+        )

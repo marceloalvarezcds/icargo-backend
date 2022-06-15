@@ -20,8 +20,8 @@ from app.repositories import (
     get_pais_by_nombre_corto,
     get_tipo_documento_by_descripcion,
     get_tipo_registro_by_descripcion,
-    get_user_list_by_gestor_carga_id,
 )
+from app.services import get_user_list_by_gestor_carga_id
 
 from .gestor_carga_chofer_seeds import gestor_carga_chofer_seeds
 

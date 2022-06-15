@@ -9,10 +9,12 @@ from app.database.seeds.permiso_seeds import (
     listado_permiso_seeds,
     orden_carga_gestor_permiso_seeds,
     orden_carga_permiso_seeds,
+    user_permiso_seeds,
 )
 from app.enums import CodigoRolEnum
 from app.models import GestorCarga, User
-from app.repositories import rol, user
+from app.repositories import rol
+from app.services import get_user_by_username
 from app.utils.security import get_password_hash
 
 
@@ -24,7 +26,7 @@ def user_seeds(
     gestor_carga: GestorCarga,
 ):
     admin_gestor_rol = rol.get_rol_by_codigo(db, CodigoRolEnum.ADMIN_GESTOR_CARGA.value)
-    usuario = user.get_by_username(db, username)
+    usuario = get_user_by_username(db, username)
     email = f"{first_name.replace(' ', '-').lower()}@{last_name.replace(' ', '-').lower()}.com"
     if usuario is None:
         usuario = User(
@@ -55,3 +57,4 @@ def user_seeds(
     else:
         estado_cuenta_gestor_permiso_seeds(db, usuario)
         listado_permiso_seeds(db, usuario)
+        user_permiso_seeds(db, usuario)

@@ -5,16 +5,13 @@ from typing import Optional
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.models import User
-from app.repositories import (
-    get_flete_list_by_gestor_carga_id,
-    get_orden_carga_by_id,
-    get_user_list_by_gestor_carga_id,
-)
+from app.repositories import get_flete_list_by_gestor_carga_id, get_orden_carga_by_id
 from app.schemas import OrdenCargaForm
 from app.services import (
     create_orden_carga,
     get_camion_list_by_producto_id,
     get_semi_list_by_camion_id_and_producto_id,
+    get_user_list_by_gestor_carga_id,
 )
 
 
