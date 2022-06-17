@@ -28,6 +28,7 @@ class Banco(BancoForm):
     moneda_simbolo: str
     saldo_confirmado: Optional[RoundedDecimal]
     saldo_provisional: Optional[RoundedDecimal]
+    info: str
     # Auditoría
     created_by: str
     created_at: Date

@@ -118,6 +118,7 @@ class Flete(FleteFormBaseModel):
     complementos: List[FleteComplemento]
     descuentos: List[FleteDescuento]
     tipo_flete: Optional[TipoFleteEnum] = None
+    info: str
     created_by: str
     created_at: Date
     modified_by: str
@@ -168,6 +169,7 @@ class FleteList(FleteFormBaseModel):
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
     tipo_flete: Optional[TipoFleteEnum] = None
+    info: str
     created_by: str
     created_at: Date
     modified_by: str

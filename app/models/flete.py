@@ -243,3 +243,7 @@ class Flete(AuditMixin, Base):
             return TipoFleteEnum.IMPORTACION
         else:
             return TipoFleteEnum.DESCONOCIDO
+
+    @hybrid_property
+    def info(self):
+        return f"Nº de Pedido {self.id}"

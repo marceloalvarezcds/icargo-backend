@@ -44,3 +44,7 @@ class Banco(AuditMixin, Base):
     @hybrid_property
     def moneda_simbolo(self):
         return self.moneda.simbolo
+
+    @hybrid_property
+    def info(self):
+        return f"{self.nombre}: ({self.titular} - {self.numero_cuenta})"
