@@ -120,6 +120,8 @@ def set_extra_data_in_create(obj_in: UserCreate, request: Request) -> UserCreate
     # Settea valores extras
     obj_in.token = get_md5_hash_hexdigest(string_to_hash)
     obj_in.password = get_password_hash(obj_in.password) if obj_in.password else None
+    obj_in.surname = obj_in.username
     obj_in.created_ip_address = ip
     obj_in.last_ip_address = ip
+    del obj_in.confirm_password
     return obj_in

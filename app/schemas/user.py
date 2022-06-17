@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, root_validator
 
 from app.enums.estado import EstadoEnum
 
@@ -24,17 +24,28 @@ class UserBase(BaseModel):
     last_ip_address: Optional[str] = None
 
 
-# Properties to receive via API on creation
-class UserCreate(UserBase):
-    username: str
-    email: EmailStr
-    password: Optional[str] = None
-    created_ip_address: Optional[str] = None
-
-
 # Properties to receive via API on update
 class UserUpdate(UserBase):
     password: Optional[str] = None
+    confirm_password: Optional[str] = None
+
+    @root_validator()
+    def verify_password_match(cls, values):
+        password = values.get("password")
+        confirm_password = values.get("confirm_password")
+
+        if password and password != confirm_password:
+            raise ValueError("Las contraseñas no coinciden")
+        return values
+
+
+# Properties to receive via API on creation
+class UserCreate(UserUpdate):
+    username: str
+    email: EmailStr
+    password: str
+    confirm_password: str
+    created_ip_address: Optional[str] = None
 
 
 class UserInDBBase(UserBase):
