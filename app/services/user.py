@@ -78,9 +78,14 @@ def edit_user(
     modified_by: str,
     request: Request,
 ) -> User:
-    data.last_ip_address = request.client.host
     return service.edit(
-        User, db, id, data, modified_by, unique_message_error, username=data.username
+        User,
+        db,
+        id,
+        set_extra_data_in_edit(data, request),
+        modified_by,
+        unique_message_error,
+        username=data.username,
     )
 
 
@@ -124,4 +129,15 @@ def set_extra_data_in_create(obj_in: UserCreate, request: Request) -> UserCreate
     obj_in.created_ip_address = ip
     obj_in.last_ip_address = ip
     del obj_in.confirm_password
+    return obj_in
+
+
+def set_extra_data_in_edit(obj_in: UserUpdate, request: Request) -> UserUpdate:
+    ip = request.client.host
+    # Settea valores extras
+    if obj_in.password:
+        obj_in.password = get_password_hash(obj_in.password)
+        del obj_in.confirm_password
+    obj_in.surname = obj_in.username
+    obj_in.last_ip_address = ip
     return obj_in
