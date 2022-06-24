@@ -48,6 +48,7 @@ from app.endpoints import (
     punto_venta,
     remitente,
     rentabilidad,
+    rol,
     semi,
     semi_clasificacion,
     tipo_anticipo,
@@ -171,6 +172,7 @@ api.include_router(proveedor.api, prefix="/proveedor", tags=["proveedor"])
 api.include_router(punto_venta.api, prefix="/punto_venta", tags=["punto_venta"])
 api.include_router(remitente.api, prefix="/remitente", tags=["remitente"])
 api.include_router(rentabilidad.api, prefix="/rentabilidad", tags=["rentabilidad"])
+api.include_router(rol.api, prefix="/rol", tags=["rol"])
 api.include_router(
     semi_clasificacion.api, prefix="/semi_clasificacion", tags=["semi_clasificacion"]
 )

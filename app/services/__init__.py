@@ -259,6 +259,15 @@ from .remitente import (  # noqa
 )
 from .remitente_contacto import update_remitente_contacto_list  # noqa
 from .rentabilidad import get_rentabilidad_list, get_rentabilidad_reports  # noqa
+from .rol import (  # noqa
+    change_rol_status,
+    create_rol,
+    delete_rol,
+    edit_rol,
+    get_rol_active_list,
+    get_rol_by_id,
+    get_rol_list,
+)
 from .security import create_access_token  # noqa
 from .semi import (  # noqa
     change_semi_status,

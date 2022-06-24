@@ -9,6 +9,7 @@ from app.database.seeds.permiso_seeds import (
     listado_permiso_seeds,
     orden_carga_gestor_permiso_seeds,
     orden_carga_permiso_seeds,
+    rol_permiso_seeds,
     user_permiso_seeds,
 )
 from app.enums import CodigoRolEnum
@@ -57,4 +58,5 @@ def user_seeds(
     else:
         estado_cuenta_gestor_permiso_seeds(db, usuario)
         listado_permiso_seeds(db, usuario)
+        rol_permiso_seeds(db, usuario)
         user_permiso_seeds(db, usuario)

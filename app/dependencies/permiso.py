@@ -14,17 +14,14 @@ class Permiso:
 
     accion: PermisoAccionEnum
     modelo: PermisoModeloEnum
-    autorizado: bool
 
     def __init__(
         self,
         accion: PermisoAccionEnum,
         modelo: PermisoModeloEnum,
-        autorizado: bool = True,
     ):
         self.modelo = modelo
         self.accion = accion
-        self.autorizado = autorizado
 
     def __call__(
         self, current_user: models.User = Depends(get_current_user)  # noqa: B008
@@ -34,7 +31,6 @@ class Permiso:
             if (
                 permiso.modelo == self.modelo.value
                 and permiso.accion == self.accion.value
-                and permiso.autorizado == self.autorizado
             ):
                 return True
         raise HTTPException(

@@ -6,6 +6,7 @@ from sqlalchemy.sql.elements import and_  # type: ignore
 from app.audits.audit_database import AuditDatabase as A
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+from app.enums import PermisoModuloEnum as u
 from app.enums.estado import EstadoEnum
 from app.models import OrdenCarga, OrdenCargaEstadoHistorial, User
 from app.repositories.audit_database import (
@@ -20,7 +21,7 @@ def get_audit_list_by_orden_carga(
 ) -> List[A]:
     FINALIZADO = EstadoEnum.FINALIZADO.value
     if (orden_carga.estado == FINALIZADO) and check_permiso(
-        current_user, m.ORDEN_CARGA, a.CONCILIAR
+        current_user, m.ORDEN_CARGA, a.CONCILIAR, u.OC
     ):
         estados: List[OrdenCargaEstadoHistorial] = orden_carga.historial
         finalizado = next((x for x in estados if x.estado == FINALIZADO), None)

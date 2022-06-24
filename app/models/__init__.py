@@ -66,7 +66,7 @@ from .punto_venta import PuntoVenta  # noqa
 from .punto_venta_contacto_gestor_carga import PuntoVentaContactoGestorCarga  # noqa
 from .remitente import Remitente  # noqa
 from .remitente_contacto_gestor_carga import RemitenteContactoGestorCarga  # noqa
-from .rol import Rol  # noqa
+from .rol import Rol, RolPermiso  # noqa
 from .semi import Semi  # noqa
 from .semi_clasificacion import SemiClasificacion  # noqa
 from .tipo_anticipo import TipoAnticipo  # noqa

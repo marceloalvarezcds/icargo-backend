@@ -86,7 +86,7 @@ from .orden_carga_remision_origen import (  # noqa
 )
 from .orden_carga_remision_resultado import OrdenCargaRemisionResultado  # noqa
 from .pais import Pais  # noqa
-from .permiso import Permiso  # noqa
+from .permiso import Permiso, PermisoChecked  # noqa
 from .producto import Producto  # noqa
 from .propietario import (  # noqa
     Propietario,
@@ -114,6 +114,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
     RemitenteContactoGestorCargaList,
 )
 from .rentabilidad import Rentabilidad  # noqa
+from .rol import Rol, RolCreate, RolUpdate  # noqa
 from .semi import Semi, SemiForm, SemiList  # noqa
 from .semi_clasificacion import SemiClasificacion  # noqa
 from .tipo_anticipo import TipoAnticipo  # noqa

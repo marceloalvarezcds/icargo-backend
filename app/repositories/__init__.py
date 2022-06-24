@@ -401,6 +401,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
     get_remitente_contacto_gestor_carga_by_id,
 )
 from .rol import get_rol_by_codigo, get_rol_list  # noqa
+from .rol_permiso import create_rol_permiso  # noqa
 from .semi import (  # noqa
     change_semi_status,
     create_semi,

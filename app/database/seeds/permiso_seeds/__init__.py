@@ -13,4 +13,5 @@ from .orden_carga_permiso_seeds import (  # noqa
     orden_carga_permiso_seeds,
 )
 from .permiso_seeds import permiso_seeds  # noqa
+from .rol_permiso_seeds import rol_permiso_seeds  # noqa
 from .user_permiso_seeds import user_permiso_seeds  # noqa

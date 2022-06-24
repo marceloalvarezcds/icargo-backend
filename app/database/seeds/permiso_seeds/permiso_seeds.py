@@ -1,6 +1,11 @@
 from sqlalchemy.orm import Session  # type: ignore
 
-from app.enums import PermisoAccionEnum, PermisoModeloEnum
+from app.enums import (
+    PermisoAccionEnum,
+    PermisoModeloEnum,
+    PermisoModuloEnum,
+    permisoModeloTitulo,
+)
 from app.models import Permiso
 from app.repositories import get_permiso_by
 
@@ -9,19 +14,21 @@ def permiso_seeds(
     db: Session,
     accion: PermisoAccionEnum,
     modelo: PermisoModeloEnum,
-    autorizado: bool = True,
+    modulo: PermisoModuloEnum,
     descripcion: str = None,
 ) -> Permiso:
-    permiso = get_permiso_by(db, accion, modelo, autorizado)
+    permiso = get_permiso_by(db, accion, modelo)
     if not permiso:
+        modelo_titulo = permisoModeloTitulo[modelo.value]
         if not descripcion:
             descripcion = (
-                f"{str(accion.value).capitalize()} {str(modelo.value).capitalize()}"
+                f"{str(accion.value).capitalize()} {str(modelo_titulo).capitalize()}"
             )
         permiso = Permiso(
             modelo=modelo.value,
             accion=accion.value,
-            autorizado=autorizado,
+            modulo=modulo.value,
+            modelo_titulo=modelo_titulo,
             descripcion=descripcion,
         )
         db.add(permiso)

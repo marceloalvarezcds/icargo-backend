@@ -9,7 +9,12 @@ from .liquidacion_etapa import LiquidacionEtapaEnum  # noqa
 from .movimiento_estado import MovimientoEstadoEnum  # noqa
 from .operacion_estado import OperacionEstadoEnum  # noqa
 from .orden_carga_estado import OrdenCargaEstadoEnum  # noqa
-from .permiso import PermisoAccionEnum, PermisoModeloEnum  # noqa
+from .permiso import (  # noqa
+    PermisoAccionEnum,
+    PermisoModeloEnum,
+    PermisoModuloEnum,
+    permisoModeloTitulo,
+)
 from .rol import CodigoRolEnum  # noqa
 from .tipo_anticipo import TipoAnticipoEnum  # noqa
 from .tipo_contraparte import TipoContraparteEnum  # noqa

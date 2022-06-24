@@ -32,14 +32,26 @@ def get_list_by_gestor_carga_id(
     return repository.get_list_by_gestor_carga_id(ModelType, db, gestor_carga_id)
 
 
+def get_list_all_or_by_gestor_carga_id(
+    ModelType: type, db: Session, gestor_carga_id: Optional[int]
+) -> List[Model]:
+    if gestor_carga_id:
+        return get_list_by_gestor_carga_id(ModelType, db, gestor_carga_id)
+    return get_list(ModelType, db)
+
+
 def get_active_list(ModelType: type, db: Session) -> List[Model]:
     return repository.get_active_list(ModelType, db)
 
 
 def get_active_list_by_gestor_carga_id(
-    ModelType: type, db: Session, gestor_carga_id: int
+    ModelType: type, db: Session, gestor_carga_id: Optional[int]
 ) -> List[Model]:
-    return repository.get_active_list_by_gestor_carga_id(ModelType, db, gestor_carga_id)
+    if gestor_carga_id:
+        return repository.get_active_list_by_gestor_carga_id(
+            ModelType, db, gestor_carga_id
+        )
+    return get_active_list(ModelType, db)
 
 
 def create(
@@ -58,13 +70,13 @@ def create_with_gestor_carga_id(
     ModelType: type,
     db: Session,
     data: Schema,
-    gestor_carga_id: int,
+    gestor_id: Optional[int],
     modified_by: str,
     unique_message_error: str,
     **unique_columns,
 ) -> Model:
     check_unique(ModelType, db, None, unique_message_error, **unique_columns)
-    gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
+    gestor_id = get_gestor_carga_by_params(data, gestor_id)
     return repository.create_with_gestor_carga_id(
         ModelType, db, data, gestor_id, modified_by
     )
@@ -89,13 +101,13 @@ def edit_with_gestor_carga_id(
     db: Session,
     id: int,
     data: Schema,
-    gestor_carga_id: int,
+    gestor_id: Optional[int],
     modified_by: str,
     unique_message_error: str,
     **unique_columns,
 ) -> Model:
     check_unique(ModelType, db, id, unique_message_error, **unique_columns)
-    gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
+    gestor_id = get_gestor_carga_by_params(data, gestor_id)
     obj: Model = get_by_id(ModelType, db, id)
     return repository.edit_with_gestor_carga_id(obj, db, data, gestor_id, modified_by)
 

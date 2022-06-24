@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Dict
 
 
 class PermisoAccionEnum(Enum):
@@ -90,3 +91,91 @@ class PermisoModeloEnum(Enum):
     TIPO_SEMI = "tipo_semi"
     UNIDAD = "unidad"
     USER = "usuario"
+
+
+class PermisoModuloEnum(Enum):
+    ENTIDADES = "Entidades"
+    FLOTA = "Flota"
+    FLETE = "Flete"
+    OC = "Orden de Carga"
+    CAJA_BANCO = "Caja & Banco"
+    ESTADO_CUENTA = "Estado de Cuenta"
+    LISTADOS = "Listados"
+    USUARIOS = "Usuarios"
+    PARAMETROS = "Parametros de Sistema"
+    BIBLIOTECA = "Biblioteca de Usuario"
+
+
+permisoModeloTitulo: Dict[str, str] = {
+    "banco": "Banco",
+    "caja": "Caja",
+    "camion": "Camión",
+    "camion_semi_neto": "Neto de la Combinacion Camión-Semi",
+    "cargo": "Cargo",
+    "centro_operativo_clasificacion": "Clasificación Centro Operativo",
+    "centro_operativo": "Centro Operativo",
+    "chofer": "Chofer",
+    "ciudad": "Ciudad",
+    "color": "Color",
+    "composicion_juridica": "Composición Jurídica",
+    "contacto": "Contacto",
+    "ente_emisor_automotor": "Ente emisor de Registro Automotor",
+    "ente_emisor_transporte": "Ente emisor de Registro de Transporte",
+    "estado_cuenta": "Estado de Cuenta",
+    "factura": "Factura",
+    "flete": "Flete",
+    "flete_anticipo": "Flete Anticipo",
+    "flete_complemento": "Flete Complemento",
+    "flete_descuento": "Flete descuento",
+    "gestor_carga": "Gestor de Carga",
+    "instrumento": "Instrumento",
+    "instrumento_via": "Vía de Instrumento",
+    "insumo": "Insumo",
+    "insumo_punto_venta": "Insumo Punto de Venta",
+    "insumo_punto_venta_precio": "Precio de Insumo en Punto de Venta",
+    "liquidacion": "Liquidación",
+    "localidad": "Localidad",
+    "marca_camion": "Marca de Camión",
+    "marca_semi": "Marca de Semi",
+    "moneda": "Moneda",
+    "movimiento": "Movimiento",
+    "orden_carga": "Orden de Carga",
+    "orden_carga_anticipo_retirado": "Anticipo Retirado",
+    "orden_carga_anticipo_saldo": "Saldo de Anticipo",
+    "orden_carga_complemento": "Complemento",
+    "orden_carga_descuento": "Descuento",
+    "orden_carga_remision_destino": "Remisión Destino",
+    "orden_carga_remision_origen": "Remisiñón Origen",
+    "orden_carga_remision_resultado": "Resultado de Remisión",
+    "orden_carga_remision_resultado_gestor": "Resultado de Remisión de la Gestora",
+    "pais": "País",
+    "permiso": "Permiso",
+    "producto": "Producto",
+    "propietario": "Propietario",
+    "proveedor": "Proveedor",
+    "punto_venta": "Punto de Venta",
+    "remitente": "Remitente",
+    "rentabilidad": "Rentabilidad",
+    "rol": "Rol",
+    "semirremolque": "Semi",
+    "semi_clasificacion": "Clasificación de Semi",
+    "tipo_anticipo": "Tipo de Anticipo",
+    "tipo_camion": "Tipo de Camión",
+    "tipo_carga": "Tipo de Carga",
+    "tipo_comprobante": "Tipo de Comprobante",
+    "tipo_concepto_complemento": "Concepto de Complemento",
+    "tipo_concepto_descuento": "Concepto de Descuento",
+    "tipo_contraparte": "Tipo de Contraparte",
+    "tipo_cuenta": "Tipo de Cuenta",
+    "tipo_documento": "Tipo de Documento",
+    "tipo_documento_relacionado": "Tipo de Documento Relacionado",
+    "tipo_instrumento": "Tipo de Instrumento",
+    "tipo_insumo": "Tipo de Insumo",
+    "tipo_iva": "Tipo de IVA",
+    "tipo_movimiento": "Tipo de Movimiento",
+    "tipo_persona": "Tipo Persona",
+    "tipo_registro": "Tipo de Registro",
+    "tipo_semi": "Tipo de Semi",
+    "unidad": "Unidad",
+    "usuario": "Usuario",
+}

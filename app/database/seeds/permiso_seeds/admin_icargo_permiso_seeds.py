@@ -8,6 +8,7 @@ from .flete_permiso_seeds import flete_admin_permiso_seeds
 from .flota_permiso_seeds import flota_admin_permiso_seeds
 from .listado_permiso_seeds import listado_permiso_seeds
 from .orden_carga_permiso_seeds import orden_carga_admin_permiso_seeds
+from .rol_permiso_seeds import rol_permiso_seeds
 from .user_permiso_seeds import user_permiso_seeds
 
 
@@ -19,3 +20,4 @@ def admin_icargo_permiso_seeds(db: Session, user: User):
     listado_permiso_seeds(db, user)
     orden_carga_admin_permiso_seeds(db, user)
     user_permiso_seeds(db, user)
+    rol_permiso_seeds(db, user)

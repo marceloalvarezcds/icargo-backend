@@ -11,7 +11,6 @@ def get_permiso_by(
     db: Session,
     accion: PermisoAccionEnum,
     modelo: PermisoModeloEnum,
-    autorizado: bool = True,
 ) -> Optional[Permiso]:
     return (
         db.query(Permiso)
@@ -19,7 +18,6 @@ def get_permiso_by(
             and_(
                 Permiso.accion == accion.value,
                 Permiso.modelo == modelo.value,
-                Permiso.autorizado == autorizado,
             )
         )
         .first()
@@ -27,4 +25,6 @@ def get_permiso_by(
 
 
 def get_permiso_list(db: Session) -> List[Permiso]:
-    return db.query(Permiso).order_by(Permiso.descripcion).all()
+    return (
+        db.query(Permiso).order_by(Permiso.modulo, Permiso.modelo, Permiso.accion).all()
+    )
