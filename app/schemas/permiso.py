@@ -9,8 +9,8 @@ class Permiso(BaseModel):
     id: int
     modelo: PermisoModeloEnum
     accion: PermisoAccionEnum
-    modulo: PermisoModuloEnum
-    modelo_titulo: str
+    modulo: Optional[PermisoModuloEnum] = None
+    modelo_titulo: Optional[str] = None
     descripcion: Optional[str] = None
     is_for_superuser: Optional[bool] = False
 
