@@ -1,9 +1,12 @@
+from http.client import BAD_REQUEST
 from typing import List, Optional
 
+from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums.estado import EstadoEnum
 from app.models import Rol, RolPermiso
+from app.repositories import exists_user_for_rol_id
 from app.schemas import PermisoChecked, RolCreate, RolUpdate
 from app.services import generic_service as service
 
@@ -77,6 +80,13 @@ def change_rol_status(
     status: EstadoEnum,
     modified_by: str,
 ) -> Rol:
+    if status == EstadoEnum.INACTIVO:
+        exists_user_for_rol = exists_user_for_rol_id(db, id)
+        if exists_user_for_rol:
+            raise HTTPException(
+                status_code=BAD_REQUEST,
+                detail="No puede Desactivar un rol cuando está relacionado a uno o más usuarios",
+            )
     return service.change_status(Rol, db, id, status, modified_by)
 
 

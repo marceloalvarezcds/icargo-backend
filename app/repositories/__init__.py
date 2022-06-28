@@ -471,4 +471,9 @@ from .tipo_registro import (  # noqa
 )
 from .tipo_semi import get_tipo_semi_by_descripcion, get_tipo_semi_list  # noqa
 from .unidad import get_unidad_by_descripcion, get_unidad_list  # noqa
-from .user import get_user_by_email, get_user_by_id, get_user_by_username  # noqa
+from .user import (  # noqa
+    exists_user_for_rol_id,
+    get_user_by_email,
+    get_user_by_id,
+    get_user_by_username,
+)

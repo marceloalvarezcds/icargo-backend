@@ -102,7 +102,7 @@ class PermisoModuloEnum(Enum):
     ESTADO_CUENTA = "Estado de Cuenta"
     LISTADOS = "Listados"
     USUARIOS = "Usuarios"
-    PARAMETROS = "Parametros de Sistema"
+    PARAMETROS = "Parámetros del Sistema"
     BIBLIOTECA = "Biblioteca de Usuario"
 
 
@@ -145,7 +145,7 @@ permisoModeloTitulo: Dict[str, str] = {
     "orden_carga_complemento": "Complemento",
     "orden_carga_descuento": "Descuento",
     "orden_carga_remision_destino": "Remisión Destino",
-    "orden_carga_remision_origen": "Remisiñón Origen",
+    "orden_carga_remision_origen": "Remisión Origen",
     "orden_carga_remision_resultado": "Resultado de Remisión",
     "orden_carga_remision_resultado_gestor": "Resultado de Remisión de la Gestora",
     "pais": "País",

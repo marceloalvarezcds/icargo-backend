@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, status
 
 from app import models
 from app.dependencies import get_current_user
-from app.enums import PermisoAccionEnum, PermisoModeloEnum
+from app.enums import PermisoAccionEnum, PermisoModeloEnum, permisoModeloTitulo
 
 
 class Permiso:
@@ -33,7 +33,9 @@ class Permiso:
                 and permiso.accion == self.accion.value
             ):
                 return True
+        modelo = permisoModeloTitulo[self.modelo.value]
+        accion = " ".join(str(self.accion.value).split("_")).capitalize()
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tiene permiso para realizar la acción",
+            detail=f"No tiene permiso para {accion} {modelo}",
         )
