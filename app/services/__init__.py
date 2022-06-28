@@ -281,14 +281,11 @@ from .tipo_instrumento import get_tipo_instrumento_via_banco  # noqa
 from .user import (  # noqa
     change_user_status,
     create_user,
-    create_user_with_gestor_carga_id,
     delete_user,
     edit_user,
-    edit_user_with_gestor_carga_id,
     get_user_active_list_by_gestor_carga_id,
     get_user_by_email,
     get_user_by_id,
     get_user_by_username,
-    get_user_list,
     get_user_list_by_gestor_carga_id,
 )

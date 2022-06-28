@@ -1,43 +1,41 @@
+from typing import List
+
 from sqlalchemy.orm.session import Session  # type: ignore
 
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums import PermisoModuloEnum as u
-from app.models import User
+from app.models import Permiso
 
 from .permiso_seeds import permiso_seeds
 
 
-def flete_admin_permiso_seeds(db: Session, user: User):
-    permiso_generico_seeds(db, user)
+def flete_admin_permiso_seeds(db: Session) -> List[Permiso]:
     permisos = []
-
+    permisos.extend(permiso_generico_seeds(db))
     permisos.append(permiso_seeds(db, a.LISTAR, m.FLETE, u.FLETE))
     permisos.append(permiso_seeds(db, a.VER, m.FLETE, u.FLETE))
     permisos.append(permiso_seeds(db, a.REPORTE, m.FLETE, u.FLETE, "Reporte de Flete"))
-
     permisos.append(permiso_seeds(db, a.LISTAR, m.FLETE_ANTICIPO, u.FLETE))
     permisos.append(permiso_seeds(db, a.VER, m.FLETE_ANTICIPO, u.FLETE))
-
     permisos.append(permiso_seeds(db, a.LISTAR, m.FLETE_COMPLEMENTO, u.FLETE))
     permisos.append(permiso_seeds(db, a.VER, m.FLETE_COMPLEMENTO, u.FLETE))
-
     permisos.append(permiso_seeds(db, a.LISTAR, m.FLETE_DESCUENTO, u.FLETE))
     permisos.append(permiso_seeds(db, a.VER, m.FLETE_DESCUENTO, u.FLETE))
-
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def flete_permiso_seeds(db: Session, user: User):
-    permiso_generico_seeds(db, user)
-    permiso_flete_seeds(db, user)
-    permiso_flete_anticipo_seeds(db, user)
-    permiso_flete_complemento_seeds(db, user)
-    permiso_flete_descuento_seeds(db, user)
+def flete_permiso_seeds(db: Session) -> List[Permiso]:
+    permisos = []
+    permisos.extend(permiso_generico_seeds(db))
+    permisos.extend(permiso_flete_seeds(db))
+    permisos.extend(permiso_flete_anticipo_seeds(db))
+    permisos.extend(permiso_flete_complemento_seeds(db))
+    permisos.extend(permiso_flete_descuento_seeds(db))
+    return permisos
 
 
-def permiso_generico_seeds(db: Session, user: User):
+def permiso_generico_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.LISTAR, m.CENTRO_OPERATIVO, u.ENTIDADES))
     permisos.append(permiso_seeds(db, a.LISTAR, m.MONEDA, u.PARAMETROS))
@@ -53,11 +51,10 @@ def permiso_generico_seeds(db: Session, user: User):
     )
     permisos.append(permiso_seeds(db, a.LISTAR, m.UNIDAD, u.PARAMETROS))
     permisos.append(permiso_seeds(db, a.VER, m.CONTACTO, u.FLETE))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_flete_seeds(db: Session, user: User):
+def permiso_flete_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.FLETE, u.FLETE))
     permisos.append(permiso_seeds(db, a.CREAR, m.FLETE, u.FLETE))
@@ -66,11 +63,10 @@ def permiso_flete_seeds(db: Session, user: User):
     permisos.append(permiso_seeds(db, a.LISTAR, m.FLETE, u.FLETE))
     permisos.append(permiso_seeds(db, a.VER, m.FLETE, u.FLETE))
     permisos.append(permiso_seeds(db, a.REPORTE, m.FLETE, u.FLETE, "Reporte de Flete"))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_flete_anticipo_seeds(db: Session, user: User):
+def permiso_flete_anticipo_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(
         permiso_seeds(db, a.CREAR, m.FLETE_ANTICIPO, u.FLETE, "Crear Anticipo de Flete")
@@ -93,11 +89,10 @@ def permiso_flete_anticipo_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.VER, m.FLETE_ANTICIPO, u.FLETE, "Ver Anticipo de Flete")
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_flete_complemento_seeds(db: Session, user: User):
+def permiso_flete_complemento_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(
         permiso_seeds(
@@ -128,11 +123,10 @@ def permiso_flete_complemento_seeds(db: Session, user: User):
             db, a.VER, m.FLETE_COMPLEMENTO, u.FLETE, "Ver Complemento de Flete"
         )
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_flete_descuento_seeds(db: Session, user: User):
+def permiso_flete_descuento_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(
         permiso_seeds(
@@ -157,5 +151,4 @@ def permiso_flete_descuento_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.VER, m.FLETE_DESCUENTO, u.FLETE, "Ver Descuento de Flete")
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos

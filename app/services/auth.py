@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app.audits import AuditAuth
 from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from app.constants import AUTHORIZATION
+from app.enums.estado import EstadoEnum
 from app.models.user import User
 from app.schemas import TokenPayload
 from app.services.security import create_access_token
@@ -63,7 +64,7 @@ def login(db: Session, *, request: Request, form_data: OAuth2PasswordRequestForm
     user = authenticate(db, username=form_data.username, password=form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
-    elif not user.is_activated:
+    elif user.estado == EstadoEnum.INACTIVO.value:
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     register_audit_auth(db, user=user, action="login", ip=request.client.host)

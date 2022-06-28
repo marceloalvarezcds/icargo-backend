@@ -1,23 +1,27 @@
+from typing import List
+
 from sqlalchemy.orm.session import Session  # type: ignore
 
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums import PermisoModuloEnum as u
-from app.models import User
+from app.models import Permiso
 
 from .permiso_seeds import permiso_seeds
 
 
-def entities_admin_permiso_seeds(db: Session, user: User):
-    permiso_generico_seeds(db, user)
-    permiso_centro_operativo_seeds(db, user)
-    permiso_gestor_carga_seeds(db, user)
-    permiso_proveedor_seeds(db, user)
-    permiso_punto_venta_seeds(db, user)
-    permiso_remitente_seeds(db, user)
+def entities_admin_permiso_seeds(db: Session) -> List[Permiso]:
     permisos = []
+    permisos.extend(permiso_generico_seeds(db))
+    permisos.extend(permiso_centro_operativo_seeds(db))
+    permisos.extend(permiso_gestor_carga_seeds(db))
+    permisos.extend(permiso_proveedor_seeds(db))
+    permisos.extend(permiso_punto_venta_seeds(db))
+    permisos.extend(permiso_remitente_seeds(db))
     permisos.append(
-        permiso_seeds(db, a.CREAR, m.GESTOR_CARGA, u.ENTIDADES, "Crear Gestor de Carga")
+        permiso_seeds(
+            db, a.CREAR, m.GESTOR_CARGA, u.ENTIDADES, "Crear Gestor de Carga", True
+        )
     )
     permisos.append(
         permiso_seeds(
@@ -26,23 +30,25 @@ def entities_admin_permiso_seeds(db: Session, user: User):
             m.GESTOR_CARGA,
             u.ENTIDADES,
             "Eliminar Gestor de Carga",
+            True,
         )
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def entities_permiso_seeds(db: Session, user: User):
-    permiso_generico_seeds(db, user)
-    permiso_cargo_seeds(db, user)
-    permiso_centro_operativo_seeds(db, user)
-    permiso_gestor_carga_seeds(db, user)
-    permiso_proveedor_seeds(db, user)
-    permiso_punto_venta_seeds(db, user)
-    permiso_remitente_seeds(db, user)
+def entities_permiso_seeds(db: Session) -> List[Permiso]:
+    permisos = []
+    permisos.extend(permiso_generico_seeds(db))
+    permisos.extend(permiso_cargo_seeds(db))
+    permisos.extend(permiso_centro_operativo_seeds(db))
+    permisos.extend(permiso_gestor_carga_seeds(db))
+    permisos.extend(permiso_proveedor_seeds(db))
+    permisos.extend(permiso_punto_venta_seeds(db))
+    permisos.extend(permiso_remitente_seeds(db))
+    return permisos
 
 
-def permiso_generico_seeds(db: Session, user: User):
+def permiso_generico_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(
         permiso_seeds(
@@ -74,22 +80,20 @@ def permiso_generico_seeds(db: Session, user: User):
         )
     )
     permisos.append(permiso_seeds(db, a.VER, m.USER, u.USUARIOS))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_cargo_seeds(db: Session, user: User):
+def permiso_cargo_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.LISTAR, m.CARGO, u.BIBLIOTECA))
     permisos.append(permiso_seeds(db, a.VER, m.CARGO, u.BIBLIOTECA))
     permisos.append(permiso_seeds(db, a.CREAR, m.CARGO, u.BIBLIOTECA))
     permisos.append(permiso_seeds(db, a.EDITAR, m.CARGO, u.BIBLIOTECA))
     permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.CARGO, u.BIBLIOTECA))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_centro_operativo_seeds(db: Session, user: User):
+def permiso_centro_operativo_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(
         permiso_seeds(
@@ -143,11 +147,10 @@ def permiso_centro_operativo_seeds(db: Session, user: User):
             "Reporte de Centro Operativo",
         )
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_gestor_carga_seeds(db: Session, user: User):
+def permiso_gestor_carga_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(
         permiso_seeds(
@@ -185,11 +188,10 @@ def permiso_gestor_carga_seeds(db: Session, user: User):
             db, a.REPORTE, m.GESTOR_CARGA, u.ENTIDADES, "Reporte de Gestor de Carga"
         )
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_proveedor_seeds(db: Session, user: User):
+def permiso_proveedor_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.PROVEEDOR, u.ENTIDADES))
     permisos.append(permiso_seeds(db, a.EDITAR, m.PROVEEDOR, u.ENTIDADES))
@@ -217,11 +219,10 @@ def permiso_proveedor_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.REPORTE, m.PROVEEDOR, u.ENTIDADES, "Reporte de Proveedor")
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_punto_venta_seeds(db: Session, user: User):
+def permiso_punto_venta_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(
         permiso_seeds(db, a.CREAR, m.PUNTO_VENTA, u.ENTIDADES, "Crear Punto de Venta")
@@ -263,11 +264,10 @@ def permiso_punto_venta_seeds(db: Session, user: User):
             db, a.REPORTE, m.PUNTO_VENTA, u.ENTIDADES, "Reporte de Punto de Venta"
         )
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_remitente_seeds(db: Session, user: User):
+def permiso_remitente_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.REMITENTE, u.ENTIDADES))
     permisos.append(permiso_seeds(db, a.EDITAR, m.REMITENTE, u.ENTIDADES))
@@ -295,5 +295,4 @@ def permiso_remitente_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.REPORTE, m.REMITENTE, u.ENTIDADES, "Reporte de Remitente")
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos

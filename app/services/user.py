@@ -5,9 +5,9 @@ from fastapi import HTTPException, Request  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums.estado import EstadoEnum
-from app.models import User
+from app.models import User, UserRol
 from app.repositories import user
-from app.schemas import UserCreate, UserUpdate
+from app.schemas import RolChecked, UserCreate, UserUpdate
 from app.services import generic_service as service
 from app.utils.security import get_md5_hash_hexdigest, get_password_hash
 
@@ -27,12 +27,10 @@ def get_user_by_username(db: Session, username: str) -> Optional[User]:
     return user.get_user_by_username(db, username)
 
 
-def get_user_list(db: Session) -> List[User]:
-    return service.get_list(User, db)
-
-
-def get_user_list_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> List[User]:
-    return service.get_list_by_gestor_carga_id(User, db, gestor_carga_id)
+def get_user_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[User]:
+    return service.get_list_all_or_by_gestor_carga_id(User, db, gestor_carga_id)
 
 
 def get_user_active_list_by_gestor_carga_id(
@@ -47,10 +45,15 @@ unique_message_error = "Este nombre de usuario ya existe en el sistema"
 def create_user(
     db: Session,
     data: UserCreate,
+    gestor_carga_id: Optional[int],
     modified_by: str,
     request: Request,
 ) -> User:
-    return service.create(
+    roles: List[RolChecked] = data.roles
+    del data.roles
+    if not data.gestor_carga_id and gestor_carga_id:
+        data.gestor_carga_id = gestor_carga_id
+    user: User = service.create(
         User,
         db,
         set_extra_data_in_create(data, request),
@@ -58,27 +61,23 @@ def create_user(
         unique_message_error,
         username=data.username,
     )
-
-
-def create_user_with_gestor_carga_id(
-    db: Session,
-    data: UserCreate,
-    gestor_carga_id: int,
-    modified_by: str,
-    request: Request,
-) -> User:
-    data.gestor_carga_id = gestor_carga_id
-    return create_user(db, data, modified_by, request)
+    save_roles(db, user, roles, modified_by)
+    return user
 
 
 def edit_user(
     db: Session,
     id: int,
     data: UserUpdate,
+    gestor_carga_id: Optional[int],
     modified_by: str,
     request: Request,
 ) -> User:
-    return service.edit(
+    roles: List[RolChecked] = data.roles
+    del data.roles
+    if not data.gestor_carga_id and gestor_carga_id:
+        data.gestor_carga_id = gestor_carga_id
+    user: User = service.edit(
         User,
         db,
         id,
@@ -87,18 +86,8 @@ def edit_user(
         unique_message_error,
         username=data.username,
     )
-
-
-def edit_user_with_gestor_carga_id(
-    db: Session,
-    id: int,
-    data: UserUpdate,
-    gestor_carga_id: int,
-    modified_by: str,
-    request: Request,
-) -> User:
-    data.gestor_carga_id = gestor_carga_id
-    return edit_user(db, id, data, modified_by, request)
+    save_roles(db, user, roles, modified_by)
+    return user
 
 
 def change_user_status(
@@ -141,3 +130,18 @@ def set_extra_data_in_edit(obj_in: UserUpdate, request: Request) -> UserUpdate:
     obj_in.surname = obj_in.username
     obj_in.last_ip_address = ip
     return obj_in
+
+
+def save_roles(db: Session, user: User, roles: List[RolChecked], modified_by: str):
+    user.user_roles = []
+    db.commit()
+    for rol in roles:
+        user.user_roles.append(
+            UserRol(
+                rol_id=rol.id,
+                user_id=user.id,
+                created_by=modified_by,
+                modified_by=modified_by,
+            )
+        )
+    db.commit()

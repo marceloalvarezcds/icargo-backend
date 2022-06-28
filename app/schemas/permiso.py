@@ -12,6 +12,7 @@ class Permiso(BaseModel):
     modulo: PermisoModuloEnum
     modelo_titulo: str
     descripcion: Optional[str] = None
+    is_for_superuser: Optional[bool] = False
 
     class Config:
         orm_mode = True

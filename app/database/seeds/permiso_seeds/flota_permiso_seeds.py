@@ -1,16 +1,18 @@
+from typing import List
+
 from sqlalchemy.orm.session import Session  # type: ignore
 
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums import PermisoModuloEnum as u
-from app.models import User
+from app.models import Permiso
 
 from .permiso_seeds import permiso_seeds
 
 
-def flota_admin_permiso_seeds(db: Session, user: User):
-    permiso_generico_seeds(db, user)
+def flota_admin_permiso_seeds(db: Session) -> List[Permiso]:
     permisos = []
+    permisos.extend(permiso_generico_seeds(db))
 
     permisos.append(permiso_seeds(db, a.LISTAR, m.CAMION, u.FLOTA))
     permisos.append(permiso_seeds(db, a.VER, m.CAMION, u.FLOTA))
@@ -40,21 +42,21 @@ def flota_admin_permiso_seeds(db: Session, user: User):
             db, a.REPORTE, m.SEMIRREMOLQUE, u.FLOTA, "Reporte de Semirremolque"
         )
     )
-
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def flota_permiso_seeds(db: Session, user: User):
-    permiso_generico_seeds(db, user)
-    permiso_camion_seeds(db, user)
-    permiso_camion_semi_neto_seeds(db, user)
-    permiso_chofer_seeds(db, user)
-    permiso_propietario_seeds(db, user)
-    permiso_semirremolque_seeds(db, user)
+def flota_permiso_seeds(db: Session) -> List[Permiso]:
+    permisos = []
+    permisos.extend(permiso_generico_seeds(db))
+    permisos.extend(permiso_camion_seeds(db))
+    permisos.extend(permiso_camion_semi_neto_seeds(db))
+    permisos.extend(permiso_chofer_seeds(db))
+    permisos.extend(permiso_propietario_seeds(db))
+    permisos.extend(permiso_semirremolque_seeds(db))
+    return permisos
 
 
-def permiso_generico_seeds(db: Session, user: User):
+def permiso_generico_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.LISTAR, m.CARGO, u.BIBLIOTECA))
     permisos.append(permiso_seeds(db, a.LISTAR, m.CIUDAD, u.PARAMETROS))
@@ -123,11 +125,10 @@ def permiso_generico_seeds(db: Session, user: User):
     )
     permisos.append(permiso_seeds(db, a.LISTAR, m.USER, u.USUARIOS))
     permisos.append(permiso_seeds(db, a.VER, m.USER, u.USUARIOS))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_camion_seeds(db: Session, user: User):
+def permiso_camion_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.CAMION, u.FLOTA))
     permisos.append(permiso_seeds(db, a.CREAR, m.CAMION, u.FLOTA))
@@ -152,22 +153,20 @@ def permiso_camion_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.REPORTE, m.CAMION, u.FLOTA, "Reporte de Camion")
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_camion_semi_neto_seeds(db: Session, user: User):
+def permiso_camion_semi_neto_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.CAMION_SEMI_NETO, u.FLOTA))
     permisos.append(permiso_seeds(db, a.EDITAR, m.CAMION_SEMI_NETO, u.FLOTA))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.CAMION_SEMI_NETO, u.FLOTA))
     permisos.append(permiso_seeds(db, a.LISTAR, m.CAMION_SEMI_NETO, u.FLOTA))
     permisos.append(permiso_seeds(db, a.VER, m.CAMION_SEMI_NETO, u.FLOTA))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_chofer_seeds(db: Session, user: User):
+def permiso_chofer_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.CHOFER, u.FLOTA))
     permisos.append(permiso_seeds(db, a.CREAR, m.CHOFER, u.FLOTA))
@@ -192,11 +191,10 @@ def permiso_chofer_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.REPORTE, m.CHOFER, u.FLOTA, "Reporte de Chofer")
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_propietario_seeds(db: Session, user: User):
+def permiso_propietario_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.PROPIETARIO, u.FLOTA))
     permisos.append(permiso_seeds(db, a.CREAR, m.PROPIETARIO, u.FLOTA))
@@ -225,11 +223,10 @@ def permiso_propietario_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.REPORTE, m.PROPIETARIO, u.FLOTA, "Reporte de Propietario")
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_semirremolque_seeds(db: Session, user: User):
+def permiso_semirremolque_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.SEMIRREMOLQUE, u.FLOTA))
     permisos.append(permiso_seeds(db, a.CREAR, m.SEMIRREMOLQUE, u.FLOTA))
@@ -260,5 +257,4 @@ def permiso_semirremolque_seeds(db: Session, user: User):
             db, a.REPORTE, m.SEMIRREMOLQUE, u.FLOTA, "Reporte de Semirremolque"
         )
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos

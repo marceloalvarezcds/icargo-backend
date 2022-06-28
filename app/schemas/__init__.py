@@ -114,7 +114,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
     RemitenteContactoGestorCargaList,
 )
 from .rentabilidad import Rentabilidad  # noqa
-from .rol import Rol, RolCreate, RolUpdate  # noqa
+from .rol import Rol, RolChecked, RolCreate, RolUpdate  # noqa
 from .semi import Semi, SemiForm, SemiList  # noqa
 from .semi_clasificacion import SemiClasificacion  # noqa
 from .tipo_anticipo import TipoAnticipo  # noqa

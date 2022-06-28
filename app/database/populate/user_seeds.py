@@ -1,20 +1,12 @@
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.database.seeds.permiso_seeds import (
-    entities_permiso_seeds,
-    estado_cuenta_gestor_permiso_seeds,
-    estado_cuenta_permiso_seeds,
-    flete_permiso_seeds,
-    flota_permiso_seeds,
-    listado_permiso_seeds,
-    orden_carga_gestor_permiso_seeds,
-    orden_carga_permiso_seeds,
-    rol_permiso_seeds,
-    user_permiso_seeds,
+    gestor_icargo_permiso_seeds,
+    gestor_suplente_icargo_permiso_seeds,
 )
+from app.database.seeds.user_rol_seeds import user_rol_seeds
 from app.enums import CodigoRolEnum
 from app.models import GestorCarga, User
-from app.repositories import rol
 from app.services import get_user_by_username
 from app.utils.security import get_password_hash
 
@@ -26,7 +18,6 @@ def user_seeds(
     last_name: str,
     gestor_carga: GestorCarga,
 ):
-    admin_gestor_rol = rol.get_rol_by_codigo(db, CodigoRolEnum.ADMIN_GESTOR_CARGA.value)
     usuario = get_user_by_username(db, username)
     email = f"{first_name.replace(' ', '-').lower()}@{last_name.replace(' ', '-').lower()}.com"
     if usuario is None:
@@ -37,26 +28,22 @@ def user_seeds(
             username=username,
             surname=username,
             email=email,
-            is_activated=True,
-            is_guest=False,
             is_superuser=False,
             password=get_password_hash(username),
             gestor_carga_id=gestor_carga.id,
-            roles=[admin_gestor_rol],
         )
         db.add(usuario)
         db.commit()
-    entities_permiso_seeds(db, usuario)
-    flete_permiso_seeds(db, usuario)
-    flota_permiso_seeds(db, usuario)
     if "suplente" in username:
-        orden_carga_permiso_seeds(db, usuario)
+        permisos = gestor_suplente_icargo_permiso_seeds(db)
+        rol = CodigoRolEnum.SUPLENTE_GESTOR_CARGA.value
     else:
-        orden_carga_gestor_permiso_seeds(db, usuario)
-    if "suplente" in username:
-        estado_cuenta_permiso_seeds(db, usuario)
-    else:
-        estado_cuenta_gestor_permiso_seeds(db, usuario)
-        listado_permiso_seeds(db, usuario)
-        rol_permiso_seeds(db, usuario)
-        user_permiso_seeds(db, usuario)
+        permisos = gestor_icargo_permiso_seeds(db)
+        rol = CodigoRolEnum.ADMIN_GESTOR_CARGA.value
+    user_rol_seeds(
+        db,
+        usuario,
+        rol,
+        permisos,
+        gestor_carga.id,
+    )

@@ -1,14 +1,16 @@
+from typing import List
+
 from sqlalchemy.orm.session import Session  # type: ignore
 
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums import PermisoModuloEnum as u
-from app.models import User
+from app.models import Permiso
 
 from .permiso_seeds import permiso_seeds
 
 
-def rol_permiso_seeds(db: Session, user: User):
+def rol_permiso_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.LISTAR, m.PERMISO, u.USUARIOS))
     permisos.append(permiso_seeds(db, a.LISTAR, m.ROL, u.USUARIOS))
@@ -21,5 +23,4 @@ def rol_permiso_seeds(db: Session, user: User):
     permisos.append(permiso_seeds(db, a.EDITAR, m.ROL, u.USUARIOS))
     permisos.append(permiso_seeds(db, a.VER, m.ROL, u.USUARIOS))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.ROL, u.USUARIOS))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos

@@ -1,0 +1,55 @@
+from typing import List, Optional
+
+from sqlalchemy.orm import Session  # type: ignore
+
+from app.models import Permiso, Rol, User, UserRol
+from app.schemas import RolCreate
+from app.services import create_rol
+from app.services.generic_service import get_by_unique_columns
+
+
+def user_rol_seeds(
+    db: Session,
+    user: User,
+    rol_descripcion: str,
+    permisos: List[Permiso],
+    gestor_carga_id: Optional[int] = None,
+):
+    rol = get_by_unique_columns(
+        Rol, db, descripcion=rol_descripcion, gestor_carga_id=gestor_carga_id
+    )
+    modified_by = "system"
+    if not rol:
+        permiso_list = []
+        permiso_id_list = []
+        for p in permisos:
+            if p.id not in permiso_id_list:
+                permiso_list.append(p)
+                permiso_id_list.append(p.id)
+        rol = create_rol(
+            db,
+            RolCreate(
+                descripcion=rol_descripcion,
+                permisos=permiso_list,
+                gestor_carga_id=gestor_carga_id,
+            ),
+            gestor_carga_id,
+            modified_by,
+        )
+    exists = get_by_unique_columns(
+        UserRol,
+        db,
+        user_id=user.id,
+        rol_id=rol.id,
+    )
+    if not exists:
+        user.user_roles.append(
+            UserRol(
+                user_id=user.id,
+                rol_id=rol.id,
+                created_by=modified_by,
+                modified_by=modified_by,
+            )
+        )
+        user.modified_by = modified_by
+        db.commit()

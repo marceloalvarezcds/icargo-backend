@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from app.enums.estado import EstadoEnum
 
@@ -13,23 +13,20 @@ from .permiso import PermisoChecked
 class RolBase(BaseModel):
     descripcion: str
     gestor_carga_id: Optional[int] = None
-    permisos: List[PermisoChecked] = []
 
 
 # Properties to receive via API on creation
 class RolCreate(RolBase):
-    pass
+    permisos: List[PermisoChecked] = []
 
 
 # Properties to receive via API on update
 class RolUpdate(RolBase):
-    pass
+    permisos: List[PermisoChecked] = []
 
 
 class RolInDBBase(RolBase):
     id: int
-    codigo: Optional[str] = None
-    gestor_carga: Optional[GestorCarga] = None
     estado: EstadoEnum
     # Auditoría
     created_by: str
@@ -43,4 +40,12 @@ class RolInDBBase(RolBase):
 
 # Additional properties to return via API
 class Rol(RolInDBBase):
-    pass
+    permisos: List[PermisoChecked] = []
+
+
+class RolChecked(RolInDBBase):
+    checked: Optional[bool] = True
+
+    @validator("checked")
+    def set_checked(cls, _):
+        return True

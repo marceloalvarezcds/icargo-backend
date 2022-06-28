@@ -1,16 +1,18 @@
+from typing import List
+
 from sqlalchemy.orm.session import Session  # type: ignore
 
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums import PermisoModuloEnum as u
-from app.models import User
+from app.models import Permiso
 
 from .permiso_seeds import permiso_seeds
 
 
-def orden_carga_admin_permiso_seeds(db: Session, user: User):
-    permiso_generico_seeds(db, user)
+def orden_carga_admin_permiso_seeds(db: Session) -> List[Permiso]:
     permisos = []
+    permisos.extend(permiso_generico_seeds(db))
 
     permisos.append(permiso_seeds(db, a.VER, m.INSUMO, u.PARAMETROS))
     permisos.append(permiso_seeds(db, a.VER, m.INSUMO_PUNTO_VENTA, u.BIBLIOTECA))
@@ -49,29 +51,31 @@ def orden_carga_admin_permiso_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.VER, m.ORDEN_CARGA_REMISION_RESULTADO_GESTOR, u.OC)
     )
-
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def orden_carga_permiso_seeds(db: Session, user: User):
-    permiso_generico_seeds(db, user)
-    permiso_orden_carga_seeds(db, user)
-    permiso_orden_carga_anticipo_retirado_seeds(db, user)
-    permiso_orden_carga_anticipo_saldo_seeds(db, user)
-    permiso_orden_carga_complemento_seeds(db, user)
-    permiso_orden_carga_descuento_seeds(db, user)
-    permiso_orden_carga_remision_destino_seeds(db, user)
-    permiso_orden_carga_remision_origen_seeds(db, user)
-    permiso_orden_carga_remision_resultado_seeds(db, user)
+def orden_carga_permiso_seeds(db: Session) -> List[Permiso]:
+    permisos = []
+    permisos.extend(permiso_generico_seeds(db))
+    permisos.extend(permiso_orden_carga_seeds(db))
+    permisos.extend(permiso_orden_carga_anticipo_retirado_seeds(db))
+    permisos.extend(permiso_orden_carga_anticipo_saldo_seeds(db))
+    permisos.extend(permiso_orden_carga_complemento_seeds(db))
+    permisos.extend(permiso_orden_carga_descuento_seeds(db))
+    permisos.extend(permiso_orden_carga_remision_destino_seeds(db))
+    permisos.extend(permiso_orden_carga_remision_origen_seeds(db))
+    permisos.extend(permiso_orden_carga_remision_resultado_seeds(db))
+    return permisos
 
 
-def orden_carga_gestor_permiso_seeds(db: Session, user: User):
-    orden_carga_permiso_seeds(db, user)
-    permiso_orden_carga_remision_resultado_gestor_seeds(db, user)
+def orden_carga_gestor_permiso_seeds(db: Session) -> List[Permiso]:
+    permisos = []
+    permisos.extend(orden_carga_permiso_seeds(db))
+    permisos.extend(permiso_orden_carga_remision_resultado_gestor_seeds(db))
+    return permisos
 
 
-def permiso_generico_seeds(db: Session, user: User):
+def permiso_generico_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.LISTAR, m.CAMION, u.FLOTA))
     permisos.append(permiso_seeds(db, a.LISTAR, m.CAMION_SEMI_NETO, u.FLOTA))
@@ -100,11 +104,10 @@ def permiso_generico_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.LISTAR, m.INSUMO_PUNTO_VENTA_PRECIO, u.BIBLIOTECA)
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_orden_carga_seeds(db: Session, user: User):
+def permiso_orden_carga_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.ORDEN_CARGA, u.OC))
     permisos.append(permiso_seeds(db, a.CONCILIAR, m.ORDEN_CARGA, u.OC))
@@ -116,11 +119,10 @@ def permiso_orden_carga_seeds(db: Session, user: User):
     permisos.append(
         permiso_seeds(db, a.REPORTE, m.ORDEN_CARGA, u.OC, "Reporte de Orden de Carga")
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_orden_carga_anticipo_retirado_seeds(db: Session, user: User):
+def permiso_orden_carga_anticipo_retirado_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.ORDEN_CARGA_ANTICIPO_RETIRADO, u.OC))
     permisos.append(permiso_seeds(db, a.EDITAR, m.ORDEN_CARGA_ANTICIPO_RETIRADO, u.OC))
@@ -129,77 +131,69 @@ def permiso_orden_carga_anticipo_retirado_seeds(db: Session, user: User):
     )
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_ANTICIPO_RETIRADO, u.OC))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_ANTICIPO_RETIRADO, u.OC))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_orden_carga_anticipo_saldo_seeds(db: Session, user: User):
+def permiso_orden_carga_anticipo_saldo_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.ORDEN_CARGA_ANTICIPO_SALDO, u.OC))
     permisos.append(permiso_seeds(db, a.EDITAR, m.ORDEN_CARGA_ANTICIPO_SALDO, u.OC))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.ORDEN_CARGA_ANTICIPO_SALDO, u.OC))
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_ANTICIPO_SALDO, u.OC))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_ANTICIPO_SALDO, u.OC))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_orden_carga_complemento_seeds(db: Session, user: User):
+def permiso_orden_carga_complemento_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.ORDEN_CARGA_COMPLEMENTO, u.OC))
     permisos.append(permiso_seeds(db, a.EDITAR, m.ORDEN_CARGA_COMPLEMENTO, u.OC))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.ORDEN_CARGA_COMPLEMENTO, u.OC))
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_COMPLEMENTO, u.OC))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_COMPLEMENTO, u.OC))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_orden_carga_descuento_seeds(db: Session, user: User):
+def permiso_orden_carga_descuento_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.ORDEN_CARGA_DESCUENTO, u.OC))
     permisos.append(permiso_seeds(db, a.EDITAR, m.ORDEN_CARGA_DESCUENTO, u.OC))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.ORDEN_CARGA_DESCUENTO, u.OC))
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_DESCUENTO, u.OC))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_DESCUENTO, u.OC))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_orden_carga_remision_destino_seeds(db: Session, user: User):
+def permiso_orden_carga_remision_destino_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.ORDEN_CARGA_REMISION_DESTINO, u.OC))
     permisos.append(permiso_seeds(db, a.EDITAR, m.ORDEN_CARGA_REMISION_DESTINO, u.OC))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.ORDEN_CARGA_REMISION_DESTINO, u.OC))
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_REMISION_DESTINO, u.OC))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_REMISION_DESTINO, u.OC))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_orden_carga_remision_origen_seeds(db: Session, user: User):
+def permiso_orden_carga_remision_origen_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.ORDEN_CARGA_REMISION_ORIGEN, u.OC))
     permisos.append(permiso_seeds(db, a.EDITAR, m.ORDEN_CARGA_REMISION_ORIGEN, u.OC))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.ORDEN_CARGA_REMISION_ORIGEN, u.OC))
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_REMISION_ORIGEN, u.OC))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_REMISION_ORIGEN, u.OC))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_orden_carga_remision_resultado_seeds(db: Session, user: User):
+def permiso_orden_carga_remision_resultado_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.LISTAR, m.ORDEN_CARGA_REMISION_RESULTADO, u.OC))
     permisos.append(permiso_seeds(db, a.VER, m.ORDEN_CARGA_REMISION_RESULTADO, u.OC))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_orden_carga_remision_resultado_gestor_seeds(db: Session, user: User):
+def permiso_orden_carga_remision_resultado_gestor_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(
         permiso_seeds(db, a.VER, m.ORDEN_CARGA_REMISION_RESULTADO_GESTOR, u.OC)
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos

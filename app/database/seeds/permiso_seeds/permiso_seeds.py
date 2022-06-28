@@ -16,6 +16,7 @@ def permiso_seeds(
     modelo: PermisoModeloEnum,
     modulo: PermisoModuloEnum,
     descripcion: str = None,
+    is_for_superuser: bool = False,
 ) -> Permiso:
     permiso = get_permiso_by(db, accion, modelo)
     if not permiso:
@@ -30,6 +31,7 @@ def permiso_seeds(
             modulo=modulo.value,
             modelo_titulo=modelo_titulo,
             descripcion=descripcion,
+            is_for_superuser=is_for_superuser,
         )
         db.add(permiso)
         db.commit()

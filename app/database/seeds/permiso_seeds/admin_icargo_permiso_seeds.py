@@ -1,6 +1,8 @@
+from typing import List
+
 from sqlalchemy.orm.session import Session  # type: ignore
 
-from app.models import User
+from app.models import Permiso
 
 from .entities_permiso_seeds import entities_admin_permiso_seeds
 from .estado_cuenta_permiso_seeds import estado_cuenta_permiso_seeds
@@ -12,12 +14,14 @@ from .rol_permiso_seeds import rol_permiso_seeds
 from .user_permiso_seeds import user_permiso_seeds
 
 
-def admin_icargo_permiso_seeds(db: Session, user: User):
-    entities_admin_permiso_seeds(db, user)
-    estado_cuenta_permiso_seeds(db, user)
-    flete_admin_permiso_seeds(db, user)
-    flota_admin_permiso_seeds(db, user)
-    listado_permiso_seeds(db, user)
-    orden_carga_admin_permiso_seeds(db, user)
-    user_permiso_seeds(db, user)
-    rol_permiso_seeds(db, user)
+def admin_icargo_permiso_seeds(db: Session) -> List[Permiso]:
+    permisos = []
+    permisos.extend(entities_admin_permiso_seeds(db))
+    permisos.extend(estado_cuenta_permiso_seeds(db))
+    permisos.extend(flete_admin_permiso_seeds(db))
+    permisos.extend(flota_admin_permiso_seeds(db))
+    permisos.extend(listado_permiso_seeds(db))
+    permisos.extend(orden_carga_admin_permiso_seeds(db))
+    permisos.extend(user_permiso_seeds(db))
+    permisos.extend(rol_permiso_seeds(db))
+    return permisos

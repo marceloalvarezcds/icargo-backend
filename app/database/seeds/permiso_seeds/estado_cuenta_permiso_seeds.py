@@ -1,47 +1,47 @@
+from typing import List
+
 from sqlalchemy.orm.session import Session  # type: ignore
 
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums import PermisoModuloEnum as u
-from app.models import User
+from app.models import Permiso
 
 from .permiso_seeds import permiso_seeds
 
 
-def estado_cuenta_gestor_permiso_seeds(db: Session, user: User):
-    permiso_generico_seeds(db, user)
-    permiso_banco_seeds(db, user)
-    permiso_caja_seeds(db, user)
-    permiso_factura_seeds(db, user)
-    permiso_instrumento_seeds(db, user)
-    permiso_movimiento_seeds(db, user)
-    permiso_liquidacion_seeds(db, user)
+def estado_cuenta_gestor_permiso_seeds(db: Session) -> List[Permiso]:
     permisos = []
+    permisos.extend(permiso_generico_seeds(db))
+    permisos.extend(permiso_banco_seeds(db))
+    permisos.extend(permiso_caja_seeds(db))
+    permisos.extend(permiso_factura_seeds(db))
+    permisos.extend(permiso_instrumento_seeds(db))
+    permisos.extend(permiso_movimiento_seeds(db))
+    permisos.extend(permiso_liquidacion_seeds(db))
     permisos.append(permiso_seeds(db, a.ACEPTAR, m.LIQUIDACION, u.ESTADO_CUENTA))
     permisos.append(permiso_seeds(db, a.CANCELAR, m.LIQUIDACION, u.ESTADO_CUENTA))
     permisos.append(permiso_seeds(db, a.RECHAZAR, m.LIQUIDACION, u.ESTADO_CUENTA))
     permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.INSTRUMENTO, u.ESTADO_CUENTA))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def estado_cuenta_permiso_seeds(db: Session, user: User):
-    permiso_generico_seeds(db, user)
-    permiso_banco_seeds(db, user)
-    permiso_caja_seeds(db, user)
-    permiso_factura_seeds(db, user)
-    permiso_instrumento_seeds(db, user)
-    permiso_movimiento_seeds(db, user)
-    permiso_liquidacion_seeds(db, user)
+def estado_cuenta_permiso_seeds(db: Session) -> List[Permiso]:
     permisos = []
+    permisos.extend(permiso_generico_seeds(db))
+    permisos.extend(permiso_banco_seeds(db))
+    permisos.extend(permiso_caja_seeds(db))
+    permisos.extend(permiso_factura_seeds(db))
+    permisos.extend(permiso_instrumento_seeds(db))
+    permisos.extend(permiso_movimiento_seeds(db))
+    permisos.extend(permiso_liquidacion_seeds(db))
     permisos.append(
         permiso_seeds(db, a.PASAR_A_REVISION, m.LIQUIDACION, u.ESTADO_CUENTA)
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_generico_seeds(db: Session, user: User):
+def permiso_generico_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(
         permiso_seeds(
@@ -99,11 +99,10 @@ def permiso_generico_seeds(db: Session, user: User):
             "Listar Tipo de movimiento",
         )
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_banco_seeds(db: Session, user: User):
+def permiso_banco_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.BANCO, u.CAJA_BANCO))
     permisos.append(permiso_seeds(db, a.EDITAR, m.BANCO, u.CAJA_BANCO))
@@ -111,11 +110,10 @@ def permiso_banco_seeds(db: Session, user: User):
     permisos.append(permiso_seeds(db, a.LISTAR, m.BANCO, u.CAJA_BANCO))
     permisos.append(permiso_seeds(db, a.VER, m.BANCO, u.CAJA_BANCO))
     permisos.append(permiso_seeds(db, a.REPORTE, m.BANCO, u.CAJA_BANCO))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_caja_seeds(db: Session, user: User):
+def permiso_caja_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.CAJA, u.CAJA_BANCO))
     permisos.append(permiso_seeds(db, a.EDITAR, m.CAJA, u.CAJA_BANCO))
@@ -130,22 +128,20 @@ def permiso_caja_seeds(db: Session, user: User):
             u.CAJA_BANCO,
         )
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_factura_seeds(db: Session, user: User):
+def permiso_factura_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.FACTURA, u.ESTADO_CUENTA))
     permisos.append(permiso_seeds(db, a.EDITAR, m.FACTURA, u.ESTADO_CUENTA))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.FACTURA, u.ESTADO_CUENTA))
     permisos.append(permiso_seeds(db, a.LISTAR, m.FACTURA, u.ESTADO_CUENTA))
     permisos.append(permiso_seeds(db, a.VER, m.FACTURA, u.ESTADO_CUENTA))
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_instrumento_seeds(db: Session, user: User):
+def permiso_instrumento_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.INSTRUMENTO, u.ESTADO_CUENTA))
     permisos.append(permiso_seeds(db, a.EDITAR, m.INSTRUMENTO, u.ESTADO_CUENTA))
@@ -157,11 +153,10 @@ def permiso_instrumento_seeds(db: Session, user: User):
             db, a.REPORTE, m.INSTRUMENTO, u.ESTADO_CUENTA, "Reporte de Instrumento"
         )
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_movimiento_seeds(db: Session, user: User):
+def permiso_movimiento_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.MOVIMIENTO, u.ESTADO_CUENTA))
     permisos.append(permiso_seeds(db, a.EDITAR, m.MOVIMIENTO, u.ESTADO_CUENTA))
@@ -176,11 +171,10 @@ def permiso_movimiento_seeds(db: Session, user: User):
             u.ESTADO_CUENTA,
         )
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos
 
 
-def permiso_liquidacion_seeds(db: Session, user: User):
+def permiso_liquidacion_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CREAR, m.LIQUIDACION, u.ESTADO_CUENTA))
     permisos.append(permiso_seeds(db, a.EDITAR, m.LIQUIDACION, u.ESTADO_CUENTA))
@@ -192,5 +186,4 @@ def permiso_liquidacion_seeds(db: Session, user: User):
             db, a.REPORTE, m.LIQUIDACION, u.ESTADO_CUENTA, "Reporte de Remitente"
         )
     )
-    user.permisos.extend(permisos)
-    db.commit()
+    return permisos

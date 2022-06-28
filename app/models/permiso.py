@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String  # type: ignore
+from sqlalchemy import Boolean, Column, Integer, String, text  # type: ignore
 from sqlalchemy.sql.schema import Index, UniqueConstraint  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
@@ -20,3 +20,4 @@ class Permiso(AuditMixin, Base):
     modulo = Column(String(255))
     modelo_titulo = Column(String(255))
     descripcion = Column(String(255))
+    is_for_superuser = Column(Boolean, server_default=text("false"))
