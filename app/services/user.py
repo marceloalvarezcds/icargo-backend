@@ -1,4 +1,5 @@
 from datetime import datetime
+from http.client import BAD_REQUEST
 from typing import List, Optional
 
 from fastapi import HTTPException, Request  # type: ignore
@@ -95,7 +96,13 @@ def change_user_status(
     id: int,
     status: EstadoEnum,
     modified_by: str,
+    current_user_id: Optional[int] = None,
 ) -> User:
+    if status == EstadoEnum.INACTIVO and current_user_id == id:
+        raise HTTPException(
+            status_code=BAD_REQUEST,
+            detail="No puede Desactivar su propio usuario",
+        )
     return service.change_status(User, db, id, status, modified_by)
 
 

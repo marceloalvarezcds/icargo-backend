@@ -104,5 +104,5 @@ def inactive_user_by_id(
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.USER)),  # noqa: B008
 ):
     return services.change_user_status(
-        db, id, EstadoEnum.INACTIVO, current_user.username
+        db, id, EstadoEnum.INACTIVO, current_user.username, current_user.id
     )

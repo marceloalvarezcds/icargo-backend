@@ -83,9 +83,10 @@ def change_rol_status(
     if status == EstadoEnum.INACTIVO:
         exists_user_for_rol = exists_user_for_rol_id(db, id)
         if exists_user_for_rol:
+            m = "No puede Desactivar un rol cuando está relacionado a uno o más usuarios"
             raise HTTPException(
                 status_code=BAD_REQUEST,
-                detail="No puede Desactivar un rol cuando está relacionado a uno o más usuarios",
+                detail=m,
             )
     return service.change_status(Rol, db, id, status, modified_by)
 

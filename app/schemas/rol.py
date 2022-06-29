@@ -5,7 +5,6 @@ from pydantic import BaseModel, validator
 from app.enums.estado import EstadoEnum
 
 from .date_model import Date
-from .gestor_carga import GestorCarga
 from .permiso import PermisoChecked
 
 
