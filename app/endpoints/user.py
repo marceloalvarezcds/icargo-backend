@@ -37,7 +37,7 @@ async def read_user_active_list(
 @api.get("/me", response_model=schemas.UserAccount)
 def my_account(
     current_user: User = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.VER, m.USER)),  # noqa: B008
+    _: bool = Depends(Permiso(a.INICIAR_SESION, m.USER)),  # noqa: B008
 ) -> Any:
     """
     Retrieve current user.

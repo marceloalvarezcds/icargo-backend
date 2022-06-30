@@ -17,11 +17,12 @@ from .orden_carga_permiso_seeds import (
     orden_carga_permiso_seeds,
 )
 from .rol_permiso_seeds import rol_permiso_seeds
-from .user_permiso_seeds import user_permiso_seeds
+from .user_permiso_seeds import iniciar_sesion_permiso_seeds, user_permiso_seeds
 
 
 def gestor_icargo_permiso_seeds(db: Session) -> List[Permiso]:
     permisos = []
+    permisos.extend(iniciar_sesion_permiso_seeds(db))
     permisos.extend(entities_permiso_seeds(db))
     permisos.extend(flete_permiso_seeds(db))
     permisos.extend(flota_permiso_seeds(db))
@@ -35,6 +36,7 @@ def gestor_icargo_permiso_seeds(db: Session) -> List[Permiso]:
 
 def gestor_suplente_icargo_permiso_seeds(db: Session) -> List[Permiso]:
     permisos = []
+    permisos.extend(iniciar_sesion_permiso_seeds(db))
     permisos.extend(entities_permiso_seeds(db))
     permisos.extend(flete_permiso_seeds(db))
     permisos.extend(flota_permiso_seeds(db))

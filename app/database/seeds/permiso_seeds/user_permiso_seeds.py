@@ -10,6 +10,12 @@ from app.models import Permiso
 from .permiso_seeds import permiso_seeds
 
 
+def iniciar_sesion_permiso_seeds(db: Session) -> List[Permiso]:
+    permisos = []
+    permisos.append(permiso_seeds(db, a.INICIAR_SESION, m.USER, u.USUARIOS))
+    return permisos
+
+
 def user_permiso_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.LISTAR, m.USER, u.USUARIOS))

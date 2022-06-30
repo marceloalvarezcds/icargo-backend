@@ -3,6 +3,7 @@ from typing import Dict
 
 
 class PermisoAccionEnum(Enum):
+    INICIAR_SESION = "iniciar_sesion"
     ACEPTAR = "aceptar"
     CAMBIAR_ESTADO = "cambiar_estado"
     CANCELAR = "cancelar"
@@ -94,71 +95,82 @@ class PermisoModeloEnum(Enum):
 
 
 class PermisoModuloEnum(Enum):
-    ENTIDADES = "Entidades"
-    FLOTA = "Flota"
-    FLETE = "Flete"
-    OC = "Orden de Carga"
-    CAJA_BANCO = "Caja & Banco"
-    ESTADO_CUENTA = "Estado de Cuenta"
-    LISTADOS = "Listados"
-    USUARIOS = "Usuarios"
+    USUARIOS = "1 - Usuarios"
+    ENTIDADES = "2 - Entidades"
+    FLOTA = "3 - Flota"
+    FLETE = "4 - Flete"
+    OC = "5 - Orden de Carga"
+    CAJA_BANCO = "6 - Caja & Banco"
+    ESTADO_CUENTA = "7 - Estado de Cuenta"
+    LISTADOS = "8 - Listados"
+    BIBLIOTECA = "9 - Biblioteca de Usuario"
     PARAMETROS = "Parámetros del Sistema"
-    BIBLIOTECA = "Biblioteca de Usuario"
 
 
 permisoModeloTitulo: Dict[str, str] = {
-    "banco": "Banco",
-    "caja": "Caja",
-    "camion": "Camión",
-    "camion_semi_neto": "Neto de la Combinacion Camión-Semi",
-    "cargo": "Cargo",
-    "centro_operativo_clasificacion": "Clasificación Centro Operativo",
-    "centro_operativo": "Centro Operativo",
-    "chofer": "Chofer",
-    "ciudad": "Ciudad",
-    "color": "Color",
-    "composicion_juridica": "Composición Jurídica",
-    "contacto": "Contacto",
-    "ente_emisor_automotor": "Ente emisor de Registro Automotor",
-    "ente_emisor_transporte": "Ente emisor de Registro de Transporte",
-    "estado_cuenta": "Estado de Cuenta",
-    "factura": "Factura",
+    # USUARIOS
+    "usuario": "1 - Usuario",
+    "rol": "2 - Rol",
+    "permiso": "3 - Permiso",
+    # ENTIDADES
+    "centro_operativo": "1 - Centro Operativo",
+    "remitente": "2 - Remitente",
+    "proveedor": "3 - Proveedor",
+    "punto_venta": "4 - Punto de Venta",
+    "gestor_carga": "5 - Gestor de Carga",
+    "contacto": "6 - Contacto",
+    # FLOTA
+    "propietario": "1 - Propietario",
+    "chofer": "2 - Chofer",
+    "camion": "3 - Camión",
+    "semirremolque": "4 - Semi",
+    "camion_semi_neto": "5 - Neto de la Combinacion Camión-Semi",
+    # FLETE
     "flete": "Flete",
     "flete_anticipo": "Flete Anticipo",
     "flete_complemento": "Flete Complemento",
-    "flete_descuento": "Flete descuento",
-    "gestor_carga": "Gestor de Carga",
-    "instrumento": "Instrumento",
-    "instrumento_via": "Vía de Instrumento",
-    "insumo": "Insumo",
+    "flete_descuento": "Flete Descuento",
+    # OC (Orden de Carga)
+    "orden_carga": "1 - Orden de Carga",
+    "orden_carga_complemento": "2 - Complemento",
+    "orden_carga_descuento": "3 - Descuento",
+    "orden_carga_anticipo_saldo": "4 - Saldo de Anticipo",
+    "orden_carga_anticipo_retirado": "5 - Anticipo Retirado",
+    "orden_carga_remision_destino": "6 - Remisión Destino",
+    "orden_carga_remision_origen": "7 - Remisión Origen",
+    "orden_carga_remision_resultado": "8 - Resultado de Remisión",
+    "orden_carga_remision_resultado_gestor": "9 - Resultado de Remisión de la Gestora",
+    # CAJA_BANCO
+    "caja": "1 - Caja",
+    "banco": "2 - Banco",
+    # ESTADO_CUENTA
+    "estado_cuenta": "1 - Estado de Cuenta",
+    "movimiento": "2 - Movimiento",
+    "liquidacion": "3 - Liquidación",
+    "instrumento": "4 - Instrumento",
+    "factura": "5 - Factura",
+    # LISTADOS
+    "rentabilidad": "Rentabilidad",
+    # BIBLIOTECA
+    "cargo": "Cargo",
     "insumo_punto_venta": "Insumo Punto de Venta",
     "insumo_punto_venta_precio": "Precio de Insumo en Punto de Venta",
-    "liquidacion": "Liquidación",
+    # PARAMETROS
+    "ciudad": "Ciudad",
+    "centro_operativo_clasificacion": "Clasificación Centro Operativo",
+    "semi_clasificacion": "Clasificación de Semi",
+    "color": "Color",
+    "composicion_juridica": "Composición Jurídica",
+    "ente_emisor_automotor": "Ente emisor de Registro Automotor",
+    "ente_emisor_transporte": "Ente emisor de Registro de Transporte",
+    "instrumento_via": "Vía de Instrumento",
+    "insumo": "Insumo",
     "localidad": "Localidad",
     "marca_camion": "Marca de Camión",
     "marca_semi": "Marca de Semi",
     "moneda": "Moneda",
-    "movimiento": "Movimiento",
-    "orden_carga": "Orden de Carga",
-    "orden_carga_anticipo_retirado": "Anticipo Retirado",
-    "orden_carga_anticipo_saldo": "Saldo de Anticipo",
-    "orden_carga_complemento": "Complemento",
-    "orden_carga_descuento": "Descuento",
-    "orden_carga_remision_destino": "Remisión Destino",
-    "orden_carga_remision_origen": "Remisión Origen",
-    "orden_carga_remision_resultado": "Resultado de Remisión",
-    "orden_carga_remision_resultado_gestor": "Resultado de Remisión de la Gestora",
     "pais": "País",
-    "permiso": "Permiso",
     "producto": "Producto",
-    "propietario": "Propietario",
-    "proveedor": "Proveedor",
-    "punto_venta": "Punto de Venta",
-    "remitente": "Remitente",
-    "rentabilidad": "Rentabilidad",
-    "rol": "Rol",
-    "semirremolque": "Semi",
-    "semi_clasificacion": "Clasificación de Semi",
     "tipo_anticipo": "Tipo de Anticipo",
     "tipo_camion": "Tipo de Camión",
     "tipo_carga": "Tipo de Carga",
@@ -177,5 +189,4 @@ permisoModeloTitulo: Dict[str, str] = {
     "tipo_registro": "Tipo de Registro",
     "tipo_semi": "Tipo de Semi",
     "unidad": "Unidad",
-    "usuario": "Usuario",
 }

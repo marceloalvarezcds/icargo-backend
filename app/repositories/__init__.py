@@ -328,7 +328,11 @@ from .orden_carga_remision_origen import (  # noqa
     get_orden_carga_remision_origen_list_by_orden_carga_id,
 )
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
-from .permiso import get_permiso_by, get_permiso_list  # noqa
+from .permiso import (  # noqa
+    get_permiso_by,
+    get_permiso_list,
+    get_permiso_list_by_rol_id,
+)
 from .producto import get_producto_by_descripcion, get_producto_list  # noqa
 from .propietario import (  # noqa
     change_propietario_status,

@@ -11,11 +11,12 @@ from .flota_permiso_seeds import flota_admin_permiso_seeds
 from .listado_permiso_seeds import listado_permiso_seeds
 from .orden_carga_permiso_seeds import orden_carga_admin_permiso_seeds
 from .rol_permiso_seeds import rol_permiso_seeds
-from .user_permiso_seeds import user_permiso_seeds
+from .user_permiso_seeds import iniciar_sesion_permiso_seeds, user_permiso_seeds
 
 
 def admin_icargo_permiso_seeds(db: Session) -> List[Permiso]:
     permisos = []
+    permisos.extend(iniciar_sesion_permiso_seeds(db))
     permisos.extend(entities_admin_permiso_seeds(db))
     permisos.extend(estado_cuenta_permiso_seeds(db))
     permisos.extend(flete_admin_permiso_seeds(db))
