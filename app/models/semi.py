@@ -98,7 +98,7 @@ class Semi(AuditMixin, Base):
 
     @hybrid_property
     def color_descripcion(self):
-        return self.color.descripcion if self.color else "#ffffff"
+        return self.color.descripcion if self.color else ""
 
     @hybrid_property
     def gestor_cuenta_id(self):

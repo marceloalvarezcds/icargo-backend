@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from typing import List, cast
+from typing import List, Optional, cast
 
 from fastapi import HTTPException
 from jinja2 import Template
@@ -24,6 +24,14 @@ from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete
 from .orden_carga_remision_resultado import (
     get_orden_carga_remision_resultado_list_by_orden_carga,
 )
+
+
+def get_orden_carga_list(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[OrdenCarga]:
+    if gestor_carga_id:
+        return repositories.get_orden_carga_list_by_gestor_carga_id(db, gestor_carga_id)
+    return repositories.get_orden_carga_list(db)
 
 
 def get_orden_carga_with_resultado(
