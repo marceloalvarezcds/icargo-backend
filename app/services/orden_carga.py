@@ -131,10 +131,10 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "camion_foto": obj.camion.foto,
         "camion_placa": obj.camion_placa,
         "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",
-        "camion_color": obj.camion.color.descripcion,
+        "camion_color": obj.camion.color_descripcion,
         "semi_placa": obj.semi_placa,
         "semi_marca_tipo": f"{obj.semi.marca_descripcion}/{obj.semi.tipo_descripcion}",
-        "semi_color": obj.semi.color.descripcion if obj.semi.color else "",
+        "semi_color": obj.semi.color_descripcion,
         "comentarios": obj.comentarios if obj.comentarios else "-",
         "texto_legal": obj.flete.emision_orden_texto_legal
         if obj.flete.emision_orden_texto_legal
