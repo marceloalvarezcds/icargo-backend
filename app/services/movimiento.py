@@ -17,9 +17,19 @@ from app.models import (
     OrdenCargaComplemento,
     OrdenCargaDescuento,
 )
-from app.schemas import MovimientoForm
+from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm
 from app.schemas.date_model import Date
+from app.schemas.orden_carga import OrdenCargaEditForm
 from app.schemas.rounded_decimal_model import RoundedDecimal
+
+
+def get_orden_carga_by_movimiento(movimiento: Movimiento):
+    oc = movimiento.orden_carga
+    if not oc:
+        raise HTTPException(
+            status_code=404, detail=f"No existe Orden de Carga para el movimiento {id}"
+        )
+    return oc
 
 
 def get_movimiento_list(
@@ -568,6 +578,122 @@ def edit_movimiento(
         raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
     to_edit_obj = get_movimiento_by_id(db, id)
     return repositories.edit_movimiento(to_edit_obj, db, data, gestor_id, modified_by)
+
+
+def edit_movimiento_by_gestor_flete(
+    id: int,
+    db: Session,
+    data: MovimientoFleteEditForm,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+) -> Optional[Movimiento]:
+    if not gestor_carga_id:
+        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+    to_edit_obj = get_movimiento_by_id(db, id)
+    oc = get_orden_carga_by_movimiento(to_edit_obj)
+    orden = repositories.edit_orden_carga_by_movimiento(
+        oc,
+        db,
+        OrdenCargaEditForm(
+            condicion_gestor_carga_moneda_id=data.moneda_id,
+            condicion_gestor_carga_tarifa=data.tarifa,
+        ),
+        gestor_carga_id,
+        modified_by,
+    )
+    moneda_id = data.moneda_id
+    monto = orden.resultado_gestor_carga_total_flete * -1
+    return repositories.edit_monto_movimiento(
+        to_edit_obj, db, monto, moneda_id, gestor_carga_id, modified_by
+    )
+
+
+def edit_movimiento_by_gestor_merma(
+    id: int,
+    db: Session,
+    data: MovimientoMermaEditForm,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+) -> Optional[Movimiento]:
+    if not gestor_carga_id:
+        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+    to_edit_obj = get_movimiento_by_id(db, id)
+    oc = get_orden_carga_by_movimiento(to_edit_obj)
+    orden = repositories.edit_orden_carga_by_movimiento(
+        oc,
+        db,
+        OrdenCargaEditForm(
+            merma_gestor_carga_es_porcentual=data.es_porcentual,
+            merma_gestor_carga_moneda_id=data.moneda_id,
+            merma_gestor_carga_tolerancia=data.tolerancia,
+            merma_gestor_carga_valor=data.valor,
+        ),
+        gestor_carga_id,
+        modified_by,
+    )
+    moneda_id = data.moneda_id
+    monto = orden.resultado_gestor_carga_merma_valor_total
+    return repositories.edit_monto_movimiento(
+        to_edit_obj, db, monto, moneda_id, gestor_carga_id, modified_by
+    )
+
+
+def edit_movimiento_by_propietario_flete(
+    id: int,
+    db: Session,
+    data: MovimientoFleteEditForm,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+) -> Optional[Movimiento]:
+    if not gestor_carga_id:
+        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+    to_edit_obj = get_movimiento_by_id(db, id)
+    oc = get_orden_carga_by_movimiento(to_edit_obj)
+    orden = repositories.edit_orden_carga_by_movimiento(
+        oc,
+        db,
+        OrdenCargaEditForm(
+            condicion_propietario_moneda_id=data.moneda_id,
+            condicion_propietario_tarifa=data.tarifa,
+        ),
+        gestor_carga_id,
+        modified_by,
+    )
+    moneda_id = data.moneda_id
+    monto = orden.resultado_propietario_total_flete
+    return repositories.edit_monto_movimiento(
+        to_edit_obj, db, monto, moneda_id, gestor_carga_id, modified_by
+    )
+
+
+def edit_movimiento_by_propietario_merma(
+    id: int,
+    db: Session,
+    data: MovimientoMermaEditForm,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+) -> Optional[Movimiento]:
+    if not gestor_carga_id:
+        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+    to_edit_obj = get_movimiento_by_id(db, id)
+    oc = get_orden_carga_by_movimiento(to_edit_obj)
+    orden = repositories.edit_orden_carga_by_movimiento(
+        oc,
+        db,
+        OrdenCargaEditForm(
+            merma_propietario_es_porcentual=data.es_porcentual,
+            merma_propietario_moneda_id=data.moneda_id,
+            merma_propietario_tolerancia=data.tolerancia,
+            merma_propietario_valor=data.valor,
+        ),
+        gestor_carga_id,
+        modified_by,
+    )
+    moneda_id = data.moneda_id
+    monto = orden.resultado_propietario_merma_valor_total * -1
+    return repositories.edit_monto_movimiento(
+        to_edit_obj, db, monto, moneda_id, gestor_carga_id, modified_by
+    )
 
 
 def delete_movimiento(db: Session, id: int, modified_by: str) -> Movimiento:

@@ -22,6 +22,7 @@ from .orden_carga_anticipo_saldo import get_orden_carga_by_id
 from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete
 from .orden_carga_remision_resultado import (
+    get_orden_carga_remision_resultado_list_by_flete,
     get_orden_carga_remision_resultado_list_by_orden_carga,
 )
 
@@ -39,6 +40,9 @@ def get_orden_carga_with_resultado(
 ) -> schemas.OrdenCarga:
     obj = schemas.OrdenCarga.from_orm(model)
     obj.remisiones_resultado = get_orden_carga_remision_resultado_list_by_orden_carga(
+        model, current_user
+    )
+    obj.remisiones_resultado_flete = get_orden_carga_remision_resultado_list_by_flete(
         model, current_user
     )
     obj.auditorias = cast(

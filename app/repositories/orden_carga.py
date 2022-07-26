@@ -55,6 +55,30 @@ def create_orden_carga(
         comentarios=data.comentarios,
         origen_id=flete.origen_id,
         destino_id=flete.destino_id,
+        # INICIO Cantidad y Flete
+        # inicio - Condiciones para el Gestor de Carga
+        condicion_gestor_carga_moneda_id=flete.condicion_gestor_carga_moneda_id,
+        condicion_gestor_carga_tarifa=flete.condicion_gestor_carga_tarifa,
+        # fin - Condiciones para el Gestor de Cuenta
+        # inicio - Condiciones para el Propietario
+        condicion_propietario_moneda_id=flete.condicion_propietario_moneda_id,
+        condicion_propietario_tarifa=flete.condicion_propietario_tarifa,
+        # fin - Condiciones para el Gestor de Carga
+        # inicio - Condiciones para el Propietario
+        # INICIO Mermas de Fletes
+        # inicio - Mermas para el Gestor de Carga
+        merma_gestor_carga_valor=flete.merma_gestor_carga_valor,
+        merma_gestor_carga_moneda_id=flete.merma_gestor_carga_moneda_id,
+        merma_gestor_carga_es_porcentual=flete.merma_gestor_carga_es_porcentual,
+        merma_gestor_carga_tolerancia=flete.merma_gestor_carga_tolerancia,
+        # fin - Mermas para el Gestor de Carga
+        # inicio - Mermas para el Propietario
+        merma_propietario_valor=flete.merma_propietario_valor,
+        merma_propietario_moneda_id=flete.merma_propietario_moneda_id,
+        merma_propietario_es_porcentual=flete.merma_propietario_es_porcentual,
+        merma_propietario_tolerancia=flete.merma_propietario_tolerancia,
+        # fin - Mermas para el Propietario
+        # FIN Mermas de Fletes
         gestor_carga_id=gestor_carga_id,
         created_by=modified_by,
         modified_by=modified_by,
@@ -87,6 +111,25 @@ def edit_orden_carga(
         obj.destino_id = data.destino_id
     if data.comentarios:
         obj.comentarios = data.comentarios
+    obj.gestor_carga_id = gestor_carga_id
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+def edit_orden_carga_by_movimiento(
+    obj: OrdenCarga,
+    db: Session,
+    data: OrdenCargaEditForm,
+    gestor_carga_id: int,
+    modified_by: str,
+) -> OrdenCarga:
+    for prop, value in data.dict().items():
+        if hasattr(obj, prop) and value:
+            setattr(obj, prop, value)
+    obj.modify_by_movimiento = True
     obj.gestor_carga_id = gestor_carga_id
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()

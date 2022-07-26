@@ -122,6 +122,58 @@ async def edit_movimiento(
     )
 
 
+@api.put("/{id}/edit_by_gestor_flete", response_model=schemas.Movimiento)
+async def edit_movimiento_by_gestor_flete(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.MovimientoFleteEditForm] = Form(...),  # type: ignore  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
+):
+    return services.edit_movimiento_by_gestor_flete(
+        id, db, data, current_user.gestor_carga_id, current_user.username  # type: ignore
+    )
+
+
+@api.put("/{id}/edit_by_gestor_merma", response_model=schemas.Movimiento)
+async def edit_movimiento_by_gestor_merma(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.MovimientoMermaEditForm] = Form(...),  # type: ignore  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
+):
+    return services.edit_movimiento_by_gestor_merma(
+        id, db, data, current_user.gestor_carga_id, current_user.username  # type: ignore
+    )
+
+
+@api.put("/{id}/edit_by_propietario_flete", response_model=schemas.Movimiento)
+async def edit_movimiento_by_propietario_flete(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.MovimientoFleteEditForm] = Form(...),  # type: ignore  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
+):
+    return services.edit_movimiento_by_propietario_flete(
+        id, db, data, current_user.gestor_carga_id, current_user.username  # type: ignore
+    )
+
+
+@api.put("/{id}/edit_by_propietario_merma", response_model=schemas.Movimiento)
+async def edit_movimiento_by_propietario_merma(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.MovimientoMermaEditForm] = Form(...),  # type: ignore  # noqa: B008
+    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
+):
+    return services.edit_movimiento_by_propietario_merma(
+        id, db, data, current_user.gestor_carga_id, current_user.username  # type: ignore
+    )
+
+
 @api.delete("/{id}", response_model=schemas.Movimiento)
 async def delete_movimiento(
     id: int,

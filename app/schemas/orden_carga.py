@@ -9,6 +9,7 @@ from .audit_database import AuditDatabase
 from .centro_operativo import CentroOperativo
 from .date_model import Date
 from .flete_anticipo import FleteAnticipo
+from .moneda import Moneda
 from .movimiento import Movimiento
 from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 from .orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
@@ -37,9 +38,34 @@ class OrdenCargaEditForm(BaseModel):
     comentarios: Optional[str] = None
     origen_id: Optional[int] = None
     destino_id: Optional[int] = None
+    # INICIO Cantidad y Flete
+    modify_by_movimiento: Optional[bool] = False
+    # inicio - Condiciones para el Gestor de Carga
+    condicion_gestor_carga_moneda_id: Optional[int] = None
+    condicion_gestor_carga_tarifa: Optional[RoundedDecimal] = None
+    # fin - Condiciones para el Gestor de Carga
+    # inicio - Condiciones para el Propietario
+    condicion_propietario_moneda_id: Optional[int] = None
+    condicion_propietario_tarifa: Optional[RoundedDecimal] = None
+    # fin - Condiciones para el Propietario
+    # FIN Cantidad y Flete
+    # INICIO Mermas de Fletes
+    # inicio - Mermas para el Gestor de Carga
+    merma_gestor_carga_valor: Optional[RoundedDecimal] = None
+    merma_gestor_carga_moneda_id: Optional[int] = None
+    merma_gestor_carga_es_porcentual: Optional[bool] = False
+    merma_gestor_carga_tolerancia: Optional[RoundedDecimal] = None
+    # fin - Mermas para el Gestor de Carga
+    # inicio - Mermas para el Propietario
+    merma_propietario_valor: Optional[RoundedDecimal] = None
+    merma_propietario_moneda_id: Optional[int] = None
+    merma_propietario_es_porcentual: Optional[bool] = False
+    merma_propietario_tolerancia: Optional[RoundedDecimal] = None
+    # fin - Mermas para el Propietario
+    # FIN Mermas de Fletes
 
 
-class OrdenCarga(OrdenCargaForm):
+class OrdenCarga(OrdenCargaEditForm):
     id: int
     # Datos de camion
     camion_chofer_nombre: Optional[str] = None
@@ -83,11 +109,27 @@ class OrdenCarga(OrdenCargaForm):
     anticipos_liberados: bool
     anticipos_liberados_descripcion: str
     # INICIO Tramo de OC
-    origen_id: Optional[int] = None
     origen: Optional[CentroOperativo] = None
-    destino_id: Optional[int] = None
     destino: Optional[CentroOperativo] = None
     # FIN Tramo de OC
+    # INICIO Cantidad y Flete
+    # inicio - Condiciones para el Gestor de Carga
+    condicion_gestor_carga_moneda: Moneda
+    # fin - Condiciones para el Gestor de Carga
+    # inicio - Condiciones para el Propietario
+    condicion_propietario_moneda: Moneda
+    # fin - Condiciones para el Propietario
+    # FIN Cantidad y Flete
+    # INICIO Mermas de Fletes
+    # inicio - Mermas para el Gestor de Carga
+    merma_gestor_carga_moneda: Moneda
+    merma_gestor_carga_es_porcentual_descripcion: str
+    # fin - Mermas para el Gestor de Carga
+    # inicio - Mermas para el Propietario
+    merma_propietario_moneda: Moneda
+    merma_propietario_es_porcentual_descripcion: str
+    # fin - Mermas para el Propietario
+    # FIN Mermas de Fletes
     # Relaciones Listas
     auditorias: List[AuditDatabase]
     historial: List[OrdenCargaEstadoHistorial]
@@ -100,6 +142,7 @@ class OrdenCarga(OrdenCargaForm):
     remisiones_destino: List[OrdenCargaRemisionDestino]
     remisiones_origen: List[OrdenCargaRemisionOrigen]
     remisiones_resultado: List[OrdenCargaRemisionResultado]
+    remisiones_resultado_flete: List[OrdenCargaRemisionResultado]
     cantidad_destino: RoundedDecimal
     cantidad_origen: RoundedDecimal
     # Auditoría
@@ -116,6 +159,7 @@ class OrdenCarga(OrdenCargaForm):
     def from_orm(cls, obj: Any) -> "OrdenCarga":
         obj.auditorias = []
         obj.remisiones_resultado = []
+        obj.remisiones_resultado_flete = []
         return super().from_orm(obj)
 
 

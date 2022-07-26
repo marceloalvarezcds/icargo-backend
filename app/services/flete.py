@@ -312,13 +312,13 @@ def get_flete_reports(db: Session) -> str:
         value_cell.value = item.condicion_cantidad
 
         value_cell = ws.cell(row=row + 2, column=17)
-        value_cell.value = item.condicion_gestor_cuenta_moneda_nombre
+        value_cell.value = item.condicion_gestor_carga_moneda_nombre
 
         value_cell = ws.cell(row=row + 2, column=18)
         value_cell.value = item.condicion_gestor_cuenta_tarifa
 
         value_cell = ws.cell(row=row + 2, column=19)
-        value_cell.value = item.condicion_gestor_cuenta_unidad_descripcion
+        value_cell.value = item.condicion_gestor_carga_unidad_descripcion
 
         value_cell = ws.cell(row=row + 2, column=20)
         value_cell.value = item.condicion_propietario_moneda_nombre
@@ -333,10 +333,10 @@ def get_flete_reports(db: Session) -> str:
         value_cell.value = item.merma_gestor_cuenta_valor
 
         value_cell = ws.cell(row=row + 2, column=24)
-        value_cell.value = item.merma_gestor_cuenta_moneda_nombre
+        value_cell.value = item.merma_gestor_carga_moneda_nombre
 
         value_cell = ws.cell(row=row + 2, column=25)
-        value_cell.value = item.merma_gestor_cuenta_unidad_descripcion
+        value_cell.value = item.merma_gestor_carga_unidad_descripcion
 
         value_cell = ws.cell(row=row + 2, column=26)
         value_cell.value = "Si" if item.merma_gestor_cuenta_es_porcentual else "No"

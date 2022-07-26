@@ -74,11 +74,11 @@ def create_flete(
         # FIN Tramo de Fletes
         # INICIO Cantidad y Flete
         condicion_cantidad=data.condicion_cantidad,
-        # inicio - Condiciones para el Gestor de Cuenta
-        condicion_gestor_cuenta_moneda_id=data.condicion_gestor_cuenta_moneda_id,
-        condicion_gestor_cuenta_tarifa=data.condicion_gestor_cuenta_tarifa,
-        condicion_gestor_cuenta_unidad_id=data.condicion_gestor_cuenta_unidad_id,
-        # fin - Condiciones para el Gestor de Cuenta
+        # inicio - Condiciones para el Gestor de Carga
+        condicion_gestor_cuenta_moneda_id=data.condicion_gestor_carga_moneda_id,
+        condicion_gestor_cuenta_tarifa=data.condicion_gestor_carga_tarifa,
+        condicion_gestor_cuenta_unidad_id=data.condicion_gestor_carga_unidad_id,
+        # fin - Condiciones para el Gestor de Carga
         # inicio - Condiciones para el Propietario
         condicion_propietario_moneda_id=data.condicion_propietario_moneda_id,
         condicion_propietario_tarifa=data.condicion_propietario_tarifa,
@@ -86,13 +86,13 @@ def create_flete(
         # fin - Condiciones para el Propietario
         # FIN Cantidad y Flete
         # INICIO Mermas de Fletes
-        # inicio - Mermas para el Gestor de Cuenta
-        merma_gestor_cuenta_valor=data.merma_gestor_cuenta_valor,
-        merma_gestor_cuenta_moneda_id=data.merma_gestor_cuenta_moneda_id,
-        merma_gestor_cuenta_unidad_id=data.merma_gestor_cuenta_unidad_id,
-        merma_gestor_cuenta_es_porcentual=data.merma_gestor_cuenta_es_porcentual,
-        merma_gestor_cuenta_tolerancia=data.merma_gestor_cuenta_tolerancia,
-        # fin - Mermas para el Gestor de Cuenta
+        # inicio - Mermas para el Gestor de Carga
+        merma_gestor_cuenta_valor=data.merma_gestor_carga_valor,
+        merma_gestor_cuenta_moneda_id=data.merma_gestor_carga_moneda_id,
+        merma_gestor_cuenta_unidad_id=data.merma_gestor_carga_unidad_id,
+        merma_gestor_cuenta_es_porcentual=data.merma_gestor_carga_es_porcentual,
+        merma_gestor_cuenta_tolerancia=data.merma_gestor_carga_tolerancia,
+        # fin - Mermas para el Gestor de Carga
         # inicio - Mermas para el Propietario
         merma_propietario_valor=data.merma_propietario_valor,
         merma_propietario_moneda_id=data.merma_propietario_moneda_id,
@@ -142,11 +142,11 @@ def edit_flete(
         # FIN Tramo de Fletes
         # INICIO Cantidad y Flete
         obj.condicion_cantidad = data.condicion_cantidad
-        # inicio - Condiciones para el Gestor de Cuenta
-        obj.condicion_gestor_cuenta_moneda_id = data.condicion_gestor_cuenta_moneda_id
-        obj.condicion_gestor_cuenta_tarifa = data.condicion_gestor_cuenta_tarifa
-        obj.condicion_gestor_cuenta_unidad_id = data.condicion_gestor_cuenta_unidad_id
-        # fin - Condiciones para el Gestor de Cuenta
+        # inicio - Condiciones para el Gestor de Carga
+        obj.condicion_gestor_cuenta_moneda_id = data.condicion_gestor_carga_moneda_id
+        obj.condicion_gestor_cuenta_tarifa = data.condicion_gestor_carga_tarifa
+        obj.condicion_gestor_cuenta_unidad_id = data.condicion_gestor_carga_unidad_id
+        # fin - Condiciones para el Gestor de Carga
         # inicio - Condiciones para el Propietario
         obj.condicion_propietario_moneda_id = data.condicion_propietario_moneda_id
         obj.condicion_propietario_tarifa = data.condicion_propietario_tarifa
@@ -154,13 +154,13 @@ def edit_flete(
         # fin - Condiciones para el Propietario
         # FIN Cantidad y Flete
         # INICIO Mermas de Fletes
-        # inicio - Mermas para el Gestor de Cuenta
-        obj.merma_gestor_cuenta_valor = data.merma_gestor_cuenta_valor
-        obj.merma_gestor_cuenta_moneda_id = data.merma_gestor_cuenta_moneda_id
-        obj.merma_gestor_cuenta_unidad_id = data.merma_gestor_cuenta_unidad_id
-        obj.merma_gestor_cuenta_es_porcentual = data.merma_gestor_cuenta_es_porcentual
-        obj.merma_gestor_cuenta_tolerancia = data.merma_gestor_cuenta_tolerancia
-        # fin - Mermas para el Gestor de Cuenta
+        # inicio - Mermas para el Gestor de Carga
+        obj.merma_gestor_cuenta_valor = data.merma_gestor_carga_valor
+        obj.merma_gestor_cuenta_moneda_id = data.merma_gestor_carga_moneda_id
+        obj.merma_gestor_cuenta_unidad_id = data.merma_gestor_carga_unidad_id
+        obj.merma_gestor_cuenta_es_porcentual = data.merma_gestor_carga_es_porcentual
+        obj.merma_gestor_cuenta_tolerancia = data.merma_gestor_carga_tolerancia
+        # fin - Mermas para el Gestor de Carga
         # inicio - Mermas para el Propietario
         obj.merma_propietario_valor = data.merma_propietario_valor
         obj.merma_propietario_moneda_id = data.merma_propietario_moneda_id

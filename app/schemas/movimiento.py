@@ -48,6 +48,18 @@ class MovimientoForm(MovimientoBaseModel):
     es_creacion_contraparte: Optional[bool] = False
 
 
+class MovimientoFleteEditForm(BaseModel):
+    moneda_id: Optional[int] = None
+    tarifa: Optional[RoundedDecimal] = None
+
+
+class MovimientoMermaEditForm(BaseModel):
+    valor: Optional[RoundedDecimal] = None
+    moneda_id: Optional[int] = None
+    es_porcentual: Optional[bool] = False
+    tolerancia: Optional[RoundedDecimal] = None
+
+
 class Movimiento(MovimientoBaseModel):
     id: int
     gestor_carga_id: int
@@ -86,6 +98,25 @@ class Movimiento(MovimientoBaseModel):
     tipo_insumo_descripcion: Optional[str]
     tipo_movimiento_descripcion: str
     tipo_operacion_descripcion: str
+    # Datos de la OC
+    es_flete: bool
+    es_gestor: bool
+    es_merma: bool
+    es_propietario: bool
+    can_edit_oc: bool
+    cantidad_destino: Optional[RoundedDecimal] = None
+    condicion_gestor_carga_moneda_id: Optional[int] = None
+    condicion_gestor_carga_tarifa: Optional[RoundedDecimal] = None
+    condicion_propietario_moneda_id: Optional[int] = None
+    condicion_propietario_tarifa: Optional[RoundedDecimal] = None
+    merma_gestor_carga_valor: Optional[RoundedDecimal] = None
+    merma_gestor_carga_moneda_id: Optional[int] = None
+    merma_gestor_carga_es_porcentual: Optional[bool] = False
+    merma_gestor_carga_tolerancia: Optional[RoundedDecimal] = None
+    merma_propietario_valor: Optional[RoundedDecimal] = None
+    merma_propietario_moneda_id: Optional[int] = None
+    merma_propietario_es_porcentual: Optional[bool] = False
+    merma_propietario_tolerancia: Optional[RoundedDecimal] = None
     # Auditoría
     created_by: str
     created_at: Date

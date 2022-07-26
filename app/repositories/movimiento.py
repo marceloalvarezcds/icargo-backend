@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
@@ -211,6 +212,25 @@ def create_movimiento(
         modified_by=modified_by,
     )
     db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+def edit_monto_movimiento(
+    obj: Movimiento,
+    db: Session,
+    monto: Decimal,
+    moneda_id: Optional[int],
+    gestor_carga_id: int,
+    modified_by: str,
+) -> Movimiento:
+    obj.monto = monto
+    if moneda_id:
+        obj.moneda_id = moneda_id
+    obj.gestor_carga_id = gestor_carga_id
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
     db.commit()
     db.refresh(obj)
     return obj

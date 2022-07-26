@@ -34,11 +34,11 @@ class FleteFormBaseModel(BaseModel):
     # FIN Tramo de Fletes
     # INICIO Cantidad y Flete
     condicion_cantidad: RoundedDecimal
-    # inicio - Condiciones para el Gestor de Cuenta
-    condicion_gestor_cuenta_moneda_id: int
-    condicion_gestor_cuenta_tarifa: RoundedDecimal
-    condicion_gestor_cuenta_unidad_id: int
-    # fin - Condiciones para el Gestor de Cuenta
+    # inicio - Condiciones para el Gestor de Carga
+    condicion_gestor_carga_moneda_id: int
+    condicion_gestor_carga_tarifa: RoundedDecimal
+    condicion_gestor_carga_unidad_id: int
+    # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda_id: int
     condicion_propietario_tarifa: RoundedDecimal
@@ -46,13 +46,13 @@ class FleteFormBaseModel(BaseModel):
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
-    # inicio - Mermas para el Gestor de Cuenta
-    merma_gestor_cuenta_valor: RoundedDecimal
-    merma_gestor_cuenta_moneda_id: int
-    merma_gestor_cuenta_unidad_id: int
-    merma_gestor_cuenta_es_porcentual: Optional[bool] = False
-    merma_gestor_cuenta_tolerancia: RoundedDecimal
-    # fin - Mermas para el Gestor de Cuenta
+    # inicio - Mermas para el Gestor de Carga
+    merma_gestor_carga_valor: RoundedDecimal
+    merma_gestor_carga_moneda_id: int
+    merma_gestor_carga_unidad_id: int
+    merma_gestor_carga_es_porcentual: Optional[bool] = False
+    merma_gestor_carga_tolerancia: RoundedDecimal
+    # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
     merma_propietario_valor: RoundedDecimal
     merma_propietario_moneda_id: int
@@ -90,21 +90,21 @@ class Flete(FleteFormBaseModel):
     destino: CentroOperativo
     # FIN Tramo de Fletes
     # INICIO Cantidad y Flete
-    # inicio - Condiciones para el Gestor de Cuenta
-    condicion_gestor_cuenta_moneda: Moneda
-    condicion_gestor_cuenta_unidad: Unidad
-    # fin - Condiciones para el Gestor de Cuenta
+    # inicio - Condiciones para el Gestor de Carga
+    condicion_gestor_carga_moneda: Moneda
+    condicion_gestor_carga_unidad: Unidad
+    # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda: Moneda
     condicion_propietario_unidad: Unidad
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
-    # inicio - Mermas para el Gestor de Cuenta
-    merma_gestor_cuenta_moneda: Moneda
-    merma_gestor_cuenta_unidad: Unidad
-    merma_gestor_cuenta_es_porcentual_descripcion: str
-    # fin - Mermas para el Gestor de Cuenta
+    # inicio - Mermas para el Gestor de Carga
+    merma_gestor_carga_moneda: Moneda
+    merma_gestor_carga_unidad: Unidad
+    merma_gestor_carga_es_porcentual_descripcion: str
+    # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
     merma_propietario_moneda: Moneda
     merma_propietario_unidad: Unidad
@@ -147,21 +147,21 @@ class FleteList(FleteFormBaseModel):
     destino_nombre: str
     # FIN Tramo de Fletes
     # INICIO Cantidad y Flete
-    # inicio - Condiciones para el Gestor de Cuenta
-    condicion_gestor_cuenta_moneda_nombre: str
-    condicion_gestor_cuenta_unidad_descripcion: str
-    # fin - Condiciones para el Gestor de Cuenta
+    # inicio - Condiciones para el Gestor de Carga
+    condicion_gestor_carga_moneda_nombre: str
+    condicion_gestor_carga_unidad_descripcion: str
+    # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda_nombre: str
     condicion_propietario_unidad_descripcion: str
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
-    # inicio - Mermas para el Gestor de Cuenta
-    merma_gestor_cuenta_moneda_nombre: str
-    merma_gestor_cuenta_unidad_descripcion: str
-    merma_gestor_cuenta_es_porcentual_descripcion: str
-    # fin - Mermas para el Gestor de Cuenta
+    # inicio - Mermas para el Gestor de Carga
+    merma_gestor_carga_moneda_nombre: str
+    merma_gestor_carga_unidad_descripcion: str
+    merma_gestor_carga_es_porcentual_descripcion: str
+    # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
     merma_propietario_moneda_nombre: str
     merma_propietario_unidad_descripcion: str
