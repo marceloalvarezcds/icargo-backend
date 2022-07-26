@@ -114,19 +114,19 @@ class OrdenCarga(OrdenCargaEditForm):
     # FIN Tramo de OC
     # INICIO Cantidad y Flete
     # inicio - Condiciones para el Gestor de Carga
-    condicion_gestor_carga_moneda: Moneda
+    condicion_gestor_carga_moneda: Optional[Moneda] = None
     # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
-    condicion_propietario_moneda: Moneda
+    condicion_propietario_moneda: Optional[Moneda] = None
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
     # inicio - Mermas para el Gestor de Carga
-    merma_gestor_carga_moneda: Moneda
+    merma_gestor_carga_moneda: Optional[Moneda] = None
     merma_gestor_carga_es_porcentual_descripcion: str
     # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
-    merma_propietario_moneda: Moneda
+    merma_propietario_moneda: Optional[Moneda] = None
     merma_propietario_es_porcentual_descripcion: str
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
