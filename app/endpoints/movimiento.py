@@ -20,6 +20,40 @@ async def read_movimiento_list(
     return repositories.get_movimiento_list(db)
 
 
+@api.get("/reports")
+async def banco_reports(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008
+):
+    return services.get_movimiento_reports(db)
+
+
+@api.get(
+    "/reports/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}",  # noqa: B950
+)
+async def banco_reports_by_estado(
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    etapa: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008
+):
+    return services.get_movimiento_reports_by_contraparte(
+        db, tipo_contraparte_id, contraparte, contraparte_numero_documento, etapa
+    )
+
+
+@api.get("/reports/liquidacion/{liquidacion_id}/estado/{estado}")
+async def banco_reports_by_estado_and_liquidacion_id(
+    liquidacion_id: int,
+    estado: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008
+):
+    return services.get_movimiento_reports(db, liquidacion_id, estado)
+
+
 @api.get("/gestor_carga_id", response_model=List[schemas.Movimiento])
 async def read_movimiento_list_by_gestor_carga_id(
     db: Session = Depends(get_db_session),  # noqa: B008

@@ -163,6 +163,7 @@ from .movimiento import (  # noqa
     get_movimiento_list_by_estado_cuenta,
     get_movimiento_list_by_liquidacion,
     get_movimiento_reports,
+    get_movimiento_reports_by_contraparte,
 )
 from .orden_carga import (  # noqa
     aceptar_orden_carga,

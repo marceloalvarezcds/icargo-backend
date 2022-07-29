@@ -702,95 +702,145 @@ def delete_movimiento(db: Session, id: int, modified_by: str) -> Movimiento:
     return repositories.delete_movimiento(co, db, modified_by)
 
 
-def get_movimiento_reports(db: Session) -> str:
-    datalist = repositories.get_movimiento_list(db)
+def get_movimiento_reports_by_contraparte(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+    gestor_carga_id: Optional[int] = None,
+) -> str:
+    datalist = []
+    if gestor_carga_id:
+        datalist = repositories.get_movimiento_list_for_reports_by_contraparte_and_gestor_carga_id(  # noqa: B950
+            db,
+            tipo_contraparte_id,
+            contraparte,
+            contraparte_numero_documento,
+            estado,
+            gestor_carga_id,
+        )
+    datalist = repositories.get_movimiento_list_for_reports_by_contraparte(
+        db, tipo_contraparte_id, contraparte, contraparte_numero_documento, estado
+    )
+    return generate_movimiento_reports(datalist)
+
+
+def get_movimiento_reports(
+    db: Session,
+    liquidacion_id: Optional[int] = None,
+    estado: Optional[str] = None,
+) -> str:
+    datalist = []
+    if estado and liquidacion_id:
+        datalist = repositories.get_movimiento_list_for_reports_by_liquidacion_id(
+            db, liquidacion_id, estado
+        )
+    else:
+        datalist = repositories.get_movimiento_list(db)
+    return generate_movimiento_reports(datalist)
+
+
+def generate_movimiento_reports(
+    datalist: List[Movimiento],
+) -> str:
     wb = Workbook()
     ws = wb.active
+    i = 0
 
-    title_cell = ws.cell(row=1, column=1)
-    title_cell.value = "ID"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Estado"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=2)
-    title_cell.value = "Nombre de Cuenta"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Tipo Contraparte"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=3)
-    title_cell.value = "Titular"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Contraparte"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=4)
-    title_cell.value = "Movimiento"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Nº de Doc Fiscal"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=5)
-    title_cell.value = "Crédito"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Fecha"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=6)
-    title_cell.value = "Débito"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Cuenta"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=7)
-    title_cell.value = "Saldo"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Concepto"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=8)
-    title_cell.value = "Pendiente"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Nº de Mov."
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=9)
-    title_cell.value = "Usuario creación"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Nº de Liq."
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=10)
-    title_cell.value = "Fecha creación"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Nº Doc Relac."
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=11)
-    title_cell.value = "Usuario modificación"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Monto"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=12)
-    title_cell.value = "Fecha modificación"
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Detalle"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Usuario"
     title_cell.font = Font(bold=True)
 
     for row, item in enumerate(datalist):
-        value_cell = ws.cell(row=row + 2, column=1)
+        i = 0
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.estado
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.tipo_contraparte_descripcion
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.contraparte
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.contraparte_numero_documento
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.fecha if item.fecha else item.created_at
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.cuenta_descripcion
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.concepto
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.id
 
-        value_cell = ws.cell(row=row + 2, column=2)
-        value_cell.value = item.numero_cuenta
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.liquidacion_id
 
-        value_cell = ws.cell(row=row + 2, column=3)
-        value_cell.value = item.titular
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.numero_documento_relacionado
 
-        value_cell = ws.cell(row=row + 2, column=4)
-        value_cell.value = item.nombre
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.monto
 
-        value_cell = ws.cell(row=row + 2, column=5)
-        value_cell.value = item.credito
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.detalle
 
-        value_cell = ws.cell(row=row + 2, column=6)
-        value_cell.value = item.debito
-
-        value_cell = ws.cell(row=row + 2, column=7)
-        value_cell.value = item.saldo_confirmado
-
-        value_cell = ws.cell(row=row + 2, column=8)
-        value_cell.value = item.saldo_provisional
-
-        value_cell = ws.cell(row=row + 2, column=9)
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.created_by
-
-        value_cell = ws.cell(row=row + 2, column=10)
-        value_cell.value = item.created_at
-
-        value_cell = ws.cell(row=row + 2, column=11)
-        value_cell.value = item.modified_by
-
-        value_cell = ws.cell(row=row + 2, column=12)
-        value_cell.value = item.modified_at
 
     ws.auto_filter.ref = ws.dimensions
     filename = "movimiento_reports.xls"
