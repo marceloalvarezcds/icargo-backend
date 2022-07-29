@@ -261,6 +261,9 @@ from .movimiento import (  # noqa
     get_movimiento_list_by_liquidacion_and_gestor_carga_id,
     get_movimiento_list_by_liquidacion_id,
     get_movimiento_list_by_orden_carga_id,
+    get_movimiento_list_for_reports_by_contraparte,
+    get_movimiento_list_for_reports_by_contraparte_and_gestor_carga_id,
+    get_movimiento_list_for_reports_by_liquidacion_id,
 )
 from .orden_carga import (  # noqa
     aceptar_orden_carga,
