@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Resumen de Liquidación</title>
+    <meta name="generator" content="BCL easyConverter SDK 5.0.252" />
+    <meta name="title" content="2022 01 21 Anticipos icargo" />
+    <style type="text/css">
+      body {
+        margin: 0px;
+        padding: 0px;
+        overflow: auto;
+        font-family: "Georgia";
+      }
+
+      .align-center {
+        align-items: center;
+      }
+
+      .blue {
+        color: #3399ff;
+      }
+
+      .bold {
+        font-weight: bold;
+      }
+
+      .box {
+        border: 2px solid #d1d3d4;
+        box-sizing: border-box;
+      }
+
+      .center {
+        text-align: center;
+      }
+
+      .dashed {
+        border: 1px dashed;
+        margin: 20px 0;
+      }
+
+      .flex1 {
+        flex: 1;
+      }
+
+      .firma-container {
+        display: flex;
+        margin-top: 100px;
+      }
+
+      .firma {
+        border-top: 2px solid #444;
+        margin: auto;
+        width: 400px;
+      }
+
+      .firma p {
+        text-align: center;
+        line-height: 35px;
+      }
+
+      .fs1 {
+        font-size: 34px;
+      }
+
+      .fs2 {
+        font-size: 24px;
+      }
+
+      .fs3 {
+        font-size: 20px;
+      }
+
+      .fs4 {
+        font-size: 18px;
+      }
+
+      .fs5 {
+        font-size: 16px;
+      }
+
+      .fs6 {
+        font-size: 14px;
+      }
+
+      .fs7 {
+        font-size: 11px;
+      }
+
+      .gestor-logo {
+        width: 186px;
+        height: 186px;
+      }
+
+      .gestor-logo div {
+        text-align: center;
+      }
+
+      .gestor-logo img {
+        width: 100%;
+        height: auto;
+      }
+
+      .gestor-logo .table {
+        height: 100%;
+      }
+
+      .gray {
+        color: #939598;
+      }
+
+      .lh1 {
+        line-height: 40px;
+      }
+
+      .lh2 {
+        line-height: 28px;
+      }
+
+      .lh3 {
+        line-height: 25px;
+      }
+
+      .lh4 {
+        line-height: 16px;
+      }
+
+      .liquidacion-flete {
+        width: 194px;
+      }
+
+      .logo-container .logo {
+        width: 430px;
+        height: 120px;
+      }
+
+      .logo-container img {
+        margin: auto;
+        width: auto;
+        height: 120px;
+      }
+
+      .mb10 {
+        margin-bottom: 10px;
+      }
+
+      .mt0 {
+        margin-top: 0;
+      }
+
+      .mt10 {
+        margin-top: 10px;
+      }
+
+      p {
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-top: 0px;
+        margin-bottom: 0px;
+      }
+
+      .p0 {
+        padding: 0 !important;
+      }
+
+      .py10 {
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      .table {
+        display: flex;
+      }
+
+      .table .box {
+        border-right-width: 0;
+      }
+
+      .table .box:last-of-type {
+        border-right-width: 2px;
+      }
+
+      .table .td {
+        padding: 8px 0 7px 0;
+      }
+
+      .table.gap .box {
+        margin-bottom: 10px;
+        margin-right: 8px;
+        border-right-width: 2px;
+      }
+
+      .table.gap .box:last-of-type {
+        margin-right: 0;
+      }
+
+      .table.gap .nogap .box {
+        margin-top: 0;
+        margin-right: 0;
+        border-right-width: 0;
+      }
+
+      .table.gap .nogap .box:last-of-type {
+        border-right-width: 2px;
+      }
+
+      .table0 .td:last-of-type {
+        width: 400px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+
+      table tr {
+        border-top: 0px;
+      }
+
+      table td,
+      table th {
+        padding: 0 5px;
+        text-align: left;
+      }
+
+      .table-fletes td,
+      .table-fletes th,
+      .table-otros td,
+      .table-otros th,
+      .table-instrumentos td,
+      .table-instrumentos th {
+        width: 70px;
+      }
+
+      .table-fletes .concepto,
+      .table-otros .concepto {
+        width: 80px;
+      }
+
+      .table-fletes .detalle {
+        width: 150px;
+      }
+
+      .table-otros .detalle {
+        width: 370px;
+      }
+
+      .table-instrumentos .cuenta {
+        width: 200px;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <div class="table gap">
+        <div class="box td gestor-logo">
+          <div class="table align-center">
+            {% if gestor_carga_logo %}
+            <img src="{{gestor_carga_logo}}" />
+            {% else %}
+            <div class="center fs3 lh3 bold gray flex1">
+              LOGO
+              <div class="fs4">Gestora Carga</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="td flex1 p0">
+          <div class="table nogap table0">
+            <div class="box td flex1">
+              <p class="bold fs5 lh1 mb10">{{gestor_carga_nombre}}</p>
+              <p class="lh3 mb10">
+                <span class="bold">Dirección: </span>{{gestor_carga_direccion}}
+              </p>
+            </div>
+            <div class="box td">
+              <p class="fs5 lh1">
+                <span class="bold">Fecha de impresión: </span>{{fecha}}
+              </p>
+            </div>
+          </div>
+          <div class="table nogap table0">
+            <div class="box td flex1">
+              <p class="fs4 lh3">
+                <span class="bold">Contraparte: </span>
+                {{contraparte}}
+              </p>
+              <p class="fs4 lh3">
+                <span class="bold">Tipo Contraparte: </span>
+                {{tipo_contraparte}}
+              </p>
+            </div>
+            <div class="box td">
+              <p class="bold fs5 lh3">Nº Operación</p>
+              <p class="blue bold fs2 lh2">{{id}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="table-title bold mt10">Liquidación de Flete</div>
+      <div class="box mt10">
+        <table class="table-fletes">
+          <thead>
+            <tr class="box">
+              <th>OC Nro.</th>
+              <th>Fecha</th>
+              <th>Placa</th>
+              <th>Cuenta</th>
+              <th class="concepto">Concepto</th>
+              <th class="detalle">Detalle</th>
+              <th>Mov. Nro.</th>
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in flete_movimientos %}
+            <tr>
+              <td>{{ item.orden_carga_id if item.orden_carga_id else "-" }}</td>
+              <td>
+                {% if item.fecha %} {{ item.fecha.strftime('%Y-%m-%d') }} {%
+                else %} {{ item.created_at.strftime('%Y-%m-%d') }} {% endif %}
+              </td>
+              <td>{{ item.camion_placa if item.camion_placa else "-" }}</td>
+              <td>{{ item.cuenta_descripcion }}</td>
+              <td class="concepto">{{ item.concepto }}</td>
+              <td class="detalle">{{ item.detalle }}</td>
+              <td>{{ item.id }}</td>
+              <td>{{ item.monto | number_format }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="table gap mt10">
+        <div class="box td flex1">
+          <div class="table">
+            <div class="flex1 td">
+              <p class="fs5 lh3">
+                <span class="bold"> Total Propietario: </span>
+                {{total_propietario}}
+              </p>
+            </div>
+          </div>
+          <div class="table gray text-right">
+            <div class="flex1 td">
+              <p class="fs6 lh3">
+                <span class="bold">
+                  Total Flete (Precio Flete + Compl/Desc - Merma):
+                </span>
+                {{total_flete}}
+              </p>
+            </div>
+          </div>
+          <div class="table gray fs6 text-right">
+            <div class="flex1 td">
+              <p class="lh3">
+                <span class="bold"> Total Anticipo Efectivo: </span>
+                {{total_anticipo_efectivo}}
+              </p>
+            </div>
+            <div class="flex1 td">
+              <p class="lh3">
+                <span class="bold"> Total Anticipo Combustible: </span>
+                {{total_anticipo_combustible}}
+              </p>
+            </div>
+            <div class="flex1 td">
+              <p class="lh3">
+                <span class="bold"> Otros Insumos: </span>
+                {{total_anticipo_otro}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="table-title bold mt10">Liquidación de Otros Conceptos</div>
+      <div class="box mt10">
+        <table class="table-otros">
+          <thead>
+            <tr class="box">
+              <th>Fecha</th>
+              <th>Cuenta</th>
+              <th class="concepto">Concepto</th>
+              <th class="detalle">Detalle</th>
+              <th>Mov. Nro.</th>
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in otro_movimientos %}
+            <tr>
+              <td>
+                {% if item.fecha %} {{ item.fecha.strftime('%Y-%m-%d') }} {%
+                else %} {{ item.created_at.strftime('%Y-%m-%d') }} {% endif %}
+              </td>
+              <td>{{ item.cuenta_descripcion }}</td>
+              <td class="concepto">{{ item.concepto }}</td>
+              <td class="detalle">{{ item.detalle }}</td>
+              <td>{{ item.id }}</td>
+              <td>{{ item.monto | number_format }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="table gap mt10">
+        <div class="box td flex1">
+          <div class="table">
+            <div class="flex1 td">
+              <p class="fs5 lh3">
+                <span class="bold"> Saldo de Otros Conceptos: </span>
+                {{total_otros}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="table-title bold mt10">Pagos/ Cobros</div>
+      <div class="box mt10">
+        <table class="table-instrumentos">
+          <thead>
+            <tr class="box">
+              <th>Nro.</th>
+              <th>Fecha</th>
+              <th>Tipo Doc.</th>
+              <th class="cuenta">Caja | Banco</th>
+              <th>Moneda</th>
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in instrumentos %}
+            <tr>
+              <td>{{ item.id }}</td>
+              <td>{{ item.modified_at.strftime('%Y-%m-%d') }}</td>
+              <td>{{ item.tipo_instrumento_descripcion }}</td>
+              <td class="cuenta">{{ item.cuenta_descripcion }}</td>
+              <td>{{ item.moneda_simbolo }}</td>
+              <td>{{ item.monto | number_format }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="table gap mt10">
+        <div class="box td flex1">
+          <div class="table">
+            <div class="flex1 td">
+              <p class="fs5 lh3">
+                <span class="bold"> Total Pagos/ Cobros: </span>
+                {{total_instrumentos}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="logo-container table box align-center mt10">
+        <div class="logo">
+          <img src="{{logo}}" alt="iCargo" />
+        </div>
+        <p class="fs7 lh4 flex1">
+          iCargo es solo una Herramienta de Gestión y no constituye parte alguna
+          en la Cadena de Operaciones, limitándose su aporte solo al Registro,
+          Gestión y Publicación de la información que por ella se administra.
+          Las partes, Gestora de carga y Propietario, asumen total
+          responsabilidad por la Publicación de los Pedidos y por la Emisión de
+          las Ordenes de Carga que consideren apropiadas, dejando indemne a
+          iCargo de cualquier reclamo Judicial y/o Extra-Judicial en cualquier
+          litigio que pudiera surgir entre estas partes
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

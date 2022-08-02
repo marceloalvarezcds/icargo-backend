@@ -205,6 +205,7 @@ from .instrumento import (  # noqa
     edit_instrumento,
     get_instrumento_by_id,
     get_instrumento_list,
+    get_instrumento_list_by_liquidacion_id,
 )
 from .instrumento_via import (  # noqa
     get_instrumento_via_by_descripcion,
@@ -261,6 +262,8 @@ from .movimiento import (  # noqa
     get_movimiento_list_by_liquidacion_and_gestor_carga_id,
     get_movimiento_list_by_liquidacion_id,
     get_movimiento_list_by_orden_carga_id,
+    get_movimiento_list_for_flete_pdf_reports_by_liquidacion_id,
+    get_movimiento_list_for_otro_pdf_reports_by_liquidacion_id,
     get_movimiento_list_for_reports_by_contraparte,
     get_movimiento_list_for_reports_by_contraparte_and_gestor_carga_id,
     get_movimiento_list_for_reports_by_liquidacion_id,

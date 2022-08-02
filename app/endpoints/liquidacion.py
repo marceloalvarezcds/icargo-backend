@@ -82,6 +82,16 @@ async def liquidacion_reports_by_estado_cuenta(
     )
 
 
+@api.get("/{id}/pdf/etapa/{etapa}")
+def get_liquidacion_resumen_pdf_by_id(
+    id: int,
+    etapa: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.LIQUIDACION)),  # noqa: B008
+):
+    return services.get_liquidacion_resumen_pdf_by_id(db, id, etapa)
+
+
 @api.get("/{id}", response_model=schemas.Liquidacion)
 async def read_liquidacion_by_id(
     id: int,
