@@ -3,12 +3,14 @@ from datetime import datetime
 from typing import List, Optional
 
 from fastapi import HTTPException  # type: ignore
+from jinja2 import Template
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
+from pdfkit import from_string  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
-from app.config import REPORTS_FOLDER
+from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
 from app.enums import (
     LiquidacionEstadoEnum,
     LiquidacionEtapaEnum,
@@ -21,7 +23,7 @@ from app.schemas import (
     LiquidacionAddMovimientosForm,
     LiquidacionForm,
 )
-from app.utils.gestor_carga import get_gestor_carga_by_params
+from app.utils import get_gestor_carga_by_params, number_format
 
 from .instrumento import create_instrumento
 
@@ -246,6 +248,53 @@ def add_instrumentos(
             detail="La suma de los instrumentos debe ser igual al Valor de la operación",
         )
     return obj
+
+
+def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
+    obj = repositories.get_liquidacion_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Orden de Carga no encontrada")
+    gestor_carga = repositories.get_gestor_carga_by_id(db, obj.gestor_carga_id)
+    if not gestor_carga:
+        raise HTTPException(status_code=404, detail="Gestor no encontrado")
+    OUTPUT_FILENAME = f"resumen_liquidacion_{id}.pdf"
+    TEMPLATE_FILENAME = "pdf_liquidacion_resumen.html"
+    templateEnv.filters["number_format"] = number_format
+    template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
+    flete_movimientos = (
+        repositories.get_movimiento_list_for_flete_pdf_reports_by_liquidacion_id(
+            db, id, estado
+        )
+    )
+    otro_movimientos = (
+        repositories.get_movimiento_list_for_otro_pdf_reports_by_liquidacion_id(
+            db, id, estado
+        )
+    )
+    instrumentos = repositories.get_instrumento_list_by_liquidacion_id(db, id)
+    data = {
+        "id": id,
+        "gestor_carga_direccion": gestor_carga.direccion,
+        "gestor_carga_logo": gestor_carga.logo,
+        "gestor_carga_nombre": f"{gestor_carga.nombre} - {gestor_carga.numero_documento}",
+        "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
+        "contraparte": obj.contraparte,
+        "tipo_contraparte": obj.tipo_contraparte_descripcion,
+        "flete_movimientos": flete_movimientos,
+        "otro_movimientos": otro_movimientos,
+        "instrumentos": instrumentos,
+        "total_propietario": 0,
+        "total_flete": 0,
+        "total_anticipo_efectivo": 0,
+        "total_anticipo_combustible": 0,
+        "total_anticipo_otro": 0,
+        "total_otros": 0,
+        "total_instrumentos": 0,
+    }
+    source_html = template.render(logo=LOGO_IMAGE_URL, **data)
+    pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
+    from_string(source_html, pdf_filename, {"page-size": "Legal"})
+    return OUTPUT_FILENAME
 
 
 def get_reports(datalist: List[Liquidacion]) -> str:

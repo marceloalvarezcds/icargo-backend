@@ -6,7 +6,9 @@ from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import MovimientoEstadoEnum
+from app.enums.tipo_movimiento import TipoMovimientoEnum
 from app.models import Movimiento
+from app.models.tipo_movimiento import TipoMovimiento
 from app.schemas import MovimientoForm
 
 
@@ -106,6 +108,54 @@ def get_movimiento_list_for_reports_by_liquidacion_id(
             and_(
                 Movimiento.estado == estado,
                 Movimiento.liquidacion_id == liquidacion_id,
+            )
+        )
+        .order_by(
+            Movimiento.numero_documento_relacionado,
+            Movimiento.contraparte,
+            Movimiento.liquidacion_id,
+        )
+        .all()
+    )
+
+
+def get_movimiento_list_for_flete_pdf_reports_by_liquidacion_id(
+    db: Session,
+    liquidacion_id: int,
+    estado: str,
+) -> List[Movimiento]:
+    return (
+        db.query(Movimiento)
+        .join(Movimiento.tipo_movimiento)
+        .filter(
+            and_(
+                Movimiento.estado == estado,
+                Movimiento.liquidacion_id == liquidacion_id,
+                TipoMovimiento.descripcion != TipoMovimientoEnum.OTRO.value,
+            )
+        )
+        .order_by(
+            Movimiento.numero_documento_relacionado,
+            Movimiento.contraparte,
+            Movimiento.liquidacion_id,
+        )
+        .all()
+    )
+
+
+def get_movimiento_list_for_otro_pdf_reports_by_liquidacion_id(
+    db: Session,
+    liquidacion_id: int,
+    estado: str,
+) -> List[Movimiento]:
+    return (
+        db.query(Movimiento)
+        .join(Movimiento.tipo_movimiento)
+        .filter(
+            and_(
+                Movimiento.estado == estado,
+                Movimiento.liquidacion_id == liquidacion_id,
+                TipoMovimiento.descripcion == TipoMovimientoEnum.OTRO.value,
             )
         )
         .order_by(

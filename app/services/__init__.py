@@ -144,6 +144,7 @@ from .liquidacion import (  # noqa
     get_liquidacion_list_by_estado_cuenta,
     get_liquidacion_reports,
     get_liquidacion_reports_by_estado_cuenta,
+    get_liquidacion_resumen_pdf_by_id,
     rechazar_liquidacion,
     remove_movimiento,
 )

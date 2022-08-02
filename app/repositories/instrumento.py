@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
+from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum, OperacionEstadoEnum
 from app.models import Instrumento
@@ -13,6 +14,22 @@ def get_instrumento_list(db: Session) -> List[Instrumento]:
         db.query(Instrumento)
         .filter(Instrumento.estado != EstadoEnum.ELIMINADO.value)
         .order_by(Instrumento.contraparte, Instrumento.liquidacion_id)
+        .all()
+    )
+
+
+def get_instrumento_list_by_liquidacion_id(
+    db: Session, liquidacion_id: int
+) -> List[Instrumento]:
+    return (
+        db.query(Instrumento)
+        .filter(
+            and_(
+                Instrumento.estado != EstadoEnum.ELIMINADO.value,
+                Instrumento.liquidacion_id == liquidacion_id,
+            )
+        )
+        .order_by(Instrumento.created_at)
         .all()
     )
 

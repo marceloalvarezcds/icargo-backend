@@ -4,6 +4,7 @@ from .flete_anticipo import (  # noqa
     get_flete_anticipo_efectivo,
     get_porcentaje_maximo_by_flete_anticipo_list,
 )
+from .gestor_carga import get_gestor_carga_by_params  # noqa
 from .number import number_format  # noqa
 from .security import (  # noqa
     get_md5_hash_hexdigest,
