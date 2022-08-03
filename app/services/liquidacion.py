@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Optional
 
 from fastapi import HTTPException  # type: ignore
@@ -261,35 +262,62 @@ def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
     TEMPLATE_FILENAME = "pdf_liquidacion_resumen.html"
     templateEnv.filters["number_format"] = number_format
     template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
-    flete_movimientos = (
-        repositories.get_movimiento_list_for_flete_pdf_reports_by_liquidacion_id(
-            db, id, estado
-        )
+    flete_movimientos: List[
+        Movimiento
+    ] = repositories.get_movimiento_list_for_flete_pdf_reports_by_liquidacion_id(
+        db, id, estado
     )
-    otro_movimientos = (
-        repositories.get_movimiento_list_for_otro_pdf_reports_by_liquidacion_id(
-            db, id, estado
-        )
+    otro_movimientos: List[
+        Movimiento
+    ] = repositories.get_movimiento_list_for_otro_pdf_reports_by_liquidacion_id(
+        db, id, estado
     )
-    instrumentos = repositories.get_instrumento_list_by_liquidacion_id(db, id)
+    instrumentos: List[
+        Instrumento
+    ] = repositories.get_instrumento_list_by_liquidacion_id(db, id)
+    # Obtención de totales
+    # moneda = gestor_carga.moneda_simbolo
+    total_contraparte = Decimal(0)
+    total_flete = Decimal(0)
+    total_anticipo_efectivo = Decimal(0)
+    total_anticipo_combustible = Decimal(0)
+    total_anticipo_otro = Decimal(0)
+    total_otros = Decimal(0)
+    for mov in flete_movimientos:
+        total_contraparte += mov.monto
+        total_flete += (
+            mov.monto
+            if (mov.es_flete or mov.es_complemento or mov.es_descuento or mov.es_merma)
+            else Decimal(0)
+        )
+        total_anticipo_efectivo += mov.monto if mov.es_anticipo_efectivo else Decimal(0)
+        total_anticipo_combustible += (
+            mov.monto if mov.es_anticipo_combustible else Decimal(0)
+        )
+        total_anticipo_otro += mov.monto if mov.es_anticipo_otro else Decimal(0)
+
+    for mov in otro_movimientos:
+        total_otros += mov.monto
+
+    # FIN Obtención de totales
     data = {
         "id": id,
         "gestor_carga_direccion": gestor_carga.direccion,
         "gestor_carga_logo": gestor_carga.logo,
         "gestor_carga_nombre": f"{gestor_carga.nombre} - {gestor_carga.numero_documento}",
-        "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
+        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "contraparte": obj.contraparte,
         "tipo_contraparte": obj.tipo_contraparte_descripcion,
         "flete_movimientos": flete_movimientos,
         "otro_movimientos": otro_movimientos,
         "instrumentos": instrumentos,
-        "total_propietario": 0,
-        "total_flete": 0,
-        "total_anticipo_efectivo": 0,
-        "total_anticipo_combustible": 0,
-        "total_anticipo_otro": 0,
-        "total_otros": 0,
-        "total_instrumentos": 0,
+        "total_contraparte": f"{number_format(total_contraparte)}",
+        "total_flete": f"{number_format(total_flete)}",
+        "total_anticipo_efectivo": f"{number_format(total_anticipo_efectivo)}",
+        "total_anticipo_combustible": f"{number_format(total_anticipo_combustible)}",
+        "total_anticipo_otro": f"{number_format(total_anticipo_otro)}",
+        "total_otros": f"{number_format(total_otros)}",
+        "total_instrumentos": f"{number_format(obj.instrumentos_saldo)}",
     }
     source_html = template.render(logo=LOGO_IMAGE_URL, **data)
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)

@@ -70,7 +70,7 @@ class OrdenCargaComplemento(AuditMixin, Base):
 
     @hybrid_property
     def propietario_detalle(self):
-        return f"Monto: {number_format(self.propietario_monto)}{self.propietario_moneda_simbolo}"  # || Tipo de Cambio: 250,0{self.gestor_carga_moneda_simbolo}/{self.propietario_moneda_simbolo}"  # noqa
+        return f"{self.concepto_descripcion}: {number_format(self.propietario_monto)}{self.propietario_moneda_simbolo}"  # || Tipo de Cambio: 250,0{self.gestor_carga_moneda_simbolo}/{self.propietario_moneda_simbolo}"  # noqa
 
     @hybrid_property
     def propietario_moneda_nombre(self):
@@ -82,7 +82,7 @@ class OrdenCargaComplemento(AuditMixin, Base):
 
     @hybrid_property
     def remitente_detalle(self):
-        return f"Monto: {number_format(self.remitente_monto)}{self.remitente_moneda_simbolo}"  # || Tipo de Cambio: 250,0{self.gestor_carga_moneda_simbolo}/{self.remitente_moneda_simbolo}"  # noqa
+        return f"{self.concepto_descripcion}: {number_format(self.remitente_monto)}{self.remitente_moneda_simbolo}"  # || Tipo de Cambio: 250,0{self.gestor_carga_moneda_simbolo}/{self.remitente_moneda_simbolo}"  # noqa
 
     @hybrid_property
     def remitente_moneda_nombre(self):
