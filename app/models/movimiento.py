@@ -14,9 +14,13 @@ from sqlalchemy.orm import relationship  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
-from app.enums import MovimientoEstadoEnum
-from app.enums.tipo_contraparte import TipoContraparteEnum
-from app.enums.tipo_movimiento import TipoMovimientoEnum
+from app.enums import (
+    MovimientoEstadoEnum,
+    TipoAnticipoEnum,
+    TipoContraparteEnum,
+    TipoInsumoEnum,
+    TipoMovimientoEnum,
+)
 
 from .chofer import Chofer
 from .gestor_carga import GestorCarga
@@ -210,6 +214,51 @@ class Movimiento(AuditMixin, Base):
 
     # Campos editables de la OC desde el movimiento
     @hybrid_property
+    def es_anticipo(self):
+        return (
+            self.tipo_movimiento_descripcion == TipoMovimientoEnum.ANTICIPO.value
+            and self.anticipo is not None
+        )
+
+    @hybrid_property
+    def es_anticipo_combustible(self):
+        return (
+            self.es_anticipo
+            and self.anticipo.tipo_insumo_descripcion
+            == TipoInsumoEnum.COMBUSTIBLE.value
+        )
+
+    @hybrid_property
+    def es_anticipo_efectivo(self):
+        return (
+            self.es_anticipo
+            and self.anticipo.tipo_anticipo_descripcion
+            == TipoAnticipoEnum.EFECTIVO.value
+        )
+
+    @hybrid_property
+    def es_anticipo_otro(self):
+        return (
+            self.es_anticipo
+            and not self.es_anticipo_combustible
+            and not self.es_anticipo_efectivo
+        )
+
+    @hybrid_property
+    def es_complemento(self):
+        return (
+            self.tipo_movimiento_descripcion == TipoMovimientoEnum.COMPLEMENTO.value
+            and self.complemento is not None
+        )
+
+    @hybrid_property
+    def es_descuento(self):
+        return (
+            self.tipo_movimiento_descripcion == TipoMovimientoEnum.DESCUENTO.value
+            and self.descuento is not None
+        )
+
+    @hybrid_property
     def es_flete(self):
         return self.tipo_movimiento_descripcion == TipoMovimientoEnum.FLETE.value
 
@@ -225,6 +274,7 @@ class Movimiento(AuditMixin, Base):
     def es_propietario(self):
         return (
             self.tipo_contraparte_descripcion == TipoContraparteEnum.PROPIETARIO.value
+            and self.propietario is not None
         )
 
     @hybrid_property

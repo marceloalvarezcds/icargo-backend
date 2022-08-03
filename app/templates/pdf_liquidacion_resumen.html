@@ -17,10 +17,6 @@
         align-items: center;
       }
 
-      .blue {
-        color: #3399ff;
-      }
-
       .bold {
         font-weight: bold;
       }
@@ -220,8 +216,15 @@
 
       table td,
       table th {
-        padding: 0 5px;
+        padding: 5px 2px;
         text-align: left;
+      }
+
+      table td {
+        border-bottom: 1px solid #d1d3d4;
+      }
+      table tr:last-of-type td {
+        border-bottom: 0;
       }
 
       .table-fletes td,
@@ -235,19 +238,44 @@
 
       .table-fletes .concepto,
       .table-otros .concepto {
-        width: 80px;
+        width: 60px;
+      }
+
+      .table-fletes .cuenta,
+      .table-otros .cuenta {
+        width: 40px;
       }
 
       .table-fletes .detalle {
         width: 150px;
       }
 
+      .table-fletes td.detalle {
+        font-size: 10px;
+      }
+
+      .table-fletes .placa {
+        width: 60px;
+      }
+
       .table-otros .detalle {
-        width: 370px;
+        width: 250px;
       }
 
       .table-instrumentos .cuenta {
         width: 200px;
+      }
+
+      .table-fletes .fecha,
+      .table-otros .fecha,
+      .table-instrumentos .fecha {
+        width: 70px;
+      }
+
+      .table-fletes .id,
+      .table-otros .id,
+      .table-instrumentos .id {
+        width: 35px;
       }
 
       .text-right {
@@ -274,14 +302,12 @@
         <div class="td flex1 p0">
           <div class="table nogap table0">
             <div class="box td flex1">
+              <p class="fs5 lh1 text-right">
+                <span class="bold">Fecha de impresión: </span>{{fecha}}
+              </p>
               <p class="bold fs5 lh1 mb10">{{gestor_carga_nombre}}</p>
               <p class="lh3 mb10">
                 <span class="bold">Dirección: </span>{{gestor_carga_direccion}}
-              </p>
-            </div>
-            <div class="box td">
-              <p class="fs5 lh1">
-                <span class="bold">Fecha de impresión: </span>{{fecha}}
               </p>
             </div>
           </div>
@@ -298,7 +324,7 @@
             </div>
             <div class="box td">
               <p class="bold fs5 lh3">Nº Operación</p>
-              <p class="blue bold fs2 lh2">{{id}}</p>
+              <p class="bold fs2 lh2">{{id}}</p>
             </div>
           </div>
         </div>
@@ -308,29 +334,58 @@
         <table class="table-fletes">
           <thead>
             <tr class="box">
-              <th>OC Nro.</th>
-              <th>Fecha</th>
-              <th>Placa</th>
-              <th>Cuenta</th>
+              <th class="id">OC Nº</th>
+              <th class="fecha">Fecha</th>
+              <th class="placa">Placa</th>
+              <th class="cuenta">Cuenta</th>
               <th class="concepto">Concepto</th>
               <th class="detalle">Detalle</th>
-              <th>Mov. Nro.</th>
+              <th class="id">Mov Nº</th>
               <th>Monto</th>
             </tr>
           </thead>
           <tbody>
             {% for item in flete_movimientos %}
             <tr>
-              <td>{{ item.orden_carga_id if item.orden_carga_id else "-" }}</td>
-              <td>
-                {% if item.fecha %} {{ item.fecha.strftime('%Y-%m-%d') }} {%
-                else %} {{ item.created_at.strftime('%Y-%m-%d') }} {% endif %}
+              <td class="id">
+                {{ item.orden_carga_id if item.orden_carga_id else "-" }}
               </td>
-              <td>{{ item.camion_placa if item.camion_placa else "-" }}</td>
-              <td>{{ item.cuenta_descripcion }}</td>
-              <td class="concepto">{{ item.concepto }}</td>
-              <td class="detalle">{{ item.detalle }}</td>
-              <td>{{ item.id }}</td>
+              <td class="fecha">
+                {% if item.fecha %} {{ item.fecha.strftime('%y-%m-%d %H:%M') }}
+                {% else %} {{ item.created_at.strftime('%y-%m-%d %H:%M') }} {%
+                endif %}
+              </td>
+              <td class="placa">
+                {{ item.camion_placa if item.camion_placa else "-" }}
+              </td>
+              <td class="cuenta">{{ item.cuenta_descripcion }}</td>
+              <td class="concepto">
+                {{ item.concepto }} {{ '-' +
+                item.anticipo.tipo_anticipo_descripcion if item.anticipo else ""
+                }}
+              </td>
+              <td class="detalle">
+                {% if item.complemento or item.descuento %} {{
+                item.complemento.propietario_detalle if item.complemento and
+                item.es_propietario else ""}} {{
+                item.complemento.remitente_detalle if item.complemento and not
+                item.es_propietario else ""}} {{
+                item.descuento.propietario_detalle if item.descuento and
+                item.es_propietario else ""}} {{
+                item.descuento.proveedor_detalle if item.descuento and not
+                item.es_propietario else ""}} {% elif item.anticipo %} {{
+                item.anticipo.detalle }} {% elif item.es_flete and
+                item.orden_carga %} {{
+                item.orden_carga.flete_propietario_detalle if
+                item.es_propietario else
+                item.orden_carga.flete_gestor_carga_detalle}} {% elif
+                item.es_merma and item.orden_carga %} {{
+                item.orden_carga.merma_propietario_detalle if
+                item.es_propietario else
+                item.orden_carga.merma_gestor_carga_detalle}} {% else %} {{
+                item.detalle }} {% endif %}
+              </td>
+              <td class="id">{{ item.id }}</td>
               <td>{{ item.monto | number_format }}</td>
             </tr>
             {% endfor %}
@@ -342,8 +397,8 @@
           <div class="table">
             <div class="flex1 td">
               <p class="fs5 lh3">
-                <span class="bold"> Total Propietario: </span>
-                {{total_propietario}}
+                <span class="bold"> Total {{tipo_contraparte}}: </span>
+                {{total_contraparte}}
               </p>
             </div>
           </div>
@@ -384,25 +439,28 @@
         <table class="table-otros">
           <thead>
             <tr class="box">
-              <th>Fecha</th>
-              <th>Cuenta</th>
+              <th class="fecha">Fecha</th>
+              <th class="cuenta">Cuenta</th>
               <th class="concepto">Concepto</th>
               <th class="detalle">Detalle</th>
-              <th>Mov. Nro.</th>
+              <th class="id">Mov Nº</th>
               <th>Monto</th>
             </tr>
           </thead>
           <tbody>
             {% for item in otro_movimientos %}
             <tr>
-              <td>
-                {% if item.fecha %} {{ item.fecha.strftime('%Y-%m-%d') }} {%
-                else %} {{ item.created_at.strftime('%Y-%m-%d') }} {% endif %}
+              <td class="fecha">
+                {% if item.fecha %} {{ item.fecha.strftime('%d-%m-%y %H:%M') }}
+                {% else %} {{ item.created_at.strftime('%d-%m-%y %H:%M') }} {%
+                endif %}
               </td>
-              <td>{{ item.cuenta_descripcion }}</td>
+              <td class="cuenta">{{ item.cuenta_descripcion }}</td>
               <td class="concepto">{{ item.concepto }}</td>
-              <td class="detalle">{{ item.detalle }}</td>
-              <td>{{ item.id }}</td>
+              <td class="detalle">
+                {{ item.detalle if item.detalle else "" }}
+              </td>
+              <td class="id">{{ item.id }}</td>
               <td>{{ item.monto | number_format }}</td>
             </tr>
             {% endfor %}
@@ -426,8 +484,8 @@
         <table class="table-instrumentos">
           <thead>
             <tr class="box">
-              <th>Nro.</th>
-              <th>Fecha</th>
+              <th class="id">Nº</th>
+              <th class="fecha">Fecha</th>
               <th>Tipo Doc.</th>
               <th class="cuenta">Caja | Banco</th>
               <th>Moneda</th>
@@ -437,8 +495,10 @@
           <tbody>
             {% for item in instrumentos %}
             <tr>
-              <td>{{ item.id }}</td>
-              <td>{{ item.modified_at.strftime('%Y-%m-%d') }}</td>
+              <td class="id">{{ item.id }}</td>
+              <td class="fecha">
+                {{ item.created_at.strftime('%y-%m-%d %H:%M') }}
+              </td>
               <td>{{ item.tipo_instrumento_descripcion }}</td>
               <td class="cuenta">{{ item.cuenta_descripcion }}</td>
               <td>{{ item.moneda_simbolo }}</td>

@@ -73,7 +73,13 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
 
     @hybrid_property
     def detalle(self):
-        return f"PDV: {self.concepto} || Monto: {number_format(self.monto_retirado)}{self.moneda_simbolo} || Fecha: {self.created_at.strftime('%Y-%m-%d / %H:%M:%S')}"  # noqa
+        producto_info = ""
+        if self.insumo_punto_venta_precio:
+            producto_info = f" || Precio: {number_format(self.precio_unitario)} || Prod: {self.insumo_descripcion}"  # noqa: B950
+        return f"""
+            {self.concepto}: {number_format(self.monto_retirado)}{self.moneda_simbolo}
+            {producto_info} || {self.punto_venta_nombre}
+        """
 
     @hybrid_property
     def gestor_carga_id(self):
