@@ -71,6 +71,7 @@ class Chofer(AuditMixin, Base):
     direccion = Column(String(255))
     ciudad_id = Column(Integer, ForeignKey("ciudad.id"))
     ciudad = relationship(Ciudad, uselist=False, foreign_keys=[ciudad_id])
+    puede_recibir_anticipos = Column(Boolean, server_default=text("true"))
     gestores = relationship("GestorCargaChofer", back_populates="chofer")
 
     @hybrid_property

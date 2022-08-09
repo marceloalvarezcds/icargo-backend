@@ -10,6 +10,7 @@ from app import repositories, schemas
 from app.config import REPORTS_FOLDER
 from app.enums import EstadoEnum
 from app.models import Camion
+from app.utils import get_gestor_carga_by_params
 
 from .camion_check_files import check_files
 
@@ -24,8 +25,13 @@ async def create_camion(
     foto_habilitacion_transporte_reverso_file: Optional[UploadFile],
     foto_habilitacion_automotor_frente_file: Optional[UploadFile],
     foto_habilitacion_automotor_reverso_file: Optional[UploadFile],
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Camion:
+    gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
+    gestor = repositories.get_gestor_carga_by_id(db, gestor_id)
+    if not gestor:
+        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
     if repositories.get_camion_by(db, data.placa):
         raise HTTPException(
             status_code=409,
@@ -48,6 +54,8 @@ async def create_camion(
         foto_habilitacion_automotor_frente_file,
         foto_habilitacion_automotor_reverso_file,
     )
+    if data.limite_cantidad_oc_activas is None:
+        data.limite_cantidad_oc_activas = gestor.limite_cantidad_oc_activas
     return repositories.create_camion(
         db,
         data,

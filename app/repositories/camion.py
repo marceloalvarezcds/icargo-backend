@@ -72,6 +72,10 @@ def create_camion(
         chofer_id=data.chofer_id,
         numero_chasis=data.numero_chasis,
         foto=foto_url,
+        # INICIO Limitaciones del Camión
+        limite_cantidad_oc_activas=data.limite_cantidad_oc_activas,
+        limite_monto_anticipos=data.limite_monto_anticipos,
+        # FIN Limitaciones del Camión
         # INICIO Habilitaciones del Camión
         # inicio - municipal
         ciudad_habilitacion_municipal_id=data.ciudad_habilitacion_municipal_id,
@@ -130,6 +134,10 @@ def edit_camion(
         obj.propietario_id = data.propietario_id
         obj.chofer_id = data.chofer_id
         obj.numero_chasis = data.numero_chasis
+        # INICIO Limitaciones del Camión
+        obj.limite_cantidad_oc_activas = data.limite_cantidad_oc_activas
+        obj.limite_monto_anticipos = data.limite_monto_anticipos
+        # FIN Limitaciones del Camión
         if foto_url:
             obj.foto = foto_url
         # INICIO Habilitaciones del Camión

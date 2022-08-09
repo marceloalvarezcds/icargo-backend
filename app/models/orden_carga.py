@@ -121,12 +121,28 @@ class OrdenCarga(AuditMixin, Base):
         return self.camion.chofer_numero_documento
 
     @hybrid_property
+    def camion_chofer_puede_recibir_anticipos(self):
+        return self.camion.chofer_puede_recibir_anticipos
+
+    @hybrid_property
+    def camion_limite_cantidad_oc_activas(self):
+        return self.camion.limite_cantidad_oc_activas
+
+    @hybrid_property
+    def camion_limite_monto_anticipos(self):
+        return self.camion.limite_monto_anticipos
+
+    @hybrid_property
     def camion_placa(self):
         return self.camion.placa
 
     @hybrid_property
     def camion_propietario_nombre(self):
         return self.camion.propietario_nombre
+
+    @hybrid_property
+    def camion_propietario_puede_recibir_anticipos(self):
+        return self.camion.propietario_puede_recibir_anticipos
 
     @hybrid_property
     def cantidad_destino(self):

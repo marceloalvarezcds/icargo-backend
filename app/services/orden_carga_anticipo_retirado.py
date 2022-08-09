@@ -1,5 +1,6 @@
 import os
 from decimal import Decimal
+from http import HTTPStatus
 from typing import cast
 
 from fastapi import HTTPException
@@ -10,7 +11,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
 from app.enums import TipoAnticipoEnum, TipoInsumoEnum
-from app.models import OrdenCargaAnticipoRetirado, TipoAnticipo, TipoInsumo
+from app.models import Camion, OrdenCargaAnticipoRetirado, TipoAnticipo, TipoInsumo
 from app.schemas.rounded_decimal_model import RoundedDecimal
 from app.utils import number_format
 
@@ -53,6 +54,20 @@ def create_orden_carga_anticipo_retirado(
     data: schemas.OrdenCargaAnticipoRetiradoForm,
     modified_by: str,
 ) -> schemas.OrdenCargaAnticipoRetirado:
+    oc = repositories.get_orden_carga_by_id(db, data.orden_carga_id)
+    if oc is None:
+        raise HTTPException(status_code=404, detail="Orden de Carga no encontrada")
+    camion: Camion = oc.camion
+    if not camion.propietario_puede_recibir_anticipos:
+        raise HTTPException(
+            status_code=HTTPStatus.LOCKED,
+            detail=f"El propietario {camion.propietario_nombre} no puede retirar anticipos",
+        )
+    if not camion.chofer_puede_recibir_anticipos:
+        raise HTTPException(
+            status_code=HTTPStatus.LOCKED,
+            detail=f"El chofer {camion.chofer_nombre} no puede retirar anticipos",
+        )
     if repositories.get_orden_carga_anticipo_retirado_by(
         db,
         data.flete_anticipo_id,
@@ -68,6 +83,15 @@ def create_orden_carga_anticipo_retirado(
     if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
         data.monto_retirado = RoundedDecimal(
             data.cantidad_retirada * data.precio_unitario
+        )
+    if data.monto_retirado > camion.limite_monto_anticipos:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=f"""
+                El monto {number_format(data.monto_retirado)}
+                supera al límite {number_format(camion.limite_monto_anticipos)}
+                establecido por el camión con placa {camion.placa}
+            """,
         )
     update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
     anticipo = repositories.create_orden_carga_anticipo_retirado(

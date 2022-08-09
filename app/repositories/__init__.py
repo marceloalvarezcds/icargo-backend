@@ -284,6 +284,7 @@ from .orden_carga import (  # noqa
     edit_orden_carga,
     edit_orden_carga_by_movimiento,
     finalizar_orden_carga,
+    get_orden_carga_aceptada_count_by_camion_id,
     get_orden_carga_by_id,
     get_orden_carga_list,
     get_orden_carga_list_by_gestor_carga_id,
