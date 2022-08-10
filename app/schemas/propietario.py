@@ -29,6 +29,7 @@ class PropietarioBaseModel(BaseModel):
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
     es_chofer: Optional[bool] = False
+    puede_recibir_anticipos: bool
     # INICIO Datos del Chofer
     tipo_documento_id: Optional[int] = None
     pais_emisor_documento_id: Optional[int] = None
@@ -71,6 +72,7 @@ class PropietarioEditForm(BaseModel):
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
     es_chofer: Optional[bool] = False
+    puede_recibir_anticipos: bool
     # INICIO Datos del Chofer
     tipo_documento_id: Optional[int] = None
     pais_emisor_documento_id: Optional[int] = None

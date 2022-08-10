@@ -27,6 +27,9 @@ class GestorCargaForm(BaseModel):
     longitud: Optional[RoundedDecimal] = None
     direccion: Optional[str] = None
     ciudad_id: Optional[int] = None
+    # INICIO Limitaciones de la Gestora
+    limite_cantidad_oc_activas: int
+    # FIN Limitaciones de la Gestora
 
 
 class GestorCarga(GestorCargaForm):

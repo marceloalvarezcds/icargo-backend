@@ -121,12 +121,28 @@ class OrdenCarga(AuditMixin, Base):
         return self.camion.chofer_numero_documento
 
     @hybrid_property
+    def camion_chofer_puede_recibir_anticipos(self):
+        return self.camion.chofer_puede_recibir_anticipos
+
+    @hybrid_property
+    def camion_limite_cantidad_oc_activas(self):
+        return self.camion.limite_cantidad_oc_activas
+
+    @hybrid_property
+    def camion_limite_monto_anticipos(self):
+        return self.camion.limite_monto_anticipos
+
+    @hybrid_property
     def camion_placa(self):
         return self.camion.placa
 
     @hybrid_property
     def camion_propietario_nombre(self):
         return self.camion.propietario_nombre
+
+    @hybrid_property
+    def camion_propietario_puede_recibir_anticipos(self):
+        return self.camion.propietario_puede_recibir_anticipos
 
     @hybrid_property
     def cantidad_destino(self):
@@ -174,9 +190,9 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_gestor_carga_detalle(self):
         return f"""
-            Remi: {self.flete.remitente_nombre} ||
+            {self.flete.remitente_nombre} ||
             P.Dest.: {number_format(self.cantidad_destino)}Kg ||
-            Tarifa: {number_format(self.flete_tarifa_gestor_carga)}{self.flete_tarifa_unidad_gestor_carga} ||
+            {number_format(self.flete_tarifa_gestor_carga)}{self.flete_tarifa_unidad_gestor_carga} ||
             Nº Rem: {self.remisiones} ||
             Tickets: {self.nro_tickets} ||
             Ori: {self.origen_nombre} ||
@@ -218,9 +234,9 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_propietario_detalle(self):
         return f"""
-            Remi: {self.flete.remitente_nombre} ||
+            {self.flete.remitente_nombre} ||
             P.Dest.: {number_format(self.cantidad_destino)}Kg ||
-            Tarifa: {number_format(self.flete_tarifa)}{self.flete_tarifa_unidad} ||
+            {number_format(self.flete_tarifa)}{self.flete_tarifa_unidad} ||
             Nº Rem: {self.remisiones} ||
             Tickets: {self.nro_tickets} ||
             Ori: {self.origen_nombre} ||
@@ -302,11 +318,11 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def merma_gestor_carga_detalle(self):
         return f"""
-            Remi: {self.flete.remitente_nombre} ||
+            {self.flete.remitente_nombre} ||
             Dif.: {number_format(self.diferencia_origen_destino)}Kg ||
             Tol.: {number_format(self.resultado_gestor_carga_tolerancia_kg)}Kg ||
             M.: {number_format(self.resultado_gestor_carga_merma)}Kg ||
-            Tarifa: {number_format(self.merma_gestor_carga_valor)}Grs/Kg ||
+            {number_format(self.merma_gestor_carga_valor)}Grs/Kg ||
             Nº Rem: {self.remisiones} ||
             Tickets: {self.nro_tickets} ||
             Ori: {self.origen_nombre} ||
@@ -329,11 +345,11 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def merma_propietario_detalle(self):
         return f"""
-            Remi: {self.flete.remitente_nombre} ||
+            {self.flete.remitente_nombre} ||
             Dif.: {number_format(self.diferencia_origen_destino)}Kg ||
             Tol.: {number_format(self.resultado_propietario_tolerancia_kg)}Kg ||
             M.: {number_format(self.resultado_propietario_merma)}Kg ||
-            Tarifa: {number_format(self.merma_propietario_valor)}Grs/Kg ||
+            {number_format(self.merma_propietario_valor)}Grs/Kg ||
             Nº Rem: {self.remisiones} ||
             Tickets: {self.nro_tickets} ||
             Ori: {self.origen_nombre} ||

@@ -38,6 +38,7 @@ class OrdenCargaEditForm(BaseModel):
     comentarios: Optional[str] = None
     origen_id: Optional[int] = None
     destino_id: Optional[int] = None
+    anticipos_liberados: Optional[bool] = True
     # INICIO Cantidad y Flete
     modify_by_movimiento: Optional[bool] = False
     # inicio - Condiciones para el Gestor de Carga
@@ -70,8 +71,12 @@ class OrdenCarga(OrdenCargaEditForm):
     # Datos de camion
     camion_chofer_nombre: Optional[str] = None
     camion_chofer_numero_documento: Optional[str] = None
+    camion_chofer_puede_recibir_anticipos: bool
+    camion_limite_cantidad_oc_activas: int
+    camion_limite_monto_anticipos: Optional[RoundedDecimal] = None
     camion_placa: str
     camion_propietario_nombre: str
+    camion_propietario_puede_recibir_anticipos: bool
     # Datos de semi
     semi_placa: str
     # Datos de fletes

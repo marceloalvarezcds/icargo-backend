@@ -20,6 +20,21 @@ def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
     )
 
 
+def get_orden_carga_aceptada_count_by_camion_id(
+    db: Session, camion_id: int
+) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter(
+            and_(
+                OrdenCarga.camion_id == camion_id,
+                OrdenCarga.estado == EstadoEnum.ACEPTADO.value,
+            )
+        )
+        .count()
+    )
+
+
 def get_orden_carga_list_by_gestor_carga_id(
     db: Session, gestor_carga_id: int
 ) -> List[OrdenCarga]:
@@ -111,6 +126,7 @@ def edit_orden_carga(
         obj.destino_id = data.destino_id
     if data.comentarios:
         obj.comentarios = data.comentarios
+    obj.anticipos_liberados = data.anticipos_liberados
     obj.gestor_carga_id = gestor_carga_id
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()

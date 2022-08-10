@@ -347,11 +347,13 @@ def edit_monto_movimiento(
     obj: Movimiento,
     db: Session,
     monto: Decimal,
+    detalle: str,
     moneda_id: Optional[int],
     gestor_carga_id: int,
     modified_by: str,
 ) -> Movimiento:
     obj.monto = monto
+    obj.detalle = detalle
     if moneda_id:
         obj.moneda_id = moneda_id
     obj.gestor_carga_id = gestor_carga_id

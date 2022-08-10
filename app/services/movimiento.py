@@ -603,8 +603,9 @@ def edit_movimiento_by_gestor_flete(
     )
     moneda_id = data.moneda_id
     monto = orden.resultado_gestor_carga_total_flete * -1
+    detalle = orden.flete_gestor_carga_detalle
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
     )
 
 
@@ -633,8 +634,9 @@ def edit_movimiento_by_gestor_merma(
     )
     moneda_id = data.moneda_id
     monto = orden.resultado_gestor_carga_merma_valor_total
+    detalle = orden.merma_gestor_carga_detalle
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
     )
 
 
@@ -661,8 +663,9 @@ def edit_movimiento_by_propietario_flete(
     )
     moneda_id = data.moneda_id
     monto = orden.resultado_propietario_total_flete
+    detalle = orden.flete_gestor_carga_detalle
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
     )
 
 
@@ -691,8 +694,9 @@ def edit_movimiento_by_propietario_merma(
     )
     moneda_id = data.moneda_id
     monto = orden.resultado_propietario_merma_valor_total * -1
+    detalle = orden.merma_propietario_detalle
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
     )
 
 

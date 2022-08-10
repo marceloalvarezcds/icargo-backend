@@ -108,6 +108,7 @@ async def add_new_camion(
         foto_habilitacion_transporte_reverso_file,
         foto_habilitacion_automotor_frente_file,
         foto_habilitacion_automotor_reverso_file,
+        current_user.gestor_carga_id,
         current_user.username,
     )
 

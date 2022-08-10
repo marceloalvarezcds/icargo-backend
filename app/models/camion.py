@@ -5,6 +5,7 @@ from sqlalchemy import (  # type: ignore
     Integer,
     Numeric,
     String,
+    text,
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
@@ -12,6 +13,7 @@ from sqlalchemy.orm import relationship  # type: ignore
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums.estado import EstadoEnum
+from app.utils import number_format
 
 from .chofer import Chofer
 from .ciudad import Ciudad
@@ -37,6 +39,11 @@ class Camion(AuditMixin, Base):
     numero_chasis = Column(String(255))
     foto = Column(String(255))
     estado = Column(String(255), server_default=EstadoEnum.PENDIENTE.value)
+    # INICIO Limitaciones del Camión
+    limite_cantidad_oc_activas = Column(Integer, server_default=text("1"))
+    # SE USA LA MONEDA DEL GESTOR, por el momento
+    limite_monto_anticipos = Column(Numeric(38, 10))
+    # FIN Limitaciones del Camión
     # INICIO Habilitaciones del Camión
     # inicio - municipal
     ciudad_habilitacion_municipal_id = Column(Integer, ForeignKey("ciudad.id"))
@@ -86,6 +93,10 @@ class Camion(AuditMixin, Base):
         return self.chofer.numero_documento if self.chofer else None
 
     @hybrid_property
+    def chofer_puede_recibir_anticipos(self):
+        return self.chofer.puede_recibir_anticipos if self.chofer else False
+
+    @hybrid_property
     def ciudad_habilitacion_municipal_nombre(self):
         return (
             self.ciudad_habilitacion_municipal.nombre
@@ -104,6 +115,18 @@ class Camion(AuditMixin, Base):
     @hybrid_property
     def gestor_cuenta_nombre(self):
         return self.propietario.gestor_cuenta.nombre
+
+    @hybrid_property
+    def limites(self):
+        anticipos = (
+            f" || Anticipos: {number_format(self.limite_monto_anticipos)}"
+            if self.limite_monto_anticipos
+            else ""
+        )
+        return f"""
+            OC: {self.limite_cantidad_oc_activas if self.limite_cantidad_oc_activas else ''}
+            {anticipos}
+        """
 
     @hybrid_property
     def localidad_habilitacion_municipal_id(self):
@@ -184,6 +207,10 @@ class Camion(AuditMixin, Base):
     @hybrid_property
     def propietario_ruc(self):
         return self.propietario.ruc
+
+    @hybrid_property
+    def propietario_puede_recibir_anticipos(self):
+        return self.propietario.puede_recibir_anticipos
 
     @hybrid_property
     def tipo_descripcion(self):

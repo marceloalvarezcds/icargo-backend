@@ -59,6 +59,7 @@ class Propietario(AuditMixin, Base):
     ciudad = relationship(Ciudad, uselist=False)
     chofer_id = Column(Integer, ForeignKey("chofer.id"))
     chofer = relationship(Chofer, uselist=False)
+    puede_recibir_anticipos = Column(Boolean, server_default=text("true"))
     contactos = relationship(
         "PropietarioContactoGestorCarga", back_populates="propietario"
     )

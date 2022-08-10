@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from http import HTTPStatus
 from typing import List, Optional, cast
 
 from fastapi import HTTPException
@@ -12,7 +13,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, STATICS_URL, templateEnv
 from app.enums import EstadoEnum
-from app.models import Flete, OrdenCarga, User
+from app.models import Camion, Flete, OrdenCarga, User
 from app.schemas.audit_database import AuditDatabase as A
 from app.utils import number_format
 
@@ -232,7 +233,38 @@ def change_orden_carga_anticipos_liberados(
 
 def aceptar_orden_carga(db: Session, id: int, current_user: User) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
-    model = repositories.aceptar_orden_carga(obj, db, current_user.username)
+    cant_oc_aceptadas = repositories.get_orden_carga_aceptada_count_by_camion_id(
+        db, obj.camion_id
+    )
+    camion: Camion = obj.camion
+    camion.limite_cantidad_oc_activas
+    if cant_oc_aceptadas > camion.limite_cantidad_oc_activas:
+        raise HTTPException(
+            status_code=HTTPStatus.LOCKED,
+            detail=f"""
+            Existen {cant_oc_aceptadas} OC aceptadas
+            y el límite es de {camion.limite_cantidad_oc_activas},
+            establecido por Camión con placa {camion.placa}
+            """,
+        )
+    username = current_user.username
+    gestor_id = (
+        current_user.gestor_carga_id
+        if current_user.gestor_carga_id
+        else obj.gestor_carga_id
+    )
+    anticipos_liberados = (
+        camion.propietario_puede_recibir_anticipos
+        and camion.chofer_puede_recibir_anticipos
+    )
+    oc = repositories.edit_orden_carga(
+        obj,
+        db,
+        schemas.OrdenCargaEditForm(anticipos_liberados=anticipos_liberados),
+        gestor_id,
+        username,
+    )
+    model = repositories.aceptar_orden_carga(oc, db, username)
     return get_orden_carga_with_resultado(db, model, current_user)
 
 
