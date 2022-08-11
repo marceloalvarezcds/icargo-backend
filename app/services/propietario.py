@@ -10,11 +10,13 @@ from app import repositories, schemas
 from app.config import REPORTS_FOLDER
 from app.enums import EstadoEnum
 from app.models import Propietario
+from app.utils import get_gestor_carga_by_params
 
 from .gestor_carga_propietario import (
     create_gestor_carga_propietario,
     edit_gestor_carga_propietario,
 )
+from .propietario_anticipos_oc import bloquear_anticipos_desde_el_propietario
 from .propietario_check_files import check_files, get_propietario_detail
 from .propietario_chofer import (
     create_or_edit_chofer_by_propietario,
@@ -77,7 +79,7 @@ async def create_propietario(
         db, data.contactos, obj, gestor_cuenta_id, modified_by
     )
     create_gestor_carga_propietario(db, obj, gestor_cuenta_id, data.alias, modified_by)
-    return get_propietario_detail(obj, gestor_cuenta_id)
+    return get_propietario_detail(db, obj, gestor_cuenta_id)
 
 
 def get_propietario_by_id(db: Session, id: int) -> Propietario:
@@ -93,7 +95,7 @@ def get_propietario_by_id_and_gestor_cuenta_id(
     obj = repositories.get_propietario_by_id(db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Propietario no encontrado")
-    return get_propietario_detail(obj, gestor_cuenta_id)
+    return get_propietario_detail(db, obj, gestor_cuenta_id)
 
 
 async def edit_propietario(
@@ -107,9 +109,10 @@ async def edit_propietario(
     foto_documento_reverso_chofer_file: Optional[UploadFile],
     foto_registro_frente_file: Optional[UploadFile],
     foto_registro_reverso_file: Optional[UploadFile],
-    gestor_cuenta_id: Optional[int],
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Propietario:
+    gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
     if data.tipo_persona_id and data.ruc:
         exists = repositories.get_propietario_by(db, data.tipo_persona_id, data.ruc)
         if exists and exists.id != id:
@@ -128,7 +131,7 @@ async def edit_propietario(
     )
     to_edit_obj = get_propietario_by_id(db, id)
     chofer_id = to_edit_obj.chofer_id
-    chofer = to_edit_obj.chofer
+    chofer: Optional[schemas.Chofer] = to_edit_obj.chofer
     if data.es_chofer:
         chofer_data = cast(schemas.PropietarioForm, data)
         chofer = await create_or_edit_chofer_by_propietario(
@@ -139,7 +142,7 @@ async def edit_propietario(
             foto_registro_frente_file,
             foto_registro_reverso_file,
             foto_perfil_url,
-            gestor_cuenta_id,
+            gestor_id,
             modified_by,
             chofer_id,
         )
@@ -155,11 +158,10 @@ async def edit_propietario(
         chofer,
         modified_by,
     )
-    update_propietario_contacto_list(
-        db, data.contactos, obj, gestor_cuenta_id, modified_by
-    )
-    edit_gestor_carga_propietario(db, obj, gestor_cuenta_id, data.alias, modified_by)
-    return get_propietario_detail(obj, gestor_cuenta_id)
+    update_propietario_contacto_list(db, data.contactos, obj, gestor_id, modified_by)
+    edit_gestor_carga_propietario(db, obj, gestor_id, data.alias, modified_by)
+    bloquear_anticipos_desde_el_propietario(db, id, data, gestor_id, modified_by)
+    return get_propietario_detail(db, obj, gestor_id)
 
 
 def delete_propietario(
@@ -167,7 +169,7 @@ def delete_propietario(
 ) -> schemas.Propietario:
     co = get_propietario_by_id(db, id)
     obj = repositories.delete_propietario(co, db, modified_by)
-    return get_propietario_detail(obj, gestor_cuenta_id)
+    return get_propietario_detail(db, obj, gestor_cuenta_id)
 
 
 def change_propietario_status(

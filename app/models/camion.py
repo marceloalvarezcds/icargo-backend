@@ -85,6 +85,10 @@ class Camion(AuditMixin, Base):
     combinaciones = relationship("CamionSemiNeto", back_populates="camion")
 
     @hybrid_property
+    def chofer_estado(self):
+        return self.chofer.estado if self.chofer else None
+
+    @hybrid_property
     def chofer_nombre(self):
         return self.chofer.nombre if self.chofer else None
 
@@ -199,6 +203,10 @@ class Camion(AuditMixin, Base):
             if self.ente_emisor_automotor
             else None
         )
+
+    @hybrid_property
+    def propietario_estado(self):
+        return self.propietario.estado
 
     @hybrid_property
     def propietario_nombre(self):

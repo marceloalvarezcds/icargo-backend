@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.models import (
-    Chofer,
     GestorCargaPropietario,
     Propietario,
     PropietarioContactoGestorCarga,
@@ -38,51 +37,20 @@ async def check_files(
 
 
 def get_propietario_detail(
-    obj: Propietario, gestor_cuenta_id: Optional[int]
+    db: Session, model: Propietario, gestor_cuenta_id: Optional[int]
 ) -> schemas.Propietario:
-    obj_dict = obj.as_dict(for_json=False)
-    contactos: List[PropietarioContactoGestorCarga] = obj.contactos
-    ges: List[GestorCargaPropietario] = obj.gestores
+    obj = schemas.Propietario.from_orm(model)
+    contactos: List[PropietarioContactoGestorCarga] = model.contactos
+    ges: List[GestorCargaPropietario] = model.gestores
     gestores = [x for x in ges if x.gestor_carga_id == gestor_cuenta_id]
-    obj_dict["contactos"] = [
-        x for x in contactos if x.gestor_carga_id == gestor_cuenta_id
-    ]
-    obj_dict["gestor_carga_propietario"] = gestores[0] if len(gestores) > 0 else None
-    obj_dict["tipo_persona"] = obj.tipo_persona
-    obj_dict["gestor_cuenta_nombre"] = (
-        obj.gestor_cuenta.nombre if obj.gestor_cuenta else None
+    obj.contactos = [x for x in contactos if x.gestor_carga_id == gestor_cuenta_id]
+    obj.gestor_carga_propietario = gestores[0] if len(gestores) > 0 else None
+    obj.oc_with_anticipos_liberados = (
+        repositories.get_orden_carga_with_anticipo_liberado_count_by_propietario_id(
+            db, obj.id
+        )
     )
-    obj_dict["oficial_cuenta_nombre"] = obj.oficial_cuenta_nombre
-    obj_dict["pais_origen"] = obj.pais_origen
-    obj_dict["ciudad"] = obj.ciudad
-    # Datos del chofer
-    if obj.chofer:
-        chofer: Chofer = obj.chofer
-        obj_dict["tipo_documento_id"] = chofer.tipo_documento_id
-        obj_dict["tipo_documento"] = chofer.tipo_documento
-        obj_dict["pais_emisor_documento_id"] = chofer.pais_emisor_documento_id
-        obj_dict["pais_emisor_documento"] = chofer.pais_emisor_documento
-        obj_dict["numero_documento"] = chofer.numero_documento
-        obj_dict["foto_documento_frente_chofer"] = chofer.foto_documento_frente
-        obj_dict["foto_documento_reverso_chofer"] = chofer.foto_documento_reverso
-        # inicio registro
-        ciudad_emisor_registro = chofer.ciudad_emisor_registro
-        localidad_emisor_registro = ciudad_emisor_registro.localidad
-        pais_emisor_registro = ciudad_emisor_registro.localidad.pais
-        obj_dict["pais_emisor_registro_id"] = pais_emisor_registro.id
-        obj_dict["pais_emisor_registro"] = pais_emisor_registro
-        obj_dict["localidad_emisor_registro_id"] = localidad_emisor_registro.id
-        obj_dict["localidad_emisor_registro"] = localidad_emisor_registro
-        obj_dict["ciudad_emisor_registro_id"] = chofer.ciudad_emisor_registro_id
-        obj_dict["ciudad_emisor_registro"] = chofer.ciudad_emisor_registro
-        obj_dict["tipo_registro_id"] = chofer.tipo_registro_id
-        obj_dict["tipo_registro"] = chofer.tipo_registro
-        obj_dict["numero_registro"] = chofer.numero_registro
-        obj_dict["vencimiento_registro"] = chofer.vencimiento_registro
-        obj_dict["foto_registro_frente"] = chofer.foto_registro_frente
-        obj_dict["foto_registro_reverso"] = chofer.foto_registro_reverso
-        # fin registro
-    return schemas.Propietario.parse_obj(obj_dict)
+    return obj
 
 
 def get_propietario_by_ruc(db: Session, ruc: Optional[str]) -> Optional[Propietario]:

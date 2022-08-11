@@ -56,9 +56,9 @@ class Propietario(AuditMixin, Base):
     email = Column(String(50))
     direccion = Column(String(255))
     ciudad_id = Column(Integer, ForeignKey("ciudad.id"))
-    ciudad = relationship(Ciudad, uselist=False)
+    ciudad: Ciudad = relationship(Ciudad, uselist=False)
     chofer_id = Column(Integer, ForeignKey("chofer.id"))
-    chofer = relationship(Chofer, uselist=False)
+    chofer: Chofer = relationship(Chofer, uselist=False)
     puede_recibir_anticipos = Column(Boolean, server_default=text("true"))
     contactos = relationship(
         "PropietarioContactoGestorCarga", back_populates="propietario"
@@ -71,7 +71,7 @@ class Propietario(AuditMixin, Base):
 
     @hybrid_property
     def gestor_cuenta_nombre(self):
-        return self.gestor_cuenta.nombre
+        return self.gestor_cuenta.nombre if self.gestor_cuenta else None
 
     @hybrid_property
     def localidad_nombre(self):
@@ -104,3 +104,91 @@ class Propietario(AuditMixin, Base):
     @hybrid_property
     def tipo_persona_descripcion(self):
         return self.tipo_persona.descripcion
+
+    @hybrid_property
+    def tipo_documento_id(self):
+        return self.chofer.tipo_documento_id if self.chofer else None
+
+    @hybrid_property
+    def tipo_documento(self):
+        return self.chofer.tipo_documento if self.chofer else None
+
+    @hybrid_property
+    def pais_emisor_documento_id(self):
+        return self.chofer.pais_emisor_documento_id if self.chofer else None
+
+    @hybrid_property
+    def pais_emisor_documento(self):
+        return self.chofer.pais_emisor_documento if self.chofer else None
+
+    @hybrid_property
+    def numero_documento(self):
+        return self.chofer.numero_documento if self.chofer else None
+
+    @hybrid_property
+    def foto_documento_frente_chofer(self):
+        return self.chofer.foto_documento_frente if self.chofer else None
+
+    @hybrid_property
+    def foto_documento_reverso_chofer(self):
+        return self.chofer.foto_documento_reverso if self.chofer else None
+
+    @hybrid_property
+    def ciudad_emisor_registro(self):
+        return self.chofer.ciudad_emisor_registro if self.chofer else None
+
+    @hybrid_property
+    def ciudad_emisor_registro_id(self):
+        return self.ciudad_emisor_registro.id if self.ciudad_emisor_registro else None
+
+    @hybrid_property
+    def localidad_emisor_registro(self):
+        return (
+            self.ciudad_emisor_registro.localidad
+            if self.ciudad_emisor_registro
+            else None
+        )
+
+    @hybrid_property
+    def localidad_emisor_registro_id(self):
+        return (
+            self.localidad_emisor_registro.id
+            if self.localidad_emisor_registro
+            else None
+        )
+
+    @hybrid_property
+    def pais_emisor_registro(self):
+        return (
+            self.localidad_emisor_registro.pais
+            if self.localidad_emisor_registro
+            else None
+        )
+
+    @hybrid_property
+    def pais_emisor_registro_id(self):
+        return self.pais_emisor_registro.id if self.pais_emisor_registro else None
+
+    @hybrid_property
+    def tipo_registro(self):
+        return self.chofer.tipo_registro if self.chofer else None
+
+    @hybrid_property
+    def tipo_registro_id(self):
+        return self.chofer.tipo_registro_id if self.chofer else None
+
+    @hybrid_property
+    def numero_registro(self):
+        return self.chofer.numero_registro if self.chofer else None
+
+    @hybrid_property
+    def vencimiento_registro(self):
+        return self.chofer.vencimiento_registro if self.chofer else None
+
+    @hybrid_property
+    def foto_registro_frente(self):
+        return self.chofer.foto_registro_frente if self.chofer else None
+
+    @hybrid_property
+    def foto_registro_reverso(self):
+        return self.chofer.foto_registro_reverso if self.chofer else None
