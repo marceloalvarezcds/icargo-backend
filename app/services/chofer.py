@@ -10,7 +10,9 @@ from app import repositories, schemas
 from app.config import REPORTS_FOLDER
 from app.enums import EstadoEnum
 from app.models import Chofer
+from app.utils import get_gestor_carga_by_params
 
+from .chofer_anticipos_oc import bloquear_anticipos_desde_el_chofer
 from .chofer_check_files import check_files, get_chofer_detail
 from .chofer_propietario import (
     create_or_edit_propietario_by_chofer,
@@ -105,9 +107,10 @@ async def edit_chofer(
     foto_registro_reverso_file: Optional[UploadFile],
     foto_documento_frente_propietario_file: Optional[UploadFile],
     foto_documento_reverso_propietario_file: Optional[UploadFile],
-    gestor_cuenta_id: Optional[int],
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Chofer:
+    gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
     if (
         data.tipo_documento_id
         and data.pais_emisor_documento_id
@@ -149,7 +152,7 @@ async def edit_chofer(
         foto_registro_reverso_url,
         modified_by,
     )
-    edit_gestor_carga_chofer(db, obj, gestor_cuenta_id, data.alias, modified_by)
+    edit_gestor_carga_chofer(db, obj, gestor_id, data.alias, modified_by)
     if data.es_propietario:
         chofer_data = cast(schemas.ChoferForm, data)
         await create_or_edit_propietario_by_chofer(
@@ -158,13 +161,14 @@ async def edit_chofer(
             foto_documento_frente_propietario_file,
             foto_documento_reverso_propietario_file,
             foto_perfil_url,
-            gestor_cuenta_id,
+            gestor_id,
             obj,
             modified_by,
         )
     else:
         disable_propietario_by_ruc(db, to_edit_obj.ruc, modified_by)
-    return get_chofer_detail(db, obj, gestor_cuenta_id)
+    bloquear_anticipos_desde_el_chofer(db, id, data, gestor_id, modified_by)
+    return get_chofer_detail(db, obj, gestor_id)
 
 
 def delete_chofer(

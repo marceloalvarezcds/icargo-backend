@@ -67,7 +67,9 @@ class CamionForm(BaseModel):
 class Camion(CamionForm):
     id: int
     propietario: Propietario
+    propietario_estado: EstadoEnum
     chofer: Optional[Chofer]
+    chofer_estado: Optional[EstadoEnum] = None
     estado: EstadoEnum
     gestor_cuenta_id: int
     info: str

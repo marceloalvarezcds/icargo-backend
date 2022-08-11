@@ -58,25 +58,30 @@ def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
     db: Session,
     flete_anticipo_id: int,
     orden_carga_id: int,
+    modified_by: str,
 ) -> Decimal:
-    exists = repositories.get_orden_carga_anticipo_saldo_by(
+    exists: Optional[
+        schemas.OrdenCargaAnticipoSaldo
+    ] = repositories.get_orden_carga_anticipo_saldo_by(
         db, flete_anticipo_id, orden_carga_id
     )
-    if exists:
-        return exists.saldo
-    else:
-        flete_anticipo = get_flete_anticipo_by_id(db, flete_anticipo_id)
+    if not exists:
         orden_carga = get_orden_carga_by_id(db, orden_carga_id)
-        total_complemento = get_total_complemento(
-            orden_carga.complementos,
-            flete_anticipo.tipo_descripcion == enums.TipoAnticipoEnum.EFECTIVO.value,
-        )
-        total_anticipo = (
-            orden_carga.flete_proyectado * (flete_anticipo.porcentaje / Decimal(100))
-            if flete_anticipo.porcentaje
-            else 0
-        )
-        return total_anticipo + total_complemento
+        total_complemento = get_total_complemento(orden_carga.complementos, True)
+        flete_anticipo = repositories.get_flete_anticipo_by_id(db, flete_anticipo_id)
+        if flete_anticipo is None:
+            flete_anticipo = get_flete_anticipo_by_orden_carga(orden_carga)
+        if flete_anticipo:
+            exists = update_orden_carga_anticipo_saldo(
+                db,
+                flete_anticipo,
+                orden_carga,
+                Decimal(0),
+                total_complemento,
+                modified_by,
+            )
+    saldo_disponible: Decimal = exists.saldo if exists else Decimal(0)
+    return saldo_disponible
 
 
 def get_total_complemento(complementos: List[OrdenCargaComplemento], es_efectivo: bool):
@@ -117,6 +122,7 @@ def update_orden_carga_anticipo_saldo(
 ) -> Optional[schemas.OrdenCargaAnticipoSaldo]:
     flete_anticipo_id = flete_anticipo.id
     orden_carga_id = orden_carga.id
+    camion_limite: Optional[Decimal] = orden_carga.camion_limite_monto_anticipos
     exists = repositories.get_orden_carga_anticipo_saldo_by(
         db, flete_anticipo_id, orden_carga_id
     )
@@ -126,7 +132,12 @@ def update_orden_carga_anticipo_saldo(
         else 0
     )
     total_retirado = monto_retirado
-    total_disponible = total_anticipo + total_complemento
+    total_disponible_oc = total_anticipo + total_complemento
+    total_disponible = (
+        camion_limite
+        if camion_limite and camion_limite < total_disponible_oc
+        else total_disponible_oc
+    )
     if exists:
         total_retirado += exists.total_retirado
         saldo = total_disponible - total_retirado

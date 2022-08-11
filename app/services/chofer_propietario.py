@@ -65,7 +65,7 @@ async def create_or_edit_propietario_by_chofer(
         create_gestor_carga_propietario(
             db, obj, gestor_cuenta_id, data.alias, modified_by
         )
-    return get_propietario_detail(obj, gestor_cuenta_id)
+    return get_propietario_detail(db, obj, gestor_cuenta_id)
 
 
 def disable_propietario_by_ruc(

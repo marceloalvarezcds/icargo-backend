@@ -1,11 +1,12 @@
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy.orm import Session  # type: ignore
-from sqlalchemy.sql.elements import and_  # type: ignore
+from sqlalchemy.orm import Query, Session  # type: ignore
+from sqlalchemy.sql.elements import and_, or_  # type: ignore
+from sqlalchemy.sql.expression import true  # type: ignore
 
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
-from app.models import Flete, OrdenCarga
+from app.models import Camion, Flete, OrdenCarga
 from app.schemas import OrdenCargaEditForm, OrdenCargaForm
 
 from .orden_carga_estado_historial import create_orden_carga_estado_historial
@@ -53,6 +54,80 @@ def get_orden_carga_list_by_gestor_carga_id(
 
 def get_orden_carga_by_id(db: Session, id: int) -> Optional[OrdenCarga]:
     return db.query(OrdenCarga).filter(OrdenCarga.id == id).first()
+
+
+def get_orden_carga_with_anticipo_liberado_by_chofer_id_query(
+    db: Session, chofer_id: int
+) -> Query:
+    return (
+        db.query(OrdenCarga)
+        .join(OrdenCarga.camion)
+        .filter(
+            and_(
+                Camion.chofer_id == chofer_id,
+                OrdenCarga.anticipos_liberados == true(),
+                or_(
+                    OrdenCarga.estado == EstadoEnum.ACEPTADO.value,
+                    OrdenCarga.estado == EstadoEnum.EN_PROCESO.value,
+                    OrdenCarga.estado == EstadoEnum.FINALIZADO.value,
+                ),
+            )
+        )
+        .order_by(OrdenCarga.created_by)
+    )
+
+
+def get_orden_carga_with_anticipo_liberado_count_by_chofer_id(
+    db: Session, chofer_id: int
+) -> int:
+    return get_orden_carga_with_anticipo_liberado_by_chofer_id_query(
+        db, chofer_id
+    ).count()
+
+
+def get_orden_carga_with_anticipo_liberado_list_by_chofer_id(
+    db: Session, chofer_id: int
+) -> List[OrdenCarga]:
+    return get_orden_carga_with_anticipo_liberado_by_chofer_id_query(
+        db, chofer_id
+    ).all()
+
+
+def get_orden_carga_with_anticipo_liberado_by_propietario_id_query(
+    db: Session, propietario_id: int
+) -> Query:
+    return (
+        db.query(OrdenCarga)
+        .join(OrdenCarga.camion)
+        .filter(
+            and_(
+                Camion.propietario_id == propietario_id,
+                OrdenCarga.anticipos_liberados == true(),
+                or_(
+                    OrdenCarga.estado == EstadoEnum.ACEPTADO.value,
+                    OrdenCarga.estado == EstadoEnum.EN_PROCESO.value,
+                    OrdenCarga.estado == EstadoEnum.FINALIZADO.value,
+                ),
+            )
+        )
+        .order_by(OrdenCarga.created_by)
+    )
+
+
+def get_orden_carga_with_anticipo_liberado_count_by_propietario_id(
+    db: Session, propietario_id: int
+) -> int:
+    return get_orden_carga_with_anticipo_liberado_by_propietario_id_query(
+        db, propietario_id
+    ).count()
+
+
+def get_orden_carga_with_anticipo_liberado_list_by_propietario_id(
+    db: Session, propietario_id: int
+) -> List[OrdenCarga]:
+    return get_orden_carga_with_anticipo_liberado_by_propietario_id_query(
+        db, propietario_id
+    ).all()
 
 
 def create_orden_carga(
