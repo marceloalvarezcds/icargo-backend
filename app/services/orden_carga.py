@@ -239,13 +239,12 @@ def aceptar_orden_carga(db: Session, id: int, current_user: User) -> schemas.Ord
     camion: Camion = obj.camion
     camion.limite_cantidad_oc_activas
     if cant_oc_aceptadas > camion.limite_cantidad_oc_activas:
+        oc_aceptadas = f"Existen {cant_oc_aceptadas} OC aceptadas"
+        limite = f"y el límite es de {camion.limite_cantidad_oc_activas}"
+        camion_placa = f"establecido por Camión con placa {camion.placa}"
         raise HTTPException(
             status_code=HTTPStatus.LOCKED,
-            detail=f"""
-            Existen {cant_oc_aceptadas} OC aceptadas
-            y el límite es de {camion.limite_cantidad_oc_activas},
-            establecido por Camión con placa {camion.placa}
-            """,
+            detail=f"{oc_aceptadas} {limite}, {camion_placa}",
         )
     username = current_user.username
     gestor_id = (
