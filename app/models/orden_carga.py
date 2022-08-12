@@ -110,7 +110,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def anticipos_liberados_descripcion(self):
-        return "Si" if self.anticipos_liberados else "No"
+        return "Liberados" if self.anticipos_liberados else "Bloqueados"
 
     @hybrid_property
     def camion_chofer_nombre(self):
