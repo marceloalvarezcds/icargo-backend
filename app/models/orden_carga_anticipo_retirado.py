@@ -76,10 +76,9 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         producto_info = ""
         if self.insumo_punto_venta_precio:
             producto_info = f" || Precio: {number_format(self.precio_unitario)} || Prod: {self.insumo_descripcion}"  # noqa: B950
-        return f"""
-            {self.concepto}: {number_format(self.monto_retirado)}{self.moneda_simbolo}
-            {producto_info} || {self.punto_venta_nombre}
-        """
+        concepto = f"{self.concepto}: {number_format(self.monto_retirado)}{self.moneda_simbolo}"
+        punto_venta_producto = f"{producto_info} || {self.punto_venta_nombre}"
+        return f"{concepto} {punto_venta_producto}"
 
     @hybrid_property
     def gestor_carga_id(self):

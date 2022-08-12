@@ -189,15 +189,12 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_gestor_carga_detalle(self):
-        return f"""
-            {self.flete.remitente_nombre} ||
-            P.Dest.: {number_format(self.cantidad_destino)}Kg ||
-            {number_format(self.flete_tarifa_gestor_carga)}{self.flete_tarifa_unidad_gestor_carga} ||
-            Nº Rem: {self.remisiones} ||
-            Tickets: {self.nro_tickets} ||
-            Ori: {self.origen_nombre} ||
-            Des: {self.destino_nombre}
-        """  # noqa: B950
+        remi = f"{self.flete.remitente_nombre} ||"
+        dest = f"P.Dest.: {number_format(self.cantidad_destino)}Kg ||"
+        tari = f"{number_format(self.flete_tarifa_gestor_carga)}{self.flete_tarifa_unidad_gestor_carga} ||"  # noqa: B950
+        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
+        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
+        return f"{remi} {dest} {tari} {nums} {ubic}"
 
     @hybrid_property
     def flete_gestor_carga_id(self):
@@ -233,15 +230,12 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_propietario_detalle(self):
-        return f"""
-            {self.flete.remitente_nombre} ||
-            P.Dest.: {number_format(self.cantidad_destino)}Kg ||
-            {number_format(self.flete_tarifa)}{self.flete_tarifa_unidad} ||
-            Nº Rem: {self.remisiones} ||
-            Tickets: {self.nro_tickets} ||
-            Ori: {self.origen_nombre} ||
-            Des: {self.destino_nombre}
-        """
+        remi = f"{self.flete.remitente_nombre} ||"
+        dest = f"P.Dest.: {number_format(self.cantidad_destino)}Kg ||"
+        tari = f"{number_format(self.flete_tarifa)}{self.flete_tarifa_unidad} ||"
+        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
+        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
+        return f"{remi} {dest} {tari} {nums} {ubic}"
 
     @hybrid_property
     def flete_proyectado(self):
@@ -317,17 +311,14 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def merma_gestor_carga_detalle(self):
-        return f"""
-            {self.flete.remitente_nombre} ||
-            Dif.: {number_format(self.diferencia_origen_destino)}Kg ||
-            Tol.: {number_format(self.resultado_gestor_carga_tolerancia_kg)}Kg ||
-            M.: {number_format(self.resultado_gestor_carga_merma)}Kg ||
-            {number_format(self.merma_gestor_carga_valor)}Grs/Kg ||
-            Nº Rem: {self.remisiones} ||
-            Tickets: {self.nro_tickets} ||
-            Ori: {self.origen_nombre} ||
-            Des: {self.destino_nombre}
-        """
+        remi = f"{self.flete.remitente_nombre} ||"
+        diff = f"Dif.: {number_format(self.diferencia_origen_destino)}Kg ||"
+        totl = f"Tol.: {number_format(self.resultado_gestor_carga_tolerancia_kg)}Kg ||"
+        merm = f"M.: {number_format(self.resultado_gestor_carga_merma)}Kg ||"
+        mval = f"{number_format(self.merma_gestor_carga_valor)}Grs/Kg ||"
+        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
+        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
+        return f"{remi} {diff} {totl} {merm} {mval} {nums} {ubic}"
 
     @hybrid_property
     def merma_gestor_carga_es_porcentual_descripcion(self):
@@ -344,17 +335,14 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def merma_propietario_detalle(self):
-        return f"""
-            {self.flete.remitente_nombre} ||
-            Dif.: {number_format(self.diferencia_origen_destino)}Kg ||
-            Tol.: {number_format(self.resultado_propietario_tolerancia_kg)}Kg ||
-            M.: {number_format(self.resultado_propietario_merma)}Kg ||
-            {number_format(self.merma_propietario_valor)}Grs/Kg ||
-            Nº Rem: {self.remisiones} ||
-            Tickets: {self.nro_tickets} ||
-            Ori: {self.origen_nombre} ||
-            Des: {self.destino_nombre}
-        """
+        remi = f"{self.flete.remitente_nombre} ||"
+        diff = f"Dif.: {number_format(self.diferencia_origen_destino)}Kg ||"
+        totl = f"Tol.: {number_format(self.resultado_propietario_tolerancia_kg)}Kg ||"
+        merm = f"M.: {number_format(self.resultado_propietario_merma)}Kg ||"
+        mval = f"{number_format(self.merma_propietario_valor)}Grs/Kg ||"
+        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
+        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
+        return f"{remi} {diff} {totl} {merm} {mval} {nums} {ubic}"
 
     @hybrid_property
     def merma_propietario_es_porcentual_descripcion(self):
