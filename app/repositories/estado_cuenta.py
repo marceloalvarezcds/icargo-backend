@@ -235,7 +235,7 @@ def get_estado_cuenta_list_by_gestor_carga_id(
 ) -> List[Row]:
     table = (
         get_estado_cuenta_subquery(db)
-        .filter_by(gestor_carga_id=gestor_carga_id)
+        .filter(Movimiento.gestor_carga_id == gestor_carga_id)
         .subquery()
     )
     return get_estado_cuenta_group_by_query(db, table).all()
