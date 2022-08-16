@@ -53,18 +53,6 @@ def create_orden_carga_anticipo_retirado(
     data: schemas.OrdenCargaAnticipoRetiradoForm,
     modified_by: str,
 ) -> schemas.OrdenCargaAnticipoRetirado:
-    if repositories.get_orden_carga_anticipo_retirado_by(
-        db,
-        data.flete_anticipo_id,
-        data.orden_carga_id,
-        data.punto_venta_id,
-        data.tipo_comprobante_id,
-        data.numero_comprobante,
-    ):
-        raise HTTPException(
-            status_code=409,
-            detail=get_error_message(db, data),
-        )
     if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
         data.monto_retirado = RoundedDecimal(
             data.cantidad_retirada * data.precio_unitario
@@ -96,19 +84,6 @@ def edit_orden_carga_anticipo_retirado(
     data: schemas.OrdenCargaAnticipoRetiradoForm,
     modified_by: str,
 ) -> schemas.OrdenCargaAnticipoRetirado:
-    exists = repositories.get_orden_carga_anticipo_retirado_by(
-        db,
-        data.flete_anticipo_id,
-        data.orden_carga_id,
-        data.punto_venta_id,
-        data.tipo_comprobante_id,
-        data.numero_comprobante,
-    )
-    if exists and exists.id != id:
-        raise HTTPException(
-            status_code=409,
-            detail=get_error_message(db, data),
-        )
     if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
         data.monto_retirado = RoundedDecimal(
             data.cantidad_retirada * data.precio_unitario
