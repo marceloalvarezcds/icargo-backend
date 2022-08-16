@@ -29,7 +29,11 @@ def get_orden_carga_aceptada_count_by_camion_id(
         .filter(
             and_(
                 OrdenCarga.camion_id == camion_id,
-                OrdenCarga.estado == EstadoEnum.ACEPTADO.value,
+                or_(
+                    OrdenCarga.estado == EstadoEnum.ACEPTADO.value,
+                    OrdenCarga.estado == EstadoEnum.EN_PROCESO.value,
+                    OrdenCarga.estado == EstadoEnum.FINALIZADO.value,
+                ),
             )
         )
         .count()

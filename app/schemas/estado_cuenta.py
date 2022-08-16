@@ -10,6 +10,8 @@ from .rounded_decimal_model import RoundedDecimal
 class EstadoCuenta(BaseModel):
     contraparte: str
     contraparte_numero_documento: str
+    actual_contraparte: str
+    actual_contraparte_numero_documento: str
     tipo_contraparte_id: int
     tipo_contraparte_descripcion: str
     pendiente: RoundedDecimal
@@ -30,6 +32,10 @@ class EstadoCuenta(BaseModel):
     def from_orm_row(cls, row: Row) -> "EstadoCuenta":
         dic = row._asdict()
         qdic = {
+            "actual_contraparte": dic["actual_contraparte"],
+            "actual_contraparte_numero_documento": dic[
+                "actual_contraparte_numero_documento"
+            ],
             "contraparte": dic["contraparte"],
             "contraparte_numero_documento": dic["contraparte_numero_documento"],
             "tipo_contraparte_id": dic["tipo_contraparte_id"],
