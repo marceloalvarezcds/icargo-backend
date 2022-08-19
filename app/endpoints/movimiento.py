@@ -21,7 +21,7 @@ async def read_movimiento_list(
 
 
 @api.get("/reports")
-async def banco_reports(
+async def movimiento_reports(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008
 ):
@@ -29,10 +29,11 @@ async def banco_reports(
 
 
 @api.get(
-    "/reports/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}",  # noqa: B950
+    "/reports/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}",  # noqa: B950
 )
-async def banco_reports_by_estado(
+async def get_movimiento_reports_by_estado(
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
@@ -40,12 +41,17 @@ async def banco_reports_by_estado(
     _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008
 ):
     return services.get_movimiento_reports_by_contraparte(
-        db, tipo_contraparte_id, contraparte, contraparte_numero_documento, etapa
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        etapa,
     )
 
 
 @api.get("/reports/liquidacion/{liquidacion_id}/estado/{estado}")
-async def banco_reports_by_estado_and_liquidacion_id(
+async def movimiento_reports_by_estado_and_liquidacion_id(
     liquidacion_id: int,
     estado: str,
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -64,11 +70,12 @@ async def read_movimiento_list_by_gestor_carga_id(
 
 
 @api.get(
-    "/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}",  # noqa
+    "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}",  # noqa
     response_model=List[schemas.Movimiento],
 )
 async def read_movimiento_list_by_estado_cuenta(
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
@@ -79,6 +86,7 @@ async def read_movimiento_list_by_estado_cuenta(
     return services.get_movimiento_list_by_estado_cuenta(
         db,
         tipo_contraparte_id,
+        contraparte_id,
         contraparte,
         contraparte_numero_documento,
         etapa,
@@ -112,14 +120,6 @@ async def read_movimiento_list_by_orden_carga_id(
     _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
 ):
     return repositories.get_movimiento_list_by_orden_carga_id(db, orden_carga_id)
-
-
-@api.get("/reports")
-async def movimiento_reports(
-    db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008
-):
-    return services.get_movimiento_reports(db)
 
 
 @api.get("/{id}", response_model=schemas.Movimiento)

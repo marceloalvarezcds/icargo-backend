@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
-from sqlalchemy.sql.elements import and_  # type: ignore
+from sqlalchemy.sql.elements import and_, or_  # type: ignore
 
 from app.enums import LiquidacionEstadoEnum, LiquidacionEtapaEnum
 from app.models import Liquidacion
@@ -21,6 +21,7 @@ def get_liquidacion_list(db: Session) -> List[Liquidacion]:
 def get_liquidacion_list_by_contraparte(
     db: Session,
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
@@ -30,9 +31,17 @@ def get_liquidacion_list_by_contraparte(
         .filter(
             and_(
                 Liquidacion.tipo_contraparte_id == tipo_contraparte_id,
-                Liquidacion.contraparte == contraparte,
-                Liquidacion.contraparte_numero_documento
-                == contraparte_numero_documento,
+                or_(
+                    Liquidacion.propietario_id == contraparte_id,
+                    Liquidacion.remitente_id == contraparte_id,
+                    Liquidacion.proveedor_id == contraparte_id,
+                    and_(
+                        Liquidacion.contraparte == contraparte,
+                        Liquidacion.contraparte_numero_documento
+                        == contraparte_numero_documento,
+                    ),
+                    Liquidacion.chofer_id == contraparte_id,
+                ),
                 Liquidacion.etapa == etapa,
                 Liquidacion.estado != LiquidacionEstadoEnum.ELIMINADO.value,
             )
@@ -45,6 +54,7 @@ def get_liquidacion_list_by_contraparte(
 def get_liquidacion_list_by_contraparte_and_gestor_carga_id(
     db: Session,
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
@@ -55,9 +65,17 @@ def get_liquidacion_list_by_contraparte_and_gestor_carga_id(
         .filter(
             and_(
                 Liquidacion.tipo_contraparte_id == tipo_contraparte_id,
-                Liquidacion.contraparte == contraparte,
-                Liquidacion.contraparte_numero_documento
-                == contraparte_numero_documento,
+                or_(
+                    Liquidacion.propietario_id == contraparte_id,
+                    Liquidacion.remitente_id == contraparte_id,
+                    Liquidacion.proveedor_id == contraparte_id,
+                    and_(
+                        Liquidacion.contraparte == contraparte,
+                        Liquidacion.contraparte_numero_documento
+                        == contraparte_numero_documento,
+                    ),
+                    Liquidacion.chofer_id == contraparte_id,
+                ),
                 Liquidacion.etapa == etapa,
                 Liquidacion.gestor_carga_id == gestor_carga_id,
                 Liquidacion.estado != LiquidacionEstadoEnum.ELIMINADO.value,

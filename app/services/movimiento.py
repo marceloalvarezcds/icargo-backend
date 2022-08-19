@@ -43,6 +43,7 @@ def get_movimiento_list(
 def get_movimiento_list_by_estado_cuenta(
     db: Session,
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     estado: str,
@@ -52,13 +53,19 @@ def get_movimiento_list_by_estado_cuenta(
         return repositories.get_movimiento_list_by_contraparte_and_gestor_carga_id(
             db,
             tipo_contraparte_id,
+            contraparte_id,
             contraparte,
             contraparte_numero_documento,
             estado,
             gestor_carga_id,
         )
     return repositories.get_movimiento_list_by_contraparte(
-        db, tipo_contraparte_id, contraparte, contraparte_numero_documento, estado
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        estado,
     )
 
 
@@ -709,6 +716,7 @@ def delete_movimiento(db: Session, id: int, modified_by: str) -> Movimiento:
 def get_movimiento_reports_by_contraparte(
     db: Session,
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     estado: str,
@@ -719,13 +727,19 @@ def get_movimiento_reports_by_contraparte(
         datalist = repositories.get_movimiento_list_for_reports_by_contraparte_and_gestor_carga_id(  # noqa: B950
             db,
             tipo_contraparte_id,
+            contraparte_id,
             contraparte,
             contraparte_numero_documento,
             estado,
             gestor_carga_id,
         )
     datalist = repositories.get_movimiento_list_for_reports_by_contraparte(
-        db, tipo_contraparte_id, contraparte, contraparte_numero_documento, estado
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        estado,
     )
     return generate_movimiento_reports(datalist)
 
