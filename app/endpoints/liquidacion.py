@@ -21,11 +21,12 @@ async def read_liquidacion_list(
 
 
 @api.get(
-    "/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}",  # noqa
+    "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}",  # noqa
     response_model=List[schemas.Liquidacion],
 )
 async def read_liquidacion_list_by_estado_cuenta(
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
@@ -36,6 +37,7 @@ async def read_liquidacion_list_by_estado_cuenta(
     return services.get_liquidacion_list_by_estado_cuenta(
         db,
         tipo_contraparte_id,
+        contraparte_id,
         contraparte,
         contraparte_numero_documento,
         etapa,
@@ -61,10 +63,11 @@ async def liquidacion_reports(
 
 
 @api.get(
-    "/reports/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}"  # noqa
+    "/reports/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}"  # noqa
 )
 async def liquidacion_reports_by_estado_cuenta(
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
@@ -75,6 +78,7 @@ async def liquidacion_reports_by_estado_cuenta(
     return services.get_liquidacion_reports_by_estado_cuenta(
         db,
         tipo_contraparte_id,
+        contraparte_id,
         contraparte,
         contraparte_numero_documento,
         etapa,

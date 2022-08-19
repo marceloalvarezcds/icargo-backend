@@ -29,11 +29,12 @@ async def read_estado_cuenta_list_by_gestor_carga_id(
 
 
 @api.get(
-    "/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}",  # noqa
+    "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}",  # noqa
     response_model=schemas.EstadoCuenta,
 )
 async def read_estado_cuenta_by_contraparte(
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -42,6 +43,7 @@ async def read_estado_cuenta_by_contraparte(
     return services.get_estado_cuenta_by_contraparte(
         db,
         tipo_contraparte_id,
+        contraparte_id,
         contraparte,
         contraparte_numero_documento,
     )

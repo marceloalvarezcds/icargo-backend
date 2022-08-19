@@ -19,10 +19,9 @@ from app.models import (
 
 def get_estado_cuenta_case_statement() -> Tuple:
     return (
-        Movimiento.contraparte.label("contraparte"),
-        Movimiento.contraparte_numero_documento.label("contraparte_numero_documento"),
         Movimiento.tipo_contraparte_id.label("tipo_contraparte_id"),
         TipoContraparte.descripcion.label("tipo_contraparte_descripcion"),
+        Movimiento.gestor_carga_id.label("gestor_carga_id"),
         case(
             (
                 and_(
@@ -109,8 +108,9 @@ def get_estado_cuenta_case_statement() -> Tuple:
 def get_estado_cuenta_chofer(db: Session) -> Query:
     return (
         db.query(
-            Chofer.nombre.label("actual_contraparte"),
-            Chofer.numero_documento.label("actual_contraparte_numero_documento"),
+            Movimiento.chofer_id.label("contraparte_id"),
+            Chofer.nombre.label("contraparte"),
+            Chofer.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_case_statement(),
         )
         .join(Movimiento.chofer)
@@ -122,8 +122,9 @@ def get_estado_cuenta_chofer(db: Session) -> Query:
 def get_estado_cuenta_propietario(db: Session) -> Query:
     return (
         db.query(
-            Propietario.nombre.label("actual_contraparte"),
-            Propietario.ruc.label("actual_contraparte_numero_documento"),
+            Movimiento.propietario_id.label("contraparte_id"),
+            Propietario.nombre.label("contraparte"),
+            Propietario.ruc.label("contraparte_numero_documento"),
             *get_estado_cuenta_case_statement(),
         )
         .join(Movimiento.propietario)
@@ -135,8 +136,9 @@ def get_estado_cuenta_propietario(db: Session) -> Query:
 def get_estado_cuenta_proveedor(db: Session) -> Query:
     return (
         db.query(
-            Proveedor.nombre.label("actual_contraparte"),
-            Proveedor.numero_documento.label("actual_contraparte_numero_documento"),
+            Movimiento.proveedor_id.label("contraparte_id"),
+            Proveedor.nombre.label("contraparte"),
+            Proveedor.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_case_statement(),
         )
         .join(Movimiento.proveedor)
@@ -148,8 +150,9 @@ def get_estado_cuenta_proveedor(db: Session) -> Query:
 def get_estado_cuenta_remitente(db: Session) -> Query:
     return (
         db.query(
-            Remitente.nombre.label("actual_contraparte"),
-            Remitente.numero_documento.label("actual_contraparte_numero_documento"),
+            Movimiento.remitente_id.label("contraparte_id"),
+            Remitente.nombre.label("contraparte"),
+            Remitente.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_case_statement(),
         )
         .join(Movimiento.remitente)
@@ -161,9 +164,10 @@ def get_estado_cuenta_remitente(db: Session) -> Query:
 def get_estado_cuenta_otro(db: Session) -> Query:
     return (
         db.query(
-            Movimiento.contraparte.label("actual_contraparte"),
+            Movimiento.tipo_contraparte_id.label("contraparte_id"),
+            Movimiento.contraparte.label("contraparte"),
             Movimiento.contraparte_numero_documento.label(
-                "actual_contraparte_numero_documento"
+                "contraparte_numero_documento"
             ),
             *get_estado_cuenta_case_statement(),
         )
@@ -185,14 +189,12 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
 def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
     return (
         db.query(
-            table.c.actual_contraparte.label("actual_contraparte"),
-            table.c.actual_contraparte_numero_documento.label(
-                "actual_contraparte_numero_documento"
-            ),
+            table.c.contraparte_id.label("contraparte_id"),
             table.c.contraparte.label("contraparte"),
             table.c.contraparte_numero_documento.label("contraparte_numero_documento"),
             table.c.tipo_contraparte_id.label("tipo_contraparte_id"),
             table.c.tipo_contraparte_descripcion.label("tipo_contraparte_descripcion"),
+            table.c.gestor_carga_id.label("gestor_carga_id"),
             func.sum(table.c.pendiente).label("pendiente"),
             func.sum(table.c.en_proceso).label("en_proceso"),
             func.sum(table.c.confirmado).label("confirmado"),
@@ -203,20 +205,20 @@ def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
             func.sum(table.c.cantidad_finalizado).label("cantidad_finalizado"),
         )
         .group_by(
-            table.c.actual_contraparte,
-            table.c.actual_contraparte_numero_documento,
+            table.c.contraparte_id,
             table.c.contraparte,
             table.c.contraparte_numero_documento,
             table.c.tipo_contraparte_id,
             table.c.tipo_contraparte_descripcion,
+            table.c.gestor_carga_id,
         )
         .order_by(
-            table.c.actual_contraparte,
-            table.c.actual_contraparte_numero_documento,
             table.c.contraparte,
             table.c.contraparte_numero_documento,
             table.c.tipo_contraparte_id,
             table.c.tipo_contraparte_descripcion,
+            table.c.contraparte_id,
+            table.c.gestor_carga_id,
         )
     )
 
@@ -243,17 +245,7 @@ def get_estado_cuenta_list_by_gestor_carga_id(
 
 def get_estado_cuenta_by_contraparte(
     db: Session,
-    tipo_contraparte_id: int,
-    contraparte: str,
-    contraparte_numero_documento: str,
+    filted_dict: dict,
 ) -> Optional[Row]:
-    table = (
-        get_estado_cuenta_subquery(db)
-        .filter_by(
-            tipo_contraparte_id=tipo_contraparte_id,
-            contraparte=contraparte,
-            contraparte_numero_documento=contraparte_numero_documento,
-        )
-        .subquery()
-    )
+    table = get_estado_cuenta_subquery(db).filter_by(**filted_dict).subquery()
     return get_estado_cuenta_group_by_query(db, table).first()

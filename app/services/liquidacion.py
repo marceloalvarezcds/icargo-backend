@@ -40,6 +40,7 @@ def get_liquidacion_list(
 def get_liquidacion_list_by_estado_cuenta(
     db: Session,
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
@@ -49,13 +50,19 @@ def get_liquidacion_list_by_estado_cuenta(
         return repositories.get_liquidacion_list_by_contraparte_and_gestor_carga_id(
             db,
             tipo_contraparte_id,
+            contraparte_id,
             contraparte,
             contraparte_numero_documento,
             etapa,
             gestor_carga_id,
         )
     return repositories.get_liquidacion_list_by_contraparte(
-        db, tipo_contraparte_id, contraparte, contraparte_numero_documento, etapa
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        etapa,
     )
 
 
@@ -478,6 +485,7 @@ def get_liquidacion_reports(db: Session) -> str:
 def get_liquidacion_reports_by_estado_cuenta(
     db: Session,
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
@@ -486,6 +494,7 @@ def get_liquidacion_reports_by_estado_cuenta(
     datalist = get_liquidacion_list_by_estado_cuenta(
         db,
         tipo_contraparte_id,
+        contraparte_id,
         contraparte,
         contraparte_numero_documento,
         etapa,
