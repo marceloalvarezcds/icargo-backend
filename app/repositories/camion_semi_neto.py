@@ -15,7 +15,7 @@ def get_camion_semi_neto_by_id(db: Session, id: int) -> Optional[CamionSemiNeto]
 
 
 def get_camion_semi_neto_by_camion_id_and_semi_id(
-    db: Session, camion_id: int, semi_id: int, gestor_carga_id: int
+    db: Session, camion_id: int, semi_id: int, gestor_carga_id: Optional[int]
 ) -> Optional[CamionSemiNeto]:
     return (
         db.query(CamionSemiNeto)
@@ -38,7 +38,11 @@ def get_camion_semi_neto_by_camion_id_and_semi_id(
 
 
 def get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
-    db: Session, camion_id: int, semi_id: int, producto_id: int, gestor_carga_id: int
+    db: Session,
+    camion_id: int,
+    semi_id: int,
+    producto_id: int,
+    gestor_carga_id: Optional[int],
 ) -> Optional[CamionSemiNeto]:
     return (
         db.query(CamionSemiNeto)
@@ -62,7 +66,7 @@ def get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
 
 
 def get_camion_semi_neto_list_by_producto_id(
-    db: Session, producto_id: int, gestor_carga_id: int
+    db: Session, producto_id: int, gestor_carga_id: Optional[int]
 ) -> List[CamionSemiNeto]:
     return (
         db.query(CamionSemiNeto)
@@ -81,7 +85,7 @@ def get_camion_semi_neto_list_by_producto_id(
 
 
 def get_camion_semi_neto_list_by_producto_id_null(
-    db: Session, gestor_carga_id: int
+    db: Session, gestor_carga_id: Optional[int]
 ) -> List[CamionSemiNeto]:
     return (
         db.query(CamionSemiNeto)

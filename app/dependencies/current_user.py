@@ -12,6 +12,23 @@ reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="login")
 
 
 async def get_current_user(
+    token: str = Depends(reusable_oauth2),  # noqa: B008
+) -> schemas.AuthUser:
+    try:
+        payload = get_payload_from_token(token)
+        token_data = schemas.TokenPayload(**payload)
+    except (jwt.JWTError, ValidationError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+        )
+    user = token_data.user if token_data.user else None
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+async def get_current_user_in_db(
     db: Session = Depends(get_db_session),  # noqa: B008
     token: str = Depends(reusable_oauth2),  # noqa: B008
 ) -> models.User:

@@ -342,9 +342,11 @@ from .orden_carga_remision_origen import (  # noqa
 )
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .permiso import (  # noqa
+    exists_permiso_for_user,
     get_permiso_by,
     get_permiso_list,
     get_permiso_list_by_rol_id,
+    get_permiso_list_by_user_id,
 )
 from .producto import get_producto_by_descripcion, get_producto_list  # noqa
 from .propietario import (  # noqa
@@ -493,4 +495,5 @@ from .user import (  # noqa
     get_user_by_email,
     get_user_by_id,
     get_user_by_username,
+    get_user_id_by_rol_id,
 )

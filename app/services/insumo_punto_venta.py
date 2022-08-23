@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -14,7 +14,7 @@ from app.services import get_tipo_insumo_list_by_flete_id
 
 
 def get_moneda_list_by_insumo_id_and_punto_venta_id(
-    db: Session, insumo_id: int, punto_venta_id: int, gestor_carga_id: int
+    db: Session, insumo_id: int, punto_venta_id: int, gestor_carga_id: Optional[int]
 ) -> List[Moneda]:
     id_list = []
     filtered_list = []
@@ -31,26 +31,30 @@ def get_moneda_list_by_insumo_id_and_punto_venta_id(
 
 
 def get_tipo_insumo_list_by_flete_id_and_gestor_carga_id(
-    db: Session, flete_id: int, gestor_carga_id: int
+    db: Session, flete_id: int, gestor_carga_id: Optional[int]
 ) -> List[TipoInsumo]:
-    id_list = []
-    filtered_list = []
-    list_by_flete_id = get_tipo_insumo_list_by_flete_id(db, flete_id)
-    original_list = get_insumo_punto_venta_list_by_gestor_carga_id(db, gestor_carga_id)
-    list_by_gestor_cuenta_id: List[TipoInsumo] = list(
-        map(lambda x: x.insumo.tipo, original_list)
-    )
-    tipo_insumo_list = list(set(list_by_flete_id) & set(list_by_gestor_cuenta_id))
-    for item in tipo_insumo_list:
-        # check if exists in unique_list or not
-        if item.id not in id_list:
-            id_list.append(item.id)
-            filtered_list.append(item)
-    return filtered_list
+    if gestor_carga_id:
+        id_list = []
+        filtered_list = []
+        list_by_flete_id = get_tipo_insumo_list_by_flete_id(db, flete_id)
+        original_list = get_insumo_punto_venta_list_by_gestor_carga_id(
+            db, gestor_carga_id
+        )
+        list_by_gestor_cuenta_id: List[TipoInsumo] = list(
+            map(lambda x: x.insumo.tipo, original_list)
+        )
+        tipo_insumo_list = list(set(list_by_flete_id) & set(list_by_gestor_cuenta_id))
+        for item in tipo_insumo_list:
+            # check if exists in unique_list or not
+            if item.id not in id_list:
+                id_list.append(item.id)
+                filtered_list.append(item)
+        return filtered_list
+    return []
 
 
 def get_insumo_list_by_tipo_insumo_id_and_gestor_carga_id(
-    db: Session, tipo_insumo_id: int, gestor_carga_id: int
+    db: Session, tipo_insumo_id: int, gestor_carga_id: Optional[int]
 ) -> List[Insumo]:
     id_list = []
     filtered_list = []
@@ -67,7 +71,7 @@ def get_insumo_list_by_tipo_insumo_id_and_gestor_carga_id(
 
 
 def get_punto_venta_list_by_insumo_id(
-    db: Session, insumo_id: int, gestor_carga_id: int
+    db: Session, insumo_id: int, gestor_carga_id: Optional[int]
 ) -> List[PuntoVenta]:
     id_list = []
     filtered_list = []
@@ -86,7 +90,7 @@ def get_punto_venta_list_by_insumo_id(
 
 
 def get_proveedor_list_by_insumo_id(
-    db: Session, insumo_id: int, gestor_carga_id: int
+    db: Session, insumo_id: int, gestor_carga_id: Optional[int]
 ) -> List[Proveedor]:
     id_list = []
     filtered_list = []
@@ -101,7 +105,7 @@ def get_proveedor_list_by_insumo_id(
 
 
 def get_punto_venta_list_by_insumo_id_and_proveedor_id(
-    db: Session, insumo_id: int, proveedor_id: int, gestor_carga_id: int
+    db: Session, insumo_id: int, proveedor_id: int, gestor_carga_id: Optional[int]
 ) -> List[Proveedor]:
     id_list = []
     filtered_list = []

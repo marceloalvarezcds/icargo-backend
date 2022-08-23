@@ -1,5 +1,9 @@
 # should be imported to help code editor (vscode) for autocompletion
-from .auth import get_user_from_request, login  # noqa
+from .auth import (  # noqa
+    get_auth_user_from_authorization_header,
+    get_authorization_header,
+    login,
+)
 from .banco import (  # noqa
     create_banco,
     delete_banco,
@@ -290,6 +294,7 @@ from .user import (  # noqa
     create_user,
     delete_user,
     edit_user,
+    get_user_account,
     get_user_active_list_by_gestor_carga_id,
     get_user_by_email,
     get_user_by_id,

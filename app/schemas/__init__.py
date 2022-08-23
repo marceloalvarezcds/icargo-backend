@@ -142,6 +142,7 @@ from .tipo_semi import TipoSemi  # noqa
 from .token import Token, TokenPayload  # noqa
 from .unidad import Unidad  # noqa
 from .user import (  # noqa
+    AuthUser,
     User,
     UserAccount,
     UserBase,

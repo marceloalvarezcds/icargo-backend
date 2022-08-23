@@ -5,12 +5,21 @@ from typing import List, Optional
 from fastapi import HTTPException, Request  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
+from app.cache.permiso import reset_permiso_in_cache_by_user_id
 from app.enums.estado import EstadoEnum
 from app.models import User, UserRol
-from app.repositories import user
-from app.schemas import RolChecked, UserCreate, UserUpdate
+from app.repositories import get_permiso_list_by_user_id, user
+from app.schemas import Permiso, RolChecked, UserAccount, UserCreate, UserUpdate
 from app.services import generic_service as service
 from app.utils.security import get_md5_hash_hexdigest, get_password_hash
+
+
+def get_user_account(db: Session, id: int) -> UserAccount:
+    user_account = UserAccount.from_orm(get_user_by_id(db, id))
+    user_account.permisos = [
+        Permiso.from_orm(x) for x in get_permiso_list_by_user_id(db, id)
+    ]
+    return user_account
 
 
 def get_user_by_email(db: Session, email: str) -> Optional[User]:
@@ -35,9 +44,11 @@ def get_user_list_by_gestor_carga_id(
 
 
 def get_user_active_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: int
+    db: Session, gestor_carga_id: Optional[int]
 ) -> List[User]:
-    return service.get_active_list_by_gestor_carga_id(User, db, gestor_carga_id)
+    if gestor_carga_id:
+        return service.get_active_list_by_gestor_carga_id(User, db, gestor_carga_id)
+    return []
 
 
 unique_message_error = "Este nombre de usuario ya existe en el sistema"
@@ -151,4 +162,6 @@ def save_roles(db: Session, user: User, roles: List[RolChecked], modified_by: st
                 modified_by=modified_by,
             )
         )
+    # reinicia la cache de permisos del usuario para que vuelva a consultar de la base de datos
+    reset_permiso_in_cache_by_user_id(user.id)
     db.commit()

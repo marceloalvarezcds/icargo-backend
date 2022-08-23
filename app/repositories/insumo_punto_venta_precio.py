@@ -38,7 +38,7 @@ def get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id(
 
 
 def get_insumo_punto_venta_precio_max_fecha_query(
-    db: Session, gestor_carga_id: int
+    db: Session, gestor_carga_id: Optional[int]
 ) -> Query:
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return (
@@ -65,7 +65,7 @@ def get_insumo_punto_venta_precio_max_fecha_query(
 
 
 def get_insumo_punto_venta_precio_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: int
+    db: Session, gestor_carga_id: Optional[int]
 ) -> List[InsumoPuntoVentaPrecio]:
     sub_query = get_insumo_punto_venta_precio_max_fecha_query(db, gestor_carga_id)
     return (

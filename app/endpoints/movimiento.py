@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import models, repositories, schemas, services
+from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
@@ -64,7 +64,7 @@ async def movimiento_reports_by_estado_and_liquidacion_id(
 async def read_movimiento_list_by_gestor_carga_id(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_movimiento_list(db, current_user.gestor_carga_id)
 
@@ -81,7 +81,7 @@ async def read_movimiento_list_by_estado_cuenta(
     etapa: str,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_movimiento_list_by_estado_cuenta(
         db,
@@ -103,7 +103,7 @@ async def read_movimiento_list_by_liquidacion(
     etapa: str,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_movimiento_list_by_liquidacion(
         db,
@@ -135,7 +135,7 @@ async def read_movimiento_by_id(
 async def add_new_movimiento_by_tipo_documento_relacionado_otro(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.MovimientoForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.MOVIMIENTO)),  # noqa: B008
 ):
     return services.create_movimiento_by_tipo_documento_relacionado_otro(
@@ -148,7 +148,7 @@ async def edit_movimiento(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.MovimientoForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
 ):
     return services.edit_movimiento(
@@ -161,7 +161,7 @@ async def edit_movimiento_by_gestor_flete(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.MovimientoFleteEditForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
 ):
     return services.edit_movimiento_by_gestor_flete(
@@ -174,7 +174,7 @@ async def edit_movimiento_by_gestor_merma(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.MovimientoMermaEditForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
 ):
     return services.edit_movimiento_by_gestor_merma(
@@ -187,7 +187,7 @@ async def edit_movimiento_by_propietario_flete(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.MovimientoFleteEditForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
 ):
     return services.edit_movimiento_by_propietario_flete(
@@ -200,7 +200,7 @@ async def edit_movimiento_by_propietario_merma(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.MovimientoMermaEditForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
 ):
     return services.edit_movimiento_by_propietario_merma(
@@ -212,7 +212,7 @@ async def edit_movimiento_by_propietario_merma(
 async def delete_movimiento(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.ELIMINAR, m.MOVIMIENTO)),  # noqa: B008
 ):
     return services.delete_movimiento(db, id, current_user.username)

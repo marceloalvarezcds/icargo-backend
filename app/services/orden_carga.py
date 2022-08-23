@@ -342,7 +342,7 @@ def liquidar_orden_carga(
     return get_orden_carga_with_resultado(db, model, current_user)
 
 
-def get_orden_carga_reports(db: Session, gestor_carga_id: int) -> str:
+def get_orden_carga_reports(db: Session, gestor_carga_id: Optional[int]) -> str:
     datalist = repositories.get_orden_carga_list_by_gestor_carga_id(db, gestor_carga_id)
     wb = Workbook()
     # get worksheet

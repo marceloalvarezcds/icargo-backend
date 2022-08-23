@@ -20,7 +20,7 @@ def get_camion_list(db: Session) -> List[Camion]:
 
 
 def get_camion_list_by_gestor_cuenta_id(
-    db: Session, gestor_cuenta_id: int
+    db: Session, gestor_cuenta_id: Optional[int]
 ) -> List[Camion]:
     return (
         db.query(Camion)

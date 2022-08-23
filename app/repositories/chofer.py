@@ -19,7 +19,7 @@ def get_chofer_list(db: Session) -> List[Chofer]:
 
 
 def get_chofer_list_by_gestor_cuenta_id(
-    db: Session, gestor_cuenta_id: int
+    db: Session, gestor_cuenta_id: Optional[int]
 ) -> List[Chofer]:
     return (
         db.query(Chofer)
@@ -34,7 +34,9 @@ def get_chofer_list_by_gestor_cuenta_id(
     )
 
 
-def get_chofer_list_without_camion(db: Session, gestor_cuenta_id: int) -> List[Chofer]:
+def get_chofer_list_without_camion(
+    db: Session, gestor_cuenta_id: Optional[int]
+) -> List[Chofer]:
     sub_query = (
         db.query(Camion.chofer_id)
         .distinct(Camion.chofer_id)

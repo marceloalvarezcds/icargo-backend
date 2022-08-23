@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import models, repositories, schemas, services
+from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
@@ -28,7 +28,7 @@ async def read_semi_list_by_camion_id(
     camion_id: int,
     producto_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.SEMIRREMOLQUE)),  # noqa: B008
 ):
     return services.get_semi_list_by_camion_id_and_producto_id(
@@ -87,7 +87,7 @@ async def add_new_semi(
     foto_habilitacion_automotor_reverso_file: Optional[UploadFile] = File(  # noqa: B008
         None
     ),
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.SEMIRREMOLQUE)),  # noqa: B008
 ):
     return await services.create_semi(
@@ -130,7 +130,7 @@ async def edit_semi(
     foto_habilitacion_automotor_reverso_file: Optional[UploadFile] = File(  # noqa: B008
         None
     ),
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.SEMIRREMOLQUE)),  # noqa: B008
 ):
     return await services.edit_semi(
@@ -152,7 +152,7 @@ async def edit_semi(
 async def delete_semi(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.ELIMINAR, m.SEMIRREMOLQUE)),  # noqa: B008
 ):
     return services.delete_semi(db, id, current_user.username)
@@ -162,7 +162,7 @@ async def delete_semi(
 def active_semi_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.SEMIRREMOLQUE)),  # noqa: B008
 ):
     return services.change_semi_status(db, id, EstadoEnum.ACTIVO, current_user.username)
@@ -172,7 +172,7 @@ def active_semi_by_id(
 def inactive_semi_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.SEMIRREMOLQUE)),  # noqa: B008
 ):
     return services.change_semi_status(

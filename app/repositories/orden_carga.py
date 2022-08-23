@@ -41,7 +41,7 @@ def get_orden_carga_aceptada_count_by_camion_id(
 
 
 def get_orden_carga_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: int
+    db: Session, gestor_carga_id: Optional[int]
 ) -> List[OrdenCarga]:
     return (
         db.query(OrdenCarga)

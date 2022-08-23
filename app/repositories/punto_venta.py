@@ -24,7 +24,7 @@ def get_punto_venta_list(db: Session, proveedor_id: int) -> List[PuntoVenta]:
 
 
 def get_punto_venta_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: int
+    db: Session, gestor_carga_id: Optional[int]
 ) -> List[PuntoVenta]:
     return (
         db.query(PuntoVenta)

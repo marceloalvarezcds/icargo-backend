@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import models, repositories, schemas, services
+from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
@@ -24,7 +24,7 @@ async def read_caja_list(
 async def read_caja_list_by_gestor_carga_id(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.CAJA)),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_caja_list(db, current_user.gestor_carga_id)
 
@@ -50,7 +50,7 @@ async def read_caja_by_id(
 async def add_new_caja(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.CajaForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.CAJA)),  # noqa: B008
 ):
     return services.create_caja(
@@ -63,7 +63,7 @@ async def edit_caja(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.CajaForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.CAJA)),  # noqa: B008
 ):
     return services.edit_caja(
@@ -75,7 +75,7 @@ async def edit_caja(
 async def delete_caja(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.ELIMINAR, m.CAJA)),  # noqa: B008
 ):
     return services.delete_caja(db, id, current_user.username)
