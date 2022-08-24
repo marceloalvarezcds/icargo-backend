@@ -1,20 +1,22 @@
 from typing import List
 
+from sqlalchemy.orm import Session  # type: ignore
+
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums import PermisoModuloEnum as u
-from app.models import OrdenCarga, User
+from app.models import OrdenCarga
 from app.schemas import OrdenCargaRemisionResultado
 from app.services.permiso import check_permiso
 
 
 def get_orden_carga_remision_resultado_list_by_orden_carga(
-    orden_carga: OrdenCarga, current_user: User
+    db: Session, orden_carga: OrdenCarga, user_id: int
 ) -> List[OrdenCargaRemisionResultado]:
     lista: List[OrdenCargaRemisionResultado] = []
-    if check_permiso(current_user, m.ORDEN_CARGA_REMISION_RESULTADO, a.LISTAR, u.OC):
+    if check_permiso(db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO, a.LISTAR, u.OC):
         if check_permiso(
-            current_user, m.ORDEN_CARGA_REMISION_RESULTADO_GESTOR, a.VER, u.OC
+            db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO_GESTOR, a.VER, u.OC
         ):
             lista.append(
                 OrdenCargaRemisionResultado(
@@ -56,12 +58,12 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
 
 
 def get_orden_carga_remision_resultado_list_by_flete(
-    orden_carga: OrdenCarga, current_user: User
+    db: Session, orden_carga: OrdenCarga, user_id: int
 ) -> List[OrdenCargaRemisionResultado]:
     lista: List[OrdenCargaRemisionResultado] = []
-    if check_permiso(current_user, m.ORDEN_CARGA_REMISION_RESULTADO, a.LISTAR, u.OC):
+    if check_permiso(db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO, a.LISTAR, u.OC):
         if check_permiso(
-            current_user, m.ORDEN_CARGA_REMISION_RESULTADO_GESTOR, a.VER, u.OC
+            db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO_GESTOR, a.VER, u.OC
         ):
             lista.append(
                 OrdenCargaRemisionResultado(

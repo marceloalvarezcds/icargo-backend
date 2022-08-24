@@ -4,13 +4,8 @@ from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import models, repositories, schemas, services
-from app.dependencies import (
-    Permiso,
-    get_current_user,
-    get_current_user_in_db,
-    get_db_session,
-)
+from app import repositories, schemas, services
+from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 
@@ -194,7 +189,7 @@ async def rechazar_liquidacion(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[str] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user_in_db),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.RECHAZAR, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.rechazar_liquidacion(db, id, data, current_user)
@@ -205,7 +200,7 @@ async def en_revision_liquidacion(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[str] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user_in_db),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.PASAR_A_REVISION, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.en_revision_liquidacion(db, id, data, current_user)

@@ -138,7 +138,7 @@ def create_orden_carga(
     db: Session,
     data: OrdenCargaForm,
     flete: Flete,
-    gestor_carga_id: int,
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> OrdenCarga:
     obj = OrdenCarga(
@@ -188,7 +188,7 @@ def edit_orden_carga(
     obj: OrdenCarga,
     db: Session,
     data: OrdenCargaEditForm,
-    gestor_carga_id: int,
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> OrdenCarga:
     if data.camion_id:

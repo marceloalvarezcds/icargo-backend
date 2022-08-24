@@ -1,21 +1,14 @@
-from typing import List
+from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums import PermisoAccionEnum, PermisoModeloEnum, PermisoModuloEnum
-from app.models import Permiso, User
+from app.repositories import exists_permiso_for_user
 
 
 def check_permiso(
-    current_user: User,
+    db: Session,
+    user_id: int,
     modelo: PermisoModeloEnum,
     accion: PermisoAccionEnum,
-    modulo: PermisoModuloEnum,
+    _: PermisoModuloEnum,
 ) -> bool:
-    permisos: List[Permiso] = current_user.permisos
-    for permiso in permisos:
-        if (
-            permiso.modelo == modelo.value
-            and permiso.accion == accion.value
-            and permiso.modulo == modulo.value
-        ):
-            return True
-    return False
+    return exists_permiso_for_user(db, user_id, accion, modelo) > 0

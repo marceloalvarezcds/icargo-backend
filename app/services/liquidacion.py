@@ -18,7 +18,7 @@ from app.enums import (
     MovimientoEstadoEnum,
     TipoContraparteEnum,
 )
-from app.models import Instrumento, Liquidacion, Movimiento, User
+from app.models import Instrumento, Liquidacion, Movimiento
 from app.schemas import (
     LiquidacionAddInstrumentosForm,
     LiquidacionAddMovimientosForm,
@@ -218,18 +218,18 @@ def cancelar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
 
 
 def rechazar_liquidacion(
-    db: Session, id: int, comentario: str, user: User
+    db: Session, id: int, comentario: str, current_user: schemas.AuthUser
 ) -> Liquidacion:
     return change_liquidacion_status(
-        db, id, comentario, LiquidacionEstadoEnum.RECHAZADO, user
+        db, id, comentario, LiquidacionEstadoEnum.RECHAZADO, current_user
     )
 
 
 def en_revision_liquidacion(
-    db: Session, id: int, comentario: str, user: User
+    db: Session, id: int, comentario: str, current_user: schemas.AuthUser
 ) -> Liquidacion:
     return change_liquidacion_status(
-        db, id, comentario, LiquidacionEstadoEnum.EN_REVISION, user
+        db, id, comentario, LiquidacionEstadoEnum.EN_REVISION, current_user
     )
 
 
@@ -450,7 +450,11 @@ def get_reports(datalist: List[Liquidacion]) -> str:
 
 
 def change_liquidacion_status(
-    db: Session, id: int, comentario: str, estado: LiquidacionEstadoEnum, user: User
+    db: Session,
+    id: int,
+    comentario: str,
+    estado: LiquidacionEstadoEnum,
+    current_user: schemas.AuthUser,
 ) -> Liquidacion:
     obj = get_liquidacion_by_id(db, id)
     if comentario:
@@ -458,10 +462,13 @@ def change_liquidacion_status(
             obj.comentarios = ""
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         comentarios = "".join([f"<li>{c}</li>" for c in comentario.split(".")])
+        full_name = f"{current_user.first_name} {current_user.last_name}"
         obj.comentarios += (
-            f"<strong>{user.full_name} ({date}): </strong><ul>{comentarios}</ul>"
+            f"<strong>{full_name} ({date}): </strong><ul>{comentarios}</ul>"
         )
-    return repositories.change_liquidacion_status(obj, db, estado, user.modified_by)
+    return repositories.change_liquidacion_status(
+        obj, db, estado, current_user.username
+    )
 
 
 def change_movimiento_list_status(
