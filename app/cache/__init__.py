@@ -1,3 +1,9 @@
+from .ciudad import (  # noqa
+    exists_ciudades_in_cache,
+    get_ciudades_in_cache,
+    reset_ciudades_in_cache,
+    set_ciudades_in_cache,
+)
 from .permiso import (  # noqa
     check_permiso_in_cache,
     get_permiso_in_cache,

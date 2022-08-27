@@ -54,6 +54,7 @@ from .chofer import (  # noqa
     get_chofer_by_id_and_gestor_cuenta_id,
     get_chofer_reports,
 )
+from .ciudad import get_ciudad_list  # noqa
 from .contacto import get_contacto_by  # noqa
 from .contraparte import get_contraparte_list_by_tipo_contraparte_id  # noqa
 from .estado_cuenta import (  # noqa
