@@ -42,9 +42,9 @@ services:
   pgbackups:
     container_name: Backup
     image: prodrigestivill/postgres-backup-local
-    restart: always
-    volumes:
-      - ./backups:/backups
+    # restart: always
+    # volumes:
+    #   - ./backups:/backups
     links:
       - db:db
     depends_on:
