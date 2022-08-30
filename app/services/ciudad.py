@@ -11,10 +11,10 @@ from app.cache import (
 from app.schemas import Ciudad
 
 
-def get_ciudad_list(db: Session) -> List[Ciudad]:
-    if exists_ciudades_in_cache():
-        return get_ciudades_in_cache()
-    ciudades = repositories.get_ciudad_list(db)
+def get_ciudad_list(db: Session, page: int, pageSize: int, query: str) -> List[Ciudad]:
+    # if exists_ciudades_in_cache():
+        # return get_ciudades_in_cache()
+    ciudades = repositories.get_ciudad_list(db, page, pageSize, query)
     lista = [Ciudad.from_orm(x) for x in ciudades]
-    set_ciudades_in_cache(lista)
+    # set_ciudades_in_cache(lista)
     return lista

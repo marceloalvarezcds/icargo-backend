@@ -10,13 +10,15 @@ from app.enums import PermisoModeloEnum as m
 
 api = APIRouter()
 
-
 @api.get("/", response_model=List[schemas.Ciudad])
 async def read_ciudad_list(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.CIUDAD)),  # noqa: B008
+    page: int = 1,
+    pageSize: int = 10,
+    query: str = ""
 ):
-    return services.get_ciudad_list(db)
+    return services.get_ciudad_list(db, page, pageSize, query)
 
 
 @api.get("/{localidad_id}", response_model=List[schemas.Ciudad])
