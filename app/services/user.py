@@ -5,13 +5,26 @@ from typing import List, Optional
 from fastapi import HTTPException, Request  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
+from app import schemas
 from app.cache.permiso import reset_permiso_in_cache_by_user_id
 from app.enums.estado import EstadoEnum
 from app.models import User, UserRol
-from app.repositories import get_permiso_list_by_user_id, user
+from app.repositories import get_permiso_list_by_user_id, get_rol_list_by_user_id, user
 from app.schemas import Permiso, RolChecked, UserAccount, UserCreate, UserUpdate
 from app.services import generic_service as service
 from app.utils.security import get_md5_hash_hexdigest, get_password_hash
+
+
+def _user_with_rol_list(db: Session, user: User) -> schemas.User:
+    schema_user = schemas.User.from_orm(user)
+    schema_user.roles = [
+        RolChecked.from_orm(r) for r in get_rol_list_by_user_id(db, user.id)
+    ]
+    return schema_user
+
+
+def _user_list_with_rol_list(db: Session, user_list: List[User]) -> List[schemas.User]:
+    return [_user_with_rol_list(db, u) for u in user_list]
 
 
 def get_user_account(db: Session, id: int) -> UserAccount:
@@ -33,6 +46,10 @@ def get_user_by_id(db: Session, id: int) -> User:
     return obj
 
 
+def get_user_with_rol_list_by_id(db: Session, id: int) -> schemas.User:
+    return _user_with_rol_list(db, get_user_by_id(db, id))
+
+
 def get_user_by_username(db: Session, username: str) -> Optional[User]:
     return user.get_user_by_username(db, username)
 
@@ -41,6 +58,14 @@ def get_user_list_by_gestor_carga_id(
     db: Session, gestor_carga_id: Optional[int]
 ) -> List[User]:
     return service.get_list_all_or_by_gestor_carga_id(User, db, gestor_carga_id)
+
+
+def get_user_list_with_rol_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[schemas.User]:
+    return _user_list_with_rol_list(
+        db, get_user_list_by_gestor_carga_id(db, gestor_carga_id)
+    )
 
 
 def get_user_active_list_by_gestor_carga_id(
@@ -60,7 +85,7 @@ def create_user(
     gestor_carga_id: Optional[int],
     modified_by: str,
     request: Request,
-) -> User:
+) -> schemas.User:
     roles: List[RolChecked] = data.roles
     del data.roles
     if not data.gestor_carga_id and gestor_carga_id:
@@ -74,7 +99,7 @@ def create_user(
         username=data.username,
     )
     save_roles(db, user, roles, modified_by)
-    return user
+    return _user_with_rol_list(db, user)
 
 
 def edit_user(
@@ -84,7 +109,7 @@ def edit_user(
     gestor_carga_id: Optional[int],
     modified_by: str,
     request: Request,
-) -> User:
+) -> schemas.User:
     roles: List[RolChecked] = data.roles
     del data.roles
     if not data.gestor_carga_id and gestor_carga_id:
@@ -99,7 +124,7 @@ def edit_user(
         username=data.username,
     )
     save_roles(db, user, roles, modified_by)
-    return user
+    return _user_with_rol_list(db, user)
 
 
 def change_user_status(
@@ -108,21 +133,22 @@ def change_user_status(
     status: EstadoEnum,
     modified_by: str,
     current_user_id: Optional[int] = None,
-) -> User:
+) -> schemas.User:
     if status == EstadoEnum.INACTIVO and current_user_id == id:
         raise HTTPException(
             status_code=BAD_REQUEST,
             detail="No puede Desactivar su propio usuario",
         )
-    return service.change_status(User, db, id, status, modified_by)
+    user: User = service.change_status(User, db, id, status, modified_by)
+    return _user_with_rol_list(db, user)
 
 
 def delete_user(
     db: Session,
     id: int,
     modified_by: str,
-) -> User:
-    return service.delete(User, db, id, modified_by)
+) -> schemas.User:
+    return _user_with_rol_list(db, service.delete(User, db, id, modified_by))
 
 
 def set_extra_data_in_create(obj_in: UserCreate, request: Request) -> UserCreate:

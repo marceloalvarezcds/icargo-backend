@@ -20,7 +20,9 @@ async def read_user_list_by_gestor_carga_id(
     _: bool = Depends(Permiso(a.LISTAR, m.USER)),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
-    return services.get_user_list_by_gestor_carga_id(db, current_user.gestor_carga_id)
+    return services.get_user_list_with_rol_list_by_gestor_carga_id(
+        db, current_user.gestor_carga_id
+    )
 
 
 @api.get("/active_list", response_model=List[schemas.User])
@@ -52,7 +54,7 @@ async def read_user_by_id(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.VER, m.USER)),  # noqa: B008
 ):
-    return services.get_user_by_id(db, id)
+    return services.get_user_with_rol_list_by_id(db, id)
 
 
 @api.post("/", response_model=schemas.User)

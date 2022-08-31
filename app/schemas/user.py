@@ -77,7 +77,12 @@ class UserInDBBase(UserBase):
 
 # Additional properties to return via API
 class User(UserInDBBase):
-    pass
+    roles: List[RolChecked] = []
+
+    @classmethod
+    def from_orm(cls, obj: Any) -> "User":
+        obj.roles = []
+        return super().from_orm(obj)
 
 
 class UserAccount(UserInDBBase):

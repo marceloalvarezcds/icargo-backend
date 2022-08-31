@@ -302,4 +302,6 @@ from .user import (  # noqa
     get_user_by_id,
     get_user_by_username,
     get_user_list_by_gestor_carga_id,
+    get_user_list_with_rol_list_by_gestor_carga_id,
+    get_user_with_rol_list_by_id,
 )
