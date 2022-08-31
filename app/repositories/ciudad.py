@@ -47,3 +47,14 @@ def get_ciudad_list(db: Session,
         .offset((page - 1) * pageSize)
         .all()
     )
+
+def get_ciudad_count(db: Session,
+        queryFilter: str = "") -> List[Ciudad]:
+    query = db.query(Ciudad)
+    if queryFilter is not None and queryFilter != "":
+        queryFilter = "%" + queryFilter + "%"
+        query = query.join(Ciudad.localidad, Localidad.pais)
+        query = query.filter(or_(Ciudad.nombre.ilike(queryFilter), Localidad.nombre.ilike(queryFilter), Pais.nombre.ilike(queryFilter)))
+
+    return query.count()
+

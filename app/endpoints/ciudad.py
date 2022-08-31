@@ -10,7 +10,7 @@ from app.enums import PermisoModeloEnum as m
 
 api = APIRouter()
 
-@api.get("/", response_model=List[schemas.Ciudad])
+@api.get("/", response_model=services.PaginatedList[schemas.Ciudad])
 async def read_ciudad_list(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.CIUDAD)),  # noqa: B008

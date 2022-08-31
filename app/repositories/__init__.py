@@ -85,6 +85,7 @@ from .chofer_propietario import (  # noqa
 from .ciudad import (  # noqa
     get_ciudad_by_nombre_and_localidad_id,
     get_ciudad_list,
+    get_ciudad_count,
     get_ciudad_list_by_localidad_id,
 )
 from .color import get_color_by_descripcion, get_color_list  # noqa
