@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 from urllib.parse import urlencode
 
 from pydantic import BaseModel
@@ -8,6 +8,7 @@ from .rounded_decimal_model import RoundedDecimal
 
 
 class EstadoCuenta(BaseModel):
+    contraparte_id: Optional[int]
     contraparte: str
     contraparte_numero_documento: str
     tipo_contraparte_id: int
@@ -30,6 +31,7 @@ class EstadoCuenta(BaseModel):
     def from_orm_row(cls, row: Row) -> "EstadoCuenta":
         dic = row._asdict()
         qdic = {
+            "contraparte_id": dic["contraparte_id"],
             "contraparte": dic["contraparte"],
             "contraparte_numero_documento": dic["contraparte_numero_documento"],
             "tipo_contraparte_id": dic["tipo_contraparte_id"],

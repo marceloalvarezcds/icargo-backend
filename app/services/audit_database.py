@@ -8,7 +8,7 @@ from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums import PermisoModuloEnum as u
 from app.enums.estado import EstadoEnum
-from app.models import OrdenCarga, OrdenCargaEstadoHistorial, User
+from app.models import OrdenCarga, OrdenCargaEstadoHistorial
 from app.repositories.audit_database import (
     get_audit_list_by_table_filter_data_and_daterange,
 )
@@ -17,11 +17,11 @@ from .permiso import check_permiso
 
 
 def get_audit_list_by_orden_carga(
-    db: Session, orden_carga: OrdenCarga, current_user: User
+    db: Session, orden_carga: OrdenCarga, user_id: int
 ) -> List[A]:
     FINALIZADO = EstadoEnum.FINALIZADO.value
     if (orden_carga.estado == FINALIZADO) and check_permiso(
-        current_user, m.ORDEN_CARGA, a.CONCILIAR, u.OC
+        db, user_id, m.ORDEN_CARGA, a.CONCILIAR, u.OC
     ):
         estados: List[OrdenCargaEstadoHistorial] = orden_carga.historial
         finalizado = next((x for x in estados if x.estado == FINALIZADO), None)

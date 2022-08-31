@@ -5,6 +5,7 @@ from sqlalchemy import (  # type: ignore
     Integer,
     String,
     Text,
+    text,
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
@@ -53,6 +54,9 @@ class GestorCarga(AuditMixin, Base):
     longitud = Column(DECIMAL)
     direccion = Column(String(255))
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
+    # INICIO Limitaciones de la Gestora
+    limite_cantidad_oc_activas = Column(Integer, server_default=text("1"))
+    # FIN Limitaciones de la Gestora
 
     @hybrid_property
     def tipo_documento_descripcion(self):

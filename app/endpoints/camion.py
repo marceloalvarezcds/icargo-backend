@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import models, repositories, schemas, services
+from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
@@ -25,7 +25,7 @@ async def read_camion_list(
 async def read_camion_list_by_gestor_carga(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.CAMION)),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return repositories.get_camion_list_by_gestor_cuenta_id(
         db, current_user.gestor_carga_id
@@ -36,7 +36,7 @@ async def read_camion_list_by_gestor_carga(
 async def read_camion_list_by_producto_id(
     producto_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.CAMION)),  # noqa: B008
 ):
     return services.get_camion_list_by_producto_id(
@@ -95,7 +95,7 @@ async def add_new_camion(
     foto_habilitacion_automotor_reverso_file: Optional[UploadFile] = File(  # noqa: B008
         None
     ),
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.CAMION)),  # noqa: B008
 ):
     return await services.create_camion(
@@ -108,6 +108,7 @@ async def add_new_camion(
         foto_habilitacion_transporte_reverso_file,
         foto_habilitacion_automotor_frente_file,
         foto_habilitacion_automotor_reverso_file,
+        current_user.gestor_carga_id,
         current_user.username,
     )
 
@@ -138,7 +139,7 @@ async def edit_camion(
     foto_habilitacion_automotor_reverso_file: Optional[UploadFile] = File(  # noqa: B008
         None
     ),
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.CAMION)),  # noqa: B008
 ):
     return await services.edit_camion(
@@ -160,7 +161,7 @@ async def edit_camion(
 async def delete_camion(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.ELIMINAR, m.CAMION)),  # noqa: B008
 ):
     return services.delete_camion(db, id, current_user.username)
@@ -170,7 +171,7 @@ async def delete_camion(
 def active_camion_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.CAMION)),  # noqa: B008
 ):
     return services.change_camion_status(
@@ -182,7 +183,7 @@ def active_camion_by_id(
 def inactive_camion_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.CAMION)),  # noqa: B008
 ):
     return services.change_camion_status(

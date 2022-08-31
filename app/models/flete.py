@@ -139,12 +139,32 @@ class Flete(AuditMixin, Base):
         return get_porcentaje_maximo_by_flete_anticipo_list(self.anticipos)
 
     @hybrid_property
-    def condicion_gestor_cuenta_moneda_nombre(self):
-        return self.condicion_gestor_cuenta_moneda.nombre
+    def condicion_gestor_carga_moneda_id(self):
+        return self.condicion_gestor_cuenta_moneda_id
 
     @hybrid_property
-    def condicion_gestor_cuenta_unidad_descripcion(self):
-        return self.condicion_gestor_cuenta_unidad.descripcion
+    def condicion_gestor_carga_moneda(self):
+        return self.condicion_gestor_cuenta_moneda
+
+    @hybrid_property
+    def condicion_gestor_carga_moneda_nombre(self):
+        return self.condicion_gestor_carga_moneda.nombre
+
+    @hybrid_property
+    def condicion_gestor_carga_tarifa(self):
+        return self.condicion_gestor_cuenta_tarifa
+
+    @hybrid_property
+    def condicion_gestor_carga_unidad_id(self):
+        return self.condicion_gestor_cuenta_unidad_id
+
+    @hybrid_property
+    def condicion_gestor_carga_unidad(self):
+        return self.condicion_gestor_cuenta_unidad
+
+    @hybrid_property
+    def condicion_gestor_carga_unidad_descripcion(self):
+        return self.condicion_gestor_carga_unidad.descripcion
 
     @hybrid_property
     def condicion_propietario_moneda_nombre(self):
@@ -163,25 +183,53 @@ class Flete(AuditMixin, Base):
         return self.gestor_carga.nombre
 
     @hybrid_property
-    def merma_gestor_cuenta_moneda_nombre(self):
-        return self.merma_gestor_cuenta_moneda.nombre
+    def merma_gestor_carga_valor(self):
+        return self.merma_gestor_cuenta_valor
 
     @hybrid_property
-    def merma_gestor_cuenta_es_porcentual_descripcion(self):
-        return "Si" if self.merma_gestor_cuenta_es_porcentual else "No"
+    def merma_gestor_carga_moneda_id(self):
+        return self.merma_gestor_cuenta_moneda_id
 
     @hybrid_property
-    def merma_gestor_cuenta_tolerancia_kg(self):
+    def merma_gestor_carga_moneda(self):
+        return self.merma_gestor_cuenta_moneda
+
+    @hybrid_property
+    def merma_gestor_carga_moneda_nombre(self):
+        return self.merma_gestor_carga_moneda.nombre
+
+    @hybrid_property
+    def merma_gestor_carga_unidad_id(self):
+        return self.merma_gestor_cuenta_unidad_id
+
+    @hybrid_property
+    def merma_gestor_carga_unidad(self):
+        return self.merma_gestor_cuenta_unidad
+
+    @hybrid_property
+    def merma_gestor_carga_es_porcentual(self):
+        return self.merma_gestor_cuenta_es_porcentual
+
+    @hybrid_property
+    def merma_gestor_carga_es_porcentual_descripcion(self):
+        return "Si" if self.merma_gestor_carga_es_porcentual else "No"
+
+    @hybrid_property
+    def merma_gestor_carga_tolerancia(self):
+        return self.merma_gestor_cuenta_tolerancia
+
+    @hybrid_property
+    def merma_gestor_carga_tolerancia_kg(self):
         return (
-            self.merma_gestor_cuenta_tolerancia
-            if self.merma_gestor_cuenta_es_porcentual
-            else self.merma_gestor_cuenta_tolerancia
-            * self.merma_gestor_cuenta_unidad.conversion_kg
+            self.merma_gestor_carga_tolerancia
+            if self.merma_gestor_carga_es_porcentual
+            else self.merma_gestor_carga_tolerancia
+            * self.merma_gestor_carga_unidad.conversion_kg
         )
 
     @hybrid_property
-    def merma_gestor_cuenta_unidad_descripcion(self):
-        return self.merma_gestor_cuenta_unidad.descripcion
+    def merma_gestor_carga_unidad_descripcion(self):
+        return self.merma_gestor_carga_unidad.descripcion
 
     @hybrid_property
     def merma_propietario_es_porcentual_descripcion(self):

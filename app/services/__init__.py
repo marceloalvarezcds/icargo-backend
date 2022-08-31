@@ -1,5 +1,9 @@
 # should be imported to help code editor (vscode) for autocompletion
-from .auth import get_user_from_request, login  # noqa
+from .auth import (  # noqa
+    get_auth_user_from_authorization_header,
+    get_authorization_header,
+    login,
+)
 from .banco import (  # noqa
     create_banco,
     delete_banco,
@@ -50,6 +54,8 @@ from .chofer import (  # noqa
     get_chofer_by_id_and_gestor_cuenta_id,
     get_chofer_reports,
 )
+from .ciudad import get_ciudad_list  # noqa
+from .ciudad import PaginatedList  # noqa
 from .contacto import get_contacto_by  # noqa
 from .contraparte import get_contraparte_list_by_tipo_contraparte_id  # noqa
 from .estado_cuenta import (  # noqa
@@ -144,6 +150,7 @@ from .liquidacion import (  # noqa
     get_liquidacion_list_by_estado_cuenta,
     get_liquidacion_reports,
     get_liquidacion_reports_by_estado_cuenta,
+    get_liquidacion_resumen_pdf_by_id,
     rechazar_liquidacion,
     remove_movimiento,
 )
@@ -154,11 +161,16 @@ from .movimiento import (  # noqa
     create_movimiento_by_tipo_documento_relacionado_otro,
     delete_movimiento,
     edit_movimiento,
+    edit_movimiento_by_gestor_flete,
+    edit_movimiento_by_gestor_merma,
+    edit_movimiento_by_propietario_flete,
+    edit_movimiento_by_propietario_merma,
     get_movimiento_by_id,
     get_movimiento_list,
     get_movimiento_list_by_estado_cuenta,
     get_movimiento_list_by_liquidacion,
     get_movimiento_reports,
+    get_movimiento_reports_by_contraparte,
 )
 from .orden_carga import (  # noqa
     aceptar_orden_carga,
@@ -284,9 +296,12 @@ from .user import (  # noqa
     create_user,
     delete_user,
     edit_user,
+    get_user_account,
     get_user_active_list_by_gestor_carga_id,
     get_user_by_email,
     get_user_by_id,
     get_user_by_username,
     get_user_list_by_gestor_carga_id,
+    get_user_list_with_rol_list_by_gestor_carga_id,
+    get_user_with_rol_list_by_id,
 )

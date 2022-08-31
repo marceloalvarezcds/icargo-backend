@@ -31,6 +31,7 @@ from .camion import Camion
 from .centro_operativo import CentroOperativo
 from .flete import Flete
 from .gestor_carga import GestorCarga
+from .moneda import Moneda
 from .semi import Semi
 
 
@@ -55,7 +56,44 @@ class OrdenCarga(AuditMixin, Base):
     origen = relationship(CentroOperativo, uselist=False, foreign_keys=[origen_id])
     destino_id = Column(Integer, ForeignKey("centro_operativo.id"))
     destino = relationship(CentroOperativo, uselist=False, foreign_keys=[destino_id])
+    modify_by_movimiento = Column(Boolean, server_default=text("false"))
     # FIN Tramo de OC
+    # INICIO Cantidad y Flete
+    # inicio - Condiciones para el Gestor de Carga
+    condicion_gestor_carga_moneda_id = Column(Integer, ForeignKey("moneda.id"))
+    condicion_gestor_carga_moneda = relationship(
+        Moneda, uselist=False, foreign_keys=[condicion_gestor_carga_moneda_id]
+    )
+    condicion_gestor_carga_tarifa = Column(Numeric(38, 10))
+    # fin - Condiciones para el Gestor de Carga
+    # inicio - Condiciones para el Propietario
+    condicion_propietario_moneda_id = Column(Integer, ForeignKey("moneda.id"))
+    condicion_propietario_moneda = relationship(
+        Moneda, uselist=False, foreign_keys=[condicion_propietario_moneda_id]
+    )
+    condicion_propietario_tarifa = Column(Numeric(38, 10))
+    # fin - Condiciones para el Propietario
+    # FIN Cantidad y Flete
+    # INICIO Mermas de Fletes
+    # inicio - Mermas para el Gestor de Carga
+    merma_gestor_carga_valor = Column(Numeric(38, 10))
+    merma_gestor_carga_moneda_id = Column(Integer, ForeignKey("moneda.id"))
+    merma_gestor_carga_moneda = relationship(
+        Moneda, uselist=False, foreign_keys=[merma_gestor_carga_moneda_id]
+    )
+    merma_gestor_carga_es_porcentual = Column(Boolean, server_default=text("false"))
+    merma_gestor_carga_tolerancia = Column(Numeric(38, 10))
+    # fin - Mermas para el Gestor de Carga
+    # inicio - Mermas para el Propietario
+    merma_propietario_valor = Column(Numeric(38, 10))
+    merma_propietario_moneda_id = Column(Integer, ForeignKey("moneda.id"))
+    merma_propietario_moneda = relationship(
+        Moneda, uselist=False, foreign_keys=[merma_propietario_moneda_id]
+    )
+    merma_propietario_es_porcentual = Column(Boolean, server_default=text("false"))
+    merma_propietario_tolerancia = Column(Numeric(38, 10))
+    # fin - Mermas para el Propietario
+    # FIN Mermas de Fletes
     # Relaciones Listas
     historial = relationship("OrdenCargaEstadoHistorial", back_populates="orden_carga")
     anticipos = relationship("OrdenCargaAnticipoRetirado", back_populates="orden_carga")
@@ -72,7 +110,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def anticipos_liberados_descripcion(self):
-        return "Si" if self.anticipos_liberados else "No"
+        return "Liberados" if self.anticipos_liberados else "Bloqueados"
 
     @hybrid_property
     def camion_chofer_nombre(self):
@@ -83,12 +121,28 @@ class OrdenCarga(AuditMixin, Base):
         return self.camion.chofer_numero_documento
 
     @hybrid_property
+    def camion_chofer_puede_recibir_anticipos(self):
+        return self.camion.chofer_puede_recibir_anticipos
+
+    @hybrid_property
+    def camion_limite_cantidad_oc_activas(self):
+        return self.camion.limite_cantidad_oc_activas
+
+    @hybrid_property
+    def camion_limite_monto_anticipos(self):
+        return self.camion.limite_monto_anticipos
+
+    @hybrid_property
     def camion_placa(self):
         return self.camion.placa
 
     @hybrid_property
     def camion_propietario_nombre(self):
         return self.camion.propietario_nombre
+
+    @hybrid_property
+    def camion_propietario_puede_recibir_anticipos(self):
+        return self.camion.propietario_puede_recibir_anticipos
 
     @hybrid_property
     def cantidad_destino(self):
@@ -135,7 +189,12 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_gestor_carga_detalle(self):
-        return f"P.Dest.: {number_format(self.cantidad_destino)}Kg || Tarifa: {number_format(self.flete_tarifa_gestor_carga)}{self.flete_tarifa_unidad_gestor_carga}."  # noqa
+        remi = f"{self.flete.remitente_nombre} ||"
+        dest = f"P.Dest.: {number_format(self.cantidad_destino)}Kg ||"
+        tari = f"{number_format(self.flete_tarifa_gestor_carga)}{self.flete_tarifa_unidad_gestor_carga} ||"  # noqa: B950
+        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
+        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
+        return f"{remi} {dest} {tari} {nums} {ubic}"
 
     @hybrid_property
     def flete_gestor_carga_id(self):
@@ -171,7 +230,12 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_propietario_detalle(self):
-        return f"P.Dest.: {number_format(self.cantidad_destino)}Kg || Tarifa: {number_format(self.flete_tarifa)}{self.flete_tarifa_unidad}."  # noqa
+        remi = f"{self.flete.remitente_nombre} ||"
+        dest = f"P.Dest.: {number_format(self.cantidad_destino)}Kg ||"
+        tari = f"{number_format(self.flete_tarifa)}{self.flete_tarifa_unidad} ||"
+        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
+        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
+        return f"{remi} {dest} {tari} {nums} {ubic}"
 
     @hybrid_property
     def flete_proyectado(self):
@@ -191,7 +255,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_tarifa_gestor_carga(self):
-        return self.flete.condicion_gestor_cuenta_tarifa
+        return self.flete.condicion_gestor_carga_tarifa
 
     @hybrid_property
     def flete_tarifa_unidad(self):
@@ -199,7 +263,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_tarifa_unidad_gestor_carga(self):
-        return f"{self.flete.condicion_gestor_cuenta_moneda.simbolo}/{self.flete.condicion_gestor_cuenta_unidad.abreviatura}"  # noqa
+        return f"{self.flete.condicion_gestor_carga_moneda.simbolo}/{self.flete.condicion_gestor_carga_unidad.abreviatura}"  # noqa
 
     @hybrid_property
     def flete_tipo(self):
@@ -247,11 +311,51 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def merma_gestor_carga_detalle(self):
-        return f"Dif.: {number_format(self.diferencia_origen_destino)}Kg || Tol.: {number_format(self.resultado_gestor_carga_tolerancia_kg)}Kg || M.: {number_format(self.resultado_gestor_carga_merma)}Kg || Tarifa: {number_format(self.resultado_gestor_carga_merma_valor)}Grs/Kg."  # noqa
+        remi = f"{self.flete.remitente_nombre} ||"
+        diff = f"Dif.: {number_format(self.diferencia_origen_destino)}Kg ||"
+        totl = f"Tol.: {number_format(self.resultado_gestor_carga_tolerancia_kg)}Kg ||"
+        merm = f"M.: {number_format(self.resultado_gestor_carga_merma)}Kg ||"
+        mval = f"{number_format(self.merma_gestor_carga_valor)}Grs/Kg ||"
+        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
+        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
+        return f"{remi} {diff} {totl} {merm} {mval} {nums} {ubic}"
+
+    @hybrid_property
+    def merma_gestor_carga_es_porcentual_descripcion(self):
+        return "Si" if self.merma_gestor_carga_es_porcentual else "No"
+
+    @hybrid_property
+    def merma_gestor_carga_tolerancia_kg(self):
+        return (
+            self.merma_gestor_carga_tolerancia
+            if self.merma_gestor_carga_es_porcentual
+            else self.merma_gestor_carga_tolerancia
+            * self.flete.merma_gestor_carga_unidad.conversion_kg
+        )
 
     @hybrid_property
     def merma_propietario_detalle(self):
-        return f"Dif.: {number_format(self.diferencia_origen_destino)}Kg || Tol.: {number_format(self.resultado_propietario_tolerancia_kg)}Kg || M.: {number_format(self.resultado_propietario_merma)}Kg || Tarifa: {number_format(self.resultado_propietario_merma_valor)}Grs/Kg."  # noqa
+        remi = f"{self.flete.remitente_nombre} ||"
+        diff = f"Dif.: {number_format(self.diferencia_origen_destino)}Kg ||"
+        totl = f"Tol.: {number_format(self.resultado_propietario_tolerancia_kg)}Kg ||"
+        merm = f"M.: {number_format(self.resultado_propietario_merma)}Kg ||"
+        mval = f"{number_format(self.merma_propietario_valor)}Grs/Kg ||"
+        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
+        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
+        return f"{remi} {diff} {totl} {merm} {mval} {nums} {ubic}"
+
+    @hybrid_property
+    def merma_propietario_es_porcentual_descripcion(self):
+        return "Si" if self.merma_propietario_es_porcentual else "No"
+
+    @hybrid_property
+    def merma_propietario_tolerancia_kg(self):
+        return (
+            self.merma_propietario_tolerancia
+            if self.merma_propietario_es_porcentual
+            else self.merma_propietario_tolerancia
+            * self.flete.merma_propietario_unidad.conversion_kg
+        )
 
     @hybrid_property
     def nro_tickets(self):
@@ -274,18 +378,8 @@ class OrdenCarga(AuditMixin, Base):
     # inicio - gestor carga
 
     @hybrid_property
-    def resultado_gestor_carga_merma_tolerancia(self):
-        return self.flete.merma_gestor_cuenta_tolerancia
-
-    @hybrid_property
-    def resultado_gestor_carga_merma_valor(self):
-        return self.flete.merma_gestor_cuenta_valor
-
-    @hybrid_property
     def resultado_gestor_carga_merma_valor_total(self):
-        return (
-            self.resultado_gestor_carga_merma_valor * self.resultado_gestor_carga_merma
-        )
+        return self.merma_gestor_carga_valor * self.resultado_gestor_carga_merma
 
     @hybrid_property
     def resultado_gestor_carga_merma_valor_total_moneda_local(self):
@@ -319,14 +413,14 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_gestor_carga_tarifa_flete(self):
-        return self.flete.condicion_gestor_cuenta_tarifa
+        return self.condicion_gestor_carga_tarifa
 
     @hybrid_property
     def resultado_gestor_carga_tolerancia_kg(self):
         return (
-            (self.resultado_gestor_carga_merma_tolerancia / 100) * self.cantidad_origen
-            if self.flete.merma_gestor_cuenta_es_porcentual
-            else self.flete.merma_gestor_cuenta_tolerancia_kg
+            (self.merma_gestor_carga_tolerancia / 100) * self.cantidad_origen
+            if self.merma_gestor_carga_es_porcentual
+            else self.merma_gestor_carga_tolerancia_kg
         )
 
     @hybrid_property
@@ -338,16 +432,8 @@ class OrdenCarga(AuditMixin, Base):
     # inicio - propietario
 
     @hybrid_property
-    def resultado_propietario_merma_tolerancia(self):
-        return self.flete.merma_propietario_tolerancia
-
-    @hybrid_property
-    def resultado_propietario_merma_valor(self):
-        return self.flete.merma_propietario_valor
-
-    @hybrid_property
     def resultado_propietario_merma_valor_total(self):
-        return self.resultado_propietario_merma_valor * self.resultado_propietario_merma
+        return self.merma_propietario_valor * self.resultado_propietario_merma
 
     @hybrid_property
     def resultado_propietario_merma_valor_total_moneda_local(self):
@@ -383,14 +469,14 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_propietario_tarifa_flete(self):
-        return self.flete.condicion_propietario_tarifa
+        return self.condicion_propietario_tarifa
 
     @hybrid_property
     def resultado_propietario_tolerancia_kg(self):
         return (
-            (self.resultado_propietario_merma_tolerancia / 100) * self.cantidad_origen
-            if self.flete.merma_propietario_es_porcentual
-            else self.flete.merma_propietario_tolerancia_kg
+            (self.merma_propietario_tolerancia / 100) * self.cantidad_origen
+            if self.merma_propietario_es_porcentual
+            else self.merma_propietario_tolerancia_kg
         )
 
     @hybrid_property
@@ -439,6 +525,148 @@ class OrdenCarga(AuditMixin, Base):
     # fin - propietario
 
     # FIN RESULTADO
+
+    # INICIO RESULTADO FLETE
+
+    # inicio - gestor carga
+
+    @hybrid_property
+    def resultado_flete_gestor_carga_merma_tolerancia(self):
+        return self.flete.merma_gestor_carga_tolerancia
+
+    @hybrid_property
+    def resultado_flete_gestor_carga_merma_valor(self):
+        return self.flete.merma_gestor_carga_valor
+
+    @hybrid_property
+    def resultado_flete_gestor_carga_merma_valor_total(self):
+        return (
+            self.resultado_flete_gestor_carga_merma_valor
+            * self.resultado_flete_gestor_carga_merma
+        )
+
+    @hybrid_property
+    def resultado_flete_gestor_carga_merma_valor_total_moneda_local(self):
+        return self.resultado_flete_gestor_carga_merma_valor_total
+
+    @hybrid_property
+    def resultado_flete_gestor_carga_merma(self):
+        return (
+            (
+                self.diferencia_origen_destino
+                - self.resultado_flete_gestor_carga_tolerancia_kg
+            )
+            if (
+                self.diferencia_origen_destino
+                - self.resultado_flete_gestor_carga_tolerancia_kg
+            )
+            > 0
+            else 0
+        )
+
+    @hybrid_property
+    def resultado_flete_gestor_carga_saldo(self):
+        return (
+            self.resultado_flete_gestor_carga_total_flete
+            - self.resultado_flete_gestor_carga_merma_valor_total
+        )
+
+    @hybrid_property
+    def resultado_flete_gestor_carga_saldo_total(self):
+        return self.resultado_flete_gestor_carga_saldo + (
+            self.resultado_propietario_total_complemento_a_cobrar
+            - self.resultado_propietario_total_descuento_a_pagar
+        )
+
+    @hybrid_property
+    def resultado_flete_gestor_carga_tarifa_flete(self):
+        return self.flete.condicion_gestor_carga_tarifa
+
+    @hybrid_property
+    def resultado_flete_gestor_carga_tolerancia_kg(self):
+        return (
+            (self.resultado_flete_gestor_carga_merma_tolerancia / 100)
+            * self.cantidad_origen
+            if self.flete.merma_gestor_carga_es_porcentual
+            else self.flete.merma_gestor_carga_tolerancia_kg
+        )
+
+    @hybrid_property
+    def resultado_flete_gestor_carga_total_flete(self):
+        return self.resultado_flete_gestor_carga_tarifa_flete * self.cantidad_destino
+
+    # fin - gestor carga
+
+    # inicio - propietario
+
+    @hybrid_property
+    def resultado_flete_propietario_merma_tolerancia(self):
+        return self.flete.merma_propietario_tolerancia
+
+    @hybrid_property
+    def resultado_flete_propietario_merma_valor(self):
+        return self.flete.merma_propietario_valor
+
+    @hybrid_property
+    def resultado_flete_propietario_merma_valor_total(self):
+        return (
+            self.resultado_flete_propietario_merma_valor
+            * self.resultado_flete_propietario_merma
+        )
+
+    @hybrid_property
+    def resultado_flete_propietario_merma_valor_total_moneda_local(self):
+        return self.resultado_flete_propietario_merma_valor_total
+
+    @hybrid_property
+    def resultado_flete_propietario_merma(self):
+        merma = (
+            self.diferencia_origen_destino
+            - self.resultado_flete_propietario_tolerancia_kg
+        )
+        return merma if merma > 0 else 0
+
+    @hybrid_property
+    def resultado_flete_propietario_saldo(self):
+        return (
+            (
+                self.resultado_flete_propietario_total_flete
+                - self.resultado_flete_propietario_merma_valor_total
+            )
+            + (
+                self.resultado_propietario_total_complemento
+                - self.resultado_propietario_total_descuento
+            )
+            - self.resultado_propietario_total_anticipos_retirados
+        )
+
+    @hybrid_property
+    def resultado_flete_propietario_saldo_total(self):
+        return (
+            self.resultado_flete_propietario_saldo
+            + self.resultado_propietario_total_anticipos_retirados
+        )
+
+    @hybrid_property
+    def resultado_flete_propietario_tarifa_flete(self):
+        return self.flete.condicion_propietario_tarifa
+
+    @hybrid_property
+    def resultado_flete_propietario_tolerancia_kg(self):
+        return (
+            (self.resultado_flete_propietario_merma_tolerancia / 100)
+            * self.cantidad_origen
+            if self.flete.merma_propietario_es_porcentual
+            else self.flete.merma_propietario_tolerancia_kg
+        )
+
+    @hybrid_property
+    def resultado_flete_propietario_total_flete(self):
+        return self.resultado_flete_propietario_tarifa_flete * self.cantidad_destino
+
+    # fin - propietario
+
+    # FIN RESULTADO FLETE
 
     def get_remision_cantidad_total_kg(
         self,

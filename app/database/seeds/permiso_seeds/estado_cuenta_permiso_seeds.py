@@ -183,7 +183,7 @@ def permiso_liquidacion_seeds(db: Session) -> List[Permiso]:
     permisos.append(permiso_seeds(db, a.VER, m.LIQUIDACION, u.ESTADO_CUENTA))
     permisos.append(
         permiso_seeds(
-            db, a.REPORTE, m.LIQUIDACION, u.ESTADO_CUENTA, "Reporte de Remitente"
+            db, a.REPORTE, m.LIQUIDACION, u.ESTADO_CUENTA, "Reporte de Liquidación"
         )
     )
     return permisos

@@ -71,6 +71,7 @@ class Chofer(AuditMixin, Base):
     direccion = Column(String(255))
     ciudad_id = Column(Integer, ForeignKey("ciudad.id"))
     ciudad = relationship(Ciudad, uselist=False, foreign_keys=[ciudad_id])
+    puede_recibir_anticipos = Column(Boolean, server_default=text("true"))
     gestores = relationship("GestorCargaChofer", back_populates="chofer")
 
     @hybrid_property
@@ -79,11 +80,27 @@ class Chofer(AuditMixin, Base):
 
     @hybrid_property
     def gestor_cuenta_nombre(self):
-        return self.gestor_cuenta.nombre
+        return self.gestor_cuenta.nombre if self.gestor_cuenta else None
 
     @hybrid_property
     def localidad_nombre(self):
         return self.ciudad.localidad.nombre if self.ciudad else None
+
+    @hybrid_property
+    def localidad_emisor_registro(self):
+        return (
+            self.ciudad_emisor_registro.localidad
+            if self.ciudad_emisor_registro
+            else None
+        )
+
+    @hybrid_property
+    def localidad_emisor_registro_id(self):
+        return (
+            self.ciudad_emisor_registro.localidad_id
+            if self.ciudad_emisor_registro
+            else None
+        )
 
     @hybrid_property
     def oficial_cuenta_nombre(self):
@@ -108,6 +125,22 @@ class Chofer(AuditMixin, Base):
     @hybrid_property
     def pais_emisor_documento_nombre_corto(self):
         return self.pais_emisor_documento.nombre_corto
+
+    @hybrid_property
+    def pais_emisor_registro(self):
+        return (
+            self.localidad_emisor_registro.pais
+            if self.localidad_emisor_registro
+            else None
+        )
+
+    @hybrid_property
+    def pais_emisor_registro_id(self):
+        return (
+            self.localidad_emisor_registro.pais_id
+            if self.localidad_emisor_registro
+            else None
+        )
 
     @hybrid_property
     def tipo_documento_descripcion(self):

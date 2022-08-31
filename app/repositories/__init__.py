@@ -85,6 +85,7 @@ from .chofer_propietario import (  # noqa
 from .ciudad import (  # noqa
     get_ciudad_by_nombre_and_localidad_id,
     get_ciudad_list,
+    get_ciudad_count,
     get_ciudad_list_by_localidad_id,
 )
 from .color import get_color_by_descripcion, get_color_list  # noqa
@@ -205,6 +206,7 @@ from .instrumento import (  # noqa
     edit_instrumento,
     get_instrumento_by_id,
     get_instrumento_list,
+    get_instrumento_list_by_liquidacion_id,
 )
 from .instrumento_via import (  # noqa
     get_instrumento_via_by_descripcion,
@@ -249,6 +251,7 @@ from .movimiento import (  # noqa
     change_movimiento_status,
     create_movimiento,
     delete_movimiento,
+    edit_monto_movimiento,
     edit_movimiento,
     get_movimiento_by_id,
     get_movimiento_count_by_tipo_documento_relacionado_id,
@@ -260,6 +263,11 @@ from .movimiento import (  # noqa
     get_movimiento_list_by_liquidacion_and_gestor_carga_id,
     get_movimiento_list_by_liquidacion_id,
     get_movimiento_list_by_orden_carga_id,
+    get_movimiento_list_for_flete_pdf_reports_by_liquidacion_id,
+    get_movimiento_list_for_otro_pdf_reports_by_liquidacion_id,
+    get_movimiento_list_for_reports_by_contraparte,
+    get_movimiento_list_for_reports_by_contraparte_and_gestor_carga_id,
+    get_movimiento_list_for_reports_by_liquidacion_id,
 )
 from .orden_carga import (  # noqa
     aceptar_orden_carga,
@@ -275,10 +283,16 @@ from .orden_carga import (  # noqa
     delete_orden_carga,
     descargar_orden_carga,
     edit_orden_carga,
+    edit_orden_carga_by_movimiento,
     finalizar_orden_carga,
+    get_orden_carga_aceptada_count_by_camion_id,
     get_orden_carga_by_id,
     get_orden_carga_list,
     get_orden_carga_list_by_gestor_carga_id,
+    get_orden_carga_with_anticipo_liberado_count_by_chofer_id,
+    get_orden_carga_with_anticipo_liberado_count_by_propietario_id,
+    get_orden_carga_with_anticipo_liberado_list_by_chofer_id,
+    get_orden_carga_with_anticipo_liberado_list_by_propietario_id,
     liquidar_orden_carga,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
@@ -329,9 +343,11 @@ from .orden_carga_remision_origen import (  # noqa
 )
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .permiso import (  # noqa
+    exists_permiso_for_user,
     get_permiso_by,
     get_permiso_list,
     get_permiso_list_by_rol_id,
+    get_permiso_list_by_user_id,
 )
 from .producto import get_producto_by_descripcion, get_producto_list  # noqa
 from .propietario import (  # noqa
@@ -404,7 +420,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
     get_remitente_contacto_gestor_carga_by_cargo_id,
     get_remitente_contacto_gestor_carga_by_id,
 )
-from .rol import get_rol_list  # noqa
+from .rol import get_rol_list, get_rol_list_by_user_id  # noqa
 from .rol_permiso import create_rol_permiso  # noqa
 from .semi import (  # noqa
     change_semi_status,
@@ -480,4 +496,5 @@ from .user import (  # noqa
     get_user_by_email,
     get_user_by_id,
     get_user_by_username,
+    get_user_id_by_rol_id,
 )

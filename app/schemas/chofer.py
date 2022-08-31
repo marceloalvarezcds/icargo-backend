@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -27,6 +27,7 @@ class ChoferBaseModel(BaseModel):
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
     es_propietario: Optional[bool] = False
+    puede_recibir_anticipos: bool
     # Datos del Propietario
     pais_origen_id: Optional[int] = None
     foto_documento_frente_propietario: Optional[str] = None
@@ -64,6 +65,8 @@ class ChoferEditForm(BaseModel):
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
     es_propietario: Optional[bool] = False
+    puede_recibir_anticipos: bool
+    anticipos_bloqueados: Optional[bool] = False
     # Datos del Propietario
     pais_origen_id: Optional[int] = None
     foto_documento_frente_propietario: Optional[str] = None
@@ -145,3 +148,14 @@ class Chofer(ChoferBase):
     modified_by: str
     modified_at: datetime
     gestor_carga_chofer: Optional[GestorCargaChofer] = None
+    oc_with_anticipos_liberados: Optional[int] = None
+
+    @classmethod
+    def from_orm(cls, obj: Any) -> "Chofer":
+        obj.gestor_carga_chofer = None
+        obj.foto_documento_frente_propietario = None
+        obj.foto_documento_reverso_propietario = None
+        obj.pais_origen_id = None
+        obj.pais_origen = None
+        obj.oc_with_anticipos_liberados = None
+        return super().from_orm(obj)

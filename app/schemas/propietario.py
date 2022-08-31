@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -29,6 +29,7 @@ class PropietarioBaseModel(BaseModel):
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
     es_chofer: Optional[bool] = False
+    puede_recibir_anticipos: bool
     # INICIO Datos del Chofer
     tipo_documento_id: Optional[int] = None
     pais_emisor_documento_id: Optional[int] = None
@@ -71,6 +72,8 @@ class PropietarioEditForm(BaseModel):
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
     es_chofer: Optional[bool] = False
+    puede_recibir_anticipos: bool
+    anticipos_bloqueados: Optional[bool] = False
     # INICIO Datos del Chofer
     tipo_documento_id: Optional[int] = None
     pais_emisor_documento_id: Optional[int] = None
@@ -140,3 +143,10 @@ class PropietarioList(PropietarioBase):
 class Propietario(PropietarioBase):
     contactos: List[PropietarioContactoGestorCargaList] = []
     gestor_carga_propietario: Optional[GestorCargaPropietario] = None
+    oc_with_anticipos_liberados: Optional[int] = None
+
+    @classmethod
+    def from_orm(cls, obj: Any) -> "Propietario":
+        obj.gestor_carga_propietario = None
+        obj.oc_with_anticipos_liberados = None
+        return super().from_orm(obj)

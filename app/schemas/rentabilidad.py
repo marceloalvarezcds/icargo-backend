@@ -42,6 +42,11 @@ class Rentabilidad(BaseModel):
     condicion_propietario_unidad_abreviatura: str
     propietario_flete_total: RoundedDecimal  # cantidad_destino * tarifa
     propietario_flete_total_ml: RoundedDecimal  # cantidad_destino * tarifa (Moneda Local)
+    flete_condicion_propietario_tarifa: RoundedDecimal
+    flete_condicion_propietario_moneda_nombre: str
+    flete_condicion_propietario_moneda_simbolo: str
+    flete_propietario_total: RoundedDecimal  # cantidad_destino * flete_tarifa
+    flete_propietario_total_ml: RoundedDecimal  # cantidad_destino * flete_tarifa (Moneda Local)
     # COBRO por MERMA a PROPIETARIO p/GC
     merma_propietario_valor: RoundedDecimal
     merma_propietario_moneda_nombre: str
@@ -53,6 +58,14 @@ class Rentabilidad(BaseModel):
     merma_propietario_tolerancia: RoundedDecimal  # Si es_porcentual entonces (cantidad_origen * tolerancia_original) sino tolerancia_original # noqa
     merma_propietario_merma: RoundedDecimal  # Si (diferencia_origen_destino - tolerancia) > 0 entonces (diferencia_origen_destino - tolerancia) sino 0 # noqa
     merma_propietario_valor_merma: RoundedDecimal  # valor * merma
+    flete_merma_propietario_valor: RoundedDecimal
+    flete_merma_propietario_moneda_nombre: str
+    flete_merma_propietario_moneda_simbolo: str
+    flete_merma_propietario_es_porcentual: bool
+    flete_merma_propietario_tolerancia_original: RoundedDecimal
+    flete_merma_propietario_tolerancia: RoundedDecimal  # Si es_porcentual entonces (cantidad_origen * tolerancia_original) sino tolerancia_original # noqa
+    flete_merma_propietario_merma: RoundedDecimal  # Si (diferencia_origen_destino - tolerancia) > 0 entonces (diferencia_origen_destino - tolerancia) sino 0 # noqa
+    flete_merma_propietario_valor_merma: RoundedDecimal  # flete_valor * merma
     # COBRO FLETE a REMITENTE p/GC
     condicion_gestor_carga_tarifa: RoundedDecimal
     condicion_gestor_carga_moneda_nombre: str
@@ -61,6 +74,11 @@ class Rentabilidad(BaseModel):
     condicion_gestor_carga_unidad_abreviatura: str
     gestor_carga_flete_total: RoundedDecimal  # cantidad_destino * tarifa
     gestor_carga_flete_total_ml: RoundedDecimal  # cantidad_destino * tarifa (Moneda Local)
+    flete_condicion_gestor_carga_moneda_nombre: str
+    flete_condicion_gestor_carga_moneda_simbolo: str
+    flete_condicion_gestor_carga_tarifa: RoundedDecimal
+    flete_gestor_carga_total: RoundedDecimal  # cantidad_destino * flete_tarifa
+    flete_gestor_carga_total_ml: RoundedDecimal  # cantidad_destino * flete_tarifa (Moneda Local)  # noqa: B950
     # PAGO por MERMA a REMITENTE p/GC
     merma_gestor_carga_valor: RoundedDecimal
     merma_gestor_carga_moneda_nombre: str
@@ -72,6 +90,14 @@ class Rentabilidad(BaseModel):
     merma_gestor_carga_tolerancia: RoundedDecimal  # Si es_porcentual entonces (cantidad_origen * tolerancia_original) sino tolerancia_original # noqa
     merma_gestor_carga_merma: RoundedDecimal  # Si (diferencia_origen_destino - tolerancia) > 0 entonces (diferencia_origen_destino - tolerancia) sino 0 # noqa
     merma_gestor_carga_valor_merma: RoundedDecimal  # valor * merma
+    flete_merma_gestor_carga_valor: RoundedDecimal
+    flete_merma_gestor_carga_moneda_nombre: str
+    flete_merma_gestor_carga_moneda_simbolo: str
+    flete_merma_gestor_carga_es_porcentual: bool
+    flete_merma_gestor_carga_tolerancia_original: RoundedDecimal
+    flete_merma_gestor_carga_tolerancia: RoundedDecimal  # Si es_porcentual entonces (cantidad_origen * tolerancia_original) sino tolerancia_original # noqa
+    flete_merma_gestor_carga_merma: RoundedDecimal  # Si (diferencia_origen_destino - tolerancia) > 0 entonces (diferencia_origen_destino - tolerancia) sino 0 # noqa
+    flete_merma_gestor_carga_valor_merma: RoundedDecimal  # flete_valor * merma
     # Complementos
     total_complemento_a_pagar: RoundedDecimal
     total_complemento_a_cobrar: RoundedDecimal
@@ -126,43 +152,69 @@ class Rentabilidad(BaseModel):
             lugar_carga_nombre=item.origen_nombre,
             lugar_descarga_nombre=item.destino_nombre,
             # PAGO FLETE a PROPIETARIO p/GC
-            condicion_propietario_tarifa=item.flete_tarifa,
-            condicion_propietario_moneda_nombre=item.flete.condicion_propietario_moneda.nombre,
-            condicion_propietario_moneda_simbolo=item.flete.condicion_propietario_moneda.simbolo,  # noqa: B950
+            condicion_propietario_tarifa=item.condicion_propietario_tarifa,
+            condicion_propietario_moneda_nombre=item.condicion_propietario_moneda.nombre,
+            condicion_propietario_moneda_simbolo=item.condicion_propietario_moneda.simbolo,  # noqa: B950
             condicion_propietario_unidad_descripcion=item.flete.condicion_propietario_unidad.descripcion,  # noqa: B950
             condicion_propietario_unidad_abreviatura=item.flete.condicion_propietario_unidad.abreviatura,  # noqa: B950
             propietario_flete_total=item.resultado_propietario_total_flete,
             propietario_flete_total_ml=item.resultado_propietario_total_flete,
+            flete_condicion_propietario_tarifa=item.flete_tarifa,
+            flete_condicion_propietario_moneda_nombre=item.flete.condicion_propietario_moneda.nombre,  # noqa: B950
+            flete_condicion_propietario_moneda_simbolo=item.flete.condicion_propietario_moneda.simbolo,  # noqa: B950
+            flete_propietario_total=item.resultado_flete_propietario_total_flete,
+            flete_propietario_total_ml=item.resultado_flete_propietario_total_flete,
             # COBRO por MERMA a PROPIETARIO p/GC
-            merma_propietario_valor=item.resultado_propietario_merma_valor,
+            merma_propietario_valor=item.merma_propietario_valor,
             merma_propietario_moneda_nombre=item.flete.merma_propietario_moneda.nombre,
             merma_propietario_moneda_simbolo=item.flete.merma_propietario_moneda.simbolo,
             merma_propietario_unidad_descripcion=item.flete.merma_propietario_unidad.descripcion,  # noqa: B950
             merma_propietario_unidad_abreviatura=item.flete.merma_propietario_unidad.abreviatura,  # noqa: B950
             merma_propietario_es_porcentual=item.flete.merma_propietario_es_porcentual,
-            merma_propietario_tolerancia_original=item.resultado_propietario_merma_tolerancia,
+            merma_propietario_tolerancia_original=item.merma_propietario_tolerancia,
             merma_propietario_tolerancia=item.resultado_propietario_tolerancia_kg,
             merma_propietario_merma=item.resultado_propietario_merma,
             merma_propietario_valor_merma=item.resultado_propietario_merma_valor_total,
+            flete_merma_propietario_valor=item.flete.merma_propietario_valor,
+            flete_merma_propietario_moneda_nombre=item.flete.merma_propietario_moneda.nombre,
+            flete_merma_propietario_moneda_simbolo=item.flete.merma_propietario_moneda.simbolo,
+            flete_merma_propietario_es_porcentual=item.flete.merma_propietario_es_porcentual,
+            flete_merma_propietario_tolerancia_original=item.flete.merma_propietario_tolerancia,  # noqa: B950
+            flete_merma_propietario_tolerancia=item.resultado_flete_propietario_tolerancia_kg,
+            flete_merma_propietario_merma=item.resultado_flete_propietario_merma,
+            flete_merma_propietario_valor_merma=item.resultado_flete_propietario_merma_valor_total,  # noqa: B950
             # COBRO FLETE a REMITENTE p/GC
-            condicion_gestor_carga_tarifa=item.flete_tarifa_gestor_carga,
-            condicion_gestor_carga_moneda_nombre=item.flete.condicion_gestor_cuenta_moneda.nombre,  # noqa: B950
-            condicion_gestor_carga_moneda_simbolo=item.flete.condicion_gestor_cuenta_moneda.simbolo,  # noqa: B950
+            condicion_gestor_carga_tarifa=item.condicion_gestor_carga_tarifa,
+            condicion_gestor_carga_moneda_nombre=item.condicion_gestor_carga_moneda.nombre,  # noqa: B950
+            condicion_gestor_carga_moneda_simbolo=item.condicion_gestor_carga_moneda.simbolo,  # noqa: B950
             condicion_gestor_carga_unidad_descripcion=item.flete.condicion_gestor_cuenta_unidad.descripcion,  # noqa: B950
             condicion_gestor_carga_unidad_abreviatura=item.flete.condicion_gestor_cuenta_unidad.abreviatura,  # noqa: B950
             gestor_carga_flete_total=item.resultado_gestor_carga_total_flete,
             gestor_carga_flete_total_ml=item.resultado_gestor_carga_total_flete,
+            flete_condicion_gestor_carga_tarifa=item.flete_tarifa_gestor_carga,
+            flete_condicion_gestor_carga_moneda_nombre=item.condicion_gestor_carga_moneda.nombre,  # noqa: B950
+            flete_condicion_gestor_carga_moneda_simbolo=item.condicion_gestor_carga_moneda.simbolo,  # noqa: B950
+            flete_gestor_carga_total=item.resultado_flete_gestor_carga_total_flete,
+            flete_gestor_carga_total_ml=item.resultado_flete_gestor_carga_total_flete,
             # PAGO por MERMA a REMITENTE p/GC
-            merma_gestor_carga_valor=item.resultado_gestor_carga_merma_valor,
-            merma_gestor_carga_moneda_nombre=item.flete.merma_gestor_cuenta_moneda.nombre,
-            merma_gestor_carga_moneda_simbolo=item.flete.merma_gestor_cuenta_moneda.simbolo,
+            merma_gestor_carga_valor=item.merma_gestor_carga_valor,
+            merma_gestor_carga_moneda_nombre=item.merma_gestor_carga_moneda.nombre,
+            merma_gestor_carga_moneda_simbolo=item.merma_gestor_carga_moneda.simbolo,
             merma_gestor_carga_unidad_descripcion=item.flete.merma_gestor_cuenta_unidad.descripcion,  # noqa: B950
             merma_gestor_carga_unidad_abreviatura=item.flete.merma_gestor_cuenta_unidad.abreviatura,  # noqa: B950
-            merma_gestor_carga_es_porcentual=item.flete.merma_gestor_cuenta_es_porcentual,
-            merma_gestor_carga_tolerancia_original=item.resultado_gestor_carga_merma_tolerancia,
+            merma_gestor_carga_es_porcentual=item.merma_gestor_carga_es_porcentual,
+            merma_gestor_carga_tolerancia_original=item.merma_gestor_carga_tolerancia,
             merma_gestor_carga_tolerancia=item.resultado_gestor_carga_tolerancia_kg,
             merma_gestor_carga_merma=item.resultado_gestor_carga_merma,
             merma_gestor_carga_valor_merma=item.resultado_gestor_carga_merma_valor_total,
+            flete_merma_gestor_carga_valor=item.flete.merma_gestor_cuenta_valor,
+            flete_merma_gestor_carga_moneda_nombre=item.flete.merma_gestor_cuenta_moneda.nombre,
+            flete_merma_gestor_carga_moneda_simbolo=item.flete.merma_gestor_cuenta_moneda.simbolo,  # noqa: B950
+            flete_merma_gestor_carga_es_porcentual=item.flete.merma_gestor_cuenta_es_porcentual,
+            flete_merma_gestor_carga_tolerancia_original=item.flete.merma_gestor_carga_tolerancia,  # noqa: B950
+            flete_merma_gestor_carga_tolerancia=item.resultado_flete_gestor_carga_tolerancia_kg,
+            flete_merma_gestor_carga_merma=item.resultado_flete_gestor_carga_merma,
+            flete_merma_gestor_carga_valor_merma=item.resultado_flete_gestor_carga_merma_valor_total,  # noqa: B950
             # Complementos
             total_complemento_a_pagar=item.resultado_propietario_total_complemento,
             total_complemento_a_cobrar=item.resultado_propietario_total_complemento_a_cobrar,

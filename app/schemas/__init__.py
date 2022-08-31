@@ -55,7 +55,12 @@ from .localidad import Localidad  # noqa
 from .marca_camion import MarcaCamion  # noqa
 from .marca_semi import MarcaSemi  # noqa
 from .moneda import Moneda  # noqa
-from .movimiento import Movimiento, MovimientoForm  # noqa
+from .movimiento import (  # noqa
+    Movimiento,
+    MovimientoFleteEditForm,
+    MovimientoForm,
+    MovimientoMermaEditForm,
+)
 from .orden_carga import (  # noqa
     OrdenCarga,
     OrdenCargaEditForm,
@@ -137,6 +142,7 @@ from .tipo_semi import TipoSemi  # noqa
 from .token import Token, TokenPayload  # noqa
 from .unidad import Unidad  # noqa
 from .user import (  # noqa
+    AuthUser,
     User,
     UserAccount,
     UserBase,

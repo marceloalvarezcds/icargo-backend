@@ -29,7 +29,7 @@ services:
       - POSTGRES_PASSWORD=${DATABASE_PASS}
       - TZ=America/Asuncion
     # volumes:
-    #   - ./volumes/db:/var/lib/postgresql/data
+    #   - db:/var/lib/postgresql/data
     # restart: always
 
   pictshare:
@@ -40,11 +40,10 @@ services:
       - pictshare:/usr/share/nginx/html/data
 
   pgbackups:
-    container_name: Backup
     image: prodrigestivill/postgres-backup-local
-    restart: always
-    volumes:
-      - ./backups:/backups
+    # restart: always
+    # volumes:
+    #   - ./backups:/backups
     links:
       - db:db
     depends_on:
@@ -62,4 +61,5 @@ services:
       - HEALTHCHECK_PORT=666
 
 volumes:
+  db:
   pictshare:

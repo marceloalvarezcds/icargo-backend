@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import models, repositories, schemas, services
+from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
@@ -21,21 +21,23 @@ async def read_liquidacion_list(
 
 
 @api.get(
-    "/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}",  # noqa
+    "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}",  # noqa
     response_model=List[schemas.Liquidacion],
 )
 async def read_liquidacion_list_by_estado_cuenta(
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.LIQUIDACION)),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_liquidacion_list_by_estado_cuenta(
         db,
         tipo_contraparte_id,
+        contraparte_id,
         contraparte,
         contraparte_numero_documento,
         etapa,
@@ -47,7 +49,7 @@ async def read_liquidacion_list_by_estado_cuenta(
 async def read_liquidacion_list_by_gestor_carga_id(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.LIQUIDACION)),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_liquidacion_list(db, current_user.gestor_carga_id)
 
@@ -61,25 +63,37 @@ async def liquidacion_reports(
 
 
 @api.get(
-    "/reports/tipo_contraparte/{tipo_contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}"  # noqa
+    "/reports/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}"  # noqa
 )
 async def liquidacion_reports_by_estado_cuenta(
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.REPORTE, m.LIQUIDACION)),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_liquidacion_reports_by_estado_cuenta(
         db,
         tipo_contraparte_id,
+        contraparte_id,
         contraparte,
         contraparte_numero_documento,
         etapa,
         current_user.gestor_carga_id,
     )
+
+
+@api.get("/{id}/pdf/etapa/{etapa}")
+def get_liquidacion_resumen_pdf_by_id(
+    id: int,
+    etapa: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.LIQUIDACION)),  # noqa: B008
+):
+    return services.get_liquidacion_resumen_pdf_by_id(db, id, etapa)
 
 
 @api.get("/{id}", response_model=schemas.Liquidacion)
@@ -95,7 +109,7 @@ async def read_liquidacion_by_id(
 async def add_new_liquidacion(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.LiquidacionAddMovimientosForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.create_liquidacion_pendiente(
@@ -108,7 +122,7 @@ async def edit_liquidacion(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.LiquidacionForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.edit_liquidacion(
@@ -120,7 +134,7 @@ async def edit_liquidacion(
 async def delete_liquidacion(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.ELIMINAR, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.delete_liquidacion(db, id, current_user.username)
@@ -131,7 +145,7 @@ async def add_movimientos(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.LiquidacionAddMovimientosForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
     __: bool = Depends(Permiso(a.EDITAR, m.LIQUIDACION)),  # noqa: B008
 ):
@@ -143,7 +157,7 @@ async def remove_movimiento(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.Movimiento] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
     __: bool = Depends(Permiso(a.EDITAR, m.LIQUIDACION)),  # noqa: B008
 ):
@@ -154,7 +168,7 @@ async def remove_movimiento(
 async def aceptar_liquidacion(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.ACEPTAR, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.aceptar_liquidacion(db, id, current_user.username)
@@ -164,7 +178,7 @@ async def aceptar_liquidacion(
 async def cancelar_liquidacion(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CANCELAR, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.cancelar_liquidacion(db, id, current_user.username)
@@ -175,7 +189,7 @@ async def rechazar_liquidacion(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[str] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.RECHAZAR, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.rechazar_liquidacion(db, id, data, current_user)
@@ -186,7 +200,7 @@ async def en_revision_liquidacion(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[str] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.PASAR_A_REVISION, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.en_revision_liquidacion(db, id, data, current_user)
@@ -197,7 +211,7 @@ async def add_instrumentos(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.LiquidacionAddInstrumentosForm] = Form(...),  # type: ignore  # noqa
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.INSTRUMENTO)),  # noqa: B008
     __: bool = Depends(Permiso(a.EDITAR, m.LIQUIDACION)),  # noqa: B008
 ):

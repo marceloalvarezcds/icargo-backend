@@ -1,11 +1,14 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
-from sqlalchemy.sql.elements import and_  # type: ignore
+from sqlalchemy.sql.elements import and_, or_  # type: ignore
 
 from app.enums import MovimientoEstadoEnum
+from app.enums.tipo_movimiento import TipoMovimientoEnum
 from app.models import Movimiento
+from app.models.tipo_movimiento import TipoMovimiento
 from app.schemas import MovimientoForm
 
 
@@ -21,6 +24,7 @@ def get_movimiento_list(db: Session) -> List[Movimiento]:
 def get_movimiento_list_by_contraparte(
     db: Session,
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     estado: str,
@@ -30,6 +34,17 @@ def get_movimiento_list_by_contraparte(
         .filter(
             and_(
                 Movimiento.tipo_contraparte_id == tipo_contraparte_id,
+                or_(
+                    Movimiento.propietario_id == contraparte_id,
+                    Movimiento.remitente_id == contraparte_id,
+                    Movimiento.proveedor_id == contraparte_id,
+                    and_(
+                        Movimiento.contraparte == contraparte,
+                        Movimiento.contraparte_numero_documento
+                        == contraparte_numero_documento,
+                    ),
+                    Movimiento.chofer_id == contraparte_id,
+                ),
                 Movimiento.contraparte == contraparte,
                 Movimiento.contraparte_numero_documento == contraparte_numero_documento,
                 Movimiento.estado == estado,
@@ -40,9 +55,46 @@ def get_movimiento_list_by_contraparte(
     )
 
 
-def get_movimiento_list_by_contraparte_and_gestor_carga_id(
+def get_movimiento_list_for_reports_by_contraparte(
     db: Session,
     tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+) -> List[Movimiento]:
+    return (
+        db.query(Movimiento)
+        .filter(
+            and_(
+                Movimiento.tipo_contraparte_id == tipo_contraparte_id,
+                or_(
+                    Movimiento.propietario_id == contraparte_id,
+                    Movimiento.remitente_id == contraparte_id,
+                    Movimiento.proveedor_id == contraparte_id,
+                    and_(
+                        Movimiento.contraparte == contraparte,
+                        Movimiento.contraparte_numero_documento
+                        == contraparte_numero_documento,
+                    ),
+                    Movimiento.chofer_id == contraparte_id,
+                ),
+                Movimiento.estado == estado,
+            )
+        )
+        .order_by(
+            Movimiento.numero_documento_relacionado,
+            Movimiento.contraparte,
+            Movimiento.liquidacion_id,
+        )
+        .all()
+    )
+
+
+def get_movimiento_list_for_reports_by_contraparte_and_gestor_carga_id(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     estado: str,
@@ -53,8 +105,125 @@ def get_movimiento_list_by_contraparte_and_gestor_carga_id(
         .filter(
             and_(
                 Movimiento.tipo_contraparte_id == tipo_contraparte_id,
-                Movimiento.contraparte == contraparte,
-                Movimiento.contraparte_numero_documento == contraparte_numero_documento,
+                or_(
+                    Movimiento.propietario_id == contraparte_id,
+                    Movimiento.remitente_id == contraparte_id,
+                    Movimiento.proveedor_id == contraparte_id,
+                    and_(
+                        Movimiento.contraparte == contraparte,
+                        Movimiento.contraparte_numero_documento
+                        == contraparte_numero_documento,
+                    ),
+                    Movimiento.chofer_id == contraparte_id,
+                ),
+                Movimiento.estado == estado,
+                Movimiento.gestor_carga_id == gestor_carga_id,
+            )
+        )
+        .order_by(
+            Movimiento.numero_documento_relacionado,
+            Movimiento.contraparte,
+            Movimiento.liquidacion_id,
+        )
+        .all()
+    )
+
+
+def get_movimiento_list_for_reports_by_liquidacion_id(
+    db: Session,
+    liquidacion_id: int,
+    estado: str,
+) -> List[Movimiento]:
+    return (
+        db.query(Movimiento)
+        .filter(
+            and_(
+                Movimiento.estado == estado,
+                Movimiento.liquidacion_id == liquidacion_id,
+            )
+        )
+        .order_by(
+            Movimiento.numero_documento_relacionado,
+            Movimiento.contraparte,
+            Movimiento.liquidacion_id,
+        )
+        .all()
+    )
+
+
+def get_movimiento_list_for_flete_pdf_reports_by_liquidacion_id(
+    db: Session,
+    liquidacion_id: int,
+    estado: str,
+) -> List[Movimiento]:
+    return (
+        db.query(Movimiento)
+        .join(Movimiento.tipo_movimiento)
+        .filter(
+            and_(
+                Movimiento.estado == estado,
+                Movimiento.liquidacion_id == liquidacion_id,
+                TipoMovimiento.descripcion != TipoMovimientoEnum.OTRO.value,
+            )
+        )
+        .order_by(
+            Movimiento.numero_documento_relacionado,
+            Movimiento.contraparte,
+            Movimiento.liquidacion_id,
+        )
+        .all()
+    )
+
+
+def get_movimiento_list_for_otro_pdf_reports_by_liquidacion_id(
+    db: Session,
+    liquidacion_id: int,
+    estado: str,
+) -> List[Movimiento]:
+    return (
+        db.query(Movimiento)
+        .join(Movimiento.tipo_movimiento)
+        .filter(
+            and_(
+                Movimiento.estado == estado,
+                Movimiento.liquidacion_id == liquidacion_id,
+                TipoMovimiento.descripcion == TipoMovimientoEnum.OTRO.value,
+            )
+        )
+        .order_by(
+            Movimiento.numero_documento_relacionado,
+            Movimiento.contraparte,
+            Movimiento.liquidacion_id,
+        )
+        .all()
+    )
+
+
+def get_movimiento_list_by_contraparte_and_gestor_carga_id(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    estado: str,
+    gestor_carga_id: int,
+) -> List[Movimiento]:
+    return (
+        db.query(Movimiento)
+        .filter(
+            and_(
+                Movimiento.tipo_contraparte_id == tipo_contraparte_id,
+                or_(
+                    Movimiento.propietario_id == contraparte_id,
+                    Movimiento.remitente_id == contraparte_id,
+                    Movimiento.proveedor_id == contraparte_id,
+                    and_(
+                        Movimiento.contraparte == contraparte,
+                        Movimiento.contraparte_numero_documento
+                        == contraparte_numero_documento,
+                    ),
+                    Movimiento.chofer_id == contraparte_id,
+                ),
                 Movimiento.estado == estado,
                 Movimiento.gestor_carga_id == gestor_carga_id,
             )
@@ -211,6 +380,27 @@ def create_movimiento(
         modified_by=modified_by,
     )
     db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+def edit_monto_movimiento(
+    obj: Movimiento,
+    db: Session,
+    monto: Decimal,
+    detalle: str,
+    moneda_id: Optional[int],
+    gestor_carga_id: int,
+    modified_by: str,
+) -> Movimiento:
+    obj.monto = monto
+    obj.detalle = detalle
+    if moneda_id:
+        obj.moneda_id = moneda_id
+    obj.gestor_carga_id = gestor_carga_id
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
     db.commit()
     db.refresh(obj)
     return obj

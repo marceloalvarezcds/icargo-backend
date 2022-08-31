@@ -1,5 +1,4 @@
 from datetime import timedelta
-from types import FunctionType
 from typing import Optional
 
 from fastapi import HTTPException, Request  # type: ignore
@@ -7,17 +6,18 @@ from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt  # type: ignore
 from pydantic import ValidationError
 from sqlalchemy.orm import Session  # type: ignore
+from starlette.datastructures import Headers
 
 from app.audits import AuditAuth
 from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from app.constants import AUTHORIZATION
 from app.enums.estado import EstadoEnum
 from app.models.user import User
-from app.schemas import TokenPayload
+from app.schemas import AuthUser, TokenPayload
 from app.services.security import create_access_token
 from app.utils.security import get_payload_from_token, verify_password
 
-from .user import get_user_by_id, get_user_by_username
+from .user import get_user_by_username
 
 
 def authenticate(db: Session, *, username: str, password: str) -> Optional[User]:
@@ -29,24 +29,27 @@ def authenticate(db: Session, *, username: str, password: str) -> Optional[User]
     return user
 
 
-def get_user_from_token(db: Session, *, token: str) -> Optional[User]:
+def get_auth_user_from_token(token: str) -> Optional[AuthUser]:
     try:
         payload = get_payload_from_token(token)
         token_data = TokenPayload(**payload)
-        if token_data.sub:
-            return get_user_by_id(db, token_data.sub)
-        return None
+        return token_data.user
     except (jwt.JWTError, ValidationError):
         return None
 
 
-def get_user_from_request(request: Request, database_connection_function: FunctionType):
-    auth = request.headers.get(AUTHORIZATION)
-    scheme, token = auth.split()
-    if scheme.lower() != "basic":
-        db_conn = database_connection_function()
-        db = Session(bind=db_conn)
-        return get_user_from_token(db, token=token)
+def get_authorization_header(headers: Headers) -> str:
+    if AUTHORIZATION in headers:
+        headers.get(AUTHORIZATION)
+    return ""
+
+
+def get_auth_user_from_authorization_header(auth_header: str) -> Optional[AuthUser]:
+    if auth_header:
+        scheme, token = auth_header.split()
+        if scheme.lower() != "basic":
+            return get_auth_user_from_token(token)
+    return None
 
 
 def register_audit_auth(db: Session, *, user: User, action: str, ip: str):
@@ -70,7 +73,7 @@ def login(db: Session, *, request: Request, form_data: OAuth2PasswordRequestForm
     register_audit_auth(db, user=user, action="login", ip=request.client.host)
     return {
         "access_token": create_access_token(
-            user.id, expires_delta=access_token_expires
+            AuthUser.from_orm(user), expires_delta=access_token_expires
         ),
         "token_type": "bearer",
     }

@@ -4,12 +4,13 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
+from app.enums import EstadoEnum
 from app.models import Camion, CamionSemiNeto, Semi
 from app.schemas import CamionSemiNetoForm
 
 
 def get_camion_semi_neto_list_by_producto_id(
-    db: Session, producto_id: int, gestor_carga_id: int
+    db: Session, producto_id: int, gestor_carga_id: Optional[int]
 ) -> List[CamionSemiNeto]:
     camion_semi_neto_list = repositories.get_camion_semi_neto_list_by_producto_id(
         db, producto_id, gestor_carga_id
@@ -41,37 +42,39 @@ def get_camion_semi_neto_list_by_camion_id_and_producto_id(
 
 
 def get_camion_list_by_producto_id(
-    db: Session, producto_id: int, gestor_carga_id: int
+    db: Session, producto_id: int, gestor_carga_id: Optional[int]
 ) -> List[Camion]:
-    id_list = []
-    filtered_list = []
+    id_list: List[int] = []
+    filtered_list: List[Camion] = []
     original_list = get_camion_semi_neto_list_by_producto_id(
         db, producto_id, gestor_carga_id
     )
     camion_list: List[Camion] = list(map(lambda x: x.camion, original_list))
     for item in camion_list:
-        # check if exists in unique_list or not
-        if item.id not in id_list:
+        # check if exists in unique_list or not, and is estado ACTIVO
+        if item.id not in id_list and item.estado == EstadoEnum.ACTIVO.value:
             id_list.append(item.id)
             filtered_list.append(item)
     return filtered_list
 
 
 def get_semi_list_by_camion_id_and_producto_id(
-    db: Session, camion_id: int, producto_id: int, gestor_carga_id: int
+    db: Session, camion_id: int, producto_id: int, gestor_carga_id: Optional[int]
 ) -> List[Semi]:
-    id_list = []
-    filtered_list = []
-    original_list = get_camion_semi_neto_list_by_camion_id_and_producto_id(
-        db, camion_id, producto_id, gestor_carga_id
-    )
-    semi_list: List[Semi] = list(map(lambda x: x.semi, original_list))
-    for item in semi_list:
-        # check if exists in unique_list or not
-        if item.id not in id_list:
-            id_list.append(item.id)
-            filtered_list.append(item)
-    return filtered_list
+    if gestor_carga_id:
+        id_list = []
+        filtered_list = []
+        original_list = get_camion_semi_neto_list_by_camion_id_and_producto_id(
+            db, camion_id, producto_id, gestor_carga_id
+        )
+        semi_list: List[Semi] = list(map(lambda x: x.semi, original_list))
+        for item in semi_list:
+            # check if exists in unique_list or not
+            if item.id not in id_list:
+                id_list.append(item.id)
+                filtered_list.append(item)
+        return filtered_list
+    return []
 
 
 def get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
@@ -79,7 +82,7 @@ def get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
     camion_id: int,
     semi_id: int,
     producto_id: Optional[int],
-    gestor_carga_id: int,
+    gestor_carga_id: Optional[int],
 ) -> Optional[CamionSemiNeto]:
     obj = None
     if producto_id:

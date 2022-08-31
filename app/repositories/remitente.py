@@ -19,7 +19,7 @@ def get_remitente_list(db: Session) -> List[Remitente]:
 
 
 def get_remitente_list_by_gestor_cuenta_id(
-    db: Session, gestor_cuenta_id: int
+    db: Session, gestor_cuenta_id: Optional[int]
 ) -> List[Remitente]:
     return (
         db.query(Remitente)

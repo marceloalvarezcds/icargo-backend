@@ -14,7 +14,13 @@ from sqlalchemy.orm import relationship  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
-from app.enums import MovimientoEstadoEnum
+from app.enums import (
+    MovimientoEstadoEnum,
+    TipoAnticipoEnum,
+    TipoContraparteEnum,
+    TipoInsumoEnum,
+    TipoMovimientoEnum,
+)
 
 from .chofer import Chofer
 from .gestor_carga import GestorCarga
@@ -92,15 +98,19 @@ class Movimiento(AuditMixin, Base):
 
     @hybrid_property
     def camion_placa(self):
-        return self.orden_carga.camion_placa
+        return self.orden_carga.camion_placa if self.orden_carga else None
 
     @hybrid_property
     def chofer_nombre(self):
-        return self.orden_carga.camion_chofer_nombre
+        return self.orden_carga.camion_chofer_nombre if self.orden_carga else None
 
     @hybrid_property
     def chofer_numero_documento(self):
-        return self.orden_carga.camion_chofer_numero_documento
+        return (
+            self.orden_carga.camion_chofer_numero_documento
+            if self.orden_carga
+            else None
+        )
 
     @hybrid_property
     def concepto(self):
@@ -201,3 +211,162 @@ class Movimiento(AuditMixin, Base):
     @hybrid_property
     def tipo_operacion_descripcion(self):
         return "Cobro" if self.es_cobro else "Pago"
+
+    # Campos editables de la OC desde el movimiento
+    @hybrid_property
+    def es_anticipo(self):
+        return (
+            self.tipo_movimiento_descripcion == TipoMovimientoEnum.ANTICIPO.value
+            and self.anticipo is not None
+        )
+
+    @hybrid_property
+    def es_anticipo_combustible(self):
+        return (
+            self.es_anticipo
+            and self.anticipo.tipo_insumo_descripcion
+            == TipoInsumoEnum.COMBUSTIBLE.value
+        )
+
+    @hybrid_property
+    def es_anticipo_efectivo(self):
+        return (
+            self.es_anticipo
+            and self.anticipo.tipo_anticipo_descripcion
+            == TipoAnticipoEnum.EFECTIVO.value
+        )
+
+    @hybrid_property
+    def es_anticipo_otro(self):
+        return (
+            self.es_anticipo
+            and not self.es_anticipo_combustible
+            and not self.es_anticipo_efectivo
+        )
+
+    @hybrid_property
+    def es_complemento(self):
+        return (
+            self.tipo_movimiento_descripcion == TipoMovimientoEnum.COMPLEMENTO.value
+            and self.complemento is not None
+        )
+
+    @hybrid_property
+    def es_descuento(self):
+        return (
+            self.tipo_movimiento_descripcion == TipoMovimientoEnum.DESCUENTO.value
+            and self.descuento is not None
+        )
+
+    @hybrid_property
+    def es_flete(self):
+        return self.tipo_movimiento_descripcion == TipoMovimientoEnum.FLETE.value
+
+    @hybrid_property
+    def es_gestor(self):
+        return self.tipo_contraparte_descripcion == TipoContraparteEnum.REMITENTE.value
+
+    @hybrid_property
+    def es_merma(self):
+        return self.tipo_movimiento_descripcion == TipoMovimientoEnum.MERMA.value
+
+    @hybrid_property
+    def es_propietario(self):
+        return (
+            self.tipo_contraparte_descripcion == TipoContraparteEnum.PROPIETARIO.value
+            and self.propietario is not None
+        )
+
+    @hybrid_property
+    def can_edit_oc(self):
+        return (
+            (
+                self.estado != MovimientoEstadoEnum.FINALIZADO
+                and (self.es_flete or self.es_merma)
+                and (self.es_gestor or self.es_propietario)
+            )
+            if self.orden_carga
+            else False
+        )
+
+    @hybrid_property
+    def cantidad_destino(self):
+        return self.orden_carga.cantidad_destino if self.orden_carga else None
+
+    @hybrid_property
+    def condicion_gestor_carga_moneda_id(self):
+        return (
+            self.orden_carga.condicion_gestor_carga_moneda_id
+            if self.orden_carga
+            else None
+        )
+
+    @hybrid_property
+    def condicion_gestor_carga_tarifa(self):
+        return (
+            self.orden_carga.condicion_gestor_carga_tarifa if self.orden_carga else None
+        )
+
+    @hybrid_property
+    def condicion_propietario_moneda_id(self):
+        return (
+            self.orden_carga.condicion_propietario_moneda_id
+            if self.orden_carga
+            else None
+        )
+
+    @hybrid_property
+    def condicion_propietario_tarifa(self):
+        return (
+            self.orden_carga.condicion_propietario_tarifa if self.orden_carga else None
+        )
+
+    @hybrid_property
+    def merma_gestor_carga_valor(self):
+        return self.orden_carga.merma_gestor_carga_valor if self.orden_carga else None
+
+    @hybrid_property
+    def merma_gestor_carga_moneda_id(self):
+        return (
+            self.orden_carga.merma_gestor_carga_moneda_id if self.orden_carga else None
+        )
+
+    @hybrid_property
+    def merma_gestor_carga_es_porcentual(self):
+        return (
+            self.orden_carga.merma_gestor_carga_es_porcentual
+            if self.orden_carga
+            else None
+        )
+
+    @hybrid_property
+    def merma_gestor_carga_tolerancia(self):
+        return (
+            self.orden_carga.merma_gestor_carga_tolerancia if self.orden_carga else None
+        )
+
+    @hybrid_property
+    def merma_propietario_valor(self):
+        return self.orden_carga.merma_propietario_valor if self.orden_carga else None
+
+    @hybrid_property
+    def merma_propietario_moneda_id(self):
+        return (
+            self.orden_carga.merma_propietario_moneda_id if self.orden_carga else None
+        )
+
+    @hybrid_property
+    def merma_propietario_es_porcentual(self):
+        return (
+            self.orden_carga.merma_propietario_es_porcentual
+            if self.orden_carga
+            else None
+        )
+
+    @hybrid_property
+    def merma_propietario_tolerancia(self):
+        return (
+            self.orden_carga.merma_propietario_tolerancia if self.orden_carga else None
+        )
+
+    # TERMINA Campos editables de la OC desde el movimiento

@@ -19,7 +19,7 @@ def get_proveedor_list(db: Session) -> List[Proveedor]:
 
 
 def get_proveedor_list_by_gestor_cuenta_id(
-    db: Session, gestor_cuenta_id: int
+    db: Session, gestor_cuenta_id: Optional[int]
 ) -> List[Proveedor]:
     return (
         db.query(Proveedor)

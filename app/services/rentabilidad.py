@@ -21,7 +21,7 @@ def get_rentabilidad_list(
     return Rentabilidad.get_list_by_oc(lista)
 
 
-def get_rentabilidad_reports(db: Session, gestor_carga_id: int) -> str:
+def get_rentabilidad_reports(db: Session, gestor_carga_id: Optional[int]) -> str:
     datalist = get_rentabilidad_list(db, gestor_carga_id)
     wb = Workbook()
     # get worksheet

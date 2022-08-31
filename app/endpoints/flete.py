@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import models, repositories, schemas, services
+from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
@@ -25,7 +25,7 @@ async def read_flete_list(
 async def read_flete_list_by_gestor_carga(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.FLETE)),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return repositories.get_flete_list_by_gestor_carga_id(
         db, current_user.gestor_carga_id
@@ -53,7 +53,7 @@ async def read_flete_by_id(
 async def add_new_flete(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.FleteForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.FLETE)),  # noqa: B008
 ):
     return services.create_flete(
@@ -69,7 +69,7 @@ async def edit_flete(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.FleteForm] = Form(...),  # type: ignore  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.FLETE)),  # noqa: B008
 ):
     return services.edit_flete(
@@ -85,7 +85,7 @@ async def edit_flete(
 async def delete_flete(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.ELIMINAR, m.FLETE)),  # noqa: B008
 ):
     return services.delete_flete(db, id, current_user.username)
@@ -95,7 +95,7 @@ async def delete_flete(
 def cancel_flete_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.FLETE)),  # noqa: B008
 ):
     return services.change_flete_status(
@@ -107,7 +107,7 @@ def cancel_flete_by_id(
 def publish_flete_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.FLETE)),  # noqa: B008
 ):
     return services.change_flete_public_status(db, id, True, current_user.username)
@@ -117,7 +117,7 @@ def publish_flete_by_id(
 def unpublish_flete_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.FLETE)),  # noqa: B008
 ):
     return services.change_flete_public_status(db, id, False, current_user.username)
@@ -132,7 +132,7 @@ def read_flete_destinatario_list_by_id(
     origen_id: int,
     destino_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: models.User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.VER, m.FLETE)),  # noqa: B008
 ):
     return services.get_destinatario_list_by(

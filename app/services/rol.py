@@ -4,9 +4,10 @@ from typing import List, Optional
 from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
 
+from app.cache.permiso import reset_permiso_in_cache_by_user_id
 from app.enums.estado import EstadoEnum
 from app.models import Rol, RolPermiso
-from app.repositories import exists_user_for_rol_id
+from app.repositories import exists_user_for_rol_id, get_user_id_by_rol_id
 from app.schemas import PermisoChecked, RolCreate, RolUpdate
 from app.services import generic_service as service
 
@@ -114,3 +115,9 @@ def save_permisos(
             )
         )
     db.commit()
+    # reinicia la cache de permisos de los usuarios del rol para que vuelva a consultar de la base de datos  # noqa: B950
+    user_id_tuple_list = get_user_id_by_rol_id(db, rol.id)
+    for user_id_tuple in user_id_tuple_list:
+        if user_id_tuple:
+            user_id: int = user_id_tuple[0]
+            reset_permiso_in_cache_by_user_id(user_id)

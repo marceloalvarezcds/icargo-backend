@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app.models import User
 from app.repositories import get_flete_list_by_gestor_carga_id, get_orden_carga_by_id
-from app.schemas import OrdenCargaForm
+from app.schemas import AuthUser, OrdenCargaForm
 from app.services import (
     create_orden_carga,
     get_camion_list_by_producto_id,
@@ -17,6 +17,7 @@ from app.services import (
 
 def orden_carga_seeds(db: Session, user: Optional[User]):
     if user:
+        auth_user = AuthUser.from_orm(user)
         fletes = get_flete_list_by_gestor_carga_id(db, user.gestor_carga_id)
         for flete in fletes:
             camiones = get_camion_list_by_producto_id(
@@ -37,7 +38,7 @@ def orden_carga_seeds(db: Session, user: Optional[User]):
                             cantidad_nominada=Decimal(randrange(20000, 30000)),
                             comentarios=f"Comentario {nro_comentario}",
                         ),
-                        user,
+                        auth_user,
                     )
 
 

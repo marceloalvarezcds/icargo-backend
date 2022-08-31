@@ -1,27 +1,30 @@
 import os
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Optional
 
 from fastapi import HTTPException  # type: ignore
+from jinja2 import Template
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
+from pdfkit import from_string  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
-from app.config import REPORTS_FOLDER
+from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
 from app.enums import (
     LiquidacionEstadoEnum,
     LiquidacionEtapaEnum,
     MovimientoEstadoEnum,
     TipoContraparteEnum,
 )
-from app.models import Instrumento, Liquidacion, Movimiento, User
+from app.models import Instrumento, Liquidacion, Movimiento
 from app.schemas import (
     LiquidacionAddInstrumentosForm,
     LiquidacionAddMovimientosForm,
     LiquidacionForm,
 )
-from app.utils.gestor_carga import get_gestor_carga_by_params
+from app.utils import get_gestor_carga_by_params, number_format
 
 from .instrumento import create_instrumento
 
@@ -37,6 +40,7 @@ def get_liquidacion_list(
 def get_liquidacion_list_by_estado_cuenta(
     db: Session,
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
@@ -46,13 +50,19 @@ def get_liquidacion_list_by_estado_cuenta(
         return repositories.get_liquidacion_list_by_contraparte_and_gestor_carga_id(
             db,
             tipo_contraparte_id,
+            contraparte_id,
             contraparte,
             contraparte_numero_documento,
             etapa,
             gestor_carga_id,
         )
     return repositories.get_liquidacion_list_by_contraparte(
-        db, tipo_contraparte_id, contraparte, contraparte_numero_documento, etapa
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        etapa,
     )
 
 
@@ -208,18 +218,18 @@ def cancelar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
 
 
 def rechazar_liquidacion(
-    db: Session, id: int, comentario: str, user: User
+    db: Session, id: int, comentario: str, current_user: schemas.AuthUser
 ) -> Liquidacion:
     return change_liquidacion_status(
-        db, id, comentario, LiquidacionEstadoEnum.RECHAZADO, user
+        db, id, comentario, LiquidacionEstadoEnum.RECHAZADO, current_user
     )
 
 
 def en_revision_liquidacion(
-    db: Session, id: int, comentario: str, user: User
+    db: Session, id: int, comentario: str, current_user: schemas.AuthUser
 ) -> Liquidacion:
     return change_liquidacion_status(
-        db, id, comentario, LiquidacionEstadoEnum.EN_REVISION, user
+        db, id, comentario, LiquidacionEstadoEnum.EN_REVISION, current_user
     )
 
 
@@ -246,6 +256,80 @@ def add_instrumentos(
             detail="La suma de los instrumentos debe ser igual al Valor de la operación",
         )
     return obj
+
+
+def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
+    obj = repositories.get_liquidacion_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Orden de Carga no encontrada")
+    gestor_carga = repositories.get_gestor_carga_by_id(db, obj.gestor_carga_id)
+    if not gestor_carga:
+        raise HTTPException(status_code=404, detail="Gestor no encontrado")
+    OUTPUT_FILENAME = f"resumen_liquidacion_{id}.pdf"
+    TEMPLATE_FILENAME = "pdf_liquidacion_resumen.html"
+    templateEnv.filters["number_format"] = number_format
+    template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
+    flete_movimientos: List[
+        Movimiento
+    ] = repositories.get_movimiento_list_for_flete_pdf_reports_by_liquidacion_id(
+        db, id, estado
+    )
+    otro_movimientos: List[
+        Movimiento
+    ] = repositories.get_movimiento_list_for_otro_pdf_reports_by_liquidacion_id(
+        db, id, estado
+    )
+    instrumentos: List[
+        Instrumento
+    ] = repositories.get_instrumento_list_by_liquidacion_id(db, id)
+    # Obtención de totales
+    # moneda = gestor_carga.moneda_simbolo
+    total_contraparte = Decimal(0)
+    total_flete = Decimal(0)
+    total_anticipo_efectivo = Decimal(0)
+    total_anticipo_combustible = Decimal(0)
+    total_anticipo_otro = Decimal(0)
+    total_otros = Decimal(0)
+    for mov in flete_movimientos:
+        total_contraparte += mov.monto
+        total_flete += (
+            mov.monto
+            if (mov.es_flete or mov.es_complemento or mov.es_descuento or mov.es_merma)
+            else Decimal(0)
+        )
+        total_anticipo_efectivo += mov.monto if mov.es_anticipo_efectivo else Decimal(0)
+        total_anticipo_combustible += (
+            mov.monto if mov.es_anticipo_combustible else Decimal(0)
+        )
+        total_anticipo_otro += mov.monto if mov.es_anticipo_otro else Decimal(0)
+
+    for mov in otro_movimientos:
+        total_otros += mov.monto
+
+    # FIN Obtención de totales
+    data = {
+        "id": id,
+        "gestor_carga_direccion": gestor_carga.direccion,
+        "gestor_carga_logo": gestor_carga.logo,
+        "gestor_carga_nombre": f"{gestor_carga.nombre} - {gestor_carga.numero_documento}",
+        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "contraparte": obj.contraparte,
+        "tipo_contraparte": obj.tipo_contraparte_descripcion,
+        "flete_movimientos": flete_movimientos,
+        "otro_movimientos": otro_movimientos,
+        "instrumentos": instrumentos,
+        "total_contraparte": f"{number_format(total_contraparte)}",
+        "total_flete": f"{number_format(total_flete)}",
+        "total_anticipo_efectivo": f"{number_format(total_anticipo_efectivo)}",
+        "total_anticipo_combustible": f"{number_format(total_anticipo_combustible)}",
+        "total_anticipo_otro": f"{number_format(total_anticipo_otro)}",
+        "total_otros": f"{number_format(total_otros)}",
+        "total_instrumentos": f"{number_format(obj.instrumentos_saldo)}",
+    }
+    source_html = template.render(logo=LOGO_IMAGE_URL, **data)
+    pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
+    from_string(source_html, pdf_filename, {"page-size": "Legal"})
+    return OUTPUT_FILENAME
 
 
 def get_reports(datalist: List[Liquidacion]) -> str:
@@ -366,7 +450,11 @@ def get_reports(datalist: List[Liquidacion]) -> str:
 
 
 def change_liquidacion_status(
-    db: Session, id: int, comentario: str, estado: LiquidacionEstadoEnum, user: User
+    db: Session,
+    id: int,
+    comentario: str,
+    estado: LiquidacionEstadoEnum,
+    current_user: schemas.AuthUser,
 ) -> Liquidacion:
     obj = get_liquidacion_by_id(db, id)
     if comentario:
@@ -374,10 +462,13 @@ def change_liquidacion_status(
             obj.comentarios = ""
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         comentarios = "".join([f"<li>{c}</li>" for c in comentario.split(".")])
+        full_name = f"{current_user.first_name} {current_user.last_name}"
         obj.comentarios += (
-            f"<strong>{user.full_name} ({date}): </strong><ul>{comentarios}</ul>"
+            f"<strong>{full_name} ({date}): </strong><ul>{comentarios}</ul>"
         )
-    return repositories.change_liquidacion_status(obj, db, estado, user.modified_by)
+    return repositories.change_liquidacion_status(
+        obj, db, estado, current_user.username
+    )
 
 
 def change_movimiento_list_status(
@@ -401,6 +492,7 @@ def get_liquidacion_reports(db: Session) -> str:
 def get_liquidacion_reports_by_estado_cuenta(
     db: Session,
     tipo_contraparte_id: int,
+    contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     etapa: str,
@@ -409,6 +501,7 @@ def get_liquidacion_reports_by_estado_cuenta(
     datalist = get_liquidacion_list_by_estado_cuenta(
         db,
         tipo_contraparte_id,
+        contraparte_id,
         contraparte,
         contraparte_numero_documento,
         etapa,

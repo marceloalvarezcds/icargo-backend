@@ -3,20 +3,22 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import repositories, schemas
+from app import repositories, schemas, services
 from app.dependencies import Permiso, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 
 api = APIRouter()
 
-
-@api.get("/", response_model=List[schemas.Ciudad])
+@api.get("/", response_model=services.PaginatedList[schemas.Ciudad])
 async def read_ciudad_list(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.CIUDAD)),  # noqa: B008
+    page: int = 1,
+    pageSize: int = 10,
+    query: str = ""
 ):
-    return repositories.get_ciudad_list(db)
+    return services.get_ciudad_list(db, page, pageSize, query)
 
 
 @api.get("/{localidad_id}", response_model=List[schemas.Ciudad])

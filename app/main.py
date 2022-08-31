@@ -10,7 +10,6 @@ from app.config import (
     STATICS_FOLDER_NAME,
     settings,
 )
-from app.dependencies import get_database_connection
 from app.endpoints import api
 from app.middlewares import AuditRequestMiddleware
 
@@ -25,9 +24,7 @@ app.mount(
     name=STATICS_FOLDER,
 )
 
-app.add_middleware(
-    AuditRequestMiddleware, database_connection_function=get_database_connection
-)
+app.add_middleware(AuditRequestMiddleware)
 
 # Set all CORS enabled origins
 if settings.BACKEND_CORS_ORIGINS:

@@ -73,7 +73,7 @@ class OrdenCargaDescuento(AuditMixin, Base):
 
     @hybrid_property
     def propietario_detalle(self):
-        return f"Monto: {number_format(self.propietario_monto)}{self.propietario_moneda_simbolo}"  # || Tipo de Cambio: 250,0{self.gestor_carga_moneda_simbolo}/{self.propietario_moneda_simbolo}"  # noqa
+        return f"{self.concepto_descripcion}: {number_format(self.propietario_monto)}{self.propietario_moneda_simbolo}"  # || Tipo de Cambio: 250,0{self.gestor_carga_moneda_simbolo}/{self.propietario_moneda_simbolo}"  # noqa
 
     @hybrid_property
     def propietario_moneda_nombre(self):
@@ -85,7 +85,7 @@ class OrdenCargaDescuento(AuditMixin, Base):
 
     @hybrid_property
     def proveedor_detalle(self):
-        return f"Monto: {number_format(self.proveedor_monto)}{self.proveedor_moneda_simbolo}"  # || Tipo de Cambio: 250,0{self.gestor_carga_moneda_simbolo}/{self.proveedor_moneda_simbolo}"  # noqa
+        return f"{self.concepto_descripcion}: {number_format(self.proveedor_monto)}{self.proveedor_moneda_simbolo}"  # || Tipo de Cambio: 250,0{self.gestor_carga_moneda_simbolo}/{self.proveedor_moneda_simbolo}"  # noqa
 
     @hybrid_property
     def proveedor_moneda_nombre(self):

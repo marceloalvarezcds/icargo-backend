@@ -29,7 +29,7 @@ from app.schemas import (
 from app.services import create_flete
 
 
-def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
+def flete_seeds(db: Session, gestor_carga_id: Optional[int]):
     modified_by = "system"
 
     destino3 = get_centro_operativo_by_id(db, 3)
@@ -77,7 +77,7 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
     # litros = get_unidad_by_descripcion(db, "Litros")  # TODO
 
     if (
-        gestor_cuenta_id
+        gestor_carga_id
         and destino3
         and destino5
         and destino9
@@ -151,11 +151,11 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # FIN Tramo de Fletes
                     # INICIO Cantidad y Flete
                     condicion_cantidad=Decimal(100000),
-                    # inicio - Condiciones para el Gestor de Cuenta
-                    condicion_gestor_cuenta_moneda_id=pyg.id,
-                    condicion_gestor_cuenta_tarifa=Decimal(100),
-                    condicion_gestor_cuenta_unidad_id=kilogramos.id,
-                    # fin - Condiciones para el Gestor de Cuenta
+                    # inicio - Condiciones para el Gestor de Carga
+                    condicion_gestor_carga_moneda_id=pyg.id,
+                    condicion_gestor_carga_tarifa=Decimal(100),
+                    condicion_gestor_carga_unidad_id=kilogramos.id,
+                    # fin - Condiciones para el Gestor de Carga
                     # inicio - Condiciones para el Propietario
                     condicion_propietario_moneda_id=pyg.id,
                     condicion_propietario_tarifa=Decimal(80),
@@ -163,13 +163,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # fin - Condiciones para el Propietario
                     # FIN Cantidad y Flete
                     # INICIO Mermas de Fletes
-                    # inicio - Mermas para el Gestor de Cuenta
-                    merma_gestor_cuenta_valor=Decimal(1000),
-                    merma_gestor_cuenta_moneda_id=pyg.id,
-                    merma_gestor_cuenta_unidad_id=kilogramos.id,
-                    merma_gestor_cuenta_es_porcentual=False,
-                    merma_gestor_cuenta_tolerancia=Decimal(100),
-                    # fin - Mermas para el Gestor de Cuenta
+                    # inicio - Mermas para el Gestor de Carga
+                    merma_gestor_carga_valor=Decimal(1000),
+                    merma_gestor_carga_moneda_id=pyg.id,
+                    merma_gestor_carga_unidad_id=kilogramos.id,
+                    merma_gestor_carga_es_porcentual=False,
+                    merma_gestor_carga_tolerancia=Decimal(100),
+                    # fin - Mermas para el Gestor de Carga
                     # inicio - Mermas para el Propietario
                     merma_propietario_valor=Decimal(1500),
                     merma_propietario_moneda_id=pyg.id,
@@ -283,7 +283,7 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                         ),
                     ],
                 ),
-                gestor_cuenta_id,
+                gestor_carga_id,
                 modified_by,
             )
 
@@ -306,12 +306,12 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # FIN Tramo de Fletes
                     # INICIO Cantidad y Flete
                     condicion_cantidad=Decimal(50000),
-                    # inicio - Condiciones para el Gestor de Cuenta
-                    # condicion_gestor_cuenta_moneda_id=usd.id,
-                    condicion_gestor_cuenta_moneda_id=pyg.id,
-                    condicion_gestor_cuenta_tarifa=Decimal(0.2),
-                    condicion_gestor_cuenta_unidad_id=kilogramos.id,
-                    # fin - Condiciones para el Gestor de Cuenta
+                    # inicio - Condiciones para el Gestor de Carga
+                    # condicion_gestor_carga_moneda_id=usd.id,
+                    condicion_gestor_carga_moneda_id=pyg.id,
+                    condicion_gestor_carga_tarifa=Decimal(0.2),
+                    condicion_gestor_carga_unidad_id=kilogramos.id,
+                    # fin - Condiciones para el Gestor de Carga
                     # inicio - Condiciones para el Propietario
                     # condicion_propietario_moneda_id=usd.id,
                     condicion_propietario_moneda_id=pyg.id,
@@ -320,14 +320,14 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # fin - Condiciones para el Propietario
                     # FIN Cantidad y Flete
                     # INICIO Mermas de Fletes
-                    # inicio - Mermas para el Gestor de Cuenta
-                    merma_gestor_cuenta_valor=Decimal(0.2),
-                    # merma_gestor_cuenta_moneda_id=usd.id,
-                    merma_gestor_cuenta_moneda_id=pyg.id,
-                    merma_gestor_cuenta_unidad_id=kilogramos.id,
-                    merma_gestor_cuenta_es_porcentual=True,
-                    merma_gestor_cuenta_tolerancia=Decimal(12),
-                    # fin - Mermas para el Gestor de Cuenta
+                    # inicio - Mermas para el Gestor de Carga
+                    merma_gestor_carga_valor=Decimal(0.2),
+                    # merma_gestor_carga_moneda_id=usd.id,
+                    merma_gestor_carga_moneda_id=pyg.id,
+                    merma_gestor_carga_unidad_id=kilogramos.id,
+                    merma_gestor_carga_es_porcentual=True,
+                    merma_gestor_carga_tolerancia=Decimal(12),
+                    # fin - Mermas para el Gestor de Carga
                     # inicio - Mermas para el Propietario
                     merma_propietario_valor=Decimal(0.3),
                     # merma_propietario_moneda_id=usd.id,
@@ -443,7 +443,7 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                         ),
                     ],
                 ),
-                gestor_cuenta_id,
+                gestor_carga_id,
                 modified_by,
             )
 
@@ -466,13 +466,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # FIN Tramo de Fletes
                     # INICIO Cantidad y Flete
                     condicion_cantidad=Decimal(100000),
-                    # inicio - Condiciones para el Gestor de Cuenta
-                    # condicion_gestor_cuenta_moneda_id=brl.id,
-                    condicion_gestor_cuenta_moneda_id=pyg.id,
-                    condicion_gestor_cuenta_tarifa=Decimal(12),
-                    # condicion_gestor_cuenta_unidad_id=toneladas.id,
-                    condicion_gestor_cuenta_unidad_id=kilogramos.id,
-                    # fin - Condiciones para el Gestor de Cuenta
+                    # inicio - Condiciones para el Gestor de Carga
+                    # condicion_gestor_carga_moneda_id=brl.id,
+                    condicion_gestor_carga_moneda_id=pyg.id,
+                    condicion_gestor_carga_tarifa=Decimal(12),
+                    # condicion_gestor_carga_unidad_id=toneladas.id,
+                    condicion_gestor_carga_unidad_id=kilogramos.id,
+                    # fin - Condiciones para el Gestor de Carga
                     # inicio - Condiciones para el Propietario
                     # condicion_propietario_moneda_id=brl.id,
                     condicion_propietario_moneda_id=pyg.id,
@@ -482,15 +482,15 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # fin - Condiciones para el Propietario
                     # FIN Cantidad y Flete
                     # INICIO Mermas de Fletes
-                    # inicio - Mermas para el Gestor de Cuenta
-                    merma_gestor_cuenta_valor=Decimal(50),
-                    # merma_gestor_cuenta_moneda_id=brl.id,
-                    merma_gestor_cuenta_moneda_id=pyg.id,
-                    # merma_gestor_cuenta_unidad_id=toneladas.id,
-                    merma_gestor_cuenta_unidad_id=kilogramos.id,
-                    merma_gestor_cuenta_es_porcentual=False,
-                    merma_gestor_cuenta_tolerancia=Decimal(100),
-                    # fin - Mermas para el Gestor de Cuenta
+                    # inicio - Mermas para el Gestor de Carga
+                    merma_gestor_carga_valor=Decimal(50),
+                    # merma_gestor_carga_moneda_id=brl.id,
+                    merma_gestor_carga_moneda_id=pyg.id,
+                    # merma_gestor_carga_unidad_id=toneladas.id,
+                    merma_gestor_carga_unidad_id=kilogramos.id,
+                    merma_gestor_carga_es_porcentual=False,
+                    merma_gestor_carga_tolerancia=Decimal(100),
+                    # fin - Mermas para el Gestor de Carga
                     # inicio - Mermas para el Propietario
                     merma_propietario_valor=Decimal(60),
                     # merma_propietario_moneda_id=brl.id,
@@ -576,7 +576,7 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                         ),
                     ],
                 ),
-                gestor_cuenta_id,
+                gestor_carga_id,
                 modified_by,
             )
 
@@ -599,13 +599,13 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # FIN Tramo de Fletes
                     # INICIO Cantidad y Flete
                     condicion_cantidad=Decimal(100000),
-                    # inicio - Condiciones para el Gestor de Cuenta
-                    # condicion_gestor_cuenta_moneda_id=arp.id,
-                    condicion_gestor_cuenta_moneda_id=pyg.id,
-                    condicion_gestor_cuenta_tarifa=Decimal(55),
-                    # condicion_gestor_cuenta_unidad_id=toneladas.id,
-                    condicion_gestor_cuenta_unidad_id=kilogramos.id,
-                    # fin - Condiciones para el Gestor de Cuenta
+                    # inicio - Condiciones para el Gestor de Carga
+                    # condicion_gestor_carga_moneda_id=arp.id,
+                    condicion_gestor_carga_moneda_id=pyg.id,
+                    condicion_gestor_carga_tarifa=Decimal(55),
+                    # condicion_gestor_carga_unidad_id=toneladas.id,
+                    condicion_gestor_carga_unidad_id=kilogramos.id,
+                    # fin - Condiciones para el Gestor de Carga
                     # inicio - Condiciones para el Propietario
                     # condicion_propietario_moneda_id=arp.id,
                     condicion_propietario_moneda_id=pyg.id,
@@ -615,15 +615,15 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                     # fin - Condiciones para el Propietario
                     # FIN Cantidad y Flete
                     # INICIO Mermas de Fletes
-                    # inicio - Mermas para el Gestor de Cuenta
-                    merma_gestor_cuenta_valor=Decimal(100),
-                    # merma_gestor_cuenta_moneda_id=arp.id,
-                    merma_gestor_cuenta_moneda_id=pyg.id,
-                    # merma_gestor_cuenta_unidad_id=toneladas.id,
-                    merma_gestor_cuenta_unidad_id=kilogramos.id,
-                    merma_gestor_cuenta_es_porcentual=True,
-                    merma_gestor_cuenta_tolerancia=Decimal(15),
-                    # fin - Mermas para el Gestor de Cuenta
+                    # inicio - Mermas para el Gestor de Carga
+                    merma_gestor_carga_valor=Decimal(100),
+                    # merma_gestor_carga_moneda_id=arp.id,
+                    merma_gestor_carga_moneda_id=pyg.id,
+                    # merma_gestor_carga_unidad_id=toneladas.id,
+                    merma_gestor_carga_unidad_id=kilogramos.id,
+                    merma_gestor_carga_es_porcentual=True,
+                    merma_gestor_carga_tolerancia=Decimal(15),
+                    # fin - Mermas para el Gestor de Carga
                     # inicio - Mermas para el Propietario
                     merma_propietario_valor=Decimal(110),
                     # merma_propietario_moneda_id=arp.id,
@@ -720,6 +720,6 @@ def flete_seeds(db: Session, gestor_cuenta_id: Optional[int]):
                         ),
                     ],
                 ),
-                gestor_cuenta_id,
+                gestor_carga_id,
                 modified_by,
             )

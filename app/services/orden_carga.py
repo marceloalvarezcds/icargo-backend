@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from http import HTTPStatus
 from typing import List, Optional, cast
 
 from fastapi import HTTPException
@@ -12,7 +13,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, STATICS_URL, templateEnv
 from app.enums import EstadoEnum
-from app.models import Flete, OrdenCarga, User
+from app.models import Camion, Flete, OrdenCarga
 from app.schemas.audit_database import AuditDatabase as A
 from app.utils import number_format
 
@@ -22,6 +23,7 @@ from .orden_carga_anticipo_saldo import get_orden_carga_by_id
 from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete
 from .orden_carga_remision_resultado import (
+    get_orden_carga_remision_resultado_list_by_flete,
     get_orden_carga_remision_resultado_list_by_orden_carga,
 )
 
@@ -35,15 +37,16 @@ def get_orden_carga_list(
 
 
 def get_orden_carga_with_resultado(
-    db: Session, model: OrdenCarga, current_user: User
+    db: Session, model: OrdenCarga, user_id: int
 ) -> schemas.OrdenCarga:
     obj = schemas.OrdenCarga.from_orm(model)
     obj.remisiones_resultado = get_orden_carga_remision_resultado_list_by_orden_carga(
-        model, current_user
+        db, model, user_id
     )
-    obj.auditorias = cast(
-        List[A], get_audit_list_by_orden_carga(db, model, current_user)
+    obj.remisiones_resultado_flete = get_orden_carga_remision_resultado_list_by_flete(
+        db, model, user_id
     )
+    obj.auditorias = cast(List[A], get_audit_list_by_orden_carga(db, model, user_id))
     return obj
 
 
@@ -59,7 +62,7 @@ def create_complementos_and_descuentos(
 def create_orden_carga(
     db: Session,
     data: schemas.OrdenCargaForm,
-    current_user: User,
+    current_user: schemas.AuthUser,
 ) -> schemas.OrdenCarga:
     flete = repositories.get_flete_by_id(db, data.flete_id)
     if not flete:
@@ -73,14 +76,14 @@ def create_orden_carga(
         modified_by,
     )
     create_complementos_and_descuentos(db, obj, flete, modified_by)
-    return get_orden_carga_with_resultado(db, obj, current_user)
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
 def edit_orden_carga(
     id: int,
     db: Session,
     data: schemas.OrdenCargaEditForm,
-    current_user: User,
+    current_user: schemas.AuthUser,
 ) -> schemas.OrdenCarga:
     to_edit_obj = get_orden_carga_by_id(db, id)
     obj = repositories.edit_orden_carga(
@@ -90,20 +93,22 @@ def edit_orden_carga(
         current_user.gestor_carga_id,
         current_user.username,
     )
-    return get_orden_carga_with_resultado(db, obj, current_user)
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
-def delete_orden_carga(db: Session, id: int, current_user: User) -> schemas.OrdenCarga:
+def delete_orden_carga(
+    db: Session, id: int, current_user: schemas.AuthUser
+) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.delete_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def get_orden_carga_detail(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
-    return get_orden_carga_with_resultado(db, obj, current_user)
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
 def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
@@ -211,7 +216,7 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
 
 
 def change_orden_carga_anticipos_liberados(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     if not obj.anticipos_liberados and obj.estado == EstadoEnum.CANCELADO.value:
@@ -223,91 +228,125 @@ def change_orden_carga_anticipos_liberados(
     model = repositories.change_orden_carga_anticipos_liberados(
         obj, db, anticipos_liberados, current_user.username
     )
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
-def aceptar_orden_carga(db: Session, id: int, current_user: User) -> schemas.OrdenCarga:
+def aceptar_orden_carga(
+    db: Session, id: int, current_user: schemas.AuthUser
+) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
-    model = repositories.aceptar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    cant_oc_aceptadas = repositories.get_orden_carga_aceptada_count_by_camion_id(
+        db, obj.camion_id
+    )
+    camion: Camion = obj.camion
+    camion.limite_cantidad_oc_activas
+    if cant_oc_aceptadas >= camion.limite_cantidad_oc_activas:
+        oc_aceptadas = f"Existen {cant_oc_aceptadas} OC aceptadas"
+        limite = f"y el límite es de {camion.limite_cantidad_oc_activas}"
+        camion_placa = f"establecido por Camión con placa {camion.placa}"
+        raise HTTPException(
+            status_code=HTTPStatus.LOCKED,
+            detail=f"{oc_aceptadas} {limite}, {camion_placa}",
+        )
+    username = current_user.username
+    gestor_id = (
+        current_user.gestor_carga_id
+        if current_user.gestor_carga_id
+        else obj.gestor_carga_id
+    )
+    anticipos_liberados = (
+        camion.propietario_puede_recibir_anticipos
+        and camion.chofer_puede_recibir_anticipos
+    )
+    oc = repositories.edit_orden_carga(
+        obj,
+        db,
+        schemas.OrdenCargaEditForm(anticipos_liberados=anticipos_liberados),
+        gestor_id,
+        username,
+    )
+    model = repositories.aceptar_orden_carga(oc, db, username)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def cancelar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.cancelar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def conciliar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.conciliar_orden_carga(obj, db, current_user.username)
     create_movimiento_by_conciliacion_oc(
         db, obj, current_user.gestor_carga_id, current_user.username
     )
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def contabilizar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.contabilizar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def arribado_a_cargar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.arribado_a_cargar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def arribado_a_descargar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.arribado_a_descargar_orden_carga(
         obj, db, current_user.username
     )
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
-def cargar_orden_carga(db: Session, id: int, current_user: User) -> schemas.OrdenCarga:
+def cargar_orden_carga(
+    db: Session, id: int, current_user: schemas.AuthUser
+) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.cargar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def descargar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.descargar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def finalizar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.finalizar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def liquidar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.liquidar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
-def get_orden_carga_reports(db: Session, gestor_carga_id: int) -> str:
+def get_orden_carga_reports(db: Session, gestor_carga_id: Optional[int]) -> str:
     datalist = repositories.get_orden_carga_list_by_gestor_carga_id(db, gestor_carga_id)
     wb = Workbook()
     # get worksheet

@@ -26,6 +26,7 @@ simplejson = "^3.17.5"
 orjson = "^3.6.4"
 pdfkit = "^1.0.0"
 Jinja2 = "^3.0.3"
+diskcache = "^5.4.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.910"

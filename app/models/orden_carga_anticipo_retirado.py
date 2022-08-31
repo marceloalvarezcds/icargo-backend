@@ -8,7 +8,6 @@ from sqlalchemy import (  # type: ignore
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
@@ -28,15 +27,6 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     Defines the orden carga - anticipo retirado model
     """
 
-    __table_args__ = (
-        UniqueConstraint(
-            "flete_anticipo_id",
-            "orden_carga_id",
-            "punto_venta_id",
-            "tipo_comprobante_id",
-            "numero_comprobante",
-        ),
-    )
     id = Column(Integer, primary_key=True)
     flete_anticipo_id = Column(Integer, ForeignKey("flete_anticipo.id"))
     flete_anticipo = relationship(
@@ -73,7 +63,12 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
 
     @hybrid_property
     def detalle(self):
-        return f"PDV: {self.concepto} || Monto: {number_format(self.monto_retirado)}{self.moneda_simbolo} || Fecha: {self.created_at.strftime('%Y-%m-%d / %H:%M:%S')}"  # noqa
+        producto_info = ""
+        if self.insumo_punto_venta_precio:
+            producto_info = f" || Precio: {number_format(self.precio_unitario)} || Prod: {self.insumo_descripcion}"  # noqa: B950
+        concepto = f"{self.concepto}: {number_format(self.monto_retirado)}{self.moneda_simbolo}"
+        punto_venta_producto = f"{producto_info} || {self.punto_venta_nombre}"
+        return f"{concepto} {punto_venta_producto}"
 
     @hybrid_property
     def gestor_carga_id(self):
