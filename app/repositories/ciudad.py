@@ -36,9 +36,12 @@ def get_ciudad_list(db: Session,
         pageSize = 10
     query = db.query(Ciudad)
     if queryFilter is not None and queryFilter != "":
-        queryFilter = "%" + queryFilter + "%"
-        query = query.join(Ciudad.localidad, Localidad.pais)
-        query = query.filter(or_(Ciudad.nombre.ilike(queryFilter), Localidad.nombre.ilike(queryFilter), Pais.nombre.ilike(queryFilter)))
+        if queryFilter.isnumeric():
+            query = query.filter(Ciudad.id == int(queryFilter))
+        else:
+            queryFilter = "%" + queryFilter + "%"
+            query = query.join(Ciudad.localidad, Localidad.pais)
+            query = query.filter(or_(Ciudad.nombre.ilike(queryFilter), Localidad.nombre.ilike(queryFilter), Pais.nombre.ilike(queryFilter)))
 
     return (
         query
@@ -52,9 +55,12 @@ def get_ciudad_count(db: Session,
         queryFilter: str = "") -> List[Ciudad]:
     query = db.query(Ciudad)
     if queryFilter is not None and queryFilter != "":
-        queryFilter = "%" + queryFilter + "%"
-        query = query.join(Ciudad.localidad, Localidad.pais)
-        query = query.filter(or_(Ciudad.nombre.ilike(queryFilter), Localidad.nombre.ilike(queryFilter), Pais.nombre.ilike(queryFilter)))
+        if queryFilter.isnumeric():
+            query = query.filter(Ciudad.id == int(queryFilter))
+        else:
+            queryFilter = "%" + queryFilter + "%"
+            query = query.join(Ciudad.localidad, Localidad.pais)
+            query = query.filter(or_(Ciudad.nombre.ilike(queryFilter), Localidad.nombre.ilike(queryFilter), Pais.nombre.ilike(queryFilter)))
 
     return query.count()
 
