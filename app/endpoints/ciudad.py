@@ -10,13 +10,14 @@ from app.enums import PermisoModeloEnum as m
 
 api = APIRouter()
 
-@api.get("/", response_model=services.PaginatedList[schemas.Ciudad])
+
+@api.get("/", response_model=schemas.PaginatedList[schemas.Ciudad])
 async def read_ciudad_list(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.CIUDAD)),  # noqa: B008
     page: int = 1,
     pageSize: int = 10,
-    query: str = ""
+    query: str = "",
 ):
     return services.get_ciudad_list(db, page, pageSize, query)
 

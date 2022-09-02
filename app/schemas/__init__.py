@@ -90,6 +90,7 @@ from .orden_carga_remision_origen import (  # noqa
     OrdenCargaRemisionOrigenForm,
 )
 from .orden_carga_remision_resultado import OrdenCargaRemisionResultado  # noqa
+from .paginated_list import PaginatedList  # noqa
 from .pais import Pais  # noqa
 from .permiso import Permiso, PermisoChecked  # noqa
 from .producto import Producto  # noqa

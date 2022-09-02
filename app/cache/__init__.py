@@ -3,7 +3,7 @@ from .ciudad import (  # noqa
     get_ciudades_total_records_in_cache,
     reset_ciudades_in_cache,
     set_ciudades_in_cache,
-    set_ciudades_total_records_in_cache
+    set_ciudades_total_records_in_cache,
 )
 from .permiso import (  # noqa
     check_permiso_in_cache,
