@@ -41,6 +41,18 @@ async def read_chofer_list_by_without_camion(
     return repositories.get_chofer_list_without_camion(db, current_user.gestor_carga_id)
 
 
+@api.get("/without_camion/{camion_id}", response_model=List[schemas.ChoferList])
+async def read_chofer_list_by_without_camion_by_camion_id(
+    camion_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.CHOFER)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_chofer_list_without_camion_by_camion_id(
+        db, camion_id, current_user.gestor_carga_id
+    )
+
+
 @api.get("/reports")
 async def chofer_reports(
     db: Session = Depends(get_db_session),  # noqa: B008

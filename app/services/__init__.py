@@ -52,6 +52,7 @@ from .chofer import (  # noqa
     edit_chofer,
     get_chofer_by_id,
     get_chofer_by_id_and_gestor_cuenta_id,
+    get_chofer_list_without_camion_by_camion_id,
     get_chofer_reports,
 )
 from .ciudad import get_ciudad_list  # noqa
