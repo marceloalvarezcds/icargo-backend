@@ -26,7 +26,7 @@ def create_gestor_carga_chofer(
     db: Session,
     chofer_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaChofer:
     obj = GestorCargaChofer(
@@ -47,7 +47,7 @@ def edit_gestor_carga_chofer(
     db: Session,
     chofer_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaChofer:
     obj.chofer_id = chofer_id

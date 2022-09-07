@@ -65,7 +65,7 @@ def create_user(
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.USER)),  # noqa: B008
 ) -> Any:
-    return services.create_user(
+    return services.create_user_with_rol_list(
         db, data, current_user.gestor_carga_id, current_user.username, request  # type: ignore
     )
 
@@ -79,7 +79,7 @@ async def edit_user(
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.USER)),  # noqa: B008
 ):
-    return services.edit_user(
+    return services.edit_user_with_rol_list(
         db,
         id,
         data,  # type: ignore

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -64,3 +64,9 @@ class Proveedor(ProveedorBase):
     class Config:
         orm_mode = True
         use_enum_values = True
+
+    @classmethod
+    def from_orm(cls, obj: Any) -> "Proveedor":
+        obj.contactos = []
+        obj.gestor_carga_proveedor = None
+        return super().from_orm(obj)

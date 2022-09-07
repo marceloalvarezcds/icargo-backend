@@ -35,10 +35,6 @@ def get_user_account(db: Session, id: int) -> UserAccount:
     return user_account
 
 
-def get_user_by_email(db: Session, email: str) -> Optional[User]:
-    return user.get_user_by_email(db, email)
-
-
 def get_user_by_id(db: Session, id: int) -> User:
     obj = user.get_user_by_id(db, id)
     if not obj:
@@ -85,7 +81,7 @@ def create_user(
     gestor_carga_id: Optional[int],
     modified_by: str,
     request: Request,
-) -> schemas.User:
+) -> User:
     roles: List[RolChecked] = data.roles
     del data.roles
     if not data.gestor_carga_id and gestor_carga_id:
@@ -99,7 +95,18 @@ def create_user(
         username=data.username,
     )
     save_roles(db, user, roles, modified_by)
-    return _user_with_rol_list(db, user)
+    return user
+
+
+def create_user_with_rol_list(
+    db: Session,
+    data: UserCreate,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+    request: Request,
+) -> schemas.User:
+    user_created = create_user(db, data, gestor_carga_id, modified_by, request)
+    return _user_with_rol_list(db, user_created)
 
 
 def edit_user(
@@ -109,7 +116,7 @@ def edit_user(
     gestor_carga_id: Optional[int],
     modified_by: str,
     request: Request,
-) -> schemas.User:
+) -> User:
     roles: List[RolChecked] = data.roles
     del data.roles
     if not data.gestor_carga_id and gestor_carga_id:
@@ -124,7 +131,19 @@ def edit_user(
         username=data.username,
     )
     save_roles(db, user, roles, modified_by)
-    return _user_with_rol_list(db, user)
+    return user
+
+
+def edit_user_with_rol_list(
+    db: Session,
+    id: int,
+    data: UserUpdate,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+    request: Request,
+) -> schemas.User:
+    user_updated = edit_user(db, id, data, gestor_carga_id, modified_by, request)
+    return _user_with_rol_list(db, user_updated)
 
 
 def change_user_status(

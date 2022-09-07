@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -65,3 +65,14 @@ class PuntoVenta(PuntoVentaBase):
     contactos: List[PuntoVentaContactoGestorCargaList] = []
     gestor_carga_punto_venta: Optional[GestorCargaPuntoVenta] = None
     insumos: List[InsumoPuntoVenta] = []
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True
+
+    @classmethod
+    def from_orm(cls, obj: Any) -> "PuntoVenta":
+        obj.contactos = []
+        obj.gestor_carga_punto_venta = None
+        obj.insumos = []
+        return super().from_orm(obj)

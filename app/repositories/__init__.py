@@ -386,6 +386,7 @@ from .proveedor_contacto_gestor_carga import (  # noqa
     edit_proveedor_contacto_gestor_carga,
     get_proveedor_contacto_gestor_carga_by,
     get_proveedor_contacto_gestor_carga_by_cargo_id,
+    get_proveedor_contacto_gestor_carga_list_by_proveedor_id,
 )
 from .punto_venta import (  # noqa
     create_punto_venta,
@@ -402,6 +403,7 @@ from .punto_venta_contacto_gestor_carga import (  # noqa
     edit_punto_venta_contacto_gestor_carga,
     get_punto_venta_contacto_gestor_carga_by,
     get_punto_venta_contacto_gestor_carga_by_cargo_id,
+    get_punto_venta_contacto_gestor_carga_list_by_punto_venta_id,
 )
 from .remitente import (  # noqa
     create_remitente,
@@ -493,7 +495,6 @@ from .tipo_semi import get_tipo_semi_by_descripcion, get_tipo_semi_list  # noqa
 from .unidad import get_unidad_by_descripcion, get_unidad_list  # noqa
 from .user import (  # noqa
     exists_user_for_rol_id,
-    get_user_by_email,
     get_user_by_id,
     get_user_by_username,
     get_user_id_by_rol_id,

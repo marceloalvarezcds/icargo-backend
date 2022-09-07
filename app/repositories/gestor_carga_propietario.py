@@ -26,7 +26,7 @@ def create_gestor_carga_propietario(
     db: Session,
     propietario_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaPropietario:
     obj = GestorCargaPropietario(
@@ -47,7 +47,7 @@ def edit_gestor_carga_propietario(
     db: Session,
     propietario_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaPropietario:
     obj.propietario_id = propietario_id

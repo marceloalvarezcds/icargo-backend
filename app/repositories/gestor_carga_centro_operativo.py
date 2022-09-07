@@ -26,7 +26,7 @@ def create_gestor_carga_centro_operativo(
     db: Session,
     centro_operativo_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaCentroOperativo:
     obj = GestorCargaCentroOperativo(
@@ -47,7 +47,7 @@ def edit_gestor_carga_centro_operativo(
     db: Session,
     centro_operativo_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaCentroOperativo:
     obj.centro_operativo_id = centro_operativo_id

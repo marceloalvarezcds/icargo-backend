@@ -26,7 +26,7 @@ def create_gestor_carga_proveedor(
     db: Session,
     proveedor_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaProveedor:
     obj = GestorCargaProveedor(
@@ -47,7 +47,7 @@ def edit_gestor_carga_proveedor(
     db: Session,
     proveedor_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaProveedor:
     obj.proveedor_id = proveedor_id

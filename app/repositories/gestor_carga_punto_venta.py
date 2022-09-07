@@ -26,7 +26,7 @@ def create_gestor_carga_punto_venta(
     db: Session,
     punto_venta_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaPuntoVenta:
     obj = GestorCargaPuntoVenta(
@@ -47,7 +47,7 @@ def edit_gestor_carga_punto_venta(
     db: Session,
     punto_venta_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaPuntoVenta:
     obj.punto_venta_id = punto_venta_id
