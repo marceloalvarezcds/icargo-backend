@@ -27,6 +27,13 @@ DATABASE_INITIALIZE_WITHOUT_SEEDS = (
     str(environ("DATABASE_INITIALIZE_WITHOUT_SEEDS", "false")) == "true"
 )
 
+# INICIO EMAIL ENV
+MAIL_HOST = str(environ("MAIL_HOST", "smtp.gmail.com"))
+MAIL_PORT = int(environ("MAIL_PORT", "587"))
+MAIL_USER = str(environ("MAIL_USER", "cds.apps.2020@gmail.com"))
+MAIL_PASS = str(environ("MAIL_PASS", "pass"))
+# FIN EMAIL ENV
+
 # 60 minutes * 24 hours * 8 days = 8 days
 ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 

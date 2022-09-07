@@ -12,3 +12,7 @@ from .security import (  # noqa
     get_payload_from_token,
     verify_password,
 )
+from .send_mail import (  # noqa
+    send_email_by_template,
+    send_email,
+)
