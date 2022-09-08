@@ -28,10 +28,13 @@ DATABASE_INITIALIZE_WITHOUT_SEEDS = (
 )
 
 # INICIO EMAIL ENV
+MAIL_ACTIVE = str(environ("MAIL_ACTIVE", "false")) == "true"
 MAIL_HOST = str(environ("MAIL_HOST", "smtp.gmail.com"))
 MAIL_PORT = int(environ("MAIL_PORT", "587"))
 MAIL_USER = str(environ("MAIL_USER", "cds.apps.2020@gmail.com"))
 MAIL_PASS = str(environ("MAIL_PASS", "pass"))
+MAIL_SSL = str(environ("MAIL_SSL", "false")) == "true"
+MAIL_TLS = str(environ("MAIL_TLS", "false")) == "true"
 # FIN EMAIL ENV
 
 # 60 minutes * 24 hours * 8 days = 8 days
