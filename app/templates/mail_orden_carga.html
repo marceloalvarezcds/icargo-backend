@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{title}}</title>
+    <style type="text/css">
+      body {
+        margin: 0px;
+        padding: 0px;
+        overflow: auto;
+        font-family: "Georgia";
+      }
+
+      .align-center {
+        align-items: center;
+      }
+
+      .blue {
+        color: #3399ff;
+      }
+
+      .bold {
+        font-weight: bold;
+      }
+
+      .flex1 {
+        flex: 1;
+      }
+
+      .fs2 {
+        font-size: 18px;
+      }
+
+      .fs6 {
+        font-size: 11px;
+      }
+
+      .lh2 {
+        line-height: 18px;
+      }
+
+      .lh4 {
+        line-height: 16px;
+      }
+
+      .logo-container .logo {
+        width: 430px;
+        height: 120px;
+      }
+
+      .logo-container img {
+        margin: auto;
+        width: auto;
+        height: 120px;
+      }
+
+      .mt10 {
+        margin-top: 10px;
+      }
+
+      .table {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>{{title}}</h1>
+    <div class="{{class_name}}">
+      <div class="texto-legal-container table box align-center mt10">
+        <p class="fs2 lh2 flex1">{{detail}}</p>
+      </div>
+      <div class="logo-container table box align-center mt10">
+        <div class="logo">
+          <img src="{{logo}}" alt="iCargo" />
+        </div>
+        <p class="fs6 lh4 flex1">
+          iCargo es solo una Herramienta de Gestión y no constituye parte alguna
+          en la Cadena de Operaciones, limitándose su aporte solo al Registro,
+          Gestión y Publicación de la información que por ella se administra.
+          Las partes, Gestora de carga y Propietario, asumen total
+          responsabilidad por la Publicación de los Pedidos y por la Emisión de
+          las Ordenes de Carga que consideren apropiadas, dejando indemne a
+          iCargo de cualquier reclamo Judicial y/o Extra-Judicial en cualquier
+          litigio que pudiera surgir entre estas partes
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -15,9 +15,10 @@ from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, STATICS_URL, templateEnv
 from app.enums import EstadoEnum
 from app.models import Camion, Flete, OrdenCarga
 from app.schemas.audit_database import AuditDatabase as A
-from app.utils import number_format
+from app.utils import number_format, send_email_with_template_by_thread
 
 from .audit_database import get_audit_list_by_orden_carga
+from .flete import get_flete_detail
 from .movimiento import create_movimiento_by_conciliacion_oc
 from .orden_carga_anticipo_saldo import get_orden_carga_by_id
 from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete
@@ -76,6 +77,7 @@ def create_orden_carga(
         modified_by,
     )
     create_complementos_and_descuentos(db, obj, flete, modified_by)
+    send_emision_orden_carga_mail(obj.flete)
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
@@ -344,6 +346,21 @@ def liquidar_orden_carga(
     obj = get_orden_carga_by_id(db, id)
     model = repositories.liquidar_orden_carga(obj, db, current_user.username)
     return get_orden_carga_with_resultado(db, model, current_user.id)
+
+
+def send_emision_orden_carga_mail(flete: Flete):
+    obj = get_flete_detail(flete)
+    destinatarios = ",".join([x.email for x in obj.destinatarios])
+    title: str = flete.emision_orden_texto_legal
+    detail: str = flete.emision_orden_detalle
+    send_email_with_template_by_thread(
+        template_filename="mail_orden_carga.html",
+        to=destinatarios,
+        subject="iCargo: Emisión de Orden de Carga",
+        title=title,
+        detail=detail,
+        logo=LOGO_IMAGE_URL,
+    )
 
 
 def get_orden_carga_reports(db: Session, gestor_carga_id: Optional[int]) -> str:
