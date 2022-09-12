@@ -37,6 +37,10 @@ class UserBase(BaseModel):
 class UserUpdate(UserBase):
     password: Optional[str] = None
     confirm_password: Optional[str] = None
+    chofer_id: Optional[int] = None
+    propietario_id: Optional[int] = None
+    punto_venta_id: Optional[int] = None
+    is_admin: Optional[bool] = False
     roles: List[RolChecked] = []
 
     @root_validator()

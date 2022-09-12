@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Body, Depends, File, Form, Request, UploadFile
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -106,3 +106,52 @@ async def delete_punto_venta(
     return services.delete_punto_venta(
         db, id, current_user.gestor_carga_id, current_user.username
     )
+
+
+@api.post("/{id}/create_user", response_model=schemas.PuntoVenta)
+async def create_user_for_punto_venta(
+    request: Request,
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.UserPuntoVentaCreateForm] = Form(...),  # type: ignore  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.USER)),  # noqa: B008
+):
+    return services.create_user_for_punto_venta(
+        id,
+        db,
+        data,  # type: ignore
+        False,
+        current_user.gestor_carga_id,
+        current_user.username,
+        request,
+    )
+
+
+@api.post("/{id}/create_admin_user", response_model=schemas.PuntoVenta)
+async def create_admin_user_for_punto_venta(
+    request: Request,
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.UserPuntoVentaCreateForm] = Form(...),  # type: ignore  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.USER)),  # noqa: B008
+):
+    return services.create_user_for_punto_venta(
+        id,
+        db,
+        data,  # type: ignore
+        True,
+        current_user.gestor_carga_id,
+        current_user.username,
+        request,
+    )
+
+
+@api.post("/login", response_model=schemas.ApiResponseData[schemas.UserPuntoVenta])
+def login(
+    request: Request,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: schemas.Auth = Body(...),  # noqa: B008
+):
+    return services.login_user_punto_venta(db, data, request)

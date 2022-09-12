@@ -1,4 +1,8 @@
 # should be imported to help code editor (vscode) for autocompletion
+from .app_prov_user_punto_venta import (  # noqa
+    create_user_for_punto_venta,
+    login_user_punto_venta,
+)
 from .auth import (  # noqa
     get_auth_user_from_authorization_header,
     get_authorization_header,

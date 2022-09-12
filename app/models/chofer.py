@@ -20,7 +20,6 @@ from .gestor_carga import GestorCarga
 from .pais import Pais
 from .tipo_documento import TipoDocumento
 from .tipo_registro import TipoRegistro
-from .user import User
 
 
 class Chofer(AuditMixin, Base):
@@ -48,7 +47,9 @@ class Chofer(AuditMixin, Base):
     gestor_cuenta_id = Column(Integer, ForeignKey("gestor_carga.id"))
     gestor_cuenta = relationship(GestorCarga, uselist=False)
     oficial_cuenta_id = Column(Integer, ForeignKey("user.id"))
-    oficial_cuenta = relationship(User, uselist=False)
+    oficial_cuenta = relationship(
+        "User", uselist=False, foreign_keys=[oficial_cuenta_id]
+    )
     foto_documento_frente = Column(String(255))
     foto_documento_reverso = Column(String(255))
     foto_perfil = Column(String(255))

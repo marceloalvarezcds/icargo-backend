@@ -498,4 +498,5 @@ from .user import (  # noqa
     get_user_by_id,
     get_user_by_username,
     get_user_id_by_rol_id,
+    get_user_list_by_punto_venta_id,
 )

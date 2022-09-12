@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from app.enums import EstadoEnum
 
+from .app_prov_user_punto_venta import UserPuntoVentaInfo
 from .ciudad import Ciudad
 from .composicion_juridica import ComposicionJuridica
 from .contacto import ContactoForm
@@ -65,6 +66,7 @@ class PuntoVenta(PuntoVentaBase):
     contactos: List[PuntoVentaContactoGestorCargaList] = []
     gestor_carga_punto_venta: Optional[GestorCargaPuntoVenta] = None
     insumos: List[InsumoPuntoVenta] = []
+    users: List[UserPuntoVentaInfo] = []
 
     class Config:
         orm_mode = True
@@ -75,4 +77,5 @@ class PuntoVenta(PuntoVentaBase):
         obj.contactos = []
         obj.gestor_carga_punto_venta = None
         obj.insumos = []
+        obj.users = []
         return super().from_orm(obj)

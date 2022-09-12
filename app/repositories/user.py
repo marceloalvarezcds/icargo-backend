@@ -26,3 +26,7 @@ def exists_user_for_rol_id(db: Session, rol_id: int) -> bool:
         .filter(db.query(UserRol).filter(UserRol.rol_id == rol_id).exists())
         .scalar()
     )
+
+
+def get_user_list_by_punto_venta_id(db: Session, punto_venta_id: int) -> List[User]:
+    return db.query(User).filter(User.punto_venta_id == punto_venta_id).all()

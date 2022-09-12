@@ -35,6 +35,7 @@ def get_punto_venta_detail(
     ges: List[GestorCargaPuntoVenta] = obj.gestores
     gestores = [x for x in ges if x.gestor_carga_id == gestor_carga_id]
     insumos: List[InsumoPuntoVenta] = obj.insumos
+    users = repositories.get_user_list_by_punto_venta_id(db, obj.id)
     schema.contactos = [
         schemas.PuntoVentaContactoGestorCargaList.from_orm(x)
         for x in contactos
@@ -42,6 +43,7 @@ def get_punto_venta_detail(
     ]
     schema.gestor_carga_punto_venta = gestores[0] if len(gestores) > 0 else None
     schema.insumos = [x for x in insumos if x.gestor_carga_id == gestor_carga_id]
+    schema.users = [schemas.UserPuntoVentaInfo.from_orm(x) for x in users]
     return schema
 
 

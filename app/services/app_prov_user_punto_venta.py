@@ -1,0 +1,50 @@
+from typing import Optional
+
+from fastapi import Request
+from sqlalchemy.orm import Session  # type: ignore
+
+from app.models import PuntoVenta
+from app.schemas import (
+    ApiResponseData,
+    Auth,
+    UserCreate,
+    UserPuntoVenta,
+    UserPuntoVentaCreateForm,
+)
+
+from .auth import authenticate, create_token_by_user
+from .punto_venta import get_punto_venta_by_id
+from .user import create_user
+
+
+def create_user_for_punto_venta(
+    punto_venta_id: int,
+    db: Session,
+    data: UserPuntoVentaCreateForm,
+    is_admin: bool,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+    request: Request,
+) -> PuntoVenta:
+    punto_venta = get_punto_venta_by_id(db, punto_venta_id)
+    user_punto_venta_schema = UserCreate(
+        email=punto_venta.email,
+        surname=data.username,
+        username=data.username,
+        first_name=punto_venta.nombre,
+        last_name=punto_venta.proveedor_nombre,
+        password=data.password,
+        confirm_password=data.confirm_password,
+        punto_venta_id=punto_venta_id,
+        is_admin=is_admin,
+    )
+    create_user(db, user_punto_venta_schema, gestor_carga_id, modified_by, request)
+    return punto_venta
+
+
+def login_user_punto_venta(
+    db: Session, data: Auth, request: Request
+) -> ApiResponseData[UserPuntoVenta]:
+    user = authenticate(db, username=data.username, password=data.password)
+    token = create_token_by_user(db, user, request)
+    return ApiResponseData(data=UserPuntoVenta.from_orm_with_token(user, token))
