@@ -61,7 +61,7 @@ class FleteFormBaseModel(BaseModel):
     merma_propietario_tolerancia: RoundedDecimal
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
-    vigencia_anticipos: Date
+    vigencia_anticipos: Optional[Date] = None
     # INICIO Emisión de Órdenes
     emision_orden_texto_legal: Optional[str] = None
     emision_orden_detalle: Optional[str] = None
