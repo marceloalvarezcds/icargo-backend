@@ -6,8 +6,12 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app.cache.permiso import reset_permiso_in_cache_by_user_id
 from app.enums.estado import EstadoEnum
-from app.models import Rol, RolPermiso
-from app.repositories import exists_user_for_rol_id, get_user_id_by_rol_id
+from app.models import Permiso, Rol, RolPermiso
+from app.repositories import (
+    exists_user_for_rol_id,
+    get_permiso_list_by_rol_id,
+    get_user_id_by_rol_id,
+)
 from app.schemas import PermisoChecked, RolCreate, RolUpdate
 from app.services import generic_service as service
 
@@ -50,6 +54,31 @@ def create_rol(
     return rol
 
 
+def create_rol_by_description(
+    db: Session,
+    descripcion: str,
+    permisos: List[Permiso],
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+) -> Rol:
+    permiso_list = []
+    permiso_id_list = []
+    for p in permisos:
+        if p.id not in permiso_id_list:
+            permiso_list.append(p)
+            permiso_id_list.append(p.id)
+    return create_rol(
+        db,
+        RolCreate(
+            descripcion=descripcion,
+            permisos=permiso_list,
+            gestor_carga_id=gestor_carga_id,
+        ),
+        gestor_carga_id,
+        modified_by,
+    )
+
+
 def edit_rol(
     db: Session,
     id: int,
@@ -72,6 +101,47 @@ def edit_rol(
         gestor_carga_id=data.gestor_carga_id,
     )
     save_permisos(db, rol, permisos, modified_by)
+    return rol
+
+
+def edit_rol_permisos(
+    db: Session,
+    rol: Rol,
+    permisos: List[Permiso],
+    modified_by: str,
+) -> Rol:
+    permiso_id_list = [x.id for x in get_permiso_list_by_rol_id(db, rol.id)]
+    for p in permisos:
+        if p.id not in permiso_id_list:
+            permiso_id_list.append(p.id)
+            rol.roles_permisos.append(
+                RolPermiso(
+                    rol_id=rol.id,
+                    permiso_id=p.id,
+                    created_by=modified_by,
+                    modified_by=modified_by,
+                )
+            )
+    db.commit()
+    return rol
+
+
+def edit_or_create_rol_by_descripcion(
+    db: Session,
+    descripcion: str,
+    permisos: List[Permiso],
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+) -> Rol:
+    rol: Optional[Rol] = service.get_by_unique_columns_or_none(
+        Rol, db, descripcion=descripcion, gestor_carga_id=gestor_carga_id
+    )
+    if rol:
+        edit_rol_permisos(db, rol, permisos, modified_by)
+    else:
+        rol = create_rol_by_description(
+            db, descripcion, permisos, gestor_carga_id, modified_by
+        )
     return rol
 
 

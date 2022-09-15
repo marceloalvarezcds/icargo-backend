@@ -30,6 +30,10 @@ def get_list(ModelType: type, db: Session) -> List[Model]:
     )
 
 
+def get_list_by_filter(ModelType: type, db: Session, **filter_columns) -> List[Model]:
+    return db.query(ModelType).filter_by(**filter_columns).all()
+
+
 def get_list_by_gestor_carga_id(
     ModelType: type, db: Session, gestor_carga_id: int
 ) -> List[Model]:

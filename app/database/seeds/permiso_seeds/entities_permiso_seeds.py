@@ -18,6 +18,7 @@ def entities_admin_permiso_seeds(db: Session) -> List[Permiso]:
     permisos.extend(permiso_proveedor_seeds(db))
     permisos.extend(permiso_punto_venta_seeds(db))
     permisos.extend(permiso_remitente_seeds(db))
+    permisos.extend(permiso_transactional_user_seeds(db))
     permisos.append(
         permiso_seeds(
             db, a.CREAR, m.GESTOR_CARGA, u.ENTIDADES, "Crear Gestor de Carga", True
@@ -45,6 +46,7 @@ def entities_permiso_seeds(db: Session) -> List[Permiso]:
     permisos.extend(permiso_proveedor_seeds(db))
     permisos.extend(permiso_punto_venta_seeds(db))
     permisos.extend(permiso_remitente_seeds(db))
+    permisos.extend(permiso_transactional_user_seeds(db))
     return permisos
 
 
@@ -295,4 +297,17 @@ def permiso_remitente_seeds(db: Session) -> List[Permiso]:
     permisos.append(
         permiso_seeds(db, a.REPORTE, m.REMITENTE, u.ENTIDADES, "Reporte de Remitente")
     )
+    return permisos
+
+
+def permiso_transactional_user_seeds(db: Session) -> List[Permiso]:
+    permisos = []
+    permisos.append(
+        permiso_seeds(db, a.CAMBIAR_ESTADO, m.TRANSACTIONAL_USER, u.ENTIDADES)
+    )
+    permisos.append(permiso_seeds(db, a.CREAR, m.TRANSACTIONAL_USER, u.ENTIDADES))
+    permisos.append(permiso_seeds(db, a.EDITAR, m.TRANSACTIONAL_USER, u.ENTIDADES))
+    permisos.append(permiso_seeds(db, a.ELIMINAR, m.TRANSACTIONAL_USER, u.ENTIDADES))
+    permisos.append(permiso_seeds(db, a.LISTAR, m.TRANSACTIONAL_USER, u.ENTIDADES))
+    permisos.append(permiso_seeds(db, a.VER, m.TRANSACTIONAL_USER, u.ENTIDADES))
     return permisos

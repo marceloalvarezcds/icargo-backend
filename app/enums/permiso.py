@@ -90,6 +90,7 @@ class PermisoModeloEnum(Enum):
     TIPO_PERSONA = "tipo_persona"
     TIPO_REGISTRO = "tipo_registro"
     TIPO_SEMI = "tipo_semi"
+    TRANSACTIONAL_USER = "transactional_user"
     UNIDAD = "unidad"
     USER = "usuario"
 
@@ -119,6 +120,7 @@ permisoModeloTitulo: Dict[str, str] = {
     "punto_venta": "4 - Punto de Venta",
     "gestor_carga": "5 - Gestor de Carga",
     "contacto": "6 - Contacto",
+    "transactional_user": "7 - Usuario transaccional",
     # FLOTA
     "propietario": "1 - Propietario",
     "chofer": "2 - Chofer",

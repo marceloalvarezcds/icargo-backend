@@ -14,6 +14,7 @@ from .marca_semi_seeds import marca_semi_seeds
 from .moneda_seeds import moneda_seeds
 from .pais_seeds import pais_seeds
 from .producto_seeds import producto_seeds
+from .rol_seeds import rol_seeds
 from .semi_clasificacion_seeds import semi_clasificacion_seeds
 from .tipo_anticipo_seeds import tipo_anticipo_seeds
 from .tipo_camion_seeds import tipo_camion_seeds
@@ -45,6 +46,7 @@ def seeds(db: Session):
     marca_semi_seeds(db)
     moneda_seeds(db)
     pais_seeds(db)
+    rol_seeds(db)
     semi_clasificacion_seeds(db)
     tipo_anticipo_seeds(db)
     tipo_camion_seeds(db)

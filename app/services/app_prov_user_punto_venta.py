@@ -3,7 +3,8 @@ from typing import Optional
 from fastapi import Request
 from sqlalchemy.orm import Session  # type: ignore
 
-from app.models import PuntoVenta
+from app.enums import CodigoRolEnum
+from app.models import PuntoVenta, Rol, UserRol
 from app.schemas import (
     ApiResponseData,
     Auth,
@@ -13,6 +14,7 @@ from app.schemas import (
 )
 
 from .auth import authenticate, create_token_by_user
+from .generic_service import get_by_unique_columns
 from .punto_venta import get_punto_venta_by_id
 from .user import create_user
 
@@ -38,7 +40,24 @@ def create_user_for_punto_venta(
         punto_venta_id=punto_venta_id,
         is_admin=is_admin,
     )
-    create_user(db, user_punto_venta_schema, gestor_carga_id, modified_by, request)
+    user = create_user(
+        db, user_punto_venta_schema, gestor_carga_id, modified_by, request
+    )
+    rol_descripcion = (
+        CodigoRolEnum.ADMIN_APP_PROVEEDOR.value
+        if is_admin
+        else CodigoRolEnum.USUARIO_APP_PROVEEDOR.value
+    )
+    rol: Rol = get_by_unique_columns(Rol, db, descripcion=rol_descripcion)
+    user.user_roles.append(
+        UserRol(
+            user_id=user.id,
+            rol_id=rol.id,
+            created_by=modified_by,
+            modified_by=modified_by,
+        )
+    )
+    db.commit()
     return punto_venta
 
 

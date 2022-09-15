@@ -14,6 +14,7 @@ class AuthUser(BaseModel):
     username: str
     first_name: str
     last_name: str
+    is_admin: bool
     gestor_carga_id: Optional[int] = None
 
     class Config:

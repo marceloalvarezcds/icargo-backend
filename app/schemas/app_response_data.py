@@ -8,8 +8,10 @@ T = TypeVar("T")
 
 class ApiResponseData(GenericModel, Generic[T]):
     data: T
-    code: int = HTTPStatus.OK
-    message: str = ""
+    status_code: int = HTTPStatus.OK
+    detail: str = ""
 
-    def __init__(self, data: T, code: int = HTTPStatus.OK, message: str = "") -> None:
-        super().__init__(data=data, code=code, message=message)
+    def __init__(
+        self, data: T, status_code: int = HTTPStatus.OK, detail: str = ""
+    ) -> None:
+        super().__init__(data=data, status_code=status_code, detail=detail)

@@ -280,6 +280,7 @@ from .rol import (  # noqa
     change_rol_status,
     create_rol,
     delete_rol,
+    edit_or_create_rol_by_descripcion,
     edit_rol,
     get_rol_active_list,
     get_rol_by_id,
