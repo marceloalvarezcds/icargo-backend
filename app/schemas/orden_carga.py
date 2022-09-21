@@ -74,6 +74,10 @@ class OrdenCarga(OrdenCargaEditForm):
     camion_chofer_puede_recibir_anticipos: bool
     camion_limite_cantidad_oc_activas: int
     camion_limite_monto_anticipos: Optional[RoundedDecimal] = None
+    camion_monto_anticipo_disponible: Optional[RoundedDecimal] = None
+    camion_total_anticipos_retirados_en_estado_pendiente_o_en_proceso: Optional[
+        RoundedDecimal
+    ] = None
     camion_placa: str
     camion_propietario_nombre: str
     camion_propietario_puede_recibir_anticipos: bool
@@ -88,6 +92,7 @@ class OrdenCarga(OrdenCargaEditForm):
     flete_limite_credito: RoundedDecimal
     flete_numero_lote: Optional[str] = None
     flete_monto_efectivo: RoundedDecimal
+    flete_monto_efectivo_complemento: RoundedDecimal
     flete_origen_id: Optional[int] = None
     flete_origen_nombre: Optional[str] = None
     flete_producto_descripcion: str
@@ -150,6 +155,10 @@ class OrdenCarga(OrdenCargaEditForm):
     remisiones_resultado_flete: List[OrdenCargaRemisionResultado]
     cantidad_destino: RoundedDecimal
     cantidad_origen: RoundedDecimal
+    total_anticipo: RoundedDecimal
+    total_anticipo_complemento: RoundedDecimal
+    total_anticipo_retirado: RoundedDecimal
+    total_anticipo_disponible: RoundedDecimal
     # Auditoría
     created_by: str
     created_at: Date

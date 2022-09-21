@@ -130,7 +130,23 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def camion_limite_monto_anticipos(self):
-        return self.camion.limite_monto_anticipos
+        return (
+            self.camion.limite_monto_anticipos
+            if self.camion.limite_monto_anticipos
+            else Decimal(0)
+        )
+
+    @hybrid_property
+    def camion_monto_anticipo_disponible(self):
+        return (
+            self.camion.monto_anticipo_disponible
+            if self.camion.monto_anticipo_disponible
+            else Decimal(0)
+        )
+
+    @hybrid_property
+    def camion_total_anticipos_retirados_en_estado_pendiente_o_en_proceso(self):
+        return self.camion.total_anticipos_retirados_en_estado_pendiente_o_en_proceso
 
     @hybrid_property
     def camion_placa(self):
@@ -170,6 +186,10 @@ class OrdenCarga(AuditMixin, Base):
     def fecha_conciliacion(self):
         item = self.get_estado_in_historial(EstadoEnum.CONCILIADO)
         return item.created_at if item else None
+
+    @hybrid_property
+    def total_anticipo_complemento(self):
+        return sum(x.propietario_monto for x in self.complementos if x.anticipado)
 
     @hybrid_property
     def flete_anticipo_maximo(self):
@@ -215,6 +235,10 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_monto_efectivo(self):
         return (self.flete.porcentaje_efectivo / Decimal(100)) * self.flete_proyectado
+
+    @hybrid_property
+    def flete_monto_efectivo_complemento(self):
+        return self.total_anticipo_complemento + self.flete_monto_efectivo
 
     @hybrid_property
     def flete_origen_id(self):
@@ -667,6 +691,18 @@ class OrdenCarga(AuditMixin, Base):
     # fin - propietario
 
     # FIN RESULTADO FLETE
+
+    @hybrid_property
+    def total_anticipo(self):
+        return self.flete_limite_credito + self.total_anticipo_complemento
+
+    @hybrid_property
+    def total_anticipo_retirado(self):
+        return sum(x.total_retirado for x in self.saldos)
+
+    @hybrid_property
+    def total_anticipo_disponible(self):
+        return self.total_anticipo - self.total_anticipo_retirado
 
     def get_remision_cantidad_total_kg(
         self,

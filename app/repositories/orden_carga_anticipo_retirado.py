@@ -1,9 +1,13 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import Optional
 
-from sqlalchemy.orm import Session  # type: ignore
+from sqlalchemy import func  # type: ignore
+from sqlalchemy.orm import Query, Session  # type: ignore
+from sqlalchemy.sql.elements import and_, or_  # type: ignore
 
-from app.models import OrdenCargaAnticipoRetirado
+from app.enums import EstadoEnum
+from app.models import Movimiento, OrdenCarga, OrdenCargaAnticipoRetirado
 from app.schemas import OrdenCargaAnticipoRetiradoForm
 
 
@@ -99,3 +103,31 @@ def delete_orden_carga_anticipo_retirado(db: Session, id: int, modified_by: str)
         db.commit()
         db.delete(obj)
         db.commit()
+
+
+def get_total_anticipo_retirado_by_camion_id(
+    db: Session, camion_id: int
+) -> Optional[Decimal]:
+    subquery: Query = (
+        db.query(
+            OrdenCargaAnticipoRetirado.id.label("id"),
+            OrdenCargaAnticipoRetirado.monto_retirado.label("monto_retirado"),
+        )
+        .distinct()
+        # .select_from(Movimiento)
+        .join(Movimiento.anticipo)
+        .join(OrdenCargaAnticipoRetirado.orden_carga)
+        .filter(
+            and_(
+                OrdenCarga.camion_id == camion_id,
+                or_(
+                    Movimiento.estado == EstadoEnum.PENDIENTE.value,
+                    Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                ),
+            )
+        )
+        .subquery()
+    )
+    return db.query(
+        func.sum(subquery.c.monto_retirado).label("monto_retirado")
+    ).first()[0]
