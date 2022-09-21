@@ -301,6 +301,7 @@ from .orden_carga_anticipo_retirado import (  # noqa
     edit_orden_carga_anticipo_retirado,
     get_orden_carga_anticipo_retirado_by,
     get_orden_carga_anticipo_retirado_by_id,
+    get_total_anticipo_retirado_by_camion_id,
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     create_orden_carga_anticipo_saldo,

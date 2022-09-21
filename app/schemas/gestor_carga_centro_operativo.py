@@ -1,4 +1,5 @@
 from typing import Optional
+
 from .estado_base_model import EstadoBaseModel
 
 

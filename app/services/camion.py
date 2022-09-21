@@ -142,6 +142,14 @@ def change_camion_status(
     return repositories.change_camion_status(co, db, status, modified_by)
 
 
+def update_camion_anticipo_retirado(db: Session, camion: Camion):
+    # Se actualiza el total_anticipos_retirados en camion
+    camion.total_anticipos_retirados_en_estado_pendiente_o_en_proceso = (
+        repositories.get_total_anticipo_retirado_by_camion_id(db, camion.id)
+    )
+    db.commit()
+
+
 def get_camion_reports(db: Session) -> str:
     datalist = repositories.get_camion_list(db)
     wb = Workbook()
