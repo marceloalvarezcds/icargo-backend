@@ -27,6 +27,10 @@ class CamionForm(BaseModel):
     # INICIO Limitaciones del Camión
     limite_cantidad_oc_activas: int
     limite_monto_anticipos: Optional[RoundedDecimal] = None
+    monto_anticipo_disponible: Optional[RoundedDecimal] = None
+    total_anticipos_retirados_en_estado_pendiente_o_en_proceso: Optional[
+        RoundedDecimal
+    ] = None
     # FIN Limitaciones del Camión
     # INICIO Habilitaciones del Camión
     # inicio - municipal
