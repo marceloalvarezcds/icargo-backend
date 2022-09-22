@@ -120,6 +120,7 @@ def get_total_anticipo_retirado_by_camion_id(
         .filter(
             and_(
                 OrdenCarga.camion_id == camion_id,
+                Movimiento.propietario_id.is_not(None),
                 or_(
                     Movimiento.estado == EstadoEnum.PENDIENTE.value,
                     Movimiento.estado == EstadoEnum.EN_PROCESO.value,
