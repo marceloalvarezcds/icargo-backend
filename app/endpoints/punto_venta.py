@@ -23,7 +23,7 @@ async def read_punto_venta_list_by_gestor_carga_id(
     )
 
 
-@api.get("/{proveedor_id}", response_model=List[schemas.PuntoVentaList])
+@api.get("/proveedor/{proveedor_id}", response_model=List[schemas.PuntoVentaList])
 async def read_punto_venta_list(
     proveedor_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
