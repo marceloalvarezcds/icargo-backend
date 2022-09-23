@@ -9,18 +9,6 @@ from .permiso import Permiso
 from .rol import RolChecked
 
 
-class AuthUser(BaseModel):
-    id: int
-    username: str
-    first_name: str
-    last_name: str
-    is_admin: bool
-    gestor_carga_id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
-
-
 # Shared properties
 class UserBase(BaseModel):
     token: Optional[str] = None

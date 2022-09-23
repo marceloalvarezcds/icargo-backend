@@ -13,8 +13,10 @@ from app.models import (
     InsumoPuntoVenta,
     PuntoVenta,
     PuntoVentaContactoGestorCarga,
+    TransactionalUser,
 )
 
+from .generic_service import get_list_by_filter
 from .gestor_carga_punto_venta import (
     create_gestor_carga_punto_venta,
     edit_gestor_carga_punto_venta,
@@ -35,6 +37,11 @@ def get_punto_venta_detail(
     ges: List[GestorCargaPuntoVenta] = obj.gestores
     gestores = [x for x in ges if x.gestor_carga_id == gestor_carga_id]
     insumos: List[InsumoPuntoVenta] = obj.insumos
+    transactional_users: List[TransactionalUser] = get_list_by_filter(
+        TransactionalUser,
+        db,
+        punto_venta_id=obj.id,
+    )
     users = repositories.get_user_list_by_punto_venta_id(db, obj.id)
     schema.contactos = [
         schemas.PuntoVentaContactoGestorCargaList.from_orm(x)
@@ -43,6 +50,9 @@ def get_punto_venta_detail(
     ]
     schema.gestor_carga_punto_venta = gestores[0] if len(gestores) > 0 else None
     schema.insumos = [x for x in insumos if x.gestor_carga_id == gestor_carga_id]
+    schema.transactional_users = [
+        schemas.TransactionalUser.from_orm(x) for x in transactional_users
+    ]
     schema.users = [schemas.UserPuntoVentaInfo.from_orm(x) for x in users]
     return schema
 

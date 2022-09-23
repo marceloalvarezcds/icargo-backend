@@ -1,6 +1,7 @@
+from http import HTTPStatus
 from typing import Optional
 
-from fastapi import Request
+from fastapi import HTTPException, Request
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums import CodigoRolEnum
@@ -62,8 +63,19 @@ def create_user_for_punto_venta(
 
 
 def login_user_punto_venta(
-    db: Session, data: Auth, request: Request
+    db: Session, data: Auth, request: Request, is_for_admin=False
 ) -> ApiResponseData[UserPuntoVenta]:
     user = authenticate(db, username=data.username, password=data.password)
+    if is_for_admin:
+        if not user.is_admin:
+            raise HTTPException(
+                HTTPStatus.FORBIDDEN,
+                "Este usuario no es Administrador del Punto de Venta",
+            )
+    else:
+        if user.is_admin:
+            raise HTTPException(
+                HTTPStatus.FORBIDDEN, "No es Usuario del Punto de Venta"
+            )
     token = create_token_by_user(db, user, request)
     return ApiResponseData(data=UserPuntoVenta.from_orm_with_token(user, token))

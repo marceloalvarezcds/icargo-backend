@@ -1,4 +1,8 @@
 # should be imported to help code editor (vscode) for autocompletion
+from .app_prov_transactional_user import (  # noqa
+    create_transactional_user_with_pin,
+    update_pin_by_id,
+)
 from .app_prov_user_punto_venta import (  # noqa
     create_user_for_punto_venta,
     login_user_punto_venta,

@@ -2,6 +2,7 @@
 from app import audits  # noqa
 from app.database import Base  # noqa
 
+from .app_prov_transactional_user import TransactionalUser  # noqa
 from .banco import Banco  # noqa
 from .caja import Caja  # noqa
 from .camion import Camion  # noqa

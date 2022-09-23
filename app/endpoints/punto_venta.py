@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Body, Depends, File, Form, Request, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -146,12 +146,3 @@ async def create_admin_user_for_punto_venta(
         current_user.username,
         request,
     )
-
-
-@api.post("/login", response_model=schemas.ApiResponseData[schemas.UserPuntoVenta])
-def login(
-    request: Request,
-    db: Session = Depends(get_db_session),  # noqa: B008
-    data: schemas.Auth = Body(...),  # noqa: B008
-):
-    return services.login_user_punto_venta(db, data, request)

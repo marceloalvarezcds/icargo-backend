@@ -1,5 +1,10 @@
 # should be imported to help code editor (vscode) for autocompletion
-from .app_auth import Auth  # noqa
+from .app_auth import Auth, AuthPuntoVentaUser, AuthUser  # noqa
+from .app_prov_transactional_user import (  # noqa
+    TransactionalUser,
+    TransactionalUserCreateForm,
+    TransactionalUserEditForm,
+)
 from .app_prov_user_punto_venta import (  # noqa
     UserPuntoVenta,
     UserPuntoVentaCreateForm,
@@ -150,7 +155,6 @@ from .tipo_semi import TipoSemi  # noqa
 from .token import Token, TokenPayload  # noqa
 from .unidad import Unidad  # noqa
 from .user import (  # noqa
-    AuthUser,
     User,
     UserAccount,
     UserBase,

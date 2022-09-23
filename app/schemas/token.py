@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from .user import AuthUser
+from .app_auth import AuthUser
 
 
 class Token(BaseModel):
