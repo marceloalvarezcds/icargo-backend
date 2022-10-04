@@ -809,6 +809,38 @@ packaging = "*"
 requests = "*"
 
 [[package]]
+name = "sentry-sdk"
+version = "1.9.10"
+description = "Python client for Sentry (https://sentry.io)"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+certifi = "*"
+urllib3 = {version = ">=1.26.11", markers = "python_version >= \"3.6\""}
+
+[package.extras]
+aiohttp = ["aiohttp (>=3.5)"]
+beam = ["apache-beam (>=2.12)"]
+bottle = ["bottle (>=0.12.13)"]
+celery = ["celery (>=3)"]
+chalice = ["chalice (>=1.16.0)"]
+django = ["django (>=1.8)"]
+falcon = ["falcon (>=1.4)"]
+fastapi = ["fastapi (>=0.79.0)"]
+flask = ["blinker (>=1.1)", "flask (>=0.11)"]
+httpx = ["httpx (>=0.16.0)"]
+pure_eval = ["asttokens", "executing", "pure-eval"]
+pyspark = ["pyspark (>=2.4.4)"]
+quart = ["blinker (>=1.1)", "quart (>=0.16.1)"]
+rq = ["rq (>=0.6)"]
+sanic = ["sanic (>=0.8)"]
+sqlalchemy = ["sqlalchemy (>=1.2)"]
+starlette = ["starlette (>=0.19.1)"]
+tornado = ["tornado (>=5)"]
+
+[[package]]
 name = "simplejson"
 version = "3.17.6"
 description = "Simple, fast, extensible JSON encoder/decoder for Python"
@@ -1026,7 +1058,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "3d11faf8309fc5a203244d1db05504cc3701e2e481b1dbd8d5376605eafc9bf9"
+content-hash = "4d2a804e2a5d1b19f0385aac52171fc3994bb242ebddfb4350e08d08e31f58aa"
 
 [metadata.files]
 aiofiles = [
@@ -1664,6 +1696,10 @@ rsa = [
 safety = [
     {file = "safety-1.10.3-py2.py3-none-any.whl", hash = "sha256:5f802ad5df5614f9622d8d71fedec2757099705c2356f862847c58c6dfe13e84"},
     {file = "safety-1.10.3.tar.gz", hash = "sha256:30e394d02a20ac49b7f65292d19d38fa927a8f9582cdfd3ad1adbbc66c641ad5"},
+]
+sentry-sdk = [
+    {file = "sentry-sdk-1.9.10.tar.gz", hash = "sha256:4fbace9a763285b608c06f01a807b51acb35f6059da6a01236654e08b0ee81ff"},
+    {file = "sentry_sdk-1.9.10-py2.py3-none-any.whl", hash = "sha256:2469240f6190aaebcb453033519eae69cfe8cc602065b4667e18ee14fc1e35dc"},
 ]
 simplejson = [
     {file = "simplejson-3.17.6-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:a89acae02b2975b1f8e4974cb8cdf9bf9f6c91162fb8dec50c259ce700f2770a"},
