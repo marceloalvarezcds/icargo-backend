@@ -15,7 +15,7 @@ def save_file(
     filename: str, data: Union[bytes, str], content_type: Optional[str] = "image/*"
 ) -> PictShareResponse:
     files = {"file": (filename, data, content_type)}
-    response = post(URL, files=files)
+    response = post(URL, files=files)  # type: ignore
     return PictShareResponse.parse_obj(response.json())
 
 

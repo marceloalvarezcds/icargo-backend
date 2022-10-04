@@ -12,7 +12,7 @@ from app.models import User, UserRol
 from app.repositories import get_permiso_list_by_user_id, get_rol_list_by_user_id, user
 from app.schemas import Permiso, RolChecked, UserAccount, UserCreate, UserUpdate
 from app.services import generic_service as service
-from app.utils.security import get_md5_hash_hexdigest, get_password_hash
+from app.utils import get_host_from_request, get_md5_hash_hexdigest, get_password_hash
 
 
 def _user_with_rol_list(db: Session, user: User) -> schemas.User:
@@ -173,7 +173,7 @@ def delete_user(
 def set_extra_data_in_create(obj_in: UserCreate, request: Request) -> UserCreate:
     created_at = datetime.now()
     string_to_hash = "%s-%s-%s" % (created_at, obj_in.email, obj_in.username)
-    ip = request.client.host
+    ip = get_host_from_request(request)
     # Settea valores extras
     obj_in.token = get_md5_hash_hexdigest(string_to_hash)
     obj_in.password = get_password_hash(obj_in.password)
@@ -185,7 +185,7 @@ def set_extra_data_in_create(obj_in: UserCreate, request: Request) -> UserCreate
 
 
 def set_extra_data_in_edit(obj_in: UserUpdate, request: Request) -> UserUpdate:
-    ip = request.client.host
+    ip = get_host_from_request(request)
     # Settea valores extras
     if obj_in.password:
         obj_in.password = get_password_hash(obj_in.password)

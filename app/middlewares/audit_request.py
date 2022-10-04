@@ -10,6 +10,7 @@ from app.services import (
     get_auth_user_from_authorization_header,
     get_authorization_header,
 )
+from app.utils import get_host_from_request
 
 
 def save_audit_request(ip: str, url: str, auth: str):
@@ -30,7 +31,7 @@ def save_audit_request(ip: str, url: str, auth: str):
 class AuditRequestMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
-        ip = request.client.host
+        ip = get_host_from_request(request)
         url = str(request.url)
         auth = get_authorization_header(request.headers)
         thread = Thread(target=save_audit_request, args=(ip, url, auth))
