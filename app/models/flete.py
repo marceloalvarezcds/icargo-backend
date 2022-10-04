@@ -172,7 +172,7 @@ class Flete(AuditMixin, Base):
 
     @hybrid_property
     def condicion_propietario_tarifa_unidad(self):
-        return f"{self.condicion_propietario_moneda.simbolo}/{self.condicion_propietario_unidad.abreviatura}"
+        return f"{self.condicion_propietario_moneda.simbolo}/{self.condicion_propietario_unidad.abreviatura}"  # noqa: B950
 
     @hybrid_property
     def condicion_propietario_unidad_descripcion(self):

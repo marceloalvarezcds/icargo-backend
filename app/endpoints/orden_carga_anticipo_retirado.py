@@ -68,7 +68,7 @@ async def delete_orden_carga_anticipo_retirado(
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(  # noqa: B008
-        Permiso(a.ELIMINAR, m.ORDEN_CARGA_ANTICIPO_RETIRADO)
+        Permiso(a.ELIMINAR, m.ORDEN_CARGA_ANTICIPO_RETIRADO)  # noqa: B008
     ),
 ):
     return services.delete_orden_carga_anticipo_retirado(db, id, current_user.username)

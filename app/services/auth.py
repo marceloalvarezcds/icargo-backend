@@ -15,7 +15,7 @@ from app.enums.estado import EstadoEnum
 from app.models.user import User
 from app.schemas import AuthUser, Token, TokenPayload
 from app.services.security import create_access_token
-from app.utils.security import get_payload_from_token, verify_password
+from app.utils import get_host_from_request, get_payload_from_token, verify_password
 
 from .user import get_user_by_username
 
@@ -52,7 +52,7 @@ def get_auth_user_from_authorization_header(auth_header: str) -> Optional[AuthUs
     return None
 
 
-def register_audit_auth(db: Session, *, user: User, action: str, ip: str):
+def register_audit_auth(db: Session, *, user: User, action: str, ip: Optional[str]):
     db_audit = AuditAuth(
         action=action,
         user_id=user.id,
@@ -65,7 +65,9 @@ def register_audit_auth(db: Session, *, user: User, action: str, ip: str):
 
 def create_token_by_user(db: Session, user: User, request: Request) -> Token:
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    register_audit_auth(db, user=user, action="login", ip=request.client.host)
+    register_audit_auth(
+        db, user=user, action="login", ip=get_host_from_request(request)
+    )
     return Token.parse_obj(
         {
             "access_token": create_access_token(

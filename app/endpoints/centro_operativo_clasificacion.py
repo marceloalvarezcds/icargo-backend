@@ -15,7 +15,7 @@ api = APIRouter()
 async def read_centro_operativo_clasificacion_list(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(  # noqa: B008
-        Permiso(a.LISTAR, m.CENTRO_OPERATIVO_CLASIFICACION)
+        Permiso(a.LISTAR, m.CENTRO_OPERATIVO_CLASIFICACION)  # noqa: B008
     ),
 ):
     return repositories.get_centro_operativo_clasificacion_list(db)
