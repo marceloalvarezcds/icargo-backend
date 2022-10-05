@@ -51,7 +51,7 @@ def user_rol_seeds(
             gestor_carga_id,
             modified_by,
         )
-    exists = get_by_unique_columns(
+    exists: UserRol = get_by_unique_columns(
         UserRol,
         db,
         user_id=user.id,
