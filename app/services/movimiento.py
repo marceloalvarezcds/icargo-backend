@@ -9,18 +9,26 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
 from app.config import REPORTS_FOLDER
-from app.enums import MovimientoEstadoEnum, TipoContraparteEnum, TipoMovimientoEnum
+from app.enums import (
+    MovimientoEstadoEnum,
+    TipoContraparteEnum,
+    TipoCuentaEnum,
+    TipoMovimientoEnum,
+)
 from app.models import (
     Movimiento,
     OrdenCarga,
     OrdenCargaAnticipoRetirado,
     OrdenCargaComplemento,
     OrdenCargaDescuento,
+    TipoCuenta,
+    TipoMovimiento,
 )
 from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm
 from app.schemas.date_model import Date
 from app.schemas.orden_carga import OrdenCargaEditForm
 from app.schemas.rounded_decimal_model import RoundedDecimal
+from app.services import seleccionable_service as service
 
 
 def get_orden_carga_by_movimiento(movimiento: Movimiento):
@@ -117,7 +125,9 @@ def create_movimiento_by_anticipo(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.ANTICIPO.value
     )
@@ -195,7 +205,9 @@ def create_movimiento_by_flete(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.FLETE.value
     )
@@ -271,7 +283,9 @@ def create_movimiento_by_complemento(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.COMPLEMENTO.value
     )
@@ -350,7 +364,9 @@ def create_movimiento_by_descuento(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.DESCUENTO.value
     )
@@ -429,7 +445,9 @@ def create_movimiento_by_merma(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.MERMA.value
     )
@@ -502,9 +520,19 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "Otro")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
-    tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
-        db, TipoMovimientoEnum.OTRO.value
+    tipo_cuenta = (
+        service.get_by_id(TipoCuenta, db, data.cuenta_id)
+        if data.cuenta_id
+        else repositories.get_tipo_cuenta_by_descripcion(
+            db, TipoCuentaEnum.VIAJES.value
+        )
+    )
+    tipo_movimiento = (
+        service.get_by_id(TipoMovimiento, db, data.tipo_movimiento_id)
+        if data.tipo_movimiento_id
+        else repositories.get_tipo_movimiento_by_descripcion(
+            db, TipoMovimientoEnum.OTRO.value
+        )
     )
     if (
         not tipo_contraparte

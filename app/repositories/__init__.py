@@ -423,7 +423,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
     get_remitente_contacto_gestor_carga_by_cargo_id,
     get_remitente_contacto_gestor_carga_by_id,
 )
-from .rol import get_rol_list, get_rol_list_by_user_id  # noqa
+from .rol import exists_rol_for_user, get_rol_list, get_rol_list_by_user_id  # noqa
 from .rol_permiso import create_rol_permiso  # noqa
 from .semi import (  # noqa
     change_semi_status,
@@ -484,8 +484,10 @@ from .tipo_insumo import (  # noqa
 )
 from .tipo_iva import get_tipo_iva_by_descripcion, get_tipo_iva_list  # noqa
 from .tipo_movimiento import (  # noqa
+    get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes_and_cuenta_id,
     get_tipo_movimiento_by_descripcion,
     get_tipo_movimiento_list,
+    get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes,
 )
 from .tipo_persona import get_tipo_persona_by_descripcion, get_tipo_persona_list  # noqa
 from .tipo_registro import (  # noqa

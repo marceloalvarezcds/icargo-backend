@@ -1,10 +1,11 @@
 from sqlalchemy import Column, ForeignKey, Integer  # type: ignore
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 
 from app.database.base import Base
 
 from .seleccionable_mixin import SeleccionableMixin
-from .tipo_documento_relacionado import TipoDocumentoRelacionado
+from .tipo_cuenta import TipoCuenta
 
 
 class TipoMovimiento(SeleccionableMixin, Base):
@@ -12,7 +13,9 @@ class TipoMovimiento(SeleccionableMixin, Base):
     Defines the tipo movimiento model
     """
 
-    tipo_documento_relacionado_id = Column(
-        Integer, ForeignKey("tipo_documento_relacionado.id")
-    )
-    tipo_documento_relacionado = relationship(TipoDocumentoRelacionado, uselist=False)
+    cuenta_id = Column(Integer, ForeignKey("tipo_cuenta.id"))
+    cuenta = relationship(TipoCuenta, uselist=False)
+
+    @hybrid_property
+    def cuenta_descripcion(self):
+        return self.cuenta.descripcion

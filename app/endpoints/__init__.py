@@ -58,10 +58,12 @@ from app.endpoints import (
     tipo_concepto_complemento,
     tipo_concepto_descuento,
     tipo_contraparte,
+    tipo_cuenta,
     tipo_documento,
     tipo_instrumento,
     tipo_insumo,
     tipo_iva,
+    tipo_movimiento,
     tipo_persona,
     tipo_registro,
     tipo_semi,
@@ -183,6 +185,7 @@ api.include_router(tipo_carga.api, prefix="/tipo_carga", tags=["tipo_carga"])
 api.include_router(
     tipo_comprobante.api, prefix="/tipo_comprobante", tags=["tipo_comprobante"]
 )
+api.include_router(tipo_cuenta.api, prefix="/tipo_cuenta", tags=["tipo_cuenta"])
 api.include_router(
     tipo_concepto_complemento.api,
     prefix="/tipo_concepto_complemento",
@@ -204,6 +207,9 @@ api.include_router(
 )
 api.include_router(tipo_insumo.api, prefix="/tipo_insumo", tags=["tipo_insumo"])
 api.include_router(tipo_iva.api, prefix="/tipo_iva", tags=["tipo_iva"])
+api.include_router(
+    tipo_movimiento.api, prefix="/tipo_movimiento", tags=["tipo_movimiento"]
+)
 api.include_router(tipo_persona.api, prefix="/tipo_persona", tags=["tipo_persona"])
 api.include_router(tipo_registro.api, prefix="/tipo_registro", tags=["tipo_registro"])
 api.include_router(tipo_semi.api, prefix="/tipo_semi", tags=["tipo_semi"])

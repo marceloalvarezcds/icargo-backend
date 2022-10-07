@@ -8,8 +8,14 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import schemas
 from app.cache.permiso import reset_permiso_in_cache_by_user_id
 from app.enums.estado import EstadoEnum
+from app.enums.rol import CodigoRolEnum
 from app.models import User, UserRol
-from app.repositories import get_permiso_list_by_user_id, get_rol_list_by_user_id, user
+from app.repositories import (
+    exists_rol_for_user,
+    get_permiso_list_by_user_id,
+    get_rol_list_by_user_id,
+    user,
+)
 from app.schemas import Permiso, RolChecked, UserAccount, UserCreate, UserUpdate
 from app.services import generic_service as service
 from app.utils import get_host_from_request, get_md5_hash_hexdigest, get_password_hash
@@ -32,6 +38,9 @@ def get_user_account(db: Session, id: int) -> UserAccount:
     user_account.permisos = [
         Permiso.from_orm(x) for x in get_permiso_list_by_user_id(db, id)
     ]
+    user_account.is_admin_icargo = exists_rol_for_user(
+        db, id, CodigoRolEnum.ADMIN_ICARGO
+    )
     return user_account
 
 

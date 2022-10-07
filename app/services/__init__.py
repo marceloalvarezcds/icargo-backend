@@ -290,7 +290,16 @@ from .semi import (  # noqa
     get_semi_by_id,
     get_semi_reports,
 )
+from .tipo_cuenta import (  # noqa
+    create_tipo_cuenta,
+    get_tipo_cuenta_active_list_by_tipo_documento_relacionado_otro,
+    get_tipo_cuenta_list_by_tipo_documento_relacionado_otro,
+)
 from .tipo_instrumento import get_tipo_instrumento_via_banco  # noqa
+from .tipo_movimiento import (  # noqa
+    get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes_and_cuenta_id,
+    get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes,
+)
 from .user import (  # noqa
     change_user_status,
     create_user,

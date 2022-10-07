@@ -130,13 +130,13 @@ from .tipo_comprobante import TipoComprobante  # noqa
 from .tipo_concepto_complemento import TipoConceptoComplemento  # noqa
 from .tipo_concepto_descuento import TipoConceptoDescuento  # noqa
 from .tipo_contraparte import TipoContraparte  # noqa
-from .tipo_cuenta import TipoCuenta  # noqa
+from .tipo_cuenta import TipoCuenta, TipoCuentaForm  # noqa
 from .tipo_documento import TipoDocumento  # noqa
 from .tipo_documento_relacionado import TipoDocumentoRelacionado  # noqa
 from .tipo_instrumento import TipoInstrumento  # noqa
 from .tipo_insumo import TipoInsumo  # noqa
 from .tipo_iva import TipoIva  # noqa
-from .tipo_movimiento import TipoMovimiento  # noqa
+from .tipo_movimiento import TipoMovimiento, TipoMovimientoForm  # noqa
 from .tipo_persona import TipoPersona  # noqa
 from .tipo_registro import TipoRegistro  # noqa
 from .tipo_semi import TipoSemi  # noqa

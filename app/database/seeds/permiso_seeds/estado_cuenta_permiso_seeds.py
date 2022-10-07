@@ -35,6 +35,8 @@ def estado_cuenta_permiso_seeds(db: Session) -> List[Permiso]:
     permisos.extend(permiso_instrumento_seeds(db))
     permisos.extend(permiso_movimiento_seeds(db))
     permisos.extend(permiso_liquidacion_seeds(db))
+    permisos.extend(permiso_tipo_cuenta_seeds(db))
+    permisos.extend(permiso_tipo_movimiento_seeds(db))
     permisos.append(
         permiso_seeds(db, a.PASAR_A_REVISION, m.LIQUIDACION, u.ESTADO_CUENTA)
     )
@@ -185,5 +187,27 @@ def permiso_liquidacion_seeds(db: Session) -> List[Permiso]:
         permiso_seeds(
             db, a.REPORTE, m.LIQUIDACION, u.ESTADO_CUENTA, "Reporte de Liquidación"
         )
+    )
+    return permisos
+
+
+def permiso_tipo_cuenta_seeds(db: Session) -> List[Permiso]:
+    permisos = []
+    permisos.append(permiso_seeds(db, a.LISTAR, m.TIPO_CUENTA, u.BIBLIOTECA))
+    permisos.append(permiso_seeds(db, a.VER, m.TIPO_CUENTA, u.BIBLIOTECA))
+    permisos.append(permiso_seeds(db, a.CREAR, m.TIPO_CUENTA, u.BIBLIOTECA))
+    permisos.append(permiso_seeds(db, a.EDITAR, m.TIPO_CUENTA, u.BIBLIOTECA))
+    permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.TIPO_CUENTA, u.BIBLIOTECA))
+    return permisos
+
+
+def permiso_tipo_movimiento_seeds(db: Session) -> List[Permiso]:
+    permisos = []
+    permisos.append(permiso_seeds(db, a.LISTAR, m.TIPO_MOVIMIENTO, u.BIBLIOTECA))
+    permisos.append(permiso_seeds(db, a.VER, m.TIPO_MOVIMIENTO, u.BIBLIOTECA))
+    permisos.append(permiso_seeds(db, a.CREAR, m.TIPO_MOVIMIENTO, u.BIBLIOTECA))
+    permisos.append(permiso_seeds(db, a.EDITAR, m.TIPO_MOVIMIENTO, u.BIBLIOTECA))
+    permisos.append(
+        permiso_seeds(db, a.CAMBIAR_ESTADO, m.TIPO_MOVIMIENTO, u.BIBLIOTECA)
     )
     return permisos

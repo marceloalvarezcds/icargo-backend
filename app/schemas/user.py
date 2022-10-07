@@ -87,10 +87,12 @@ class User(UserInDBBase):
 
 class UserAccount(UserInDBBase):
     permisos: List[Permiso] = []
+    is_admin_icargo: bool
 
     @classmethod
     def from_orm(cls, obj: Any) -> "UserAccount":
         obj.permisos = []
+        obj.is_admin_icargo = False
         return super().from_orm(obj)
 
 
