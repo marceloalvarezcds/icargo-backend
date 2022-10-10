@@ -6,7 +6,7 @@ from sqlalchemy.sql.elements import and_  # type: ignore
 from sqlalchemy.sql.expression import null  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import CamionSemiNeto
+from app.models import Camion, CamionSemiNeto, Chofer
 from app.schemas import CamionSemiNetoForm
 
 
@@ -70,11 +70,14 @@ def get_camion_semi_neto_list_by_producto_id(
 ) -> List[CamionSemiNeto]:
     return (
         db.query(CamionSemiNeto)
+        .join(CamionSemiNeto.camion)
+        .join(Camion.chofer)
         .filter(
             and_(
                 CamionSemiNeto.producto_id == producto_id,
                 CamionSemiNeto.gestor_carga_id == gestor_carga_id,
                 CamionSemiNeto.estado != EstadoEnum.ELIMINADO.value,
+                Chofer.estado == EstadoEnum.ACTIVO.value,
             )
         )
         .order_by(
@@ -89,11 +92,14 @@ def get_camion_semi_neto_list_by_producto_id_null(
 ) -> List[CamionSemiNeto]:
     return (
         db.query(CamionSemiNeto)
+        .join(CamionSemiNeto.camion)
+        .join(Camion.chofer)
         .filter(
             and_(
                 CamionSemiNeto.producto_id == null(),
                 CamionSemiNeto.gestor_carga_id == gestor_carga_id,
                 CamionSemiNeto.estado != EstadoEnum.ELIMINADO.value,
+                Chofer.estado == EstadoEnum.ACTIVO.value,
             )
         )
         .order_by(
