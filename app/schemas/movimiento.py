@@ -96,7 +96,7 @@ class Movimiento(MovimientoBaseModel):
     tipo_contraparte_descripcion: str
     tipo_documento_relacionado_descripcion: str
     tipo_insumo_descripcion: Optional[str]
-    tipo_movimiento_descripcion: str
+    tipo_movimiento_descripcion: Optional[str]
     tipo_operacion_descripcion: str
     # Datos de la OC
     es_flete: bool
