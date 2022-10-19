@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -7,7 +8,6 @@ from app.enums import EstadoEnum
 from .ciudad import Ciudad
 from .composicion_juridica import ComposicionJuridica
 from .moneda import Moneda
-from .rounded_decimal_model import RoundedDecimal
 from .tipo_documento import TipoDocumento
 
 
@@ -23,8 +23,8 @@ class GestorCargaForm(BaseModel):
     email: Optional[str] = None
     pagina_web: Optional[str] = None
     info_complementaria: Optional[str] = None
-    latitud: Optional[RoundedDecimal] = None
-    longitud: Optional[RoundedDecimal] = None
+    latitud: Optional[Decimal] = None
+    longitud: Optional[Decimal] = None
     direccion: Optional[str] = None
     ciudad_id: Optional[int] = None
     # INICIO Limitaciones de la Gestora

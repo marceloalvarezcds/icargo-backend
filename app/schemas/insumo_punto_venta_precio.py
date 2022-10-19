@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -54,5 +55,5 @@ class InsumoPuntoVentaPrecioList(InsumoPuntoVentaPrecio):
     punto_venta_nombre: str
     punto_venta_direccion: Optional[str] = None
     punto_venta_logo: Optional[str] = None
-    punto_venta_latitud: Optional[RoundedDecimal] = None
-    punto_venta_longitud: Optional[RoundedDecimal] = None
+    punto_venta_latitud: Optional[Decimal] = None
+    punto_venta_longitud: Optional[Decimal] = None
