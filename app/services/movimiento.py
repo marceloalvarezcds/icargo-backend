@@ -823,6 +823,10 @@ def generate_movimiento_reports(
     title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Punto de Venta"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Nº de Mov."
     title_cell.font = Font(bold=True)
 
@@ -869,6 +873,9 @@ def generate_movimiento_reports(
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.concepto
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.anticipo.punto_venta_nombre if item.anticipo else None
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.id

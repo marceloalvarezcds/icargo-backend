@@ -6,6 +6,7 @@ from app.enums import MovimientoEstadoEnum
 
 from .date_model import Date
 from .moneda import Moneda
+from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 from .rounded_decimal_model import RoundedDecimal
 from .tipo_contraparte import TipoContraparte
 from .tipo_cuenta import TipoCuenta
@@ -117,6 +118,8 @@ class Movimiento(MovimientoBaseModel):
     merma_propietario_moneda_id: Optional[int] = None
     merma_propietario_es_porcentual: Optional[bool] = False
     merma_propietario_tolerancia: Optional[RoundedDecimal] = None
+    # En caso de ser movimiento de anticipo
+    anticipo: Optional[OrdenCargaAnticipoRetirado] = None
     # Auditoría
     created_by: str
     created_at: Date
