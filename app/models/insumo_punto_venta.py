@@ -77,6 +77,10 @@ class InsumoPuntoVenta(AuditMixin, Base):
         return self.moneda.nombre
 
     @hybrid_property
+    def moneda_simbolo(self):
+        return self.moneda.simbolo
+
+    @hybrid_property
     def pais_nombre(self):
         return self.punto_venta.pais_nombre
 
@@ -95,3 +99,19 @@ class InsumoPuntoVenta(AuditMixin, Base):
     @hybrid_property
     def punto_venta_nombre(self):
         return self.punto_venta.nombre
+
+    @hybrid_property
+    def punto_venta_direccion(self):
+        return self.punto_venta.direccion
+
+    @hybrid_property
+    def punto_venta_logo(self):
+        return self.punto_venta.logo
+
+    @hybrid_property
+    def punto_venta_latitud(self):
+        return self.punto_venta.latitud
+
+    @hybrid_property
+    def punto_venta_longitud(self):
+        return self.punto_venta.longitud
