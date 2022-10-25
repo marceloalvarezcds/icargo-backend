@@ -18,7 +18,13 @@ from app.enums import (
     MovimientoEstadoEnum,
     TipoContraparteEnum,
 )
-from app.models import Instrumento, Liquidacion, Movimiento
+from app.models import (
+    Camion,
+    Instrumento,
+    Liquidacion,
+    Movimiento,
+    OrdenCargaAnticipoRetirado,
+)
 from app.schemas import (
     LiquidacionAddInstrumentosForm,
     LiquidacionAddMovimientosForm,
@@ -26,6 +32,7 @@ from app.schemas import (
 )
 from app.utils import get_gestor_carga_by_params, number_format
 
+from .camion import update_camion_anticipo_retirado
 from .instrumento import create_instrumento
 
 
@@ -481,6 +488,15 @@ def change_movimiento_list_status(
         mov.estado = estado.value
         mov.modified_by = modified_by
         mov.modified_at = datetime.now()
+        if (
+            mov.anticipo
+            and estado == LiquidacionEstadoEnum.CONFIRMADO
+            or estado == LiquidacionEstadoEnum.FINALIZADO
+        ):
+            db.commit()
+            anticipo: OrdenCargaAnticipoRetirado = mov.anticipo
+            camion: Camion = anticipo.orden_carga.camion
+            update_camion_anticipo_retirado(db, camion)
     db.commit()
 
 
