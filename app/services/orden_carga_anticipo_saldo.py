@@ -89,7 +89,7 @@ def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
     camion_monto_disponible = orden_carga.camion_monto_anticipo_disponible
     return (
         camion_monto_disponible
-        if camion_monto_disponible < oc_monto_disponible
+        if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible
         else oc_monto_disponible
     )
 
@@ -133,7 +133,7 @@ def update_orden_carga_anticipo_saldo(
     flete_anticipo_id = flete_anticipo.id
     orden_carga_id = orden_carga.id
     camion: Camion = orden_carga.camion
-    camion_limite: Decimal = orden_carga.camion_limite_monto_anticipos
+    camion_limite: Optional[Decimal] = orden_carga.camion_limite_monto_anticipos
     total_anticipos_retirados_en_estado_pendiente_o_en_proceso = (
         repositories.get_total_anticipo_retirado_by_camion_id(db, camion.id)
     )
@@ -142,7 +142,11 @@ def update_orden_carga_anticipo_saldo(
         if total_anticipos_retirados_en_estado_pendiente_o_en_proceso
         else Decimal(0)
     )
-    camion_monto_disponible = camion_limite - camion_monto_retirado - monto_retirado
+    camion_monto_disponible = (
+        camion_limite - camion_monto_retirado - monto_retirado
+        if camion_limite
+        else None
+    )
     exists = repositories.get_orden_carga_anticipo_saldo_by(
         db, flete_anticipo_id, orden_carga_id
     )
@@ -157,7 +161,7 @@ def update_orden_carga_anticipo_saldo(
     oc_monto_disponible = oc_limite + total_complemento - oc_monto_retirado
     saldo = (
         camion_monto_disponible
-        if camion_monto_disponible < oc_monto_disponible
+        if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible
         else oc_monto_disponible
     )
     if exists:
