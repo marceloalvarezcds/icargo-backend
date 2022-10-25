@@ -229,5 +229,9 @@ class Camion(AuditMixin, Base):
         return self.propietario.puede_recibir_anticipos
 
     @hybrid_property
+    def propietario_telefono(self):
+        return self.propietario.telefono
+
+    @hybrid_property
     def tipo_descripcion(self):
         return self.tipo.descripcion if self.tipo else None

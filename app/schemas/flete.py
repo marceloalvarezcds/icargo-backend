@@ -154,6 +154,7 @@ class FleteList(FleteFormBaseModel):
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda_nombre: str
     condicion_propietario_unidad_descripcion: str
+    condicion_propietario_tarifa_unidad: str
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes

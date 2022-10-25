@@ -115,6 +115,7 @@ class CamionList(BaseModel):
     placa: str
     propietario_nombre: str
     propietario_ruc: str
+    propietario_telefono: Optional[str] = None
     chofer_nombre: Optional[str] = None
     chofer_numero_documento: Optional[str] = None
     numero_chasis: Optional[str] = None
