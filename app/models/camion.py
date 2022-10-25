@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Optional
 
 from sqlalchemy import (  # type: ignore
     Column,
@@ -149,11 +150,16 @@ class Camion(AuditMixin, Base):
         )
 
     @hybrid_property
-    def monto_anticipo_disponible(self) -> Decimal:
-        return (self.limite_monto_anticipos if self.limite_monto_anticipos else 0) - (
-            self.total_anticipos_retirados_en_estado_pendiente_o_en_proceso
-            if self.total_anticipos_retirados_en_estado_pendiente_o_en_proceso
-            else 0
+    def monto_anticipo_disponible(self) -> Optional[Decimal]:
+        return (
+            self.limite_monto_anticipos
+            - (
+                self.total_anticipos_retirados_en_estado_pendiente_o_en_proceso
+                if self.total_anticipos_retirados_en_estado_pendiente_o_en_proceso
+                else 0
+            )
+            if self.limite_monto_anticipos
+            else None
         )
 
     @hybrid_property

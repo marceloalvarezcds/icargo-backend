@@ -86,7 +86,9 @@ def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
                 modified_by,
             )
     oc_monto_disponible: Decimal = exists.saldo if exists else Decimal(0)
-    camion_monto_disponible = orden_carga.camion_monto_anticipo_disponible
+    camion_monto_disponible: Optional[
+        Decimal
+    ] = orden_carga.camion_monto_anticipo_disponible
     return (
         camion_monto_disponible
         if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible
