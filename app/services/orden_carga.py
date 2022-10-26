@@ -20,6 +20,10 @@ from app.utils import number_format, send_email_with_template_by_thread
 from .audit_database import get_audit_list_by_orden_carga
 from .flete import get_flete_detail
 from .movimiento import create_movimiento_by_conciliacion_oc
+from .orden_carga_anticipo_porcentaje import (
+    create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list,
+    edit_orden_carga_anticipo_porcentaje_by_oc_porcentaje_anticipos,
+)
 from .orden_carga_anticipo_saldo import get_orden_carga_by_id
 from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete
@@ -76,6 +80,9 @@ def create_orden_carga(
         current_user.gestor_carga_id,
         modified_by,
     )
+    create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list(
+        db, obj.id, obj.flete_anticipos, modified_by
+    )
     create_complementos_and_descuentos(db, obj, flete, modified_by)
     send_emision_orden_carga_mail(obj.flete)
     return get_orden_carga_with_resultado(db, obj, current_user.id)
@@ -93,6 +100,13 @@ def edit_orden_carga(
         db,
         data,
         current_user.gestor_carga_id,
+        current_user.username,
+    )
+    edit_orden_carga_anticipo_porcentaje_by_oc_porcentaje_anticipos(
+        obj.id,
+        db,
+        to_edit_obj.porcentaje_anticipos,
+        data.porcentaje_anticipos,
         current_user.username,
     )
     return get_orden_carga_with_resultado(db, obj, current_user.id)

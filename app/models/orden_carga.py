@@ -101,6 +101,9 @@ class OrdenCarga(AuditMixin, Base):
     complementos = relationship("OrdenCargaComplemento", back_populates="orden_carga")
     descuentos = relationship("OrdenCargaDescuento", back_populates="orden_carga")
     saldos = relationship("OrdenCargaAnticipoSaldo", back_populates="orden_carga")
+    porcentaje_anticipos = relationship(
+        "OrdenCargaAnticipoPorcentaje", back_populates="orden_carga"
+    )
     remisiones_origen = relationship(
         "OrdenCargaRemisionOrigen", back_populates="orden_carga"
     )

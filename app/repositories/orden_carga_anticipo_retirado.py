@@ -51,6 +51,7 @@ def create_orden_carga_anticipo_retirado(
     obj = OrdenCargaAnticipoRetirado(
         flete_anticipo_id=data.flete_anticipo_id,
         orden_carga_id=data.orden_carga_id,
+        orden_carga_anticipo_porcentaje_id=data.orden_carga_anticipo_porcentaje_id,
         punto_venta_id=data.punto_venta_id,
         tipo_comprobante_id=data.tipo_comprobante_id,
         numero_comprobante=data.numero_comprobante,
@@ -78,6 +79,7 @@ def edit_orden_carga_anticipo_retirado(
 ) -> OrdenCargaAnticipoRetirado:
     obj.flete_anticipo_id = data.flete_anticipo_id
     obj.orden_carga_id = data.orden_carga_id
+    obj.orden_carga_anticipo_porcentaje_id = data.orden_carga_anticipo_porcentaje_id
     obj.punto_venta_id = data.punto_venta_id
     obj.tipo_comprobante_id = data.tipo_comprobante_id
     obj.numero_comprobante = data.numero_comprobante

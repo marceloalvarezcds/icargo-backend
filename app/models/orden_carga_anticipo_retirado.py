@@ -17,6 +17,7 @@ from .flete_anticipo import FleteAnticipo
 from .insumo_punto_venta_precio import InsumoPuntoVentaPrecio
 from .moneda import Moneda
 from .orden_carga import OrdenCarga
+from .orden_carga_anticipo_porcentaje import OrdenCargaAnticipoPorcentaje
 from .punto_venta import PuntoVenta
 from .tipo_comprobante import TipoComprobante
 from .unidad import Unidad
@@ -34,6 +35,12 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     )
     orden_carga_id = Column(Integer, ForeignKey("orden_carga.id"))
     orden_carga = relationship(OrdenCarga, uselist=False, back_populates="anticipos")
+    orden_carga_anticipo_porcentaje_id = Column(
+        Integer, ForeignKey("orden_carga_anticipo_porcentaje.id")
+    )
+    orden_carga_anticipo_porcentaje = relationship(
+        OrdenCargaAnticipoPorcentaje, uselist=False, back_populates="anticipos"
+    )
     punto_venta_id = Column(Integer, ForeignKey("punto_venta.id"))
     punto_venta = relationship(PuntoVenta, uselist=False)
     tipo_comprobante_id = Column(Integer, ForeignKey("tipo_comprobante.id"))

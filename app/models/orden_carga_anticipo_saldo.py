@@ -8,6 +8,7 @@ from app.database.base import Base
 
 from .flete_anticipo import FleteAnticipo
 from .orden_carga import OrdenCarga
+from .orden_carga_anticipo_porcentaje import OrdenCargaAnticipoPorcentaje
 
 
 class OrdenCargaAnticipoSaldo(AuditMixin, Base):
@@ -21,6 +22,12 @@ class OrdenCargaAnticipoSaldo(AuditMixin, Base):
     flete_anticipo = relationship(FleteAnticipo, uselist=False, back_populates="saldos")
     orden_carga_id = Column(Integer, ForeignKey("orden_carga.id"))
     orden_carga = relationship(OrdenCarga, uselist=False, back_populates="saldos")
+    orden_carga_anticipo_porcentaje_id = Column(
+        Integer, ForeignKey("orden_carga_anticipo_porcentaje.id")
+    )
+    orden_carga_anticipo_porcentaje = relationship(
+        OrdenCargaAnticipoPorcentaje, uselist=False, back_populates="saldos"
+    )
     total_anticipo = Column(Numeric(38, 10))  # cantidad_nomidada * porcentaje
     total_complemento = Column(Numeric(38, 10))
     total_retirado = Column(Numeric(38, 10))
@@ -36,7 +43,11 @@ class OrdenCargaAnticipoSaldo(AuditMixin, Base):
 
     @hybrid_property
     def porcentaje(self):
-        return self.flete_anticipo.porcentaje if self.flete_anticipo.porcentaje else 0
+        return (
+            self.orden_carga_anticipo_porcentaje.porcentaje
+            if self.orden_carga_anticipo_porcentaje.porcentaje
+            else 0
+        )
 
     @hybrid_property
     def total_disponible(self):

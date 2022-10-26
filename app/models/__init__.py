@@ -48,6 +48,7 @@ from .marca_semi import MarcaSemi  # noqa
 from .moneda import Moneda  # noqa
 from .movimiento import Movimiento  # noqa
 from .orden_carga import OrdenCarga  # noqa
+from .orden_carga_anticipo_porcentaje import OrdenCargaAnticipoPorcentaje  # noqa
 from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado  # noqa
 from .orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo  # noqa
 from .orden_carga_complemento import OrdenCargaComplemento  # noqa
