@@ -75,7 +75,7 @@ def chofer_seeds(
                 foto_registro_frente=None,
                 foto_registro_reverso=None,
                 # fin registro
-                estado=EstadoEnum.PENDIENTE.value,
+                estado=EstadoEnum.ACTIVO.value,
                 telefono=telefono,
                 email=email,
                 direccion=direccion,
