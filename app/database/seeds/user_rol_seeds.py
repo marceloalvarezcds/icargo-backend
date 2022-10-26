@@ -6,7 +6,7 @@ from app.models import Permiso, Rol, RolPermiso, User, UserRol
 from app.repositories import get_permiso_list_by_rol_id
 from app.schemas import RolCreate
 from app.services import create_rol
-from app.services.generic_service import get_by_unique_columns
+from app.services.generic_service import get_by_unique_columns_or_none
 
 
 def user_rol_seeds(
@@ -17,7 +17,7 @@ def user_rol_seeds(
     gestor_carga_id: Optional[int] = None,
     modified_by: str = "system",
 ):
-    rol: Optional[Rol] = get_by_unique_columns(
+    rol: Optional[Rol] = get_by_unique_columns_or_none(
         Rol, db, descripcion=rol_descripcion, gestor_carga_id=gestor_carga_id
     )
     if rol:
@@ -51,7 +51,7 @@ def user_rol_seeds(
             gestor_carga_id,
             modified_by,
         )
-    exists: UserRol = get_by_unique_columns(
+    exists: Optional[UserRol] = get_by_unique_columns_or_none(
         UserRol,
         db,
         user_id=user.id,
