@@ -193,6 +193,7 @@ from .orden_carga import (  # noqa
     get_orden_carga_reports,
     get_orden_carga_resumen_pdf_by_id,
     liquidar_orden_carga,
+    send_oc_mail,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,

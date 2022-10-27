@@ -1,81 +1,543 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{title}}</title>
-    <style type="text/css">
-      body {
-        margin: 0px;
-        padding: 0px;
-        overflow: auto;
-        font-family: "Georgia";
-      }
-
-      .align-center {
-        align-items: center;
-      }
-
-      .blue {
-        color: #3399ff;
-      }
-
-      .bold {
-        font-weight: bold;
-      }
-
-      .flex1 {
-        flex: 1;
-      }
-
-      .fs2 {
-        font-size: 18px;
-      }
-
-      .fs6 {
-        font-size: 11px;
-      }
-
-      .lh2 {
-        line-height: 18px;
-      }
-
-      .lh4 {
-        line-height: 16px;
-      }
-
-      .logo-container .logo {
-        width: 430px;
-        height: 120px;
-      }
-
-      .logo-container img {
-        margin: auto;
-        width: auto;
-        height: 120px;
-      }
-
-      .mt10 {
-        margin-top: 10px;
-      }
-
-      .table {
-        display: flex;
-      }
-    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Orden de Carga</title>
+    <meta name="generator" content="BCL easyConverter SDK 5.0.252" />
+    <meta name="title" content="2022 01 21 Anticipos icargo" />
   </head>
+
   <body>
-    <h1>{{title}}</h1>
-    <div class="{{class_name}}">
-      <div class="texto-legal-container table box align-center mt10">
-        <p class="fs2 lh2 flex1">{{detail}}</p>
+    <div>
+      <div style="display: flex">
+        <div
+          style="
+            border: 2px solid #d1d3d4;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            margin-right: 8px;
+            border-right-width: 2px;
+            padding: 8px 0 7px 0;
+            width: 208px;
+            height: 208px;
+          "
+        >
+          <div
+            style="
+              align-items: center;
+              display: flex;
+              height: 100%;
+              text-align: center;
+            "
+          >
+            {% if gestor_carga_logo %}
+            <img
+              src="{{gestor_carga_logo}}"
+              style="width: 100%; height: auto"
+            />
+            {% else %}
+            <div
+              style="
+                color: #939598;
+                flex: 1;
+                font-size: 20px;
+                font-weight: bold;
+                line-height: 25px;
+                text-align: center;
+              "
+            >
+              LOGO
+              <div style="font-size: 18px">Gestora Carga</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div style="flex: 1">
+          <div style="display: flex">
+            <div
+              style="
+                border: 2px solid #d1d3d4;
+                box-sizing: border-box;
+                margin-top: 0;
+                margin-right: 0;
+                border-right-width: 0;
+                margin-bottom: 10px;
+                padding: 8px 0 7px 0;
+                flex: 1;
+              "
+            >
+              <p
+                style="
+                  font-weight: bold;
+                  font-size: 18px;
+                  line-height: 36px;
+                  margin-bottom: 10px;
+                  padding-left: 10px;
+                  padding-right: 10px;
+                  margin-top: 0px;
+                "
+              >
+                {{gestor_carga_nombre}} - {{gestor_carga_numero_documento}}
+              </p>
+              <p
+                style="
+                  margin-bottom: 10px;
+                  line-height: 20px;
+                  font-size: 14px;
+                  padding-left: 10px;
+                  padding-right: 10px;
+                  margin-top: 0px;
+                "
+              >
+                <span style="font-weight: bold">Dirección: </span
+                >{{gestor_carga_direccion}}
+              </p>
+            </div>
+            <div
+              style="
+                border: 2px solid #d1d3d4;
+                box-sizing: border-box;
+                margin-bottom: 10px;
+                margin-right: 0;
+                margin-top: 0;
+                min-width: 400px;
+                padding: 8px 0 7px 0;
+              "
+            >
+              <p
+                style="
+                  line-height: 36px;
+                  font-size: 14px;
+                  padding-left: 10px;
+                  padding-right: 10px;
+                  margin-top: 0px;
+                  margin-bottom: 0px;
+                "
+              >
+                <span style="font-weight: bold">Fecha: </span>{{fecha}}
+              </p>
+            </div>
+          </div>
+          <div style="display: flex">
+            <div
+              style="
+                border: 2px solid #d1d3d4;
+                box-sizing: border-box;
+                flex: 1;
+                margin-top: 0;
+                margin-right: 0;
+                border-right-width: 0;
+                margin-bottom: 10px;
+                padding: 8px 0 7px 0;
+              "
+            >
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 20px;
+                  padding-left: 10px;
+                  padding-right: 10px;
+                  margin-top: 0px;
+                  margin-bottom: 0px;
+                "
+              >
+                <span style="font-weight: bold">Remitente: </span>{{remitente}}
+              </p>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 20px;
+                  padding-left: 10px;
+                  padding-right: 10px;
+                  margin-top: 0px;
+                  margin-bottom: 0px;
+                "
+              >
+                <span style="font-weight: bold">Orden de carga Nro: </span
+                >{{id}}
+              </p>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 20px;
+                  padding-left: 10px;
+                  padding-right: 10px;
+                  margin-top: 0px;
+                  margin-bottom: 0px;
+                "
+              >
+                <span style="font-weight: bold">Flete Nro: </span>{{flete_id}}
+              </p>
+            </div>
+            <div
+              style="
+                border: 2px solid #d1d3d4;
+                box-sizing: border-box;
+                margin-bottom: 10px;
+                margin-top: 0;
+                margin-right: 0;
+                min-width: 400px;
+                padding: 8px 0 7px 0;
+              "
+            >
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 20px;
+                  padding-left: 10px;
+                  padding-right: 10px;
+                  margin-top: 0px;
+                  margin-bottom: 0px;
+                "
+              >
+                <span style="font-weight: bold">Cantidad nominada: </span>
+                {{cantidad_nominada}}
+              </p>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 20px;
+                  padding-left: 10px;
+                  padding-right: 10px;
+                  margin-top: 0px;
+                  margin-bottom: 0px;
+                "
+              >
+                <span style="font-weight: bold">Producto: </span> {{producto}}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="logo-container table box align-center mt10">
-        <div class="logo">
+      <div
+        style="display: flex; border: 2px solid #d1d3d4; box-sizing: border-box"
+      >
+        <div style="flex: 1; padding: 8px 0 7px 0">
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span style="font-weight: bold">Origen: </span>{{origen}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span style="font-weight: bold">Ubicación: </span
+            >{{origen_direccion}}
+          </p>
+        </div>
+        <div style="flex: 1; padding: 8px 0 7px 0">
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span style="font-weight: bold">Destino: </span>{{destino}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span style="font-weight: bold">Ubicación: </span
+            >{{destino_direccion}}
+          </p>
+        </div>
+        <div style="flex: 1; padding: 8px 0 7px 0"></div>
+      </div>
+      <div
+        style="
+          display: flex;
+          border: 2px solid #d1d3d4;
+          box-sizing: border-box;
+          margin-top: 10px;
+        "
+      >
+        <div style="flex: 1; padding: 8px 0 7px 0">
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span
+              style="font-weight: bold; display: inline-block; width: 185px"
+            >
+              Placa del camión:
+            </span>
+            {{camion_placa}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span
+              style="font-weight: bold; display: inline-block; width: 185px"
+            >
+              Marca/Tipo:
+            </span>
+            {{camion_marca_tipo}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 10px;
+            "
+          >
+            <span
+              style="font-weight: bold; display: inline-block; width: 185px"
+            >
+              Color:
+            </span>
+            {{camion_color}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span
+              style="font-weight: bold; display: inline-block; width: 185px"
+            >
+              Propietario del camión:
+            </span>
+            {{propietario_nombre}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 10px;
+            "
+          >
+            <span
+              style="font-weight: bold; display: inline-block; width: 185px"
+            >
+              Teléfono:
+            </span>
+            {{propietario_telefono}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span
+              style="font-weight: bold; display: inline-block; width: 185px"
+            >
+              Placa del Semirremolque:
+            </span>
+            {{semi_placa}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span
+              style="font-weight: bold; display: inline-block; width: 185px"
+            >
+              Marca/Tipo:
+            </span>
+            {{semi_marca_tipo}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 10px;
+            "
+          >
+            <span
+              style="font-weight: bold; display: inline-block; width: 185px"
+            >
+              Color:
+            </span>
+            {{semi_color}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span
+              style="font-weight: bold; display: inline-block; width: 185px"
+            >
+              Chofer:
+            </span>
+            {{chofer_nombre}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span
+              style="font-weight: bold; display: inline-block; width: 185px"
+            >
+              Cédula de Identidad:
+            </span>
+            {{chofer_numero_documento}}
+          </p>
+          <p
+            style="
+              font-size: 16px;
+              line-height: 20px;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-top: 0px;
+              margin-bottom: 0px;
+            "
+          >
+            <span
+              style="font-weight: bold; display: inline-block; width: 185px"
+            >
+              Teléfono:
+            </span>
+            {{chofer_telefono}}
+          </p>
+        </div>
+        <div
+          style="
+            flex: 1;
+            padding: 8px 0 7px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          "
+        >
+          <div
+            style="
+              border: 2px solid #d1d3d4;
+              box-sizing: border-box;
+              height: 208px;
+              width: 208px;
+            "
+          >
+            {% if camion_foto %}
+            <img src="{{camion_foto}}" />
+            {% else %}
+            <div class="center fs4 lh3 gray flex1" style="font-weight: bold">
+              Imagen
+              <div class="fs4">CAMIÓN</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div
+        style="
+          border: 2px solid #d1d3d4;
+          box-sizing: border-box;
+          margin-top: 10px;
+          padding-top: 10px;
+          padding-bottom: 10px;
+        "
+      >
+        <p
+          style="
+            font-size: 16px;
+            line-height: 1;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-top: 0px;
+            margin-bottom: 0px;
+          "
+        >
+          {{texto_legal}}
+        </p>
+      </div>
+      <div
+        style="
+          display: flex;
+          border: 2px solid #d1d3d4;
+          box-sizing: border-box;
+          margin-top: 10px;
+          align-items: center;
+        "
+      >
+        <div style="width: 430px; height: 120px">
           <img src="{{logo}}" alt="iCargo" />
         </div>
-        <p class="fs6 lh4 flex1">
+        <p
+          style="
+            line-height: 14px;
+            font-size: 10px;
+            flex: 1;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-top: 0px;
+            margin-bottom: 0px;
+          "
+        >
           iCargo es solo una Herramienta de Gestión y no constituye parte alguna
           en la Cadena de Operaciones, limitándose su aporte solo al Registro,
           Gestión y Publicación de la información que por ella se administra.
@@ -86,6 +548,9 @@
           litigio que pudiera surgir entre estas partes
         </p>
       </div>
+      {% if x == 0 %}
+      <div></div>
+      {% endif %}
     </div>
   </body>
 </html>

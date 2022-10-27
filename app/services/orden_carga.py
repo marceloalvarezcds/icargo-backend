@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, STATICS_URL, templateEnv
 from app.enums import EstadoEnum
-from app.models import Camion, Flete, OrdenCarga
+from app.models import Camion, Flete, GestorCarga, OrdenCarga
 from app.schemas.audit_database import AuditDatabase as A
 from app.utils import number_format, send_email_with_template_by_thread
 
@@ -84,7 +84,7 @@ def create_orden_carga(
         db, obj.id, obj.flete_anticipos, modified_by
     )
     create_complementos_and_descuentos(db, obj, flete, modified_by)
-    send_emision_orden_carga_mail(obj.flete)
+    send_emision_orden_carga_mail(obj)
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
@@ -362,18 +362,53 @@ def liquidar_orden_carga(
     return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
-def send_emision_orden_carga_mail(flete: Flete):
-    obj = get_flete_detail(flete)
-    destinatarios = ",".join([x.email for x in obj.destinatarios])
-    title: str = flete.emision_orden_texto_legal
-    detail: str = flete.emision_orden_detalle
+def send_oc_mail(db: Session, id: int):
+    obj = get_orden_carga_by_id(db, id)
+    send_emision_orden_carga_mail(obj)
+
+
+def send_emision_orden_carga_mail(obj: OrdenCarga):
+    gestor_carga: GestorCarga = obj.gestor_carga
+    flete = get_flete_detail(obj.flete)
+    destinatarios = ",".join([x.email for x in flete.destinatarios])
+    data = {
+        "id": obj.id,
+        "flete_id": flete.id,
+        "remitente": f"{flete.remitente.nombre} - {flete.remitente.numero_documento}",
+        "cantidad_nominada": number_format(obj.cantidad_nominada),
+        "gestor_carga_direccion": gestor_carga.direccion,
+        "gestor_carga_logo": gestor_carga.logo,
+        "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_numero_documento": gestor_carga.numero_documento,
+        "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
+        "producto": obj.flete_producto_descripcion,
+        "origen": obj.origen_nombre,
+        "origen_direccion": obj.origen.direccion if obj.origen.direccion else "-",
+        "destino": obj.destino_nombre,
+        "destino_direccion": obj.destino.direccion if obj.destino.direccion else "-",
+        "propietario_nombre": obj.camion_propietario_nombre,
+        "propietario_telefono": obj.camion.propietario.telefono,
+        "chofer_nombre": obj.camion_chofer_nombre,
+        "chofer_numero_documento": obj.camion_chofer_numero_documento,
+        "chofer_telefono": obj.camion.chofer.telefono,
+        "camion_foto": obj.camion.foto,
+        "camion_placa": obj.camion_placa,
+        "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",
+        "camion_color": obj.camion.color_descripcion,
+        "semi_placa": obj.semi_placa,
+        "semi_marca_tipo": f"{obj.semi.marca_descripcion}/{obj.semi.tipo_descripcion}",
+        "semi_color": obj.semi.color_descripcion,
+        "comentarios": obj.comentarios if obj.comentarios else "-",
+        "texto_legal": obj.flete.emision_orden_texto_legal
+        if obj.flete.emision_orden_texto_legal
+        else "-",
+    }
     send_email_with_template_by_thread(
         template_filename="mail_orden_carga.html",
         to=destinatarios,
         subject="iCargo: Emisión de Orden de Carga",
-        title=title,
-        detail=detail,
         logo=LOGO_IMAGE_URL,
+        **data,
     )
 
 
