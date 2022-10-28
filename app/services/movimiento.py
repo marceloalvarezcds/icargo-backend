@@ -572,6 +572,8 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
     data.fecha_cambio_moneda = fecha
     if not data.fecha:
         data.fecha = fecha
+    if not data.es_cobro:
+        data.monto = data.monto * -1  # type: ignore
     return create_movimiento(
         db,
         data,
@@ -612,6 +614,8 @@ def edit_movimiento(
     if not gestor_id:
         raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
     to_edit_obj = get_movimiento_by_id(db, id)
+    if not data.es_cobro:
+        data.monto = data.monto * -1  # type: ignore
     return repositories.edit_movimiento(to_edit_obj, db, data, gestor_id, modified_by)
 
 

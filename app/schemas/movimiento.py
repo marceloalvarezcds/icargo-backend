@@ -46,6 +46,7 @@ class MovimientoBaseModel(BaseModel):
 
 
 class MovimientoForm(MovimientoBaseModel):
+    es_cobro: Optional[bool] = False
     es_creacion_contraparte: Optional[bool] = False
 
 
