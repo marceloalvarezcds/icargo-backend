@@ -34,9 +34,8 @@ def get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes(
     )
 
 
-def get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes_and_cuenta_id(
+def get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes(
     db: Session,
-    cuenta_id: int,
 ) -> List[TipoMovimiento]:
     return (
         db.query(TipoMovimiento)
@@ -45,7 +44,6 @@ def get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes_and_cuenta_
             and_(
                 TipoCuenta.descripcion != TipoCuentaEnum.VIAJES.value,
                 TipoMovimiento.estado == EstadoEnum.ACTIVO.value,
-                TipoMovimiento.cuenta_id == cuenta_id,
             )
         )
         .order_by(TipoMovimiento.descripcion)

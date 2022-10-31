@@ -4,6 +4,7 @@ from .seleccionable_base_model import SeleccionableBaseModel, SeleccionableFormB
 class TipoMovimiento(SeleccionableBaseModel):
     cuenta_id: int
     cuenta_descripcion: str
+    info: str
 
 
 class TipoMovimientoForm(SeleccionableFormBaseModel):

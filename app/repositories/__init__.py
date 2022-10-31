@@ -484,7 +484,7 @@ from .tipo_insumo import (  # noqa
 )
 from .tipo_iva import get_tipo_iva_by_descripcion, get_tipo_iva_list  # noqa
 from .tipo_movimiento import (  # noqa
-    get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes_and_cuenta_id,
+    get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes,
     get_tipo_movimiento_by_descripcion,
     get_tipo_movimiento_list,
     get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes,

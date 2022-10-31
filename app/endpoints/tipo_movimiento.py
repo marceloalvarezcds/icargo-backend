@@ -23,15 +23,12 @@ async def read_tipo_movimiento_list(
     return services.get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes(db)
 
 
-@api.get("/cuenta/{cuenta_id}", response_model=List[schemas.TipoMovimiento])
-async def read_tipo_movimiento_list_by_cuenta_id(
-    cuenta_id: int,
+@api.get("/active_list", response_model=List[schemas.TipoMovimiento])
+async def read_tipo_movimiento_active_list(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.TIPO_MOVIMIENTO)),  # noqa: B008
 ):
-    return services.get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes_and_cuenta_id(  # noqa: B950
-        db, cuenta_id
-    )
+    return services.get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes(db)
 
 
 @api.get("/{id}", response_model=schemas.TipoMovimiento)

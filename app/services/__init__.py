@@ -298,7 +298,7 @@ from .tipo_cuenta import (  # noqa
 )
 from .tipo_instrumento import get_tipo_instrumento_via_banco  # noqa
 from .tipo_movimiento import (  # noqa
-    get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes_and_cuenta_id,
+    get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes,
     get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes,
 )
 from .user import (  # noqa

@@ -19,3 +19,7 @@ class TipoMovimiento(SeleccionableMixin, Base):
     @hybrid_property
     def cuenta_descripcion(self):
         return self.cuenta.descripcion
+
+    @hybrid_property
+    def info(self):
+        return f"{self.cuenta_descripcion} - {self.descripcion}"

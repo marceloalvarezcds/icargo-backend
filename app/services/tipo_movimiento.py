@@ -12,10 +12,7 @@ def get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes(
     return r.get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes(db)
 
 
-def get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes_and_cuenta_id(
+def get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes(
     db: Session,
-    cuenta_id: int,
 ) -> List[TipoMovimiento]:
-    return r.get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes_and_cuenta_id(
-        db, cuenta_id
-    )
+    return r.get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes(db)
