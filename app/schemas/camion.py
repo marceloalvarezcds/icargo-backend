@@ -118,6 +118,7 @@ class CamionList(BaseModel):
     propietario_telefono: Optional[str] = None
     chofer_nombre: Optional[str] = None
     chofer_numero_documento: Optional[str] = None
+    color_descripcion: Optional[str] = None
     numero_chasis: Optional[str] = None
     estado: EstadoEnum
     ciudad_habilitacion_municipal_nombre: Optional[str] = None
