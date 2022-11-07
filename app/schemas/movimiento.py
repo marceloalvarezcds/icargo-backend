@@ -83,7 +83,7 @@ class Movimiento(MovimientoBaseModel):
     fecha_pago_cobro: Optional[Date]
     flete_id: Optional[int]
     insumo_descripcion: Optional[str]
-    liquidacion_fecha: Optional[str]
+    liquidacion_fecha_creacion: Optional[Date]
     moneda_nombre: str
     moneda_simbolo: str
     monto_ml: RoundedDecimal
@@ -91,6 +91,7 @@ class Movimiento(MovimientoBaseModel):
     producto_descripcion: Optional[str]
     propietario_nombre: Optional[str]
     proveedor_nombre: Optional[str]
+    punto_venta_nombre: Optional[str]
     remitente_nombre: Optional[str]
     remitente_numero_documento: Optional[str]
     saldo: RoundedDecimal

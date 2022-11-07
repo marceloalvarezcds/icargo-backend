@@ -776,6 +776,13 @@ def get_movimiento_reports_by_contraparte(
     return generate_movimiento_reports(datalist)
 
 
+def get_movimiento_reports_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int] = None
+):
+    datalist = get_movimiento_list(db, gestor_carga_id)
+    return generate_movimiento_reports(datalist, True)
+
+
 def get_movimiento_reports(
     db: Session,
     liquidacion_id: Optional[int] = None,
@@ -792,11 +799,24 @@ def get_movimiento_reports(
 
 
 def generate_movimiento_reports(
-    datalist: List[Movimiento],
+    datalist: List[Movimiento], is_for_listado: bool = False
 ) -> str:
     wb = Workbook()
     ws = wb.active
     i = 0
+
+    if is_for_listado:
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Movimiento"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Liquidación"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Fecha de creación Liq."
+        title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Estado"
@@ -811,7 +831,7 @@ def generate_movimiento_reports(
     title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
-    title_cell.value = "Nº de Doc Fiscal"
+    title_cell.value = "Nº de Doc " + "Contraparte" if is_for_listado else "Fiscal"
     title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
@@ -826,17 +846,23 @@ def generate_movimiento_reports(
     title_cell.value = "Concepto"
     title_cell.font = Font(bold=True)
 
+    if is_for_listado:
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Proveedor"
+        title_cell.font = Font(bold=True)
+
     title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Punto de Venta"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=(i := i + 1))
-    title_cell.value = "Nº de Mov."
-    title_cell.font = Font(bold=True)
+    if not is_for_listado:
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Mov."
+        title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=(i := i + 1))
-    title_cell.value = "Nº de Liq."
-    title_cell.font = Font(bold=True)
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Liq."
+        title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Nº Doc Relac."
@@ -856,6 +882,16 @@ def generate_movimiento_reports(
 
     for row, item in enumerate(datalist):
         i = 0
+
+        if is_for_listado:
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.id
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.liquidacion_id
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.liquidacion_fecha_creacion
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.estado
@@ -878,14 +914,19 @@ def generate_movimiento_reports(
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.concepto
 
-        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
-        value_cell.value = item.anticipo.punto_venta_nombre if item.anticipo else None
+        if is_for_listado:
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.proveedor_nombre
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
-        value_cell.value = item.id
+        value_cell.value = item.punto_venta_nombre
 
-        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
-        value_cell.value = item.liquidacion_id
+        if not is_for_listado:
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.id
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.liquidacion_id
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.numero_documento_relacionado
