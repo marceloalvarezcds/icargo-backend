@@ -11,6 +11,10 @@ from .date_model import Date
 from .flete_anticipo import FleteAnticipo
 from .moneda import Moneda
 from .movimiento import Movimiento
+from .orden_carga_anticipo_porcentaje import (
+    OrdenCargaAnticipoPorcentaje,
+    OrdenCargaAnticipoPorcentajeForm,
+)
 from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 from .orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from .orden_carga_complemento import OrdenCargaComplemento
@@ -30,7 +34,7 @@ class OrdenCargaForm(BaseModel):
     comentarios: Optional[str] = None
 
 
-class OrdenCargaEditForm(BaseModel):
+class OrdenCargaBaseModel(BaseModel):
     camion_id: Optional[int] = None
     semi_id: Optional[int] = None
     flete_id: Optional[int] = None
@@ -66,7 +70,11 @@ class OrdenCargaEditForm(BaseModel):
     # FIN Mermas de Fletes
 
 
-class OrdenCarga(OrdenCargaEditForm):
+class OrdenCargaEditForm(OrdenCargaBaseModel):
+    porcentaje_anticipos: List[OrdenCargaAnticipoPorcentajeForm] = []
+
+
+class OrdenCarga(OrdenCargaBaseModel):
     id: int
     # Datos de camion
     camion_chofer_nombre: Optional[str] = None
@@ -145,6 +153,7 @@ class OrdenCarga(OrdenCargaEditForm):
     historial: List[OrdenCargaEstadoHistorial]
     saldos: List[OrdenCargaAnticipoSaldo]
     anticipos: List[OrdenCargaAnticipoRetirado]
+    porcentaje_anticipos: List[OrdenCargaAnticipoPorcentaje]
     movimientos: List[Movimiento]
     flete_anticipos: List[FleteAnticipo]
     complementos: List[OrdenCargaComplemento]

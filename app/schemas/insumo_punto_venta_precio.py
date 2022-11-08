@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -40,6 +41,7 @@ class InsumoPuntoVentaPrecioList(InsumoPuntoVentaPrecio):
     insumo_descripcion: str
     insumo_moneda_id: int
     insumo_moneda_nombre: str
+    insumo_moneda_simbolo: str
     insumo_tipo_id: int
     insumo_tipo_descripcion: str
     insumo_unidad_abreviatura: Optional[str] = None
@@ -51,3 +53,7 @@ class InsumoPuntoVentaPrecioList(InsumoPuntoVentaPrecio):
     proveedor_nombre: str
     punto_venta_id: int
     punto_venta_nombre: str
+    punto_venta_direccion: Optional[str] = None
+    punto_venta_logo: Optional[str] = None
+    punto_venta_latitud: Optional[Decimal] = None
+    punto_venta_longitud: Optional[Decimal] = None

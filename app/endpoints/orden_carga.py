@@ -206,3 +206,12 @@ def modify_advance_release(
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.change_orden_carga_anticipos_liberados(db, id, current_user)
+
+
+@api.get("/{id}/send_mail", response_model=schemas.OrdenCarga)
+async def send_mail_orden_carga(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.send_oc_mail(db, id)

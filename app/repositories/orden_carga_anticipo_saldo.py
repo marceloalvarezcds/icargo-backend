@@ -41,6 +41,7 @@ def create_orden_carga_anticipo_saldo(
     obj = OrdenCargaAnticipoSaldo(
         flete_anticipo_id=data.flete_anticipo_id,
         orden_carga_id=data.orden_carga_id,
+        orden_carga_anticipo_porcentaje_id=data.orden_carga_anticipo_porcentaje_id,
         total_anticipo=data.total_anticipo,
         total_complemento=data.total_complemento,
         total_retirado=data.total_retirado,
@@ -62,6 +63,7 @@ def edit_orden_carga_anticipo_saldo(
 ) -> OrdenCargaAnticipoSaldo:
     obj.flete_anticipo_id = data.flete_anticipo_id
     obj.orden_carga_id = data.orden_carga_id
+    obj.orden_carga_anticipo_porcentaje_id = data.orden_carga_anticipo_porcentaje_id
     obj.total_anticipo = data.total_anticipo
     obj.total_complemento = data.total_complemento
     obj.total_retirado = data.total_retirado

@@ -29,6 +29,7 @@ class Contraparte(BaseModel):
     id: int
     contraparte: str
     contraparte_numero_documento: str
+    info: str
     tipo_contraparte_id: int
     tipo_contraparte_descripcion: str
 
@@ -40,6 +41,7 @@ class Contraparte(BaseModel):
             id=item.id,
             contraparte=item.nombre,
             contraparte_numero_documento=item.numero_documento,
+            info=f"{item.nombre} - {item.numero_documento}",
             tipo_contraparte_id=tipo.id,
             tipo_contraparte_descripcion=tipo.descripcion,
         )
@@ -60,6 +62,7 @@ class Contraparte(BaseModel):
             id=item.id,
             contraparte=item.nombre,
             contraparte_numero_documento=item.ruc,
+            info=f"{item.nombre} - {item.ruc}",
             tipo_contraparte_id=tipo.id,
             tipo_contraparte_descripcion=tipo.descripcion,
         )

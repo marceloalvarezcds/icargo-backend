@@ -134,7 +134,7 @@ class Movimiento(AuditMixin, Base):
 
     @hybrid_property
     def fecha_pago_cobro(self):
-        return self.liquidacion.fecha_pago_cobro
+        return self.liquidacion.fecha_pago_cobro if self.liquidacion else None
 
     @hybrid_property
     def flete_id(self):
@@ -145,8 +145,8 @@ class Movimiento(AuditMixin, Base):
         return self.anticipo.insumo_descripcion if self.anticipo else None
 
     @hybrid_property
-    def liquidacion_fecha(self):
-        return self.liquidacion.fecha_aprobacion
+    def liquidacion_fecha_creacion(self):
+        return self.liquidacion.created_at if self.liquidacion else None
 
     @hybrid_property
     def moneda_nombre(self):
@@ -175,6 +175,10 @@ class Movimiento(AuditMixin, Base):
     @hybrid_property
     def proveedor_nombre(self):
         return self.anticipo.proveedor_nombre if self.anticipo else None
+
+    @hybrid_property
+    def punto_venta_nombre(self):
+        return self.anticipo.punto_venta_nombre if self.anticipo else None
 
     @hybrid_property
     def remitente_nombre(self):

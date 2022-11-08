@@ -9,18 +9,26 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
 from app.config import REPORTS_FOLDER
-from app.enums import MovimientoEstadoEnum, TipoContraparteEnum, TipoMovimientoEnum
+from app.enums import (
+    MovimientoEstadoEnum,
+    TipoContraparteEnum,
+    TipoCuentaEnum,
+    TipoMovimientoEnum,
+)
 from app.models import (
     Movimiento,
     OrdenCarga,
     OrdenCargaAnticipoRetirado,
     OrdenCargaComplemento,
     OrdenCargaDescuento,
+    TipoCuenta,
+    TipoMovimiento,
 )
 from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm
 from app.schemas.date_model import Date
 from app.schemas.orden_carga import OrdenCargaEditForm
 from app.schemas.rounded_decimal_model import RoundedDecimal
+from app.services import seleccionable_service as service
 
 
 def get_orden_carga_by_movimiento(movimiento: Movimiento):
@@ -117,7 +125,9 @@ def create_movimiento_by_anticipo(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.ANTICIPO.value
     )
@@ -195,7 +205,9 @@ def create_movimiento_by_flete(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.FLETE.value
     )
@@ -271,7 +283,9 @@ def create_movimiento_by_complemento(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.COMPLEMENTO.value
     )
@@ -350,7 +364,9 @@ def create_movimiento_by_descuento(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.DESCUENTO.value
     )
@@ -429,7 +445,9 @@ def create_movimiento_by_merma(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.MERMA.value
     )
@@ -502,9 +520,19 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "Otro")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
-    tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
-        db, TipoMovimientoEnum.OTRO.value
+    tipo_cuenta = (
+        service.get_by_id(TipoCuenta, db, data.cuenta_id)
+        if data.cuenta_id
+        else repositories.get_tipo_cuenta_by_descripcion(
+            db, TipoCuentaEnum.VIAJES.value
+        )
+    )
+    tipo_movimiento = (
+        service.get_by_id(TipoMovimiento, db, data.tipo_movimiento_id)
+        if data.tipo_movimiento_id
+        else repositories.get_tipo_movimiento_by_descripcion(
+            db, TipoMovimientoEnum.OTRO.value
+        )
     )
     if (
         not tipo_contraparte
@@ -544,6 +572,8 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
     data.fecha_cambio_moneda = fecha
     if not data.fecha:
         data.fecha = fecha
+    if not data.es_cobro:
+        data.monto = data.monto * -1  # type: ignore
     return create_movimiento(
         db,
         data,
@@ -584,6 +614,8 @@ def edit_movimiento(
     if not gestor_id:
         raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
     to_edit_obj = get_movimiento_by_id(db, id)
+    if not data.es_cobro:
+        data.monto = data.monto * -1  # type: ignore
     return repositories.edit_movimiento(to_edit_obj, db, data, gestor_id, modified_by)
 
 
@@ -744,6 +776,13 @@ def get_movimiento_reports_by_contraparte(
     return generate_movimiento_reports(datalist)
 
 
+def get_movimiento_reports_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int] = None
+):
+    datalist = get_movimiento_list(db, gestor_carga_id)
+    return generate_movimiento_reports(datalist, True)
+
+
 def get_movimiento_reports(
     db: Session,
     liquidacion_id: Optional[int] = None,
@@ -760,11 +799,24 @@ def get_movimiento_reports(
 
 
 def generate_movimiento_reports(
-    datalist: List[Movimiento],
+    datalist: List[Movimiento], is_for_listado: bool = False
 ) -> str:
     wb = Workbook()
     ws = wb.active
     i = 0
+
+    if is_for_listado:
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Movimiento"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Liquidación"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Fecha de creación Liq."
+        title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Estado"
@@ -779,7 +831,7 @@ def generate_movimiento_reports(
     title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
-    title_cell.value = "Nº de Doc Fiscal"
+    title_cell.value = "Nº de Doc " + "Contraparte" if is_for_listado else "Fiscal"
     title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
@@ -794,13 +846,23 @@ def generate_movimiento_reports(
     title_cell.value = "Concepto"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=(i := i + 1))
-    title_cell.value = "Nº de Mov."
-    title_cell.font = Font(bold=True)
+    if is_for_listado:
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Proveedor"
+        title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
-    title_cell.value = "Nº de Liq."
+    title_cell.value = "Punto de Venta"
     title_cell.font = Font(bold=True)
+
+    if not is_for_listado:
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Mov."
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Liq."
+        title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Nº Doc Relac."
@@ -820,6 +882,16 @@ def generate_movimiento_reports(
 
     for row, item in enumerate(datalist):
         i = 0
+
+        if is_for_listado:
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.id
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.liquidacion_id
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.liquidacion_fecha_creacion
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.estado
@@ -842,11 +914,19 @@ def generate_movimiento_reports(
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.concepto
 
-        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
-        value_cell.value = item.id
+        if is_for_listado:
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.proveedor_nombre
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
-        value_cell.value = item.liquidacion_id
+        value_cell.value = item.punto_venta_nombre
+
+        if not is_for_listado:
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.id
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.liquidacion_id
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.numero_documento_relacionado

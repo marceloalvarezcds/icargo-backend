@@ -25,6 +25,10 @@ def get_list(ModelType: type, db: Session) -> List[Model]:
     return repository.get_list(ModelType, db)
 
 
+def get_list_by_filter(ModelType: type, db: Session, **filter_columns) -> List[Model]:
+    return repository.get_list_by_filter(ModelType, db, **filter_columns)
+
+
 def get_active_list(ModelType: type, db: Session) -> List[Model]:
     return repository.get_active_list(ModelType, db)
 

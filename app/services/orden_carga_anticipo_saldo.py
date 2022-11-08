@@ -12,15 +12,20 @@ from app.models import (
     OrdenCargaAnticipoSaldo,
     OrdenCargaComplemento,
 )
+from app.models.orden_carga_anticipo_porcentaje import OrdenCargaAnticipoPorcentaje
 
 from .flete_anticipo import get_flete_anticipo_by_id
+from .orden_carga_anticipo_porcentaje_create import (
+    create_orden_carga_anticipo_porcentaje,
+    get_orden_carga_anticipo_porcentaje_by,
+)
 
 
 def create_orden_carga_anticipo_saldo(
     db: Session,
     data: schemas.OrdenCargaAnticipoSaldoForm,
     modified_by: str,
-) -> schemas.OrdenCargaAnticipoSaldo:
+) -> OrdenCargaAnticipoSaldo:
     return repositories.create_orden_carga_anticipo_saldo(
         db,
         data,
@@ -86,10 +91,12 @@ def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
                 modified_by,
             )
     oc_monto_disponible: Decimal = exists.saldo if exists else Decimal(0)
-    camion_monto_disponible = orden_carga.camion_monto_anticipo_disponible
+    camion_monto_disponible: Optional[
+        Decimal
+    ] = orden_carga.camion_monto_anticipo_disponible
     return (
         camion_monto_disponible
-        if camion_monto_disponible < oc_monto_disponible
+        if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible
         else oc_monto_disponible
     )
 
@@ -106,7 +113,7 @@ def edit_orden_carga_anticipo_saldo(
     db: Session,
     data: schemas.OrdenCargaAnticipoSaldoForm,
     modified_by: str,
-) -> Optional[schemas.OrdenCargaAnticipoSaldo]:
+) -> Optional[OrdenCargaAnticipoSaldo]:
     to_edit_obj = get_orden_carga_anticipo_saldo_by_id(db, id)
     return repositories.edit_orden_carga_anticipo_saldo(
         to_edit_obj,
@@ -133,7 +140,7 @@ def update_orden_carga_anticipo_saldo(
     flete_anticipo_id = flete_anticipo.id
     orden_carga_id = orden_carga.id
     camion: Camion = orden_carga.camion
-    camion_limite: Decimal = orden_carga.camion_limite_monto_anticipos
+    camion_limite: Optional[Decimal] = orden_carga.camion_limite_monto_anticipos
     total_anticipos_retirados_en_estado_pendiente_o_en_proceso = (
         repositories.get_total_anticipo_retirado_by_camion_id(db, camion.id)
     )
@@ -142,13 +149,25 @@ def update_orden_carga_anticipo_saldo(
         if total_anticipos_retirados_en_estado_pendiente_o_en_proceso
         else Decimal(0)
     )
-    camion_monto_disponible = camion_limite - camion_monto_retirado - monto_retirado
+    camion_monto_disponible = (
+        camion_limite - camion_monto_retirado - monto_retirado
+        if camion_limite
+        else None
+    )
     exists = repositories.get_orden_carga_anticipo_saldo_by(
         db, flete_anticipo_id, orden_carga_id
     )
+    porcentaje_anticipo: Optional[OrdenCargaAnticipoPorcentaje] = (
+        exists.orden_carga_anticipo_porcentaje if exists else None
+    )
+    porcentaje: Optional[Decimal] = (
+        porcentaje_anticipo.porcentaje
+        if porcentaje_anticipo
+        else flete_anticipo.porcentaje
+    )
     oc_limite = (
-        orden_carga.flete_proyectado * (flete_anticipo.porcentaje / Decimal(100))
-        if flete_anticipo.porcentaje
+        orden_carga.flete_proyectado * (porcentaje / Decimal(100))
+        if porcentaje
         else Decimal(0)
     )
     oc_monto_retirado = monto_retirado + (
@@ -157,37 +176,64 @@ def update_orden_carga_anticipo_saldo(
     oc_monto_disponible = oc_limite + total_complemento - oc_monto_retirado
     saldo = (
         camion_monto_disponible
-        if camion_monto_disponible < oc_monto_disponible
+        if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible
         else oc_monto_disponible
+    )
+    porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
+        db, flete_anticipo_id, orden_carga_id
     )
     if exists:
         schema = schemas.OrdenCargaAnticipoSaldoForm(
             flete_anticipo_id=flete_anticipo_id,
             orden_carga_id=orden_carga_id,
+            orden_carga_anticipo_porcentaje_id=porcentaje_anticipo.id,
             total_anticipo=oc_limite,
             total_complemento=total_complemento,
             total_retirado=oc_monto_retirado,
             saldo=saldo,
         )
-        return edit_orden_carga_anticipo_saldo(
+        anticipo_saldo = edit_orden_carga_anticipo_saldo(
             exists.id,
             db,
             schema,
             modified_by,
         )
-    schema = schemas.OrdenCargaAnticipoSaldoForm(
-        flete_anticipo_id=flete_anticipo_id,
-        orden_carga_id=orden_carga_id,
-        total_anticipo=oc_limite,
-        total_complemento=total_complemento,
-        total_retirado=oc_monto_retirado,
-        saldo=saldo,
-    )
-    return create_orden_carga_anticipo_saldo(
-        db,
-        schema,
-        modified_by,
-    )
+    else:
+        schema = schemas.OrdenCargaAnticipoSaldoForm(
+            flete_anticipo_id=flete_anticipo_id,
+            orden_carga_id=orden_carga_id,
+            orden_carga_anticipo_porcentaje_id=porcentaje_anticipo.id,
+            total_anticipo=oc_limite,
+            total_complemento=total_complemento,
+            total_retirado=oc_monto_retirado,
+            saldo=saldo,
+        )
+        anticipo_saldo = create_orden_carga_anticipo_saldo(
+            db,
+            schema,
+            modified_by,
+        )
+    if anticipo_saldo:
+        # Se actualiza el porcentaje mínimo de la tabla OC anticipo porcentaje
+        if not porcentaje_anticipo:
+            porcentaje_anticipo = create_orden_carga_anticipo_porcentaje(
+                db,
+                anticipo_saldo.orden_carga_id,
+                anticipo_saldo.flete_anticipo,
+                modified_by,
+            )
+        flete_proyectado = (
+            orden_carga.flete_proyectado if orden_carga.flete_proyectado > 0 else 1
+        )
+        porcentaje_minimo = (oc_monto_retirado * 100) / flete_proyectado
+        porcentaje_minimo = (
+            flete_anticipo.porcentaje
+            if porcentaje_minimo > flete_anticipo.porcentaje
+            else porcentaje_minimo
+        )
+        porcentaje_anticipo.porcentaje_minimo = porcentaje_minimo
+        db.commit()
+    return anticipo_saldo
 
 
 def update_orden_carga_anticipo_saldo_by_form(

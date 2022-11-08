@@ -69,6 +69,17 @@ async def read_movimiento_list_by_gestor_carga_id(
     return services.get_movimiento_list(db, current_user.gestor_carga_id)
 
 
+@api.get("/reports/gestor_carga_id")
+async def movimiento_reports_by_gestor_carga_id(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_movimiento_reports_by_gestor_carga_id(
+        db, current_user.gestor_carga_id
+    )
+
+
 @api.get(
     "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}",  # noqa
     response_model=List[schemas.Movimiento],

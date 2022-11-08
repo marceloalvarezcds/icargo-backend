@@ -16,6 +16,9 @@ from app.utils import number_format
 
 from .camion import update_camion_anticipo_retirado
 from .movimiento import create_movimiento_by_anticipo
+from .orden_carga_anticipo_porcentaje_create import (
+    get_orden_carga_anticipo_porcentaje_by,
+)
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
 from .user import get_user_by_username
 
@@ -59,6 +62,10 @@ def create_orden_carga_anticipo_retirado(
             data.cantidad_retirada * data.precio_unitario
         )
     update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
+    porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
+        db, data.flete_anticipo_id, data.orden_carga_id
+    )
+    data.orden_carga_anticipo_porcentaje_id = porcentaje_anticipo.id
     anticipo = repositories.create_orden_carga_anticipo_retirado(
         db,
         data,

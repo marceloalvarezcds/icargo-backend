@@ -171,6 +171,7 @@ from .movimiento import (  # noqa
     get_movimiento_list_by_liquidacion,
     get_movimiento_reports,
     get_movimiento_reports_by_contraparte,
+    get_movimiento_reports_by_gestor_carga_id,
 )
 from .orden_carga import (  # noqa
     aceptar_orden_carga,
@@ -193,6 +194,7 @@ from .orden_carga import (  # noqa
     get_orden_carga_reports,
     get_orden_carga_resumen_pdf_by_id,
     liquidar_orden_carga,
+    send_oc_mail,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
@@ -290,7 +292,16 @@ from .semi import (  # noqa
     get_semi_by_id,
     get_semi_reports,
 )
+from .tipo_cuenta import (  # noqa
+    create_tipo_cuenta,
+    get_tipo_cuenta_active_list_by_tipo_documento_relacionado_otro,
+    get_tipo_cuenta_list_by_tipo_documento_relacionado_otro,
+)
 from .tipo_instrumento import get_tipo_instrumento_via_banco  # noqa
+from .tipo_movimiento import (  # noqa
+    get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes,
+    get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes,
+)
 from .user import (  # noqa
     change_user_status,
     create_user,

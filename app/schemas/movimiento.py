@@ -6,6 +6,7 @@ from app.enums import MovimientoEstadoEnum
 
 from .date_model import Date
 from .moneda import Moneda
+from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 from .rounded_decimal_model import RoundedDecimal
 from .tipo_contraparte import TipoContraparte
 from .tipo_cuenta import TipoCuenta
@@ -45,6 +46,7 @@ class MovimientoBaseModel(BaseModel):
 
 
 class MovimientoForm(MovimientoBaseModel):
+    es_cobro: Optional[bool] = False
     es_creacion_contraparte: Optional[bool] = False
 
 
@@ -81,7 +83,7 @@ class Movimiento(MovimientoBaseModel):
     fecha_pago_cobro: Optional[Date]
     flete_id: Optional[int]
     insumo_descripcion: Optional[str]
-    liquidacion_fecha: Optional[str]
+    liquidacion_fecha_creacion: Optional[Date]
     moneda_nombre: str
     moneda_simbolo: str
     monto_ml: RoundedDecimal
@@ -89,6 +91,7 @@ class Movimiento(MovimientoBaseModel):
     producto_descripcion: Optional[str]
     propietario_nombre: Optional[str]
     proveedor_nombre: Optional[str]
+    punto_venta_nombre: Optional[str]
     remitente_nombre: Optional[str]
     remitente_numero_documento: Optional[str]
     saldo: RoundedDecimal
@@ -96,7 +99,7 @@ class Movimiento(MovimientoBaseModel):
     tipo_contraparte_descripcion: str
     tipo_documento_relacionado_descripcion: str
     tipo_insumo_descripcion: Optional[str]
-    tipo_movimiento_descripcion: str
+    tipo_movimiento_descripcion: Optional[str]
     tipo_operacion_descripcion: str
     # Datos de la OC
     es_flete: bool
@@ -117,6 +120,8 @@ class Movimiento(MovimientoBaseModel):
     merma_propietario_moneda_id: Optional[int] = None
     merma_propietario_es_porcentual: Optional[bool] = False
     merma_propietario_tolerancia: Optional[RoundedDecimal] = None
+    # En caso de ser movimiento de anticipo
+    anticipo: Optional[OrdenCargaAnticipoRetirado] = None
     # Auditoría
     created_by: str
     created_at: Date

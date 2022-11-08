@@ -1,17 +1,15 @@
 from sqlalchemy.exc import IntegrityError  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
-from app.models import TipoDocumentoRelacionado, TipoMovimiento
+from app.models import TipoCuenta, TipoMovimiento
 
 
-def tipo_movimiento_seeds(
-    db: Session, descripcion: str, tipo_documento_relacionado: TipoDocumentoRelacionado
-):
+def tipo_movimiento_seeds(db: Session, descripcion: str, cuenta: TipoCuenta):
     try:
         db.add(
             TipoMovimiento(
                 descripcion=descripcion,
-                tipo_documento_relacionado_id=tipo_documento_relacionado.id,
+                cuenta_id=cuenta.id,
             )
         )
         db.commit()

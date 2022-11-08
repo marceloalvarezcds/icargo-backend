@@ -101,6 +101,9 @@ class OrdenCarga(AuditMixin, Base):
     complementos = relationship("OrdenCargaComplemento", back_populates="orden_carga")
     descuentos = relationship("OrdenCargaDescuento", back_populates="orden_carga")
     saldos = relationship("OrdenCargaAnticipoSaldo", back_populates="orden_carga")
+    porcentaje_anticipos = relationship(
+        "OrdenCargaAnticipoPorcentaje", back_populates="orden_carga"
+    )
     remisiones_origen = relationship(
         "OrdenCargaRemisionOrigen", back_populates="orden_carga"
     )
@@ -129,19 +132,19 @@ class OrdenCarga(AuditMixin, Base):
         return self.camion.limite_cantidad_oc_activas
 
     @hybrid_property
-    def camion_limite_monto_anticipos(self):
+    def camion_limite_monto_anticipos(self) -> Optional[Decimal]:
         return (
             self.camion.limite_monto_anticipos
             if self.camion.limite_monto_anticipos
-            else Decimal(0)
+            else None
         )
 
     @hybrid_property
-    def camion_monto_anticipo_disponible(self):
+    def camion_monto_anticipo_disponible(self) -> Optional[Decimal]:
         return (
             self.camion.monto_anticipo_disponible
             if self.camion.monto_anticipo_disponible
-            else Decimal(0)
+            else None
         )
 
     @hybrid_property
