@@ -7,6 +7,7 @@ from app import app
 from app.config import (
     REPORTS_FOLDER,
     REPORTS_FOLDER_NAME,
+    SENTRY_URL,
     STATICS_FOLDER,
     STATICS_FOLDER_NAME,
     settings,
@@ -15,8 +16,7 @@ from app.endpoints import api
 from app.middlewares import AuditRequestMiddleware
 
 sentry_sdk.init(
-    dsn="https://2e6b5c64b656417da637e21cfb0f9922@o1427902.ingest.sentry.io/6777554",
-    # dsn="http://6c8a54ed815844c388058a16563a5eb8@192.168.100.104:9000/2",
+    dsn=SENTRY_URL,
     traces_sample_rate=1.0,
 )
 
