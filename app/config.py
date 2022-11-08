@@ -54,6 +54,8 @@ JWT_ALGORITHM = "HS256"
 
 SECRET_KEY = str(environ("SECRET_KEY", "secret_key"))
 
+SENTRY_URL = str(environ("SENTRY_URL", "sentry.io"))
+
 SQLALCHEMY_DATABASE_URI = f"{dbtype}://{dbuser}:{dbpasw}@{dburl}/{dbname}"
 
 USER_ADMIN_PASS = str(environ("USER_ADMIN_PASS", "user_admin"))
