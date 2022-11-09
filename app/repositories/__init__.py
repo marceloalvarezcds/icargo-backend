@@ -114,7 +114,8 @@ from .ente_emisor_transporte import (  # noqa
     get_ente_emisor_transporte_list,
 )
 from .estado_cuenta import (  # noqa
-    get_estado_cuenta_by_contraparte,
+    get_estado_cuenta_by_contraparte_and_tipo,
+    get_estado_cuenta_by_contraparte_tipo_otro,
     get_estado_cuenta_list,
     get_estado_cuenta_list_by_gestor_carga_id,
 )

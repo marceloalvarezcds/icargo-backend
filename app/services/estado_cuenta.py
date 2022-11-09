@@ -34,15 +34,14 @@ def get_estado_cuenta_by_contraparte(
     tipo_contraparte = repositories.get_tipo_comprobante_by_id(db, tipo_contraparte_id)
     if not tipo_contraparte:
         raise HTTPException(status_code=404, detail="Tipo de Contraparte no encontrado")
-    filted_dict: Dict[str, Union[int, str]] = {
-        "tipo_contraparte_id": tipo_contraparte_id
-    }
     if tipo_contraparte.descripcion == TipoContraparteEnum.OTRO.value:
-        filted_dict["contraparte"] = contraparte
-        filted_dict["contraparte_numero_documento"] = contraparte_numero_documento
+        result = repositories.get_estado_cuenta_by_contraparte_tipo_otro(
+            db, contraparte, contraparte_numero_documento, tipo_contraparte_id
+        )
     else:
-        filted_dict["contraparte_id"] = contraparte_id
-    result = repositories.get_estado_cuenta_by_contraparte(db, filted_dict)
+        result = repositories.get_estado_cuenta_by_contraparte_and_tipo(
+            db, contraparte_id, tipo_contraparte_id
+        )
     if result:
         return EstadoCuenta.from_orm_row(result)
     return None
