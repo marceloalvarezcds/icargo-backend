@@ -19,6 +19,7 @@ class MovimientoBaseModel(BaseModel):
     liquidacion_id: Optional[int]
     orden_carga_id: Optional[int]
     tipo_contraparte_id: int
+    contraparte_id: Optional[int]
     contraparte: str
     contraparte_numero_documento: str
     tipo_documento_relacionado_id: Optional[int]
