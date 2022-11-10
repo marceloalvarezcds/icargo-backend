@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session  # type: ignore
@@ -30,7 +30,7 @@ async def read_estado_cuenta_list_by_gestor_carga_id(
 
 @api.get(
     "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}",  # noqa
-    response_model=schemas.EstadoCuenta,
+    response_model=Optional[schemas.EstadoCuenta],
 )
 async def read_estado_cuenta_by_contraparte(
     tipo_contraparte_id: int,

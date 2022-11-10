@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Form
 from pydantic import Json
@@ -142,7 +142,7 @@ async def read_movimiento_by_id(
     return services.get_movimiento_by_id(db, id)
 
 
-@api.post("/", response_model=schemas.Movimiento)
+@api.post("/", response_model=Optional[schemas.Movimiento])
 async def add_new_movimiento_by_tipo_documento_relacionado_otro(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.MovimientoForm] = Form(...),  # type: ignore  # noqa: B008
@@ -167,7 +167,7 @@ async def edit_movimiento(
     )
 
 
-@api.put("/{id}/edit_by_gestor_flete", response_model=schemas.Movimiento)
+@api.put("/{id}/edit_by_gestor_flete", response_model=Optional[schemas.Movimiento])
 async def edit_movimiento_by_gestor_flete(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -180,7 +180,7 @@ async def edit_movimiento_by_gestor_flete(
     )
 
 
-@api.put("/{id}/edit_by_gestor_merma", response_model=schemas.Movimiento)
+@api.put("/{id}/edit_by_gestor_merma", response_model=Optional[schemas.Movimiento])
 async def edit_movimiento_by_gestor_merma(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -193,7 +193,7 @@ async def edit_movimiento_by_gestor_merma(
     )
 
 
-@api.put("/{id}/edit_by_propietario_flete", response_model=schemas.Movimiento)
+@api.put("/{id}/edit_by_propietario_flete", response_model=Optional[schemas.Movimiento])
 async def edit_movimiento_by_propietario_flete(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -206,7 +206,7 @@ async def edit_movimiento_by_propietario_flete(
     )
 
 
-@api.put("/{id}/edit_by_propietario_merma", response_model=schemas.Movimiento)
+@api.put("/{id}/edit_by_propietario_merma", response_model=Optional[schemas.Movimiento])
 async def edit_movimiento_by_propietario_merma(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008

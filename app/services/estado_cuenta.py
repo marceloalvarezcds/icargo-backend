@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Optional, Union
+from typing import List, Optional
 
 from fastapi import HTTPException
 from openpyxl import Workbook  # type: ignore
