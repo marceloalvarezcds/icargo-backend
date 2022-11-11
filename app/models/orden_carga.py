@@ -25,7 +25,7 @@ from app.schemas import (
     OrdenCargaRemisionDestino,
     OrdenCargaRemisionOrigen,
 )
-from app.utils import number_format
+from app.utils import get_flete_detalle, get_merma_detalle
 
 from .camion import Camion
 from .centro_operativo import CentroOperativo
@@ -212,12 +212,12 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_gestor_carga_detalle(self):
-        remi = f"{self.flete.remitente_nombre} ||"
-        dest = f"P.Dest.: {number_format(self.cantidad_destino)}Kg ||"
-        tari = f"{number_format(self.flete_tarifa_gestor_carga)}{self.flete_tarifa_unidad_gestor_carga} ||"  # noqa: B950
-        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
-        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
-        return f"{remi} {dest} {tari} {nums} {ubic}"
+        return get_flete_detalle(
+            self,
+            self.flete_tarifa_gestor_carga,
+            self.flete.condicion_gestor_carga_moneda,
+            self.flete.condicion_gestor_carga_unidad,
+        )
 
     @hybrid_property
     def flete_gestor_carga_id(self):
@@ -257,12 +257,12 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_propietario_detalle(self):
-        remi = f"{self.flete.remitente_nombre} ||"
-        dest = f"P.Dest.: {number_format(self.cantidad_destino)}Kg ||"
-        tari = f"{number_format(self.flete_tarifa)}{self.flete_tarifa_unidad} ||"
-        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
-        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
-        return f"{remi} {dest} {tari} {nums} {ubic}"
+        return get_flete_detalle(
+            self,
+            self.flete_tarifa,
+            self.flete.condicion_propietario_moneda,
+            self.flete.condicion_propietario_unidad,
+        )
 
     @hybrid_property
     def flete_proyectado(self):
@@ -338,14 +338,14 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def merma_gestor_carga_detalle(self):
-        remi = f"{self.flete.remitente_nombre} ||"
-        diff = f"Dif.: {number_format(self.diferencia_origen_destino)}Kg ||"
-        totl = f"Tol.: {number_format(self.resultado_gestor_carga_tolerancia_kg)}Kg ||"
-        merm = f"M.: {number_format(self.resultado_gestor_carga_merma)}Kg ||"
-        mval = f"{number_format(self.merma_gestor_carga_valor)}Grs/Kg ||"
-        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
-        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
-        return f"{remi} {diff} {totl} {merm} {mval} {nums} {ubic}"
+        return get_merma_detalle(
+            self,
+            self.merma_gestor_carga_valor,
+            self.merma_gestor_carga_tolerancia,
+            self.merma_gestor_carga_es_porcentual,
+            self.flete.merma_gestor_carga_moneda,
+            self.flete.merma_gestor_carga_unidad,
+        )
 
     @hybrid_property
     def merma_gestor_carga_es_porcentual_descripcion(self):
@@ -362,14 +362,14 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def merma_propietario_detalle(self):
-        remi = f"{self.flete.remitente_nombre} ||"
-        diff = f"Dif.: {number_format(self.diferencia_origen_destino)}Kg ||"
-        totl = f"Tol.: {number_format(self.resultado_propietario_tolerancia_kg)}Kg ||"
-        merm = f"M.: {number_format(self.resultado_propietario_merma)}Kg ||"
-        mval = f"{number_format(self.merma_propietario_valor)}Grs/Kg ||"
-        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
-        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
-        return f"{remi} {diff} {totl} {merm} {mval} {nums} {ubic}"
+        return get_merma_detalle(
+            self,
+            self.merma_propietario_valor,
+            self.merma_propietario_tolerancia,
+            self.merma_propietario_es_porcentual,
+            self.flete.merma_propietario_moneda,
+            self.flete.merma_propietario_unidad,
+        )
 
     @hybrid_property
     def merma_propietario_es_porcentual_descripcion(self):
