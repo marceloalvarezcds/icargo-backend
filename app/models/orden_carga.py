@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import List, Optional, Union
 
@@ -189,6 +190,11 @@ class OrdenCarga(AuditMixin, Base):
     def fecha_conciliacion(self):
         item = self.get_estado_in_historial(EstadoEnum.CONCILIADO)
         return item.created_at if item else None
+
+    @hybrid_property
+    def fecha_validez(self):
+        created_at: datetime = self.created_at
+        return created_at + timedelta(days=3)
 
     @hybrid_property
     def total_anticipo_complemento(self):

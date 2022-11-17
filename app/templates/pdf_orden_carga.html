@@ -10,7 +10,7 @@
         margin: 0px;
         padding: 0px;
         overflow: auto;
-        font-family: "Georgia";
+        font-family: sans-serif;
       }
 
       .align-center {
@@ -23,6 +23,14 @@
 
       .bold {
         font-weight: bold;
+      }
+
+      .border-bottom {
+        border-bottom: 2px solid #d1d3d4;
+      }
+
+      .border-right {
+        border-right: 2px solid #d1d3d4;
       }
 
       .box {
@@ -63,19 +71,22 @@
         margin: 20px 0;
       }
 
+      .dflex {
+        display: flex;
+      }
+
       .flex1 {
         flex: 1;
       }
 
       .firma-container {
         display: flex;
+        justify-content: space-between;
         margin-top: 100px;
       }
 
       .firma {
-        border-top: 2px solid #444;
-        margin: auto;
-        width: 400px;
+        padding: 0 10px;
       }
 
       .firma p {
@@ -183,9 +194,18 @@
         padding: 0 !important;
       }
 
+      .pb10 {
+        padding-bottom: 10px;
+      }
+
       .py10 {
         padding-top: 10px;
         padding-bottom: 10px;
+      }
+
+      .px10 {
+        padding-left: 10px;
+        padding-right: 10px;
       }
 
       .table {
@@ -232,19 +252,23 @@
       .table0 .td:last-of-type {
         width: 400px;
       }
+
+      .uppercase {
+        text-transform: uppercase;
+      }
     </style>
   </head>
 
   <body>
     {% for x in times %}
-    <div>
-      <div class="table gap">
-        <div class="box td gestor-logo">
+    <div class="box">
+      <div class="table border-bottom">
+        <div class="td gestor-logo border-right">
           <div class="table align-center">
             {% if gestor_carga_logo %}
             <img src="{{gestor_carga_logo}}" />
             {% else %}
-            <div class="center fs3 lh3 bold gray flex1">
+            <div class="center fs3 lh3 bold blue flex1">
               LOGO
               <div class="fs4">Gestora Carga</div>
             </div>
@@ -253,96 +277,124 @@
         </div>
         <div class="td flex1 p0">
           <div class="table nogap table0">
-            <div class="box td flex1">
+            <div class="td flex1">
               <p class="bold fs3 lh1 mb10">
                 {{gestor_carga_nombre}} - {{gestor_carga_numero_documento}}
               </p>
-              <p class="fs5 lh3 mb10">
-                <span class="bold">Dirección: </span>{{gestor_carga_direccion}}
-              </p>
             </div>
-            <div class="box td">
-              <p class="fs5 lh1">
-                <span class="bold">Fecha de impresión: </span>{{fecha}}
+            <div class="td">
+              <p class="bold fs3 lh1">
+                <span class="bold gray">ORDEN DE CARGA Nº: </span>{{id}}
               </p>
             </div>
           </div>
           <div class="table nogap table0">
-            <div class="box td flex1">
-              <p class="fs4 lh3">
-                <span class="bold">Remitente: </span>{{remitente}}
-              </p>
-              <p class="fs4 lh3">
-                <span class="bold">Orden de carga Nro: </span>{{id}}
-              </p>
-              <p class="fs4 lh3">
-                <span class="bold">Flete Nro: </span>{{flete_id}}
-              </p>
+            <div class="td flex1">
+              <div class="dflex">
+                <div class="fs5 px10">
+                  <div class="bold gray">Fecha de Orden:</div>
+                  <div>{{fecha_orden}}</div>
+                </div>
+                <div class="fs5 px10">
+                  <div class="bold gray">Fecha de Validez:</div>
+                  <div>{{fecha_validez}}</div>
+                </div>
+              </div>
             </div>
-            <div class="box td">
-              <p class="fs5 lh3">
-                <span class="bold">Cantidad nominada: </span>
-                {{cantidad_nominada}}
-              </p>
-              <p class="fs5 lh3">
-                <span class="bold">Producto: </span> {{producto}}
-              </p>
+            <div class="td">
+              <div class="dflex">
+                <div class="fs5 px10">
+                  <div class="bold gray">Nº de Pedido:</div>
+                  <div>{{flete_id}}</div>
+                </div>
+                <div class="fs5 px10">
+                  <div class="bold gray">Usuario:</div>
+                  <div>{{usuario}}</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="table box">
+      <div class="table border-bottom bold">
         <div class="flex1 td">
-          <p class="fs5 lh3"><span class="bold">Origen: </span>{{origen}}</p>
-          <p class="fs5 lh3">
-            <span class="bold">Ubicación: </span>{{origen_direccion}}
+          <p class="fs4 lh3 pb10">
+            <span class="gray"> Remitente: </span>
+            <span class="uppercase"> {{remitente}} </span>
+          </p>
+          <p class="fs4 lh3 pb10">
+            <span class="gray"> Propietario: </span>
+            <span class="uppercase"> {{propietario_nombre}} </span>
+          </p>
+          <p class="fs4 lh3 pb10">
+            <span class="gray"> Chofer: </span>
+            <span class="uppercase"> {{chofer_nombre}} </span>
           </p>
         </div>
         <div class="flex1 td">
-          <p class="fs5 lh3"><span class="bold">Destino: </span>{{destino}}</p>
-          <p class="fs5 lh3">
-            <span class="bold">Ubicación: </span>{{destino_direccion}}
+          <p class="fs4 lh3 pb10">
+            <span class="gray"> Doc. Remitente: </span>
+            <span class="uppercase"> {{remitente_numero_documento}} </span>
+          </p>
+          <p class="fs4 lh3 pb10">
+            <span class="gray"> Tel. Propietario: </span>
+            <span class="uppercase"> {{propietario_telefono}} </span>
+          </p>
+          <p class="fs4 lh3 pb10">
+            <span class="gray"> Doc. Chofer: </span>
+            <span class="uppercase"> {{chofer_numero_documento}} </span>
           </p>
         </div>
-        <div class="flex1 td"></div>
       </div>
-      <div class="table box mt10">
+      <div class="table border-bottom bold">
         <div class="flex1 td">
           <p class="fs4 lh3">
-            <span class="bold key">Placa del camión: </span>{{camion_placa}}
+            <span class="key gray"> Placa del camión: </span>
+            <span class="uppercase"> {{camion_placa}} </span>
           </p>
           <p class="fs4 lh3">
-            <span class="bold key">Marca/Tipo: </span>{{camion_marca_tipo}}
-          </p>
-          <p class="fs4 lh3 mb10">
-            <span class="bold key">Color: </span>{{camion_color}}
+            <span class="key gray"> Marca/Tipo: </span>
+            <span class="uppercase"> {{camion_marca_tipo}} </span>
           </p>
           <p class="fs4 lh3">
-            <span class="bold key">Propietario del camión: </span
-            >{{propietario_nombre}}
-          </p>
-          <p class="fs4 lh3 mb10">
-            <span class="bold key">Teléfono: </span>{{propietario_telefono}}
+            <span class="key gray"> Color: </span>
+            <span class="uppercase"> {{camion_color}} </span>
           </p>
           <p class="fs4 lh3">
-            <span class="bold key">Placa del Semirremolque: </span
-            >{{semi_placa}}
+            <span class="key gray"> Tipo: </span>
+            <span class="uppercase"> {{camion_tipo}} </span>
+          </p>
+          <p class="fs4 lh3 pb10">
+            <span class="key gray"> Vto. Dinatran: </span>
+            <span class="uppercase"> {{fecha_vencimiento}} </span>
           </p>
           <p class="fs4 lh3">
-            <span class="bold key">Marca/Tipo: </span>{{semi_marca_tipo}}
-          </p>
-          <p class="fs4 lh3 mb10">
-            <span class="bold">Color: </span>{{semi_color}}
+            <span class="key gray"> Placa del Semirremolque: </span>
+            <span class="uppercase"> {{semi_placa}} </span>
           </p>
           <p class="fs4 lh3">
-            <span class="bold key">Chofer: </span>{{chofer_nombre}}
+            <span class="key gray"> Marca/Tipo: </span>
+            <span class="uppercase"> {{semi_marca_tipo}} </span>
           </p>
           <p class="fs4 lh3">
-            <span class="bold key">Cédula de Identidad: </span
-            >{{chofer_numero_documento}}
+            <span class="key gray"> Color: </span>
+            <span class="uppercase"> {{semi_color}} </span>
+          </p>
+          <p class="fs4 lh3 pb10">
+            <span class="key gray"> Tipo: </span>
+            <span class="uppercase"> {{semi_tipo}} </span>
           </p>
           <p class="fs4 lh3">
-            <span class="bold key">Teléfono: </span>{{chofer_telefono}}
+            <span class="key gray"> Peso Bruto: </span>
+            <span class="uppercase"> {{bruto}} </span>
+          </p>
+          <p class="fs4 lh3">
+            <span class="key gray"> Peso Neto: </span>
+            <span class="uppercase"> {{neto}} </span>
+          </p>
+          <p class="fs4 lh3">
+            <span class="key gray"> Cant. Nominada: </span>
+            <span class="uppercase"> {{cantidad_nominada}} </span>
           </p>
         </div>
         <div class="flex1 td camion-foto-container">
@@ -358,23 +410,57 @@
           </div>
         </div>
       </div>
-      <div class="box mt10 py10">
+      <div class="table border-bottom bold px10">
+        <div class="flex1 td">
+          <div class="fs4 lh3 pb10">
+            <div class="gray">Origen:</div>
+            <div class="uppercase">{{origen}}</div>
+          </div>
+          <div class="fs4 lh3">
+            <div class="gray">Ubicación:</div>
+            <div class="uppercase">{{origen_direccion}}</div>
+          </div>
+        </div>
+        <div class="flex1 td">
+          <div class="fs4 lh3 pb10">
+            <div class="gray">Destino:</div>
+            <div class="uppercase">{{destino}}</div>
+          </div>
+          <div class="fs4 lh3">
+            <div class="gray">Ubicación:</div>
+            <div class="uppercase">{{destino_direccion}}</div>
+          </div>
+        </div>
+        <div class="flex1 td">
+          <div class="fs4 lh3">
+            <div class="gray">Producto:</div>
+            <div class="uppercase">{{producto}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="py10">
         <p class="fs4 lh3">
-          <span class="bold">Comentarios: </span>{{comentarios}}
+          <span class="bold gray">Comentarios: </span>{{comentarios}}
         </p>
       </div>
-      <div class="box mt10 py10">
+      <div class="firma-container border-bottom">
+        <div class="firma">
+          <span class="bold fs5 lh3"> P/A: {{gestor_carga_nombre_corto}} </span>
+          <span
+            style="display: inline-block; border: 1px dashed #444; width: 200px"
+          ></span>
+        </div>
+        <div class="firma">
+          <span class="bold fs5 lh3">Firma Chofer</span>
+          <span
+            style="display: inline-block; border: 1px dashed #444; width: 200px"
+          ></span>
+        </div>
+      </div>
+      <div class="py10 border-bottom">
         <p class="fs5 lh4">{{texto_legal}}</p>
       </div>
-      <div class="firma-container">
-        <div class="firma">
-          <p class="bold fs5 lh3">Firma de la Transportadora</p>
-        </div>
-        <div class="firma">
-          <p class="bold fs5 lh3">Firma del Chofer</p>
-        </div>
-      </div>
-      <div class="logo-container table box align-center mt10">
+      <div class="logo-container table align-center mt10">
         <div class="logo">
           <img src="{{logo}}" alt="iCargo" />
         </div>

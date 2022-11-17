@@ -84,7 +84,6 @@ def create_orden_carga(
         db, obj.id, obj.flete_anticipos, modified_by
     )
     create_complementos_and_descuentos(db, obj, flete, modified_by)
-    send_emision_orden_carga_mail(obj)
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
@@ -137,16 +136,30 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
     OUTPUT_FILENAME = f"orden_carga_{id}.pdf"
     TEMPLATE_FILENAME = "pdf_orden_carga.html"
     template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
+    create_at: datetime = obj.created_at
+    fecha_vencimiento: datetime = obj.camion.vencimiento_habilitacion_transporte
+    df = "%Y-%m-%d / %H:%M:%S"
+    bruto = obj.camion.bruto + obj.semi.bruto
+    neto = obj.camion.neto + obj.semi.neto
+    gestor_carga_nombre_corto = (
+        gestor_carga.nombre_corto if gestor_carga.nombre_corto else gestor_carga.nombre
+    )
     data = {
         "id": id,
         "flete_id": obj.flete_id,
-        "remitente": f"{obj.flete.remitente_nombre} - {obj.flete.remitente.numero_documento}",
+        "remitente": obj.flete.remitente.nombre,
+        "remitente_numero_documento": obj.flete.remitente.numero_documento,
+        "bruto": number_format(bruto),
+        "neto": number_format(neto),
         "cantidad_nominada": number_format(obj.cantidad_nominada),
         "gestor_carga_direccion": gestor_carga.direccion,
         "gestor_carga_logo": gestor_carga.logo,
         "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_nombre_corto": gestor_carga_nombre_corto,
         "gestor_carga_numero_documento": gestor_carga.numero_documento,
-        "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
+        "fecha": datetime.now().strftime(df),
+        "fecha_orden": create_at.strftime(df),
+        "fecha_validez": obj.fecha_validez.strftime(df),
         "producto": obj.flete_producto_descripcion,
         "origen": obj.origen_nombre,
         "origen_direccion": obj.origen.direccion if obj.origen.direccion else "-",
@@ -161,13 +174,17 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "camion_placa": obj.camion_placa,
         "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",
         "camion_color": obj.camion.color_descripcion,
+        "camion_tipo": obj.camion.tipo_descripcion,
+        "camion_fecha_vto": fecha_vencimiento.strftime(df),
         "semi_placa": obj.semi_placa,
         "semi_marca_tipo": f"{obj.semi.marca_descripcion}/{obj.semi.tipo_descripcion}",
         "semi_color": obj.semi.color_descripcion,
+        "semi_tipo": obj.semi.tipo_descripcion,
         "comentarios": obj.comentarios if obj.comentarios else "-",
         "texto_legal": obj.flete.emision_orden_texto_legal
         if obj.flete.emision_orden_texto_legal
         else "-",
+        "usuario": obj.created_by,
     }
     source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
@@ -282,6 +299,7 @@ def aceptar_orden_carga(
         username,
     )
     model = repositories.aceptar_orden_carga(oc, db, username)
+    send_emision_orden_carga_mail(obj)
     return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
@@ -371,16 +389,30 @@ def send_emision_orden_carga_mail(obj: OrdenCarga):
     gestor_carga: GestorCarga = obj.gestor_carga
     flete = get_flete_detail(obj.flete)
     destinatarios = ",".join([x.email for x in flete.destinatarios])
+    create_at: datetime = obj.created_at
+    fecha_vencimiento: datetime = obj.camion.vencimiento_habilitacion_transporte
+    df = "%Y-%m-%d / %H:%M:%S"
+    bruto = obj.camion.bruto + obj.semi.bruto
+    neto = obj.camion.neto + obj.semi.neto
+    gestor_carga_nombre_corto = (
+        gestor_carga.nombre_corto if gestor_carga.nombre_corto else gestor_carga.nombre
+    )
     data = {
         "id": obj.id,
         "flete_id": flete.id,
-        "remitente": f"{flete.remitente.nombre} - {flete.remitente.numero_documento}",
+        "remitente": flete.remitente.nombre,
+        "remitente_numero_documento": flete.remitente.numero_documento,
+        "bruto": number_format(bruto),
+        "neto": number_format(neto),
         "cantidad_nominada": number_format(obj.cantidad_nominada),
         "gestor_carga_direccion": gestor_carga.direccion,
         "gestor_carga_logo": gestor_carga.logo,
         "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_nombre_corto": gestor_carga_nombre_corto,
         "gestor_carga_numero_documento": gestor_carga.numero_documento,
-        "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
+        "fecha": datetime.now().strftime(df),
+        "fecha_orden": create_at.strftime(df),
+        "fecha_validez": obj.fecha_validez.strftime(df),
         "producto": obj.flete_producto_descripcion,
         "origen": obj.origen_nombre,
         "origen_direccion": obj.origen.direccion if obj.origen.direccion else "-",
@@ -395,13 +427,17 @@ def send_emision_orden_carga_mail(obj: OrdenCarga):
         "camion_placa": obj.camion_placa,
         "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",
         "camion_color": obj.camion.color_descripcion,
+        "camion_tipo": obj.camion.tipo_descripcion,
+        "camion_fecha_vto": fecha_vencimiento.strftime(df),
         "semi_placa": obj.semi_placa,
         "semi_marca_tipo": f"{obj.semi.marca_descripcion}/{obj.semi.tipo_descripcion}",
         "semi_color": obj.semi.color_descripcion,
+        "semi_tipo": obj.semi.tipo_descripcion,
         "comentarios": obj.comentarios if obj.comentarios else "-",
         "texto_legal": obj.flete.emision_orden_texto_legal
         if obj.flete.emision_orden_texto_legal
         else "-",
+        "usuario": obj.created_by,
     }
     send_email_with_template_by_thread(
         template_filename="mail_orden_carga.html",
