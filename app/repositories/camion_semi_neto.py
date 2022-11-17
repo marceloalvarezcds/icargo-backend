@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
@@ -15,7 +16,10 @@ def get_camion_semi_neto_by_id(db: Session, id: int) -> Optional[CamionSemiNeto]
 
 
 def get_camion_semi_neto_by_camion_id_and_semi_id(
-    db: Session, camion_id: int, semi_id: int, gestor_carga_id: Optional[int]
+    db: Session,
+    camion_id: int,
+    semi_id: int,
+    gestor_carga_id: Optional[int],
 ) -> Optional[CamionSemiNeto]:
     return (
         db.query(CamionSemiNeto)
@@ -51,6 +55,64 @@ def get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
                 CamionSemiNeto.camion_id == camion_id,
                 CamionSemiNeto.semi_id == semi_id,
                 CamionSemiNeto.producto_id == producto_id,
+                CamionSemiNeto.gestor_carga_id == gestor_carga_id,
+                CamionSemiNeto.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(
+            CamionSemiNeto.created_at.desc(),
+            CamionSemiNeto.camion_id,
+            CamionSemiNeto.semi_id,
+            CamionSemiNeto.producto_id,
+        )
+        .first()
+    )
+
+
+def get_camion_semi_neto_by_camion_id_and_semi_id_and_neto(
+    db: Session,
+    camion_id: int,
+    semi_id: int,
+    neto: Decimal,
+    gestor_carga_id: Optional[int],
+) -> Optional[CamionSemiNeto]:
+    return (
+        db.query(CamionSemiNeto)
+        .filter(
+            and_(
+                CamionSemiNeto.camion_id == camion_id,
+                CamionSemiNeto.semi_id == semi_id,
+                CamionSemiNeto.producto_id == null(),
+                CamionSemiNeto.neto == neto,
+                CamionSemiNeto.gestor_carga_id == gestor_carga_id,
+                CamionSemiNeto.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(
+            CamionSemiNeto.created_at.desc(),
+            CamionSemiNeto.camion_id,
+            CamionSemiNeto.semi_id,
+        )
+        .first()
+    )
+
+
+def get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id_and_neto(
+    db: Session,
+    camion_id: int,
+    semi_id: int,
+    producto_id: int,
+    neto: Decimal,
+    gestor_carga_id: Optional[int],
+) -> Optional[CamionSemiNeto]:
+    return (
+        db.query(CamionSemiNeto)
+        .filter(
+            and_(
+                CamionSemiNeto.camion_id == camion_id,
+                CamionSemiNeto.semi_id == semi_id,
+                CamionSemiNeto.producto_id == producto_id,
+                CamionSemiNeto.neto == neto,
                 CamionSemiNeto.gestor_carga_id == gestor_carga_id,
                 CamionSemiNeto.estado != EstadoEnum.ELIMINADO.value,
             )

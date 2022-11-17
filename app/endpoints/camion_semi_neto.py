@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Form
 from pydantic import Json
@@ -42,7 +42,7 @@ async def read_camion_semi_neto_by_camion_id_and_semi_id(
 
 @api.get(
     "/camion/{camion_id}/semi/{semi_id}/producto/{producto_id}",
-    response_model=schemas.CamionSemiNeto,
+    response_model=Optional[schemas.CamionSemiNeto],
 )
 async def read_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
     camion_id: int,

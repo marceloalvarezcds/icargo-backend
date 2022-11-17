@@ -19,7 +19,9 @@ class CamionSemiNeto(AuditMixin, Base):
     """
 
     __table_args__ = (
-        UniqueConstraint("camion_id", "semi_id", "producto_id", "gestor_carga_id"),
+        UniqueConstraint(
+            "camion_id", "semi_id", "producto_id", "gestor_carga_id", "neto"
+        ),
     )
     id = Column(Integer, primary_key=True)
     producto_id = Column(Integer, ForeignKey("producto.id"))
