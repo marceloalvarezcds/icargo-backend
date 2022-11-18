@@ -29,6 +29,7 @@ from app.schemas import (
 from app.utils import get_flete_detalle, get_merma_detalle
 
 from .camion import Camion
+from .camion_semi_neto import CamionSemiNeto
 from .centro_operativo import CentroOperativo
 from .flete import Flete
 from .gestor_carga import GestorCarga
@@ -40,6 +41,8 @@ class OrdenCarga(AuditMixin, Base):
     id = Column(Integer, primary_key=True)
     camion_id = Column(Integer, ForeignKey("camion.id"))
     camion = relationship(Camion, uselist=False)
+    camion_semi_neto_id = Column(Integer, ForeignKey("camion_semi_neto.id"))
+    camion_semi_neto = relationship(CamionSemiNeto, uselist=False)
     semi_id = Column(Integer, ForeignKey("semi.id"))
     semi = relationship(Semi, uselist=False)
     flete_id = Column(Integer, ForeignKey("flete.id"))

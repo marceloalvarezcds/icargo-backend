@@ -18,6 +18,9 @@ from app.schemas.audit_database import AuditDatabase as A
 from app.utils import number_format, send_email_with_template_by_thread
 
 from .audit_database import get_audit_list_by_orden_carga
+from .camion_semi_neto import (
+    get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id,
+)
 from .flete import get_flete_detail
 from .movimiento import create_movimiento_by_conciliacion_oc
 from .orden_carga_anticipo_porcentaje import (
@@ -72,12 +75,17 @@ def create_orden_carga(
     flete = repositories.get_flete_by_id(db, data.flete_id)
     if not flete:
         raise HTTPException(status_code=404, detail="Flete no encontrado")
+    gestor_carga_id = current_user.gestor_carga_id
     modified_by = current_user.username
+    camion_semi_neto = get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
+        db, data.camion_id, data.semi_id, flete.producto_id, gestor_carga_id
+    )
+    data.camion_semi_neto_id = camion_semi_neto.id if camion_semi_neto else None
     obj = repositories.create_orden_carga(
         db,
         data,
         flete,
-        current_user.gestor_carga_id,
+        gestor_carga_id,
         modified_by,
     )
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list(
@@ -139,8 +147,8 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
     create_at: datetime = obj.created_at
     fecha_vencimiento: datetime = obj.camion.vencimiento_habilitacion_transporte
     df = "%Y-%m-%d / %H:%M:%S"
-    bruto = obj.camion.bruto + obj.semi.bruto
-    neto = obj.camion.neto + obj.semi.neto
+    bruto = obj.camion.bruto
+    neto = obj.camion_semi_neto.neto if obj.camion_semi_neto else None
     gestor_carga_nombre_corto = (
         gestor_carga.nombre_corto if gestor_carga.nombre_corto else gestor_carga.nombre
     )
@@ -149,8 +157,8 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "flete_id": obj.flete_id,
         "remitente": obj.flete.remitente.nombre,
         "remitente_numero_documento": obj.flete.remitente.numero_documento,
-        "bruto": number_format(bruto),
-        "neto": number_format(neto),
+        "bruto": number_format(bruto) if bruto else "-",
+        "neto": number_format(neto) if neto else "-",
         "cantidad_nominada": number_format(obj.cantidad_nominada),
         "gestor_carga_direccion": gestor_carga.direccion,
         "gestor_carga_logo": gestor_carga.logo,

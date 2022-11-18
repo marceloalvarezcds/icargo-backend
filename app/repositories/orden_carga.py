@@ -143,6 +143,7 @@ def create_orden_carga(
 ) -> OrdenCarga:
     obj = OrdenCarga(
         camion_id=data.camion_id,
+        camion_semi_neto_id=data.camion_semi_neto_id,
         semi_id=data.semi_id,
         flete_id=data.flete_id,
         cantidad_nominada=data.cantidad_nominada,

@@ -9,17 +9,21 @@
 
   <body>
     <div
-      style="border: 2px solid #d1d3d4; font-family: sans-serif; width: 1245px"
+      style="
+        border: 2px solid #d1d3d4;
+        font-size: 12px;
+        font-family: sans-serif;
+        width: 1245px;
+      "
     >
       <div style="display: flex; border-bottom: 2px solid #d1d3d4">
         <div
           style="
-            border-right: 2px solid #d1d3d4;
             box-sizing: border-box;
             border-right-width: 2px;
             padding: 8px 0 7px 0;
-            width: 150px;
-            height: 150px;
+            width: 100px;
+            height: 100px;
           "
         >
           <div
@@ -40,9 +44,9 @@
               style="
                 color: #39f;
                 flex: 1;
-                font-size: 20px;
+                font-size: 16px;
                 font-weight: bold;
-                line-height: 25px;
+                line-height: 22px;
                 text-align: center;
               "
             >
@@ -52,12 +56,12 @@
             {% endif %}
           </div>
         </div>
-        <div style="flex: 1">
+        <div style="border-left: 2px solid #d1d3d4; flex: 1">
           <div
             style="
               box-sizing: border-box;
               display: flex;
-              min-height: 146px;
+              min-height: 100px;
               align-items: flex-end;
               padding: 8px 10px 7px 10px;
             "
@@ -67,14 +71,14 @@
                 style="
                   font-weight: bold;
                   font-size: 16px;
-                  line-height: 36px;
-                  margin-bottom: 20px;
+                  line-height: 25px;
+                  margin-bottom: 10px;
                   margin-right: 10px;
                 "
               >
                 {{gestor_carga_nombre}} - {{gestor_carga_numero_documento}}
               </div>
-              <div style="display: flex; font-size: 14px; column-gap: 15%">
+              <div style="display: flex; font-size: 11px; column-gap: 15%">
                 <div>
                   <div style="color: #939598">Fecha de Orden:</div>
                   <div>{{fecha_orden}}</div>
@@ -89,9 +93,9 @@
               <div
                 style="
                   color: #939fa7;
-                  font-size: 16px;
+                  font-size: 18px;
                   font-weight: bold;
-                  line-height: 36px;
+                  line-height: 25px;
                   text-transform: uppercase;
                   margin-bottom: 20px;
                   width: 285px;
@@ -100,7 +104,7 @@
                 <span> Orden de carga Nº: </span>
                 <span> {{id}} </span>
               </div>
-              <div style="display: flex; font-size: 14px; column-gap: 15%">
+              <div style="display: flex; font-size: 11px; column-gap: 15%">
                 <div>
                   <div style="color: #939598">Nº de Pedido:</div>
                   <div>{{flete_id}}</div>
@@ -118,12 +122,10 @@
         style="
           border-bottom: 2px solid #d1d3d4;
           display: flex;
-          font-size: 16px;
           font-weight: bold;
-          line-height: 20px;
         "
       >
-        <div style="flex: 1; padding: 8px 0 7px 0">
+        <div style="flex: 1; padding: 8px 0 0 0">
           <div
             style="
               padding-bottom: 10px;
@@ -201,7 +203,6 @@
           display: flex;
           border-bottom: 2px solid #d1d3d4;
           box-sizing: border-box;
-          font-size: 16px;
           font-weight: bold;
         "
       >
@@ -247,7 +248,7 @@
           <div style="display: flex; padding-bottom: 10px">
             <div>
               <div style="color: #939598; display: inline-block; width: 200px">
-                Placa del Semirremolque:
+                Placa del Semi:
               </div>
               <div style="text-transform: uppercase">{{semi_placa}}</div>
             </div>
@@ -291,7 +292,7 @@
             </div>
           </div>
         </div>
-        <div style="min-height: 153px; width: 153px">
+        <div style="min-height: 120px; width: 120px">
           {% if camion_foto %}
           <img src="{{camion_foto}}" />
           {% else %}
@@ -305,7 +306,6 @@
       <div
         style="
           border-bottom: 2px solid #d1d3d4;
-          font-size: 16px;
           display: flex;
           font-weight: bold;
           line-height: 20px;
@@ -340,23 +340,24 @@
       </div>
       <div
         style="
-          font-size: 16px;
+          font-size: 11px;
           display: flex;
           font-weight: bold;
           line-height: 20px;
         "
       >
         <div style="padding-left: 10px; padding-right: 10px">
-          <div style="color: #939598; font-size: 14px">Comentarios:</div>
-          <div>{{destino_direccion}}</div>
+          <span style="color: #939598">Comentarios:</span>
+          <span>{{destino_direccion}}</span>
         </div>
       </div>
       <div
         style="
           border-bottom: 2px solid #d1d3d4;
           display: flex;
+          font-size: 11px;
           justify-content: space-between;
-          margin-top: 100px;
+          margin-top: 60px;
           padding: 0 10px;
         "
       >
@@ -381,7 +382,7 @@
         style="
           border-bottom: 2px solid #d1d3d4;
           box-sizing: border-box;
-          font-size: 16px;
+          font-size: 11px;
           display: flex;
           line-height: 20px;
           padding: 10px;
@@ -389,14 +390,14 @@
       >
         {{texto_legal}}
       </div>
-      <div style="display: flex; margin-top: 10px; align-items: center">
-        <div style="width: 430px; height: 120px">
+      <div style="display: flex; align-items: center">
+        <div style="width: 150px; height: 60px">
           <img src="{{logo}}" alt="iCargo" />
         </div>
         <div
           style="
             line-height: 14px;
-            font-size: 10px;
+            font-size: 9px;
             flex: 1;
             padding-left: 10px;
             padding-right: 10px;

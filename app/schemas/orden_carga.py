@@ -30,6 +30,7 @@ class OrdenCargaForm(BaseModel):
     camion_id: int
     semi_id: int
     flete_id: int
+    camion_semi_neto_id: Optional[int] = None
     cantidad_nominada: RoundedDecimal
     comentarios: Optional[str] = None
 
