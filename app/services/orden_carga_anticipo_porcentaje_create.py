@@ -26,10 +26,11 @@ def create_orden_carga_anticipo_porcentaje(
     flete_anticipo: FleteAnticipo,
     modified_by: str,
 ) -> OrdenCargaAnticipoPorcentaje:
+    porcentaje = flete_anticipo.porcentaje if flete_anticipo.porcentaje else Decimal(0)
     data = OrdenCargaAnticipoPorcentajeForm(
         flete_anticipo_id=flete_anticipo.id,
         orden_carga_id=orden_carga_id,
-        porcentaje=flete_anticipo.porcentaje,
+        porcentaje=porcentaje,
         porcentaje_minimo=Decimal(0),
     )
     obj: OrdenCargaAnticipoPorcentaje = service.create(

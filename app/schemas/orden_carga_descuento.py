@@ -26,11 +26,6 @@ class OrdenCargaDescuentoForm(BaseModel):
     # FIN Monto a pagar al Proveedor
     orden_carga_id: int
     flete_id: Optional[int] = None
-    # Auditoría
-    created_by: str
-    created_at: Date
-    modified_by: str
-    modified_at: Date
 
 
 class OrdenCargaDescuento(OrdenCargaDescuentoForm):
@@ -48,6 +43,11 @@ class OrdenCargaDescuento(OrdenCargaDescuentoForm):
     proveedor: Optional[Proveedor] = None
     proveedor_nombre: Optional[str] = None
     # FIN Monto a pagar al Proveedor
+    # Auditoría
+    created_by: str
+    created_at: Date
+    modified_by: str
+    modified_at: Date
 
     class Config:
         orm_mode = True
