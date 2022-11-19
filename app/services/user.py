@@ -91,6 +91,9 @@ def create_user(
     modified_by: str,
     request: Request,
 ) -> User:
+    service.check_unique(
+        User, db, None, f"Ya existe Usuario con email {data.email}", email=data.email
+    )
     roles: List[RolChecked] = data.roles
     del data.roles
     if not data.gestor_carga_id and gestor_carga_id:
@@ -126,6 +129,9 @@ def edit_user(
     modified_by: str,
     request: Request,
 ) -> User:
+    service.check_unique(
+        User, db, None, f"Ya existe Usuario con email {data.email}", email=data.email
+    )
     roles: List[RolChecked] = data.roles
     del data.roles
     if not data.gestor_carga_id and gestor_carga_id:
