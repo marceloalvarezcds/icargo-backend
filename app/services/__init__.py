@@ -294,11 +294,14 @@ from .semi import (  # noqa
 )
 from .tipo_cuenta import (  # noqa
     create_tipo_cuenta,
+    edit_tipo_cuenta,
     get_tipo_cuenta_active_list_by_tipo_documento_relacionado_otro,
     get_tipo_cuenta_list_by_tipo_documento_relacionado_otro,
 )
 from .tipo_instrumento import get_tipo_instrumento_via_banco  # noqa
 from .tipo_movimiento import (  # noqa
+    create_tipo_movimiento,
+    edit_tipo_movimiento,
     get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes,
     get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes,
 )

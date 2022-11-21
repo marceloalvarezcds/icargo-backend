@@ -47,7 +47,7 @@ async def add_new_tipo_movimiento(
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.TIPO_MOVIMIENTO)),  # noqa: B008
 ):
-    return service.create(TipoMovimiento, db, data, current_user.username, "El Tipo de Movimiento")  # type: ignore  # noqa: B950
+    return services.create_tipo_movimiento(db, data, current_user.username)  # type: ignore  # noqa: B950
 
 
 @api.put("/{id}", response_model=schemas.TipoMovimiento)
@@ -58,7 +58,7 @@ async def edit_tipo_movimiento(
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.TIPO_MOVIMIENTO)),  # noqa: B008
 ):
-    return service.edit(TipoMovimiento, db, id, data, current_user.username, "El Tipo de Movimiento")  # type: ignore  # noqa: B950
+    return services.edit_tipo_movimiento(id, db, data, current_user.username)  # type: ignore  # noqa: B950
 
 
 @api.get("/{id}/active", response_model=schemas.TipoMovimiento)

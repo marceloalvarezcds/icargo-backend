@@ -114,11 +114,11 @@ class Movimiento(AuditMixin, Base):
 
     @hybrid_property
     def concepto(self):
-        return self.tipo_movimiento.descripcion
+        return self.tipo_movimiento.codigo_descripcion
 
     @hybrid_property
-    def cuenta_descripcion(self):
-        return self.cuenta.descripcion
+    def cuenta_codigo_descripcion(self):
+        return self.cuenta.codigo_descripcion
 
     @hybrid_property
     def debito(self):

@@ -77,7 +77,7 @@ class Movimiento(MovimientoBaseModel):
     chofer_nombre: Optional[str]
     chofer_numero_documento: Optional[str]
     concepto: str
-    cuenta_descripcion: str
+    cuenta_codigo_descripcion: str
     debito: RoundedDecimal
     destino_nombre: Optional[str]
     es_cobro: bool

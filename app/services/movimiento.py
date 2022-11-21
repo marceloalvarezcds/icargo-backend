@@ -972,7 +972,7 @@ def generate_movimiento_reports(
         value_cell.value = item.fecha if item.fecha else item.created_at
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
-        value_cell.value = item.cuenta_descripcion
+        value_cell.value = item.cuenta_codigo_descripcion
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.concepto

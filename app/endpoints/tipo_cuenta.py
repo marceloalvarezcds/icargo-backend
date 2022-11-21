@@ -58,7 +58,7 @@ async def edit_tipo_cuenta(
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.TIPO_CUENTA)),  # noqa: B008
 ):
-    return service.edit(TipoCuenta, db, id, data, current_user.username, "El Tipo de Cuenta")  # type: ignore  # noqa: B950
+    return services.edit_tipo_cuenta(id, db, data, current_user.username)  # type: ignore  # noqa: B950
 
 
 @api.get("/{id}/active", response_model=schemas.TipoCuenta)

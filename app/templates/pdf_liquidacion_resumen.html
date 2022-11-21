@@ -358,7 +358,7 @@
               <td class="placa">
                 {{ item.camion_placa if item.camion_placa else "-" }}
               </td>
-              <td class="cuenta">{{ item.cuenta_descripcion }}</td>
+              <td class="cuenta">{{ item.cuenta_codigo_descripcion }}</td>
               <td class="concepto">
                 {{ item.concepto }} {{ '-' +
                 item.anticipo.tipo_anticipo_descripcion if item.anticipo else ""
@@ -455,7 +455,7 @@
                 {% else %} {{ item.created_at.strftime('%d-%m-%y %H:%M') }} {%
                 endif %}
               </td>
-              <td class="cuenta">{{ item.cuenta_descripcion }}</td>
+              <td class="cuenta">{{ item.cuenta_codigo_descripcion }}</td>
               <td class="concepto">{{ item.concepto }}</td>
               <td class="detalle">
                 {{ item.detalle if item.detalle else "" }}
