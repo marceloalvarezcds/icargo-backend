@@ -83,6 +83,10 @@ class Chofer(AuditMixin, Base):
         return self.gestor_cuenta.nombre if self.gestor_cuenta else None
 
     @hybrid_property
+    def info(self):
+        return f"{self.nombre} - {self.numero_documento}"
+
+    @hybrid_property
     def localidad_nombre(self):
         return self.ciudad.localidad.nombre if self.ciudad else None
 

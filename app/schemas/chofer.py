@@ -129,6 +129,7 @@ class ChoferList(BaseModel):
     direccion: Optional[str] = None
     ciudad: Optional[Ciudad] = None
     ciudad_nombre: Optional[str] = None
+    info: Optional[str] = None
     localidad_nombre: Optional[str] = None
     pais_nombre: Optional[str] = None
     pais_nombre_corto: Optional[str] = None

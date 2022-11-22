@@ -243,6 +243,7 @@ from .propietario import (  # noqa
     edit_propietario,
     get_propietario_by_id,
     get_propietario_by_id_and_gestor_cuenta_id,
+    get_propietario_list_by_gestor_cuenta_and_camion_id,
     get_propietario_reports,
 )
 from .propietario_contacto import update_propietario_contacto_list  # noqa
