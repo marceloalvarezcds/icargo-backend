@@ -24,6 +24,7 @@ from .propietario_chofer import (
     disable_chofer_by_id,
 )
 from .propietario_contacto import update_propietario_contacto_list
+from .semi import get_semi_by_id
 
 
 async def create_propietario(
@@ -106,6 +107,17 @@ def get_propietario_list_by_gestor_cuenta_and_camion_id(
     lista = repositories.get_propietario_list_by_gestor_cuenta_id(db, gestor_cuenta_id)
     if camion.propietario:
         propietario: Propietario = camion.propietario
+        lista.append(propietario)
+    return lista
+
+
+def get_propietario_list_by_gestor_cuenta_and_semi_id(
+    db: Session, semi_id: int, gestor_cuenta_id: Optional[int]
+) -> List[Propietario]:
+    semi = get_semi_by_id(db, semi_id)
+    lista = repositories.get_propietario_list_by_gestor_cuenta_id(db, gestor_cuenta_id)
+    if semi.propietario:
+        propietario: Propietario = semi.propietario
         lista.append(propietario)
     return lista
 

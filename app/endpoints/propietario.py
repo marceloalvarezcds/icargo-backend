@@ -32,7 +32,9 @@ async def read_propietario_list_by_gestor_cuenta(
     )
 
 
-@api.get("/gestor_cuenta/{camion_id}", response_model=List[schemas.PropietarioList])
+@api.get(
+    "/gestor_cuenta/camion/{camion_id}", response_model=List[schemas.PropietarioList]
+)
 async def read_propietario_list_by_gestor_cuenta_and_camion_id(
     camion_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -41,6 +43,18 @@ async def read_propietario_list_by_gestor_cuenta_and_camion_id(
 ):
     return services.get_propietario_list_by_gestor_cuenta_and_camion_id(
         db, camion_id, current_user.gestor_carga_id
+    )
+
+
+@api.get("/gestor_cuenta/semi/{semi_id}", response_model=List[schemas.PropietarioList])
+async def read_propietario_list_by_gestor_cuenta_and_semi_id(
+    semi_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.PROPIETARIO)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_propietario_list_by_gestor_cuenta_and_semi_id(
+        db, semi_id, current_user.gestor_carga_id
     )
 
 
