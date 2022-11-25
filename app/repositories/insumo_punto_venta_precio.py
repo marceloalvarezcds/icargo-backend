@@ -7,7 +7,13 @@ from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from sqlalchemy.sql.expression import null  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import FleteAnticipo, Insumo, InsumoPuntoVenta, InsumoPuntoVentaPrecio
+from app.models import (
+    FleteAnticipo,
+    Insumo,
+    InsumoPuntoVenta,
+    InsumoPuntoVentaPrecio,
+    PuntoVenta,
+)
 from app.schemas import InsumoPuntoVentaPrecioForm
 
 
@@ -50,6 +56,7 @@ def get_insumo_punto_venta_precio_max_fecha_query(
         .select_from(InsumoPuntoVentaPrecio)
         .join(InsumoPuntoVentaPrecio.insumo_punto_venta)
         .join(InsumoPuntoVenta.insumo)
+        .join(InsumoPuntoVenta.punto_venta)
         .join(FleteAnticipo, Insumo.tipo_id == FleteAnticipo.tipo_insumo_id)
         .filter(
             and_(
@@ -57,6 +64,7 @@ def get_insumo_punto_venta_precio_max_fecha_query(
                 InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
                 InsumoPuntoVenta.estado != EstadoEnum.ELIMINADO.value,
                 InsumoPuntoVentaPrecio.estado != EstadoEnum.ELIMINADO.value,
+                PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
                 or_(
                     InsumoPuntoVentaPrecio.fecha_fin >= now,
                     InsumoPuntoVentaPrecio.fecha_fin == null(),
