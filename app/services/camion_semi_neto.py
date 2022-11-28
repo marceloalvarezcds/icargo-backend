@@ -1,3 +1,5 @@
+from decimal import Decimal
+from http import HTTPStatus
 from typing import List, Optional
 
 from fastapi import HTTPException
@@ -7,10 +9,11 @@ from app import repositories
 from app.enums import EstadoEnum
 from app.models import Camion, CamionSemiNeto, Semi
 from app.schemas import CamionSemiNetoForm
+from app.utils import number_format
 
 
 def get_camion_semi_neto_list_by_producto_id(
-    db: Session, producto_id: int, gestor_carga_id: int
+    db: Session, producto_id: int, gestor_carga_id: Optional[int]
 ) -> List[CamionSemiNeto]:
     camion_semi_neto_list = repositories.get_camion_semi_neto_list_by_producto_id(
         db, producto_id, gestor_carga_id
@@ -42,7 +45,7 @@ def get_camion_semi_neto_list_by_camion_id_and_producto_id(
 
 
 def get_camion_list_by_producto_id(
-    db: Session, producto_id: int, gestor_carga_id: int
+    db: Session, producto_id: int, gestor_carga_id: Optional[int]
 ) -> List[Camion]:
     id_list: List[int] = []
     filtered_list: List[Camion] = []
@@ -59,20 +62,22 @@ def get_camion_list_by_producto_id(
 
 
 def get_semi_list_by_camion_id_and_producto_id(
-    db: Session, camion_id: int, producto_id: int, gestor_carga_id: int
+    db: Session, camion_id: int, producto_id: int, gestor_carga_id: Optional[int]
 ) -> List[Semi]:
-    id_list = []
-    filtered_list = []
-    original_list = get_camion_semi_neto_list_by_camion_id_and_producto_id(
-        db, camion_id, producto_id, gestor_carga_id
-    )
-    semi_list: List[Semi] = list(map(lambda x: x.semi, original_list))
-    for item in semi_list:
-        # check if exists in unique_list or not
-        if item.id not in id_list:
-            id_list.append(item.id)
-            filtered_list.append(item)
-    return filtered_list
+    if gestor_carga_id:
+        id_list = []
+        filtered_list = []
+        original_list = get_camion_semi_neto_list_by_camion_id_and_producto_id(
+            db, camion_id, producto_id, gestor_carga_id
+        )
+        semi_list: List[Semi] = list(map(lambda x: x.semi, original_list))
+        for item in semi_list:
+            # check if exists in unique_list or not
+            if item.id not in id_list:
+                id_list.append(item.id)
+                filtered_list.append(item)
+        return filtered_list
+    return []
 
 
 def get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
@@ -80,7 +85,7 @@ def get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
     camion_id: int,
     semi_id: int,
     producto_id: Optional[int],
-    gestor_carga_id: int,
+    gestor_carga_id: Optional[int],
 ) -> Optional[CamionSemiNeto]:
     obj = None
     if producto_id:
@@ -89,9 +94,29 @@ def get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
                 db, camion_id, semi_id, producto_id, gestor_carga_id
             )
         )
-    if obj is None:
-        return repositories.get_camion_semi_neto_by_camion_id_and_semi_id(
+    else:
+        obj = repositories.get_camion_semi_neto_by_camion_id_and_semi_id(
             db, camion_id, semi_id, gestor_carga_id
+        )
+    return obj
+
+
+def get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id_and_neto(
+    db: Session,
+    camion_id: int,
+    semi_id: int,
+    producto_id: Optional[int],
+    neto: Decimal,
+    gestor_carga_id: Optional[int],
+) -> Optional[CamionSemiNeto]:
+    obj = None
+    if producto_id:
+        obj = repositories.get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id_and_neto(  # noqa: B950
+            db, camion_id, semi_id, producto_id, neto, gestor_carga_id
+        )
+    else:
+        obj = repositories.get_camion_semi_neto_by_camion_id_and_semi_id_and_neto(
+            db, camion_id, semi_id, neto, gestor_carga_id
         )
     return obj
 
@@ -103,20 +128,21 @@ def check_if_combination_exists(
     id: Optional[int] = None,
 ):
     producto_id = data.producto_id
-    exists = get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
-        db, data.camion_id, data.semi_id, data.producto_id, gestor_carga_id
+    neto: Decimal = data.neto
+    exists = get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id_and_neto(
+        db, data.camion_id, data.semi_id, producto_id, neto, gestor_carga_id
     )
     if producto_id:
-        msg = f"La combinación de Camion Nº {data.camion_id} con Semi Nº {data.semi_id} y Producto Nº {producto_id} ya existe"  # noqa
-        error = HTTPException(status_code=409, detail=msg)
+        msg = f"La combinación de Camion Nº {data.camion_id} con Semi Nº {data.semi_id}, Producto Nº {producto_id} y neto {number_format(neto)} ya existe"  # noqa: B950
+        error = HTTPException(status_code=HTTPStatus.CONFLICT, detail=msg)
         if id:
             if exists and exists.id != id:
                 raise error
         elif exists:
             raise error
     else:
-        msg = f"La combinación de Camion Nº {data.camion_id} con Semi Nº {data.semi_id} ya existe"  # noqa
-        error = HTTPException(status_code=409, detail=msg)
+        msg = f"La combinación de Camion Nº {data.camion_id} con Semi Nº {data.semi_id} y neto {number_format(neto)} ya existe"  # noqa: B950
+        error = HTTPException(status_code=HTTPStatus.CONFLICT, detail=msg)
         if id:
             if exists and exists.id != id:
                 raise error
@@ -131,7 +157,9 @@ def create_camion_semi_neto(
     modified_by: str,
 ) -> CamionSemiNetoForm:
     if not gestor_carga_id:
-        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT, detail="Debe elegir un Gestor de carga"
+        )
     check_if_combination_exists(db, data, gestor_carga_id)
     return repositories.create_camion_semi_neto(
         db,
@@ -144,7 +172,9 @@ def create_camion_semi_neto(
 def get_camion_semi_neto_by_id(db: Session, id: int) -> CamionSemiNeto:
     obj = repositories.get_camion_semi_neto_by_id(db, id)
     if not obj:
-        raise HTTPException(status_code=404, detail="Camion no encontrado")
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail="Camion no encontrado"
+        )
     return obj
 
 

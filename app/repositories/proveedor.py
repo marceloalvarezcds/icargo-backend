@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import Proveedor, ProveedorContactoGestorCarga
+from app.models import GestorCargaProveedor, Proveedor
 from app.schemas import ProveedorForm
 
 
@@ -19,15 +19,15 @@ def get_proveedor_list(db: Session) -> List[Proveedor]:
 
 
 def get_proveedor_list_by_gestor_cuenta_id(
-    db: Session, gestor_cuenta_id: int
+    db: Session, gestor_cuenta_id: Optional[int]
 ) -> List[Proveedor]:
     return (
         db.query(Proveedor)
         .filter(
             and_(
                 Proveedor.estado != EstadoEnum.ELIMINADO.value,
-                Proveedor.contactos.any(
-                    ProveedorContactoGestorCarga.gestor_carga_id == gestor_cuenta_id
+                Proveedor.gestores.any(
+                    GestorCargaProveedor.gestor_carga_id == gestor_cuenta_id
                 ),
             )
         )

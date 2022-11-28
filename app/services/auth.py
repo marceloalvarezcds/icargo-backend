@@ -1,5 +1,4 @@
 from datetime import timedelta
-from types import FunctionType
 from typing import Optional
 
 from fastapi import HTTPException, Request  # type: ignore
@@ -7,49 +6,53 @@ from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt  # type: ignore
 from pydantic import ValidationError
 from sqlalchemy.orm import Session  # type: ignore
+from starlette.datastructures import Headers
 
 from app.audits import AuditAuth
 from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from app.constants import AUTHORIZATION
 from app.enums.estado import EstadoEnum
 from app.models.user import User
-from app.schemas import TokenPayload
+from app.schemas import AuthUser, Token, TokenPayload
 from app.services.security import create_access_token
-from app.utils.security import get_payload_from_token, verify_password
+from app.utils import get_host_from_request, get_payload_from_token, verify_password
 
-from .user import get_user_by_id, get_user_by_username
+from .user import get_user_by_username
 
 
-def authenticate(db: Session, *, username: str, password: str) -> Optional[User]:
+def authenticate(db: Session, *, username: str, password: str) -> User:
     user = get_user_by_username(db, username)
-    if not user:
-        return None
-    if not verify_password(password, user.password):
-        return None
+    if not user or not verify_password(password, user.password):
+        raise HTTPException(status_code=400, detail="Usuario o Contraseña incorrecta")
+    elif user.estado == EstadoEnum.INACTIVO.value:
+        raise HTTPException(status_code=400, detail="Usuario Inactivo")
     return user
 
 
-def get_user_from_token(db: Session, *, token: str) -> Optional[User]:
+def get_auth_user_from_token(token: str) -> Optional[AuthUser]:
     try:
         payload = get_payload_from_token(token)
         token_data = TokenPayload(**payload)
-        if token_data.sub:
-            return get_user_by_id(db, token_data.sub)
-        return None
+        return token_data.user
     except (jwt.JWTError, ValidationError):
         return None
 
 
-def get_user_from_request(request: Request, database_connection_function: FunctionType):
-    auth = request.headers.get(AUTHORIZATION)
-    scheme, token = auth.split()
-    if scheme.lower() != "basic":
-        db_conn = database_connection_function()
-        db = Session(bind=db_conn)
-        return get_user_from_token(db, token=token)
+def get_authorization_header(headers: Headers) -> str:
+    if AUTHORIZATION in headers:
+        headers.get(AUTHORIZATION)
+    return ""
 
 
-def register_audit_auth(db: Session, *, user: User, action: str, ip: str):
+def get_auth_user_from_authorization_header(auth_header: str) -> Optional[AuthUser]:
+    if auth_header:
+        scheme, token = auth_header.split()
+        if scheme.lower() != "basic":
+            return get_auth_user_from_token(token)
+    return None
+
+
+def register_audit_auth(db: Session, *, user: User, action: str, ip: Optional[str]):
     db_audit = AuditAuth(
         action=action,
         user_id=user.id,
@@ -60,17 +63,23 @@ def register_audit_auth(db: Session, *, user: User, action: str, ip: str):
     db.commit()
 
 
-def login(db: Session, *, request: Request, form_data: OAuth2PasswordRequestForm):
-    user = authenticate(db, username=form_data.username, password=form_data.password)
-    if not user:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
-    elif user.estado == EstadoEnum.INACTIVO.value:
-        raise HTTPException(status_code=400, detail="Inactive user")
+def create_token_by_user(db: Session, user: User, request: Request) -> Token:
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    register_audit_auth(db, user=user, action="login", ip=request.client.host)
-    return {
-        "access_token": create_access_token(
-            user.id, expires_delta=access_token_expires
-        ),
-        "token_type": "bearer",
-    }
+    register_audit_auth(
+        db, user=user, action="login", ip=get_host_from_request(request)
+    )
+    return Token.parse_obj(
+        {
+            "access_token": create_access_token(
+                AuthUser.from_orm(user), expires_delta=access_token_expires
+            ),
+            "token_type": "bearer",
+        }
+    )
+
+
+def login(
+    db: Session, *, request: Request, form_data: OAuth2PasswordRequestForm
+) -> Token:
+    user = authenticate(db, username=form_data.username, password=form_data.password)
+    return create_token_by_user(db, user, request)

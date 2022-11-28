@@ -24,23 +24,25 @@ from .punto_venta_contacto import update_punto_venta_contacto_list
 
 
 def get_punto_venta_detail(
-    obj: PuntoVenta, gestor_carga_id: Optional[int]
+    db: Session, obj: PuntoVenta, gestor_carga_id: Optional[int]
 ) -> schemas.PuntoVenta:
-    obj_dict = obj.as_dict(for_json=False)
-    contactos: List[PuntoVentaContactoGestorCarga] = obj.contactos
+    schema = schemas.PuntoVenta.from_orm(obj)
+    contactos: List[
+        PuntoVentaContactoGestorCarga
+    ] = repositories.get_punto_venta_contacto_gestor_carga_list_by_punto_venta_id(
+        db, obj.id, gestor_carga_id
+    )
     ges: List[GestorCargaPuntoVenta] = obj.gestores
     gestores = [x for x in ges if x.gestor_carga_id == gestor_carga_id]
     insumos: List[InsumoPuntoVenta] = obj.insumos
-    obj_dict["contactos"] = [
-        x for x in contactos if x.gestor_carga_id == gestor_carga_id
+    schema.contactos = [
+        schemas.PuntoVentaContactoGestorCargaList.from_orm(x)
+        for x in contactos
+        if x.gestor_carga_id == gestor_carga_id
     ]
-    obj_dict["gestor_carga_punto_venta"] = gestores[0] if len(gestores) > 0 else None
-    obj_dict["insumos"] = [x for x in insumos if x.gestor_carga_id == gestor_carga_id]
-    obj_dict["tipo_documento"] = obj.tipo_documento
-    obj_dict["composicion_juridica"] = obj.composicion_juridica
-    obj_dict["ciudad"] = obj.ciudad
-    obj_dict["proveedor_nombre"] = obj.proveedor_nombre
-    return schemas.PuntoVenta.parse_obj(obj_dict)
+    schema.gestor_carga_punto_venta = gestores[0] if len(gestores) > 0 else None
+    schema.insumos = [x for x in insumos if x.gestor_carga_id == gestor_carga_id]
+    return schema
 
 
 async def create_punto_venta(
@@ -63,7 +65,7 @@ async def create_punto_venta(
         db, data.contactos, obj, gestor_carga_id, modified_by
     )
     create_gestor_carga_punto_venta(db, obj, gestor_carga_id, data.alias, modified_by)
-    return get_punto_venta_detail(obj, gestor_carga_id)
+    return get_punto_venta_detail(db, obj, gestor_carga_id)
 
 
 def get_punto_venta_by_id(db: Session, id: int) -> PuntoVenta:
@@ -79,7 +81,7 @@ def get_punto_venta_by_id_and_gestor_carga_id(
     obj = repositories.get_punto_venta_by_id(db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Punto de Venta no encontrado")
-    return get_punto_venta_detail(obj, gestor_carga_id)
+    return get_punto_venta_detail(db, obj, gestor_carga_id)
 
 
 async def edit_punto_venta(
@@ -105,7 +107,7 @@ async def edit_punto_venta(
         db, data.contactos, obj, gestor_carga_id, modified_by
     )
     edit_gestor_carga_punto_venta(db, obj, gestor_carga_id, data.alias, modified_by)
-    return get_punto_venta_detail(obj, gestor_carga_id)
+    return get_punto_venta_detail(db, obj, gestor_carga_id)
 
 
 def delete_punto_venta(
@@ -113,7 +115,7 @@ def delete_punto_venta(
 ) -> schemas.PuntoVenta:
     co = get_punto_venta_by_id(db, id)
     obj = repositories.delete_punto_venta(co, db, modified_by)
-    return get_punto_venta_detail(obj, gestor_carga_id)
+    return get_punto_venta_detail(db, obj, gestor_carga_id)
 
 
 def get_punto_venta_reports(db: Session, proveedor_id: int) -> str:

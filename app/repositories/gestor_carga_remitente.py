@@ -26,7 +26,7 @@ def create_gestor_carga_remitente(
     db: Session,
     remitente_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaRemitente:
     obj = GestorCargaRemitente(
@@ -47,7 +47,7 @@ def edit_gestor_carga_remitente(
     db: Session,
     remitente_id: int,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> GestorCargaRemitente:
     obj.remitente_id = remitente_id

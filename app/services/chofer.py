@@ -1,5 +1,5 @@
 import os
-from typing import Optional, cast
+from typing import List, Optional, cast
 
 from fastapi import HTTPException, UploadFile  # type: ignore
 from openpyxl import Workbook  # type: ignore
@@ -12,6 +12,7 @@ from app.enums import EstadoEnum
 from app.models import Chofer
 from app.utils import get_gestor_carga_by_params
 
+from .camion import get_camion_by_id
 from .chofer_anticipos_oc import bloquear_anticipos_desde_el_chofer
 from .chofer_check_files import check_files, get_chofer_detail
 from .chofer_propietario import (
@@ -19,6 +20,17 @@ from .chofer_propietario import (
     disable_propietario_by_ruc,
 )
 from .gestor_carga_chofer import create_gestor_carga_chofer, edit_gestor_carga_chofer
+
+
+def get_chofer_list_without_camion_by_camion_id(
+    db: Session, camion_id: int, gestor_cuenta_id: Optional[int]
+) -> List[Chofer]:
+    camion = get_camion_by_id(db, camion_id)
+    lista = repositories.get_chofer_list_without_camion(db, gestor_cuenta_id)
+    if camion.chofer:
+        chofer: Chofer = camion.chofer
+        lista.append(chofer)
+    return lista
 
 
 async def create_chofer(

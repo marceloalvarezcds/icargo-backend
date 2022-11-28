@@ -1,5 +1,9 @@
 # should be imported to help code editor (vscode) for autocompletion
-from .auth import get_user_from_request, login  # noqa
+from .auth import (  # noqa
+    get_auth_user_from_authorization_header,
+    get_authorization_header,
+    login,
+)
 from .banco import (  # noqa
     create_banco,
     delete_banco,
@@ -48,8 +52,10 @@ from .chofer import (  # noqa
     edit_chofer,
     get_chofer_by_id,
     get_chofer_by_id_and_gestor_cuenta_id,
+    get_chofer_list_without_camion_by_camion_id,
     get_chofer_reports,
 )
+from .ciudad import get_ciudad_list  # noqa
 from .contacto import get_contacto_by  # noqa
 from .contraparte import get_contraparte_list_by_tipo_contraparte_id  # noqa
 from .estado_cuenta import (  # noqa
@@ -165,6 +171,7 @@ from .movimiento import (  # noqa
     get_movimiento_list_by_liquidacion,
     get_movimiento_reports,
     get_movimiento_reports_by_contraparte,
+    get_movimiento_reports_by_gestor_carga_id,
 )
 from .orden_carga import (  # noqa
     aceptar_orden_carga,
@@ -187,6 +194,7 @@ from .orden_carga import (  # noqa
     get_orden_carga_reports,
     get_orden_carga_resumen_pdf_by_id,
     liquidar_orden_carga,
+    send_oc_mail,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
@@ -235,6 +243,8 @@ from .propietario import (  # noqa
     edit_propietario,
     get_propietario_by_id,
     get_propietario_by_id_and_gestor_cuenta_id,
+    get_propietario_list_by_gestor_cuenta_and_camion_id,
+    get_propietario_list_by_gestor_cuenta_and_semi_id,
     get_propietario_reports,
 )
 from .propietario_contacto import update_propietario_contacto_list  # noqa
@@ -284,15 +294,31 @@ from .semi import (  # noqa
     get_semi_by_id,
     get_semi_reports,
 )
+from .tipo_cuenta import (  # noqa
+    create_tipo_cuenta,
+    edit_tipo_cuenta,
+    get_tipo_cuenta_active_list_by_tipo_documento_relacionado_otro,
+    get_tipo_cuenta_list_by_tipo_documento_relacionado_otro,
+)
 from .tipo_instrumento import get_tipo_instrumento_via_banco  # noqa
+from .tipo_movimiento import (  # noqa
+    create_tipo_movimiento,
+    edit_tipo_movimiento,
+    get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes,
+    get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes,
+)
 from .user import (  # noqa
     change_user_status,
     create_user,
+    create_user_with_rol_list,
     delete_user,
     edit_user,
+    edit_user_with_rol_list,
+    get_user_account,
     get_user_active_list_by_gestor_carga_id,
-    get_user_by_email,
     get_user_by_id,
     get_user_by_username,
     get_user_list_by_gestor_carga_id,
+    get_user_list_with_rol_list_by_gestor_carga_id,
+    get_user_with_rol_list_by_id,
 )

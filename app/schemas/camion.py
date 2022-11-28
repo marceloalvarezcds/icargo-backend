@@ -27,6 +27,10 @@ class CamionForm(BaseModel):
     # INICIO Limitaciones del Camión
     limite_cantidad_oc_activas: int
     limite_monto_anticipos: Optional[RoundedDecimal] = None
+    monto_anticipo_disponible: Optional[RoundedDecimal] = None
+    total_anticipos_retirados_en_estado_pendiente_o_en_proceso: Optional[
+        RoundedDecimal
+    ] = None
     # FIN Limitaciones del Camión
     # INICIO Habilitaciones del Camión
     # inicio - municipal
@@ -111,8 +115,10 @@ class CamionList(BaseModel):
     placa: str
     propietario_nombre: str
     propietario_ruc: str
+    propietario_telefono: Optional[str] = None
     chofer_nombre: Optional[str] = None
     chofer_numero_documento: Optional[str] = None
+    color_descripcion: Optional[str] = None
     numero_chasis: Optional[str] = None
     estado: EstadoEnum
     ciudad_habilitacion_municipal_nombre: Optional[str] = None

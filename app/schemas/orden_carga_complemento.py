@@ -2,6 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from .date_model import Date
 from .moneda import Moneda
 from .rounded_decimal_model import RoundedDecimal
 from .tipo_concepto_complemento import TipoConceptoComplemento
@@ -38,6 +39,11 @@ class OrdenCargaComplemento(OrdenCargaComplementoForm):
     remitente_moneda_id: Optional[int] = None
     remitente_moneda_nombre: Optional[str] = None
     # FIN Monto a cobrar al Remitente
+    # Auditoría
+    created_by: str
+    created_at: Date
+    modified_by: str
+    modified_at: Date
 
     class Config:
         orm_mode = True

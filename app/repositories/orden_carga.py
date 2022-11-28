@@ -41,7 +41,7 @@ def get_orden_carga_aceptada_count_by_camion_id(
 
 
 def get_orden_carga_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: int
+    db: Session, gestor_carga_id: Optional[int]
 ) -> List[OrdenCarga]:
     return (
         db.query(OrdenCarga)
@@ -138,11 +138,12 @@ def create_orden_carga(
     db: Session,
     data: OrdenCargaForm,
     flete: Flete,
-    gestor_carga_id: int,
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> OrdenCarga:
     obj = OrdenCarga(
         camion_id=data.camion_id,
+        camion_semi_neto_id=data.camion_semi_neto_id,
         semi_id=data.semi_id,
         flete_id=data.flete_id,
         cantidad_nominada=data.cantidad_nominada,
@@ -188,7 +189,7 @@ def edit_orden_carga(
     obj: OrdenCarga,
     db: Session,
     data: OrdenCargaEditForm,
-    gestor_carga_id: int,
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> OrdenCarga:
     if data.camion_id:

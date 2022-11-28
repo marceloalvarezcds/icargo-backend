@@ -57,7 +57,7 @@ def create_remitente_contacto_gestor_carga(
     remitente: Remitente,
     contacto: Contacto,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> RemitenteContactoGestorCarga:
     obj = RemitenteContactoGestorCarga(
@@ -82,7 +82,7 @@ def edit_remitente_contacto_gestor_carga(
     remitente: Remitente,
     contacto: Contacto,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> RemitenteContactoGestorCarga:
     obj.cargo_id = cargo.id

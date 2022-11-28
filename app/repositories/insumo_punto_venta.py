@@ -42,7 +42,7 @@ def get_insumo_punto_venta_list_by_gestor_carga_id(
 
 
 def get_insumo_punto_venta_list_by_tipo_insumo_id(
-    db: Session, tipo_insumo_id: int, gestor_carga_id: int
+    db: Session, tipo_insumo_id: int, gestor_carga_id: Optional[int]
 ) -> List[InsumoPuntoVenta]:
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return (
@@ -70,7 +70,7 @@ def get_insumo_punto_venta_list_by_tipo_insumo_id(
 
 
 def get_insumo_punto_venta_list_by_insumo_id(
-    db: Session, insumo_id: int, gestor_carga_id: int
+    db: Session, insumo_id: int, gestor_carga_id: Optional[int]
 ) -> List[InsumoPuntoVenta]:
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return (
@@ -98,7 +98,7 @@ def get_insumo_punto_venta_list_by_insumo_id(
 
 
 def get_insumo_punto_venta_list_by_insumo_id_and_punto_venta_id(
-    db: Session, insumo_id: int, punto_venta_id: int, gestor_carga_id: int
+    db: Session, insumo_id: int, punto_venta_id: int, gestor_carga_id: Optional[int]
 ) -> List[InsumoPuntoVenta]:
     return (
         db.query(InsumoPuntoVenta)
@@ -120,7 +120,7 @@ def get_insumo_punto_venta_by_insumo_id_and_moneda_id_and_punto_venta_id(
     insumo_id: int,
     moneda_id: int,
     punto_venta_id: int,
-    gestor_carga_id: int,
+    gestor_carga_id: Optional[int],
 ) -> Optional[InsumoPuntoVenta]:
     return (
         db.query(InsumoPuntoVenta)

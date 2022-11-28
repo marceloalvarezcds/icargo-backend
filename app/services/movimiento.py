@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from http import HTTPStatus
 from typing import List, Optional, cast
 
 from fastapi import HTTPException  # type: ignore
@@ -9,27 +10,53 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
 from app.config import REPORTS_FOLDER
-from app.enums import MovimientoEstadoEnum, TipoContraparteEnum, TipoMovimientoEnum
+from app.enums import (
+    MovimientoEstadoEnum,
+    TipoContraparteEnum,
+    TipoCuentaEnum,
+    TipoMovimientoEnum,
+)
 from app.models import (
+    Moneda,
     Movimiento,
     OrdenCarga,
     OrdenCargaAnticipoRetirado,
     OrdenCargaComplemento,
     OrdenCargaDescuento,
+    TipoCuenta,
+    TipoMovimiento,
 )
 from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm
 from app.schemas.date_model import Date
 from app.schemas.orden_carga import OrdenCargaEditForm
 from app.schemas.rounded_decimal_model import RoundedDecimal
+from app.services import seleccionable_service as service
+from app.utils import get_flete_detalle, get_merma_detalle
 
 
 def get_orden_carga_by_movimiento(movimiento: Movimiento):
     oc = movimiento.orden_carga
     if not oc:
         raise HTTPException(
-            status_code=404, detail=f"No existe Orden de Carga para el movimiento {id}"
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=f"No existe Orden de Carga para el movimiento {id}",
         )
     return oc
+
+
+def get_moneda_by_id(db: Session, moneda_id: Optional[int]) -> Moneda:
+    if not moneda_id:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=f"No existe la moneda con ID {moneda_id}",
+        )
+    moneda = repositories.get_moneda_by_id(db, moneda_id)
+    if not moneda:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=f"No existe la moneda con ID {moneda_id}",
+        )
+    return moneda
 
 
 def get_movimiento_list(
@@ -96,7 +123,7 @@ def create_movimiento(
         gestor_id = gestor_carga_id if gestor_carga_id else data.gestor_carga_id
         if not gestor_id:
             raise HTTPException(
-                status_code=409, detail="Debe elegir un Gestor de carga"
+                status_code=HTTPStatus.CONFLICT, detail="Debe elegir un Gestor de carga"
             )
         return repositories.create_movimiento(db, data, gestor_id, modified_by)
     return None
@@ -117,7 +144,9 @@ def create_movimiento_by_anticipo(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.ANTICIPO.value
     )
@@ -129,7 +158,7 @@ def create_movimiento_by_anticipo(
         or not tipo_movimiento
     ):
         raise HTTPException(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
     create_movimiento(
@@ -195,7 +224,9 @@ def create_movimiento_by_flete(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.FLETE.value
     )
@@ -207,7 +238,7 @@ def create_movimiento_by_flete(
         or not tipo_movimiento
     ):
         raise HTTPException(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
     create_movimiento(
@@ -271,7 +302,9 @@ def create_movimiento_by_complemento(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.COMPLEMENTO.value
     )
@@ -283,7 +316,7 @@ def create_movimiento_by_complemento(
         or not tipo_movimiento
     ):
         raise HTTPException(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
     if complemento.habilitar_cobro_remitente:
@@ -350,7 +383,9 @@ def create_movimiento_by_descuento(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.DESCUENTO.value
     )
@@ -362,7 +397,7 @@ def create_movimiento_by_descuento(
         or not tipo_movimiento
     ):
         raise HTTPException(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
     if descuento.habilitar_pago_proveedor and descuento.proveedor:
@@ -429,7 +464,9 @@ def create_movimiento_by_merma(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.MERMA.value
     )
@@ -441,7 +478,7 @@ def create_movimiento_by_merma(
         or not tipo_movimiento
     ):
         raise HTTPException(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
     create_movimiento(
@@ -502,9 +539,19 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
     tipo_documento_relacionado = (
         repositories.get_tipo_documento_relacionado_by_descripcion(db, "Otro")
     )
-    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(db, "Viajes")
-    tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
-        db, TipoMovimientoEnum.OTRO.value
+    tipo_cuenta = (
+        service.get_by_id(TipoCuenta, db, data.cuenta_id)
+        if data.cuenta_id
+        else repositories.get_tipo_cuenta_by_descripcion(
+            db, TipoCuentaEnum.VIAJES.value
+        )
+    )
+    tipo_movimiento = (
+        service.get_by_id(TipoMovimiento, db, data.tipo_movimiento_id)
+        if data.tipo_movimiento_id
+        else repositories.get_tipo_movimiento_by_descripcion(
+            db, TipoMovimientoEnum.OTRO.value
+        )
     )
     if (
         not tipo_contraparte
@@ -513,7 +560,7 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
         or not tipo_movimiento
     ):
         raise HTTPException(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
     exists = None
@@ -523,7 +570,7 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
         )
     if exists:
         raise HTTPException(
-            status_code=409,
+            status_code=HTTPStatus.CONFLICT,
             detail=f"La contraparte {data.contraparte} ya existe",
         )
     numero_documento_relacionado = (
@@ -544,6 +591,8 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
     data.fecha_cambio_moneda = fecha
     if not data.fecha:
         data.fecha = fecha
+    if not data.es_cobro:
+        data.monto = data.monto * -1  # type: ignore
     return create_movimiento(
         db,
         data,
@@ -569,7 +618,9 @@ def create_movimiento_by_conciliacion_oc(
 def get_movimiento_by_id(db: Session, id: int) -> Movimiento:
     obj = repositories.get_movimiento_by_id(db, id)
     if not obj:
-        raise HTTPException(status_code=404, detail="Movimiento no encontrado")
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail="Movimiento no encontrado"
+        )
     return obj
 
 
@@ -582,8 +633,12 @@ def edit_movimiento(
 ) -> Movimiento:
     gestor_id = gestor_carga_id if gestor_carga_id else data.gestor_carga_id
     if not gestor_id:
-        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT, detail="Debe elegir un Gestor de carga"
+        )
     to_edit_obj = get_movimiento_by_id(db, id)
+    if not data.es_cobro:
+        data.monto = data.monto * -1  # type: ignore
     return repositories.edit_movimiento(to_edit_obj, db, data, gestor_id, modified_by)
 
 
@@ -595,7 +650,9 @@ def edit_movimiento_by_gestor_flete(
     modified_by: str,
 ) -> Optional[Movimiento]:
     if not gestor_carga_id:
-        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT, detail="Debe elegir un Gestor de carga"
+        )
     to_edit_obj = get_movimiento_by_id(db, id)
     oc = get_orden_carga_by_movimiento(to_edit_obj)
     orden = repositories.edit_orden_carga_by_movimiento(
@@ -609,8 +666,11 @@ def edit_movimiento_by_gestor_flete(
         modified_by,
     )
     moneda_id = data.moneda_id
+    moneda = get_moneda_by_id(db, moneda_id)
     monto = orden.resultado_gestor_carga_total_flete * -1
-    detalle = orden.flete_gestor_carga_detalle
+    unidad = orden.flete.condicion_gestor_cuenta_unidad
+    tarifa = data.tarifa if data.tarifa else orden.flete_tarifa_gestor_carga
+    detalle = get_flete_detalle(orden, tarifa, moneda, unidad)
     return repositories.edit_monto_movimiento(
         to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
     )
@@ -624,7 +684,9 @@ def edit_movimiento_by_gestor_merma(
     modified_by: str,
 ) -> Optional[Movimiento]:
     if not gestor_carga_id:
-        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT, detail="Debe elegir un Gestor de carga"
+        )
     to_edit_obj = get_movimiento_by_id(db, id)
     oc = get_orden_carga_by_movimiento(to_edit_obj)
     orden = repositories.edit_orden_carga_by_movimiento(
@@ -640,8 +702,21 @@ def edit_movimiento_by_gestor_merma(
         modified_by,
     )
     moneda_id = data.moneda_id
+    moneda = get_moneda_by_id(db, moneda_id)
     monto = orden.resultado_gestor_carga_merma_valor_total
-    detalle = orden.merma_gestor_carga_detalle
+    valor = data.valor if data.valor else orden.merma_gestor_carga_valor
+    tolerancia = data.tolerancia if data.valor else orden.merma_gestor_carga_tolerancia
+    es_porcentual = (
+        data.es_porcentual if data.valor else orden.merma_gestor_carga_es_porcentual
+    )
+    detalle = get_merma_detalle(
+        orden,
+        valor,
+        tolerancia,
+        es_porcentual,
+        moneda,
+        orden.flete.merma_gestor_cuenta_unidad,
+    )
     return repositories.edit_monto_movimiento(
         to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
     )
@@ -655,7 +730,9 @@ def edit_movimiento_by_propietario_flete(
     modified_by: str,
 ) -> Optional[Movimiento]:
     if not gestor_carga_id:
-        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT, detail="Debe elegir un Gestor de carga"
+        )
     to_edit_obj = get_movimiento_by_id(db, id)
     oc = get_orden_carga_by_movimiento(to_edit_obj)
     orden = repositories.edit_orden_carga_by_movimiento(
@@ -669,8 +746,11 @@ def edit_movimiento_by_propietario_flete(
         modified_by,
     )
     moneda_id = data.moneda_id
+    moneda = get_moneda_by_id(db, moneda_id)
     monto = orden.resultado_propietario_total_flete
-    detalle = orden.flete_gestor_carga_detalle
+    unidad = orden.flete.condicion_propietario_unidad
+    tarifa = data.tarifa if data.tarifa else orden.flete_tarifa
+    detalle = get_flete_detalle(orden, tarifa, moneda, unidad)
     return repositories.edit_monto_movimiento(
         to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
     )
@@ -684,7 +764,9 @@ def edit_movimiento_by_propietario_merma(
     modified_by: str,
 ) -> Optional[Movimiento]:
     if not gestor_carga_id:
-        raise HTTPException(status_code=409, detail="Debe elegir un Gestor de carga")
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT, detail="Debe elegir un Gestor de carga"
+        )
     to_edit_obj = get_movimiento_by_id(db, id)
     oc = get_orden_carga_by_movimiento(to_edit_obj)
     orden = repositories.edit_orden_carga_by_movimiento(
@@ -700,8 +782,21 @@ def edit_movimiento_by_propietario_merma(
         modified_by,
     )
     moneda_id = data.moneda_id
+    moneda = get_moneda_by_id(db, moneda_id)
     monto = orden.resultado_propietario_merma_valor_total * -1
-    detalle = orden.merma_propietario_detalle
+    valor = data.valor if data.valor else orden.merma_propietario_valor
+    tolerancia = data.tolerancia if data.valor else orden.merma_propietario_tolerancia
+    es_porcentual = (
+        data.es_porcentual if data.valor else orden.merma_propietario_es_porcentual
+    )
+    detalle = get_merma_detalle(
+        orden,
+        valor,
+        tolerancia,
+        es_porcentual,
+        moneda,
+        orden.flete.merma_propietario_unidad,
+    )
     return repositories.edit_monto_movimiento(
         to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
     )
@@ -744,6 +839,13 @@ def get_movimiento_reports_by_contraparte(
     return generate_movimiento_reports(datalist)
 
 
+def get_movimiento_reports_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int] = None
+):
+    datalist = get_movimiento_list(db, gestor_carga_id)
+    return generate_movimiento_reports(datalist, True)
+
+
 def get_movimiento_reports(
     db: Session,
     liquidacion_id: Optional[int] = None,
@@ -760,11 +862,24 @@ def get_movimiento_reports(
 
 
 def generate_movimiento_reports(
-    datalist: List[Movimiento],
+    datalist: List[Movimiento], is_for_listado: bool = False
 ) -> str:
     wb = Workbook()
     ws = wb.active
     i = 0
+
+    if is_for_listado:
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Movimiento"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Liquidación"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Fecha de creación Liq."
+        title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Estado"
@@ -779,7 +894,7 @@ def generate_movimiento_reports(
     title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
-    title_cell.value = "Nº de Doc Fiscal"
+    title_cell.value = "Nº de Doc " + "Contraparte" if is_for_listado else "Fiscal"
     title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
@@ -794,13 +909,23 @@ def generate_movimiento_reports(
     title_cell.value = "Concepto"
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=(i := i + 1))
-    title_cell.value = "Nº de Mov."
-    title_cell.font = Font(bold=True)
+    if is_for_listado:
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Proveedor"
+        title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
-    title_cell.value = "Nº de Liq."
+    title_cell.value = "Punto de Venta"
     title_cell.font = Font(bold=True)
+
+    if not is_for_listado:
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Mov."
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Nº de Liq."
+        title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Nº Doc Relac."
@@ -821,6 +946,16 @@ def generate_movimiento_reports(
     for row, item in enumerate(datalist):
         i = 0
 
+        if is_for_listado:
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.id
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.liquidacion_id
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.liquidacion_fecha_creacion
+
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.estado
 
@@ -837,16 +972,24 @@ def generate_movimiento_reports(
         value_cell.value = item.fecha if item.fecha else item.created_at
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
-        value_cell.value = item.cuenta_descripcion
+        value_cell.value = item.cuenta_codigo_descripcion
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.concepto
 
-        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
-        value_cell.value = item.id
+        if is_for_listado:
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.proveedor_nombre
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
-        value_cell.value = item.liquidacion_id
+        value_cell.value = item.punto_venta_nombre
+
+        if not is_for_listado:
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.id
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.liquidacion_id
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.numero_documento_relacionado

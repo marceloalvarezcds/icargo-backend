@@ -17,7 +17,6 @@ from app.database.base import Base
 from app.enums.estado import EstadoEnum
 
 from .gestor_carga import GestorCarga
-from .permiso import Permiso
 from .rol import Rol
 
 
@@ -50,18 +49,6 @@ class User(AuditMixin, Base):
     @hybrid_property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
-
-    @hybrid_property
-    def roles(self) -> List[Rol]:
-        return [x.rol for x in self.user_roles]
-
-    @hybrid_property
-    def permisos(self) -> List[Permiso]:
-        permisos: List[Permiso] = []
-        roles: List[Rol] = self.roles
-        for x in roles:
-            permisos.extend(x.permisos)
-        return permisos
 
 
 class UserRol(AuditMixin, Base):

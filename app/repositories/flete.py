@@ -31,7 +31,9 @@ def get_flete_list(db: Session) -> List[Flete]:
     )
 
 
-def get_flete_list_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> List[Flete]:
+def get_flete_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[Flete]:
     return (
         db.query(Flete)
         .filter(

@@ -114,11 +114,11 @@ class Movimiento(AuditMixin, Base):
 
     @hybrid_property
     def concepto(self):
-        return self.tipo_movimiento.descripcion
+        return self.tipo_movimiento.codigo_descripcion
 
     @hybrid_property
-    def cuenta_descripcion(self):
-        return self.cuenta.descripcion
+    def cuenta_codigo_descripcion(self):
+        return self.cuenta.codigo_descripcion
 
     @hybrid_property
     def debito(self):
@@ -134,7 +134,7 @@ class Movimiento(AuditMixin, Base):
 
     @hybrid_property
     def fecha_pago_cobro(self):
-        return self.liquidacion.fecha_pago_cobro
+        return self.liquidacion.fecha_pago_cobro if self.liquidacion else None
 
     @hybrid_property
     def flete_id(self):
@@ -145,8 +145,8 @@ class Movimiento(AuditMixin, Base):
         return self.anticipo.insumo_descripcion if self.anticipo else None
 
     @hybrid_property
-    def liquidacion_fecha(self):
-        return self.liquidacion.fecha_aprobacion
+    def liquidacion_fecha_creacion(self):
+        return self.liquidacion.created_at if self.liquidacion else None
 
     @hybrid_property
     def moneda_nombre(self):
@@ -175,6 +175,10 @@ class Movimiento(AuditMixin, Base):
     @hybrid_property
     def proveedor_nombre(self):
         return self.anticipo.proveedor_nombre if self.anticipo else None
+
+    @hybrid_property
+    def punto_venta_nombre(self):
+        return self.anticipo.punto_venta_nombre if self.anticipo else None
 
     @hybrid_property
     def remitente_nombre(self):
@@ -252,6 +256,13 @@ class Movimiento(AuditMixin, Base):
         )
 
     @hybrid_property
+    def es_chofer(self):
+        return (
+            self.tipo_contraparte_descripcion == TipoContraparteEnum.CHOFER.value
+            and self.chofer is not None
+        )
+
+    @hybrid_property
     def es_descuento(self):
         return (
             self.tipo_movimiento_descripcion == TipoMovimientoEnum.DESCUENTO.value
@@ -264,7 +275,10 @@ class Movimiento(AuditMixin, Base):
 
     @hybrid_property
     def es_gestor(self):
-        return self.tipo_contraparte_descripcion == TipoContraparteEnum.REMITENTE.value
+        return (
+            self.tipo_contraparte_descripcion == TipoContraparteEnum.REMITENTE.value
+            and self.remitente is not None
+        )
 
     @hybrid_property
     def es_merma(self):
@@ -275,6 +289,13 @@ class Movimiento(AuditMixin, Base):
         return (
             self.tipo_contraparte_descripcion == TipoContraparteEnum.PROPIETARIO.value
             and self.propietario is not None
+        )
+
+    @hybrid_property
+    def es_proveedor(self):
+        return (
+            self.tipo_contraparte_descripcion == TipoContraparteEnum.PROVEEDOR.value
+            and self.proveedor is not None
         )
 
     @hybrid_property
@@ -320,6 +341,19 @@ class Movimiento(AuditMixin, Base):
         return (
             self.orden_carga.condicion_propietario_tarifa if self.orden_carga else None
         )
+
+    @hybrid_property
+    def contraparte_id(self):
+        if self.es_propietario:
+            return self.propietario_id
+        elif self.es_gestor:
+            return self.remitente_id
+        elif self.es_proveedor:
+            return self.proveedor_id
+        elif self.es_chofer:
+            return self.chofer_id
+        else:
+            return self.id
 
     @hybrid_property
     def merma_gestor_carga_valor(self):

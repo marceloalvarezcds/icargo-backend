@@ -18,7 +18,7 @@ def get_insumo_punto_venta_precio_by_insumo_id_and_moneda_id_and_punto_venta_id(
     insumo_id: int,
     moneda_id: int,
     punto_venta_id: int,
-    gestor_carga_id: int,
+    gestor_carga_id: Optional[int],
 ) -> Optional[InsumoPuntoVentaPrecio]:
     insumo_punto_venta = (
         get_insumo_punto_venta_by_insumo_id_and_moneda_id_and_punto_venta_id(

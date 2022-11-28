@@ -37,7 +37,9 @@ from .camion_semi_neto import (  # noqa
     delete_camion_semi_neto,
     edit_camion_semi_neto,
     get_camion_semi_neto_by_camion_id_and_semi_id,
+    get_camion_semi_neto_by_camion_id_and_semi_id_and_neto,
     get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id,
+    get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id_and_neto,
     get_camion_semi_neto_by_id,
     get_camion_semi_neto_list_by_camion_id,
     get_camion_semi_neto_list_by_camion_id_and_producto_id,
@@ -84,6 +86,7 @@ from .chofer_propietario import (  # noqa
 )
 from .ciudad import (  # noqa
     get_ciudad_by_nombre_and_localidad_id,
+    get_ciudad_count,
     get_ciudad_list,
     get_ciudad_list_by_localidad_id,
 )
@@ -113,7 +116,8 @@ from .ente_emisor_transporte import (  # noqa
     get_ente_emisor_transporte_list,
 )
 from .estado_cuenta import (  # noqa
-    get_estado_cuenta_by_contraparte,
+    get_estado_cuenta_by_contraparte_and_tipo,
+    get_estado_cuenta_by_contraparte_tipo_otro,
     get_estado_cuenta_list,
     get_estado_cuenta_list_by_gestor_carga_id,
 )
@@ -245,7 +249,7 @@ from .liquidacion import (  # noqa
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
 from .marca_camion import get_marca_camion_by_descripcion, get_marca_camion_list  # noqa
 from .marca_semi import get_marca_semi_by_descripcion, get_marca_semi_list  # noqa
-from .moneda import get_moneda_by_simbolo, get_moneda_list  # noqa
+from .moneda import get_moneda_by_id, get_moneda_by_simbolo, get_moneda_list  # noqa
 from .movimiento import (  # noqa
     change_movimiento_status,
     create_movimiento,
@@ -300,6 +304,7 @@ from .orden_carga_anticipo_retirado import (  # noqa
     edit_orden_carga_anticipo_retirado,
     get_orden_carga_anticipo_retirado_by,
     get_orden_carga_anticipo_retirado_by_id,
+    get_total_anticipo_retirado_by_camion_id,
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     create_orden_carga_anticipo_saldo,
@@ -342,9 +347,11 @@ from .orden_carga_remision_origen import (  # noqa
 )
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .permiso import (  # noqa
+    exists_permiso_for_user,
     get_permiso_by,
     get_permiso_list,
     get_permiso_list_by_rol_id,
+    get_permiso_list_by_user_id,
 )
 from .producto import get_producto_by_descripcion, get_producto_list  # noqa
 from .propietario import (  # noqa
@@ -383,6 +390,7 @@ from .proveedor_contacto_gestor_carga import (  # noqa
     edit_proveedor_contacto_gestor_carga,
     get_proveedor_contacto_gestor_carga_by,
     get_proveedor_contacto_gestor_carga_by_cargo_id,
+    get_proveedor_contacto_gestor_carga_list_by_proveedor_id,
 )
 from .punto_venta import (  # noqa
     create_punto_venta,
@@ -399,6 +407,7 @@ from .punto_venta_contacto_gestor_carga import (  # noqa
     edit_punto_venta_contacto_gestor_carga,
     get_punto_venta_contacto_gestor_carga_by,
     get_punto_venta_contacto_gestor_carga_by_cargo_id,
+    get_punto_venta_contacto_gestor_carga_list_by_punto_venta_id,
 )
 from .remitente import (  # noqa
     create_remitente,
@@ -417,7 +426,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
     get_remitente_contacto_gestor_carga_by_cargo_id,
     get_remitente_contacto_gestor_carga_by_id,
 )
-from .rol import get_rol_list  # noqa
+from .rol import exists_rol_for_user, get_rol_list, get_rol_list_by_user_id  # noqa
 from .rol_permiso import create_rol_permiso  # noqa
 from .semi import (  # noqa
     change_semi_status,
@@ -478,8 +487,10 @@ from .tipo_insumo import (  # noqa
 )
 from .tipo_iva import get_tipo_iva_by_descripcion, get_tipo_iva_list  # noqa
 from .tipo_movimiento import (  # noqa
+    get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes,
     get_tipo_movimiento_by_descripcion,
     get_tipo_movimiento_list,
+    get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes,
 )
 from .tipo_persona import get_tipo_persona_by_descripcion, get_tipo_persona_list  # noqa
 from .tipo_registro import (  # noqa
@@ -490,7 +501,7 @@ from .tipo_semi import get_tipo_semi_by_descripcion, get_tipo_semi_list  # noqa
 from .unidad import get_unidad_by_descripcion, get_unidad_list  # noqa
 from .user import (  # noqa
     exists_user_for_rol_id,
-    get_user_by_email,
     get_user_by_id,
     get_user_by_username,
+    get_user_id_by_rol_id,
 )

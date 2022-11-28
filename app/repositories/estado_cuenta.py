@@ -243,9 +243,37 @@ def get_estado_cuenta_list_by_gestor_carga_id(
     return get_estado_cuenta_group_by_query(db, table).all()
 
 
-def get_estado_cuenta_by_contraparte(
+def get_estado_cuenta_by_contraparte_and_tipo(
     db: Session,
-    filted_dict: dict,
+    contraparte_id: int,
+    tipo_contraparte_id: int,
 ) -> Optional[Row]:
-    table = get_estado_cuenta_subquery(db).filter_by(**filted_dict).subquery()
+    subquery = get_estado_cuenta_subquery(db).subquery()
+    table = (
+        db.query(subquery)
+        .filter(
+            subquery.c.contraparte_id == contraparte_id,
+            subquery.c.tipo_contraparte_id == tipo_contraparte_id,
+        )
+        .subquery()
+    )
+    return get_estado_cuenta_group_by_query(db, table).first()
+
+
+def get_estado_cuenta_by_contraparte_tipo_otro(
+    db: Session,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    tipo_contraparte_id: int,
+) -> Optional[Row]:
+    subquery = get_estado_cuenta_subquery(db).subquery()
+    table = (
+        db.query(subquery)
+        .filter(
+            subquery.c.contraparte == contraparte,
+            subquery.c.contraparte_numero_documento == contraparte_numero_documento,
+            subquery.c.tipo_contraparte_id == tipo_contraparte_id,
+        )
+        .subquery()
+    )
     return get_estado_cuenta_group_by_query(db, table).first()

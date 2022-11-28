@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import List, Optional
 
-from sqlalchemy import literal  # type: ignore
+from sqlalchemy import literal, select  # type: ignore
+from sqlalchemy.engine.row import Row  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.sqltypes import BigInteger  # type: ignore
 
@@ -11,12 +12,12 @@ def get_user_by_id(db: Session, id: BigInteger) -> Optional[User]:
     return db.query(User).get(id)
 
 
-def get_user_by_email(db: Session, email: str) -> Optional[User]:
-    return db.query(User).filter(User.email == email).first()
-
-
 def get_user_by_username(db: Session, username: str) -> Optional[User]:
     return db.query(User).filter(User.username == username).first()
+
+
+def get_user_id_by_rol_id(db: Session, rol_id: int) -> List[Row]:
+    return db.execute(select(UserRol.user_id).where(UserRol.rol_id == rol_id)).all()
 
 
 def exists_user_for_rol_id(db: Session, rol_id: int) -> bool:

@@ -1,4 +1,5 @@
-from typing import List, Optional
+from decimal import Decimal
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -10,7 +11,6 @@ from .contacto import ContactoForm
 from .gestor_carga_punto_venta import GestorCargaPuntoVenta
 from .insumo_punto_venta import InsumoPuntoVenta
 from .punto_venta_contacto_gestor_carga import PuntoVentaContactoGestorCargaList
-from .rounded_decimal_model import RoundedDecimal
 from .tipo_documento import TipoDocumento
 
 
@@ -26,8 +26,8 @@ class PuntoVentaBaseModel(BaseModel):
     email: Optional[str] = None
     pagina_web: Optional[str] = None
     info_complementaria: Optional[str] = None
-    latitud: Optional[RoundedDecimal] = None
-    longitud: Optional[RoundedDecimal] = None
+    latitud: Optional[Decimal] = None
+    longitud: Optional[Decimal] = None
     direccion: Optional[str] = None
     ciudad_id: Optional[int] = None
 
@@ -65,3 +65,14 @@ class PuntoVenta(PuntoVentaBase):
     contactos: List[PuntoVentaContactoGestorCargaList] = []
     gestor_carga_punto_venta: Optional[GestorCargaPuntoVenta] = None
     insumos: List[InsumoPuntoVenta] = []
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True
+
+    @classmethod
+    def from_orm(cls, obj: Any) -> "PuntoVenta":
+        obj.contactos = []
+        obj.gestor_carga_punto_venta = None
+        obj.insumos = []
+        return super().from_orm(obj)

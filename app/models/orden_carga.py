@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import List, Optional, Union
 
@@ -25,9 +26,10 @@ from app.schemas import (
     OrdenCargaRemisionDestino,
     OrdenCargaRemisionOrigen,
 )
-from app.utils import number_format
+from app.utils import get_flete_detalle, get_merma_detalle
 
 from .camion import Camion
+from .camion_semi_neto import CamionSemiNeto
 from .centro_operativo import CentroOperativo
 from .flete import Flete
 from .gestor_carga import GestorCarga
@@ -39,6 +41,8 @@ class OrdenCarga(AuditMixin, Base):
     id = Column(Integer, primary_key=True)
     camion_id = Column(Integer, ForeignKey("camion.id"))
     camion = relationship(Camion, uselist=False)
+    camion_semi_neto_id = Column(Integer, ForeignKey("camion_semi_neto.id"))
+    camion_semi_neto = relationship(CamionSemiNeto, uselist=False)
     semi_id = Column(Integer, ForeignKey("semi.id"))
     semi = relationship(Semi, uselist=False)
     flete_id = Column(Integer, ForeignKey("flete.id"))
@@ -101,6 +105,9 @@ class OrdenCarga(AuditMixin, Base):
     complementos = relationship("OrdenCargaComplemento", back_populates="orden_carga")
     descuentos = relationship("OrdenCargaDescuento", back_populates="orden_carga")
     saldos = relationship("OrdenCargaAnticipoSaldo", back_populates="orden_carga")
+    porcentaje_anticipos = relationship(
+        "OrdenCargaAnticipoPorcentaje", back_populates="orden_carga"
+    )
     remisiones_origen = relationship(
         "OrdenCargaRemisionOrigen", back_populates="orden_carga"
     )
@@ -129,8 +136,24 @@ class OrdenCarga(AuditMixin, Base):
         return self.camion.limite_cantidad_oc_activas
 
     @hybrid_property
-    def camion_limite_monto_anticipos(self):
-        return self.camion.limite_monto_anticipos
+    def camion_limite_monto_anticipos(self) -> Optional[Decimal]:
+        return (
+            self.camion.limite_monto_anticipos
+            if self.camion.limite_monto_anticipos
+            else None
+        )
+
+    @hybrid_property
+    def camion_monto_anticipo_disponible(self) -> Optional[Decimal]:
+        return (
+            self.camion.monto_anticipo_disponible
+            if self.camion.monto_anticipo_disponible
+            else None
+        )
+
+    @hybrid_property
+    def camion_total_anticipos_retirados_en_estado_pendiente_o_en_proceso(self):
+        return self.camion.total_anticipos_retirados_en_estado_pendiente_o_en_proceso
 
     @hybrid_property
     def camion_placa(self):
@@ -172,6 +195,15 @@ class OrdenCarga(AuditMixin, Base):
         return item.created_at if item else None
 
     @hybrid_property
+    def fecha_validez(self):
+        created_at: datetime = self.created_at
+        return created_at + timedelta(days=3)
+
+    @hybrid_property
+    def total_anticipo_complemento(self):
+        return sum(x.propietario_monto for x in self.complementos if x.anticipado)
+
+    @hybrid_property
     def flete_anticipo_maximo(self):
         return self.flete.anticipo_maximo
 
@@ -189,12 +221,12 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_gestor_carga_detalle(self):
-        remi = f"{self.flete.remitente_nombre} ||"
-        dest = f"P.Dest.: {number_format(self.cantidad_destino)}Kg ||"
-        tari = f"{number_format(self.flete_tarifa_gestor_carga)}{self.flete_tarifa_unidad_gestor_carga} ||"  # noqa: B950
-        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
-        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
-        return f"{remi} {dest} {tari} {nums} {ubic}"
+        return get_flete_detalle(
+            self,
+            self.flete_tarifa_gestor_carga,
+            self.flete.condicion_gestor_carga_moneda,
+            self.flete.condicion_gestor_carga_unidad,
+        )
 
     @hybrid_property
     def flete_gestor_carga_id(self):
@@ -217,6 +249,10 @@ class OrdenCarga(AuditMixin, Base):
         return (self.flete.porcentaje_efectivo / Decimal(100)) * self.flete_proyectado
 
     @hybrid_property
+    def flete_monto_efectivo_complemento(self):
+        return self.total_anticipo_complemento + self.flete_monto_efectivo
+
+    @hybrid_property
     def flete_origen_id(self):
         return self.flete.origen_id
 
@@ -230,12 +266,12 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_propietario_detalle(self):
-        remi = f"{self.flete.remitente_nombre} ||"
-        dest = f"P.Dest.: {number_format(self.cantidad_destino)}Kg ||"
-        tari = f"{number_format(self.flete_tarifa)}{self.flete_tarifa_unidad} ||"
-        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
-        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
-        return f"{remi} {dest} {tari} {nums} {ubic}"
+        return get_flete_detalle(
+            self,
+            self.flete_tarifa,
+            self.flete.condicion_propietario_moneda,
+            self.flete.condicion_propietario_unidad,
+        )
 
     @hybrid_property
     def flete_proyectado(self):
@@ -311,14 +347,14 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def merma_gestor_carga_detalle(self):
-        remi = f"{self.flete.remitente_nombre} ||"
-        diff = f"Dif.: {number_format(self.diferencia_origen_destino)}Kg ||"
-        totl = f"Tol.: {number_format(self.resultado_gestor_carga_tolerancia_kg)}Kg ||"
-        merm = f"M.: {number_format(self.resultado_gestor_carga_merma)}Kg ||"
-        mval = f"{number_format(self.merma_gestor_carga_valor)}Grs/Kg ||"
-        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
-        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
-        return f"{remi} {diff} {totl} {merm} {mval} {nums} {ubic}"
+        return get_merma_detalle(
+            self,
+            self.merma_gestor_carga_valor,
+            self.merma_gestor_carga_tolerancia,
+            self.merma_gestor_carga_es_porcentual,
+            self.flete.merma_gestor_carga_moneda,
+            self.flete.merma_gestor_carga_unidad,
+        )
 
     @hybrid_property
     def merma_gestor_carga_es_porcentual_descripcion(self):
@@ -335,14 +371,14 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def merma_propietario_detalle(self):
-        remi = f"{self.flete.remitente_nombre} ||"
-        diff = f"Dif.: {number_format(self.diferencia_origen_destino)}Kg ||"
-        totl = f"Tol.: {number_format(self.resultado_propietario_tolerancia_kg)}Kg ||"
-        merm = f"M.: {number_format(self.resultado_propietario_merma)}Kg ||"
-        mval = f"{number_format(self.merma_propietario_valor)}Grs/Kg ||"
-        nums = f"Nº Rem: {self.remisiones} || Tickets: {self.nro_tickets} ||"
-        ubic = f"Ori: {self.origen_nombre} || Des: {self.destino_nombre}"
-        return f"{remi} {diff} {totl} {merm} {mval} {nums} {ubic}"
+        return get_merma_detalle(
+            self,
+            self.merma_propietario_valor,
+            self.merma_propietario_tolerancia,
+            self.merma_propietario_es_porcentual,
+            self.flete.merma_propietario_moneda,
+            self.flete.merma_propietario_unidad,
+        )
 
     @hybrid_property
     def merma_propietario_es_porcentual_descripcion(self):
@@ -667,6 +703,18 @@ class OrdenCarga(AuditMixin, Base):
     # fin - propietario
 
     # FIN RESULTADO FLETE
+
+    @hybrid_property
+    def total_anticipo(self):
+        return self.flete_limite_credito + self.total_anticipo_complemento
+
+    @hybrid_property
+    def total_anticipo_retirado(self):
+        return sum(x.total_retirado for x in self.saldos)
+
+    @hybrid_property
+    def total_anticipo_disponible(self):
+        return self.total_anticipo - self.total_anticipo_retirado
 
     def get_remision_cantidad_total_kg(
         self,

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -9,7 +11,7 @@ from app.enums import PermisoModeloEnum as m
 api = APIRouter()
 
 
-@api.get("/{telefono}/{email}", response_model=schemas.Contacto)
+@api.get("/{telefono}/{email}", response_model=Optional[schemas.Contacto])
 async def read_ciudad_list(
     telefono: str,
     email: str,

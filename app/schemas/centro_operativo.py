@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -11,7 +12,6 @@ from .centro_operativo_contacto_gestor_carga import (
 from .ciudad import Ciudad
 from .contacto import ContactoForm
 from .gestor_carga_centro_operativo import GestorCargaCentroOperativo
-from .rounded_decimal_model import RoundedDecimal
 
 
 class CentroOperativoBaseModel(BaseModel):
@@ -21,8 +21,8 @@ class CentroOperativoBaseModel(BaseModel):
     telefono: Optional[str] = None
     email: Optional[str] = None
     pagina_web: Optional[str] = None
-    latitud: Optional[RoundedDecimal] = None
-    longitud: Optional[RoundedDecimal] = None
+    latitud: Optional[Decimal] = None
+    longitud: Optional[Decimal] = None
     direccion: Optional[str] = None
     ciudad_id: Optional[int] = None
 

@@ -2,6 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from .date_model import Date
 from .moneda import Moneda
 from .proveedor import Proveedor
 from .rounded_decimal_model import RoundedDecimal
@@ -42,6 +43,11 @@ class OrdenCargaDescuento(OrdenCargaDescuentoForm):
     proveedor: Optional[Proveedor] = None
     proveedor_nombre: Optional[str] = None
     # FIN Monto a pagar al Proveedor
+    # Auditoría
+    created_by: str
+    created_at: Date
+    modified_by: str
+    modified_at: Date
 
     class Config:
         orm_mode = True

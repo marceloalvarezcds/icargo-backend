@@ -59,7 +59,7 @@ def create_centro_operativo_contacto_gestor_carga(
     centro_operativo: CentroOperativo,
     contacto: Contacto,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> CentroOperativoContactoGestorCarga:
     obj = CentroOperativoContactoGestorCarga(
@@ -84,7 +84,7 @@ def edit_centro_operativo_contacto_gestor_carga(
     centro_operativo: CentroOperativo,
     contacto: Contacto,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> CentroOperativoContactoGestorCarga:
     obj.cargo_id = cargo.id

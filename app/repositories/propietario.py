@@ -19,7 +19,7 @@ def get_propietario_list(db: Session) -> List[Propietario]:
 
 
 def get_propietario_list_by_gestor_cuenta_id(
-    db: Session, gestor_cuenta_id: int
+    db: Session, gestor_cuenta_id: Optional[int]
 ) -> List[Propietario]:
     return (
         db.query(Propietario)

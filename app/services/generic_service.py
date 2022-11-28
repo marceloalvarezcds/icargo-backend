@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, cast
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
@@ -16,14 +16,32 @@ def get_by_id(ModelType: type, db: Session, id: int) -> Model:
     return obj
 
 
-def get_by_unique_columns(
-    ModelType: type, db: Session, **filter_columns
+def get_by_unique_columns_or_none(
+    ModelType: type, db: Session, should_throw_exception: bool = False, **filter_columns
 ) -> Optional[Model]:
-    return repository.get_by_unique_columns(ModelType, db, **filter_columns)
+    obj: Optional[Model] = repository.get_by_unique_columns(
+        ModelType, db, **filter_columns
+    )
+    if not obj and should_throw_exception:
+        raise HTTPException(status_code=404, detail="Objeto no encontrado")
+    return obj
+
+
+def get_by_unique_columns(ModelType: type, db: Session, **filter_columns) -> Model:
+    return cast(
+        Model,
+        get_by_unique_columns_or_none(
+            ModelType, db, should_throw_exception=True, **filter_columns
+        ),
+    )
 
 
 def get_list(ModelType: type, db: Session) -> List[Model]:
     return repository.get_list(ModelType, db)
+
+
+def get_list_by_filter(ModelType: type, db: Session, **filter_columns) -> List[Model]:
+    return repository.get_list_by_filter(ModelType, db, **filter_columns)
 
 
 def get_list_by_gestor_carga_id(
@@ -140,7 +158,7 @@ def check_unique(
     unique_message_error: str,
     **unique_columns,
 ):
-    exists: Optional[Model] = get_by_unique_columns(ModelType, db, **unique_columns)  # type: ignore  # noqa: B950
+    exists: Optional[Model] = get_by_unique_columns_or_none(ModelType, db, **unique_columns)  # type: ignore  # noqa: B950
     if id:
         if exists and exists.id != id:  # type: ignore
             raise HTTPException(

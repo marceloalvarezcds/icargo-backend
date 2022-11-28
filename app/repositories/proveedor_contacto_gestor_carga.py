@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -22,6 +22,21 @@ def get_proveedor_contacto_gestor_carga_by(
             ProveedorContactoGestorCarga.gestor_carga_id == gestor_carga_id,
         )
         .first()
+    )
+
+
+def get_proveedor_contacto_gestor_carga_list_by_proveedor_id(
+    db: Session,
+    proveedor_id: int,
+    gestor_carga_id: Optional[int],
+) -> List[ProveedorContactoGestorCarga]:
+    return (
+        db.query(ProveedorContactoGestorCarga)
+        .filter(
+            ProveedorContactoGestorCarga.proveedor_id == proveedor_id,
+            ProveedorContactoGestorCarga.gestor_carga_id == gestor_carga_id,
+        )
+        .all()
     )
 
 
@@ -50,7 +65,7 @@ def create_proveedor_contacto_gestor_carga(
     proveedor: Proveedor,
     contacto: Contacto,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> ProveedorContactoGestorCarga:
     obj = ProveedorContactoGestorCarga(
@@ -75,7 +90,7 @@ def edit_proveedor_contacto_gestor_carga(
     proveedor: Proveedor,
     contacto: Contacto,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> ProveedorContactoGestorCarga:
     obj.cargo_id = cargo.id

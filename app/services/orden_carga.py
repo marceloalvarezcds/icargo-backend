@@ -13,12 +13,20 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, STATICS_URL, templateEnv
 from app.enums import EstadoEnum
-from app.models import Camion, Flete, OrdenCarga, User
+from app.models import Camion, Flete, GestorCarga, OrdenCarga
 from app.schemas.audit_database import AuditDatabase as A
-from app.utils import number_format
+from app.utils import number_format, send_email_with_template_by_thread
 
 from .audit_database import get_audit_list_by_orden_carga
+from .camion_semi_neto import (
+    get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id,
+)
+from .flete import get_flete_detail
 from .movimiento import create_movimiento_by_conciliacion_oc
+from .orden_carga_anticipo_porcentaje import (
+    create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list,
+    edit_orden_carga_anticipo_porcentaje_by_oc_porcentaje_anticipos,
+)
 from .orden_carga_anticipo_saldo import get_orden_carga_by_id
 from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete
@@ -37,18 +45,16 @@ def get_orden_carga_list(
 
 
 def get_orden_carga_with_resultado(
-    db: Session, model: OrdenCarga, current_user: User
+    db: Session, model: OrdenCarga, user_id: int
 ) -> schemas.OrdenCarga:
     obj = schemas.OrdenCarga.from_orm(model)
     obj.remisiones_resultado = get_orden_carga_remision_resultado_list_by_orden_carga(
-        model, current_user
+        db, model, user_id
     )
     obj.remisiones_resultado_flete = get_orden_carga_remision_resultado_list_by_flete(
-        model, current_user
+        db, model, user_id
     )
-    obj.auditorias = cast(
-        List[A], get_audit_list_by_orden_carga(db, model, current_user)
-    )
+    obj.auditorias = cast(List[A], get_audit_list_by_orden_carga(db, model, user_id))
     return obj
 
 
@@ -64,28 +70,36 @@ def create_complementos_and_descuentos(
 def create_orden_carga(
     db: Session,
     data: schemas.OrdenCargaForm,
-    current_user: User,
+    current_user: schemas.AuthUser,
 ) -> schemas.OrdenCarga:
     flete = repositories.get_flete_by_id(db, data.flete_id)
     if not flete:
         raise HTTPException(status_code=404, detail="Flete no encontrado")
+    gestor_carga_id = current_user.gestor_carga_id
     modified_by = current_user.username
+    camion_semi_neto = get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
+        db, data.camion_id, data.semi_id, flete.producto_id, gestor_carga_id
+    )
+    data.camion_semi_neto_id = camion_semi_neto.id if camion_semi_neto else None
     obj = repositories.create_orden_carga(
         db,
         data,
         flete,
-        current_user.gestor_carga_id,
+        gestor_carga_id,
         modified_by,
     )
+    create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list(
+        db, obj.id, obj.flete_anticipos, modified_by
+    )
     create_complementos_and_descuentos(db, obj, flete, modified_by)
-    return get_orden_carga_with_resultado(db, obj, current_user)
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
 def edit_orden_carga(
     id: int,
     db: Session,
     data: schemas.OrdenCargaEditForm,
-    current_user: User,
+    current_user: schemas.AuthUser,
 ) -> schemas.OrdenCarga:
     to_edit_obj = get_orden_carga_by_id(db, id)
     obj = repositories.edit_orden_carga(
@@ -95,20 +109,29 @@ def edit_orden_carga(
         current_user.gestor_carga_id,
         current_user.username,
     )
-    return get_orden_carga_with_resultado(db, obj, current_user)
+    edit_orden_carga_anticipo_porcentaje_by_oc_porcentaje_anticipos(
+        obj.id,
+        db,
+        to_edit_obj.porcentaje_anticipos,
+        data.porcentaje_anticipos,
+        current_user.username,
+    )
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
-def delete_orden_carga(db: Session, id: int, current_user: User) -> schemas.OrdenCarga:
+def delete_orden_carga(
+    db: Session, id: int, current_user: schemas.AuthUser
+) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.delete_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def get_orden_carga_detail(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
-    return get_orden_carga_with_resultado(db, obj, current_user)
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
 def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
@@ -121,16 +144,30 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
     OUTPUT_FILENAME = f"orden_carga_{id}.pdf"
     TEMPLATE_FILENAME = "pdf_orden_carga.html"
     template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
+    create_at: datetime = obj.created_at
+    fecha_vencimiento: datetime = obj.camion.vencimiento_habilitacion_transporte
+    df = "%Y-%m-%d / %H:%M:%S"
+    bruto = obj.camion.bruto
+    neto = obj.camion_semi_neto.neto if obj.camion_semi_neto else None
+    gestor_carga_nombre_corto = (
+        gestor_carga.nombre_corto if gestor_carga.nombre_corto else gestor_carga.nombre
+    )
     data = {
         "id": id,
         "flete_id": obj.flete_id,
-        "remitente": f"{obj.flete.remitente_nombre} - {obj.flete.remitente.numero_documento}",
+        "remitente": obj.flete.remitente.nombre,
+        "remitente_numero_documento": obj.flete.remitente.numero_documento,
+        "bruto": number_format(bruto) if bruto else "-",
+        "neto": number_format(neto) if neto else "-",
         "cantidad_nominada": number_format(obj.cantidad_nominada),
         "gestor_carga_direccion": gestor_carga.direccion,
         "gestor_carga_logo": gestor_carga.logo,
         "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_nombre_corto": gestor_carga_nombre_corto,
         "gestor_carga_numero_documento": gestor_carga.numero_documento,
-        "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
+        "fecha": datetime.now().strftime(df),
+        "fecha_orden": create_at.strftime(df),
+        "fecha_validez": obj.fecha_validez.strftime(df),
         "producto": obj.flete_producto_descripcion,
         "origen": obj.origen_nombre,
         "origen_direccion": obj.origen.direccion if obj.origen.direccion else "-",
@@ -145,13 +182,17 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "camion_placa": obj.camion_placa,
         "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",
         "camion_color": obj.camion.color_descripcion,
+        "camion_tipo": obj.camion.tipo_descripcion,
+        "camion_fecha_vto": fecha_vencimiento.strftime(df),
         "semi_placa": obj.semi_placa,
         "semi_marca_tipo": f"{obj.semi.marca_descripcion}/{obj.semi.tipo_descripcion}",
         "semi_color": obj.semi.color_descripcion,
+        "semi_tipo": obj.semi.tipo_descripcion,
         "comentarios": obj.comentarios if obj.comentarios else "-",
         "texto_legal": obj.flete.emision_orden_texto_legal
         if obj.flete.emision_orden_texto_legal
         else "-",
+        "usuario": obj.created_by,
     }
     source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
@@ -216,7 +257,7 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
 
 
 def change_orden_carga_anticipos_liberados(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     if not obj.anticipos_liberados and obj.estado == EstadoEnum.CANCELADO.value:
@@ -228,10 +269,12 @@ def change_orden_carga_anticipos_liberados(
     model = repositories.change_orden_carga_anticipos_liberados(
         obj, db, anticipos_liberados, current_user.username
     )
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
-def aceptar_orden_carga(db: Session, id: int, current_user: User) -> schemas.OrdenCarga:
+def aceptar_orden_carga(
+    db: Session, id: int, current_user: schemas.AuthUser
+) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     cant_oc_aceptadas = repositories.get_orden_carga_aceptada_count_by_camion_id(
         db, obj.camion_id
@@ -264,85 +307,156 @@ def aceptar_orden_carga(db: Session, id: int, current_user: User) -> schemas.Ord
         username,
     )
     model = repositories.aceptar_orden_carga(oc, db, username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    send_emision_orden_carga_mail(obj)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def cancelar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.cancelar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def conciliar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.conciliar_orden_carga(obj, db, current_user.username)
     create_movimiento_by_conciliacion_oc(
         db, obj, current_user.gestor_carga_id, current_user.username
     )
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def contabilizar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.contabilizar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def arribado_a_cargar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.arribado_a_cargar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def arribado_a_descargar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.arribado_a_descargar_orden_carga(
         obj, db, current_user.username
     )
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
-def cargar_orden_carga(db: Session, id: int, current_user: User) -> schemas.OrdenCarga:
+def cargar_orden_carga(
+    db: Session, id: int, current_user: schemas.AuthUser
+) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.cargar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def descargar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.descargar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def finalizar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.finalizar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
 def liquidar_orden_carga(
-    db: Session, id: int, current_user: User
+    db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.liquidar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user)
+    return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
-def get_orden_carga_reports(db: Session, gestor_carga_id: int) -> str:
+def send_oc_mail(db: Session, id: int):
+    obj = get_orden_carga_by_id(db, id)
+    send_emision_orden_carga_mail(obj)
+
+
+def send_emision_orden_carga_mail(obj: OrdenCarga):
+    gestor_carga: GestorCarga = obj.gestor_carga
+    flete = get_flete_detail(obj.flete)
+    destinatarios = ",".join([x.email for x in flete.destinatarios])
+    create_at: datetime = obj.created_at
+    fecha_vencimiento: datetime = obj.camion.vencimiento_habilitacion_transporte
+    df = "%Y-%m-%d / %H:%M:%S"
+    bruto = obj.camion.bruto + obj.semi.bruto
+    neto = obj.camion.neto + obj.semi.neto
+    gestor_carga_nombre_corto = (
+        gestor_carga.nombre_corto if gestor_carga.nombre_corto else gestor_carga.nombre
+    )
+    data = {
+        "id": obj.id,
+        "flete_id": flete.id,
+        "remitente": flete.remitente.nombre,
+        "remitente_numero_documento": flete.remitente.numero_documento,
+        "bruto": number_format(bruto),
+        "neto": number_format(neto),
+        "cantidad_nominada": number_format(obj.cantidad_nominada),
+        "gestor_carga_direccion": gestor_carga.direccion,
+        "gestor_carga_logo": gestor_carga.logo,
+        "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_nombre_corto": gestor_carga_nombre_corto,
+        "gestor_carga_numero_documento": gestor_carga.numero_documento,
+        "fecha": datetime.now().strftime(df),
+        "fecha_orden": create_at.strftime(df),
+        "fecha_validez": obj.fecha_validez.strftime(df),
+        "producto": obj.flete_producto_descripcion,
+        "origen": obj.origen_nombre,
+        "origen_direccion": obj.origen.direccion if obj.origen.direccion else "-",
+        "destino": obj.destino_nombre,
+        "destino_direccion": obj.destino.direccion if obj.destino.direccion else "-",
+        "propietario_nombre": obj.camion_propietario_nombre,
+        "propietario_telefono": obj.camion.propietario.telefono,
+        "chofer_nombre": obj.camion_chofer_nombre,
+        "chofer_numero_documento": obj.camion_chofer_numero_documento,
+        "chofer_telefono": obj.camion.chofer.telefono,
+        "camion_foto": obj.camion.foto,
+        "camion_placa": obj.camion_placa,
+        "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",
+        "camion_color": obj.camion.color_descripcion,
+        "camion_tipo": obj.camion.tipo_descripcion,
+        "camion_fecha_vto": fecha_vencimiento.strftime(df),
+        "semi_placa": obj.semi_placa,
+        "semi_marca_tipo": f"{obj.semi.marca_descripcion}/{obj.semi.tipo_descripcion}",
+        "semi_color": obj.semi.color_descripcion,
+        "semi_tipo": obj.semi.tipo_descripcion,
+        "comentarios": obj.comentarios if obj.comentarios else "-",
+        "texto_legal": obj.flete.emision_orden_texto_legal
+        if obj.flete.emision_orden_texto_legal
+        else "-",
+        "usuario": obj.created_by,
+    }
+    send_email_with_template_by_thread(
+        template_filename="mail_orden_carga.html",
+        to=destinatarios,
+        subject="iCargo: Emisión de Orden de Carga",
+        logo=LOGO_IMAGE_URL,
+        **data,
+    )
+
+
+def get_orden_carga_reports(db: Session, gestor_carga_id: Optional[int]) -> str:
     datalist = repositories.get_orden_carga_list_by_gestor_carga_id(db, gestor_carga_id)
     wb = Workbook()
     # get worksheet

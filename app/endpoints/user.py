@@ -18,15 +18,17 @@ api = APIRouter()
 async def read_user_list_by_gestor_carga_id(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.USER)),  # noqa: B008
-    current_user: User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
-    return services.get_user_list_by_gestor_carga_id(db, current_user.gestor_carga_id)
+    return services.get_user_list_with_rol_list_by_gestor_carga_id(
+        db, current_user.gestor_carga_id
+    )
 
 
 @api.get("/active_list", response_model=List[schemas.User])
 async def read_user_active_list(
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.USER)),  # noqa: B008
 ):
     return services.get_user_active_list_by_gestor_carga_id(
@@ -36,13 +38,14 @@ async def read_user_active_list(
 
 @api.get("/me", response_model=schemas.UserAccount)
 def my_account(
+    db: Session = Depends(get_db_session),  # noqa: B008
     current_user: User = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.INICIAR_SESION, m.USER)),  # noqa: B008
 ) -> Any:
     """
     Retrieve current user.
     """
-    return current_user
+    return services.get_user_account(db, current_user.id)
 
 
 @api.get("/{id}", response_model=schemas.User)
@@ -51,7 +54,7 @@ async def read_user_by_id(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.VER, m.USER)),  # noqa: B008
 ):
-    return services.get_user_by_id(db, id)
+    return services.get_user_with_rol_list_by_id(db, id)
 
 
 @api.post("/", response_model=schemas.User)
@@ -59,10 +62,10 @@ def create_user(
     request: Request,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.UserCreate] = Form(...),  # type: ignore  # noqa: B008
-    current_user: User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.USER)),  # noqa: B008
 ) -> Any:
-    return services.create_user(
+    return services.create_user_with_rol_list(
         db, data, current_user.gestor_carga_id, current_user.username, request  # type: ignore
     )
 
@@ -73,10 +76,10 @@ async def edit_user(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.UserUpdate] = Form(...),  # type: ignore  # noqa: B008
-    current_user: User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.USER)),  # noqa: B008
 ):
-    return services.edit_user(
+    return services.edit_user_with_rol_list(
         db,
         id,
         data,  # type: ignore
@@ -90,7 +93,7 @@ async def edit_user(
 def active_user_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.USER)),  # noqa: B008
 ):
     return services.change_user_status(db, id, EstadoEnum.ACTIVO, current_user.username)
@@ -100,7 +103,7 @@ def active_user_by_id(
 def inactive_user_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: User = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.USER)),  # noqa: B008
 ):
     return services.change_user_status(

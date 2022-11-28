@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Orden de Carga</title>
+    <meta name="generator" content="BCL easyConverter SDK 5.0.252" />
+    <meta name="title" content="2022 01 21 Anticipos icargo" />
+  </head>
+
+  <body>
+    <div
+      style="
+        border: 2px solid #d1d3d4;
+        font-size: 12px;
+        font-family: sans-serif;
+        width: 1245px;
+      "
+    >
+      <div style="display: flex; border-bottom: 2px solid #d1d3d4">
+        <div
+          style="
+            box-sizing: border-box;
+            border-right-width: 2px;
+            padding: 8px 0 7px 0;
+            width: 100px;
+            height: 100px;
+          "
+        >
+          <div
+            style="
+              align-items: center;
+              display: flex;
+              height: 100%;
+              text-align: center;
+            "
+          >
+            {% if gestor_carga_logo %}
+            <img
+              src="{{gestor_carga_logo}}"
+              style="width: 100%; height: auto"
+            />
+            {% else %}
+            <div
+              style="
+                color: #39f;
+                flex: 1;
+                font-size: 16px;
+                font-weight: bold;
+                line-height: 22px;
+                text-align: center;
+              "
+            >
+              LOGO
+              <div style="font-size: 18px">Gestora Carga</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div style="border-left: 2px solid #d1d3d4; flex: 1">
+          <div
+            style="
+              box-sizing: border-box;
+              display: flex;
+              min-height: 100px;
+              align-items: flex-end;
+              padding: 8px 10px 7px 10px;
+            "
+          >
+            <div style="flex: 1">
+              <div
+                style="
+                  font-weight: bold;
+                  font-size: 16px;
+                  line-height: 25px;
+                  margin-bottom: 10px;
+                  margin-right: 10px;
+                "
+              >
+                {{gestor_carga_nombre}} - {{gestor_carga_numero_documento}}
+              </div>
+              <div style="display: flex; font-size: 11px; column-gap: 15%">
+                <div>
+                  <div style="color: #939598">Fecha de Orden:</div>
+                  <div>{{fecha_orden}}</div>
+                </div>
+                <div>
+                  <div style="color: #939598">Fecha de Validez:</div>
+                  <div>{{fecha_validez}}</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div
+                style="
+                  color: #939fa7;
+                  font-size: 18px;
+                  font-weight: bold;
+                  line-height: 25px;
+                  text-transform: uppercase;
+                  margin-bottom: 20px;
+                  width: 285px;
+                "
+              >
+                <span> Orden de carga Nº: </span>
+                <span> {{id}} </span>
+              </div>
+              <div style="display: flex; font-size: 11px; column-gap: 15%">
+                <div>
+                  <div style="color: #939598">Nº de Pedido:</div>
+                  <div>{{flete_id}}</div>
+                </div>
+                <div>
+                  <div style="color: #939598">Usuario:</div>
+                  <div>{{usuario}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        style="
+          border-bottom: 2px solid #d1d3d4;
+          display: flex;
+          font-weight: bold;
+        "
+      >
+        <div style="flex: 1; padding: 8px 0 0 0">
+          <div
+            style="
+              padding-bottom: 10px;
+              padding-left: 10px;
+              padding-right: 10px;
+            "
+          >
+            <span style="color: #939598"> Remitente: </span>
+            <span style="text-transform: uppercase"> {{remitente}} </span>
+          </div>
+          <div
+            style="
+              padding-bottom: 10px;
+              padding-left: 10px;
+              padding-right: 10px;
+            "
+          >
+            <span style="color: #939598"> Propietario: </span>
+            <span style="text-transform: uppercase">
+              {{propietario_nombre}}
+            </span>
+          </div>
+          <div
+            style="
+              padding-bottom: 10px;
+              padding-left: 10px;
+              padding-right: 10px;
+            "
+          >
+            <span style="color: #939598"> Chofer: </span>
+            <span style="text-transform: uppercase"> {{chofer_nombre}} </span>
+          </div>
+        </div>
+        <div style="flex: 1; padding: 8px 0 7px 0">
+          <div
+            style="
+              padding-bottom: 10px;
+              padding-left: 10px;
+              padding-right: 10px;
+            "
+          >
+            <span style="color: #939598"> Doc. Remitente: </span>
+            <span style="text-transform: uppercase">
+              {{remitente_numero_documento}}
+            </span>
+          </div>
+          <div
+            style="
+              padding-bottom: 10px;
+              padding-left: 10px;
+              padding-right: 10px;
+            "
+          >
+            <span style="color: #939598"> Tel. Propietario: </span>
+            <span style="text-transform: uppercase">
+              {{propietario_telefono}}
+            </span>
+          </div>
+          <div
+            style="
+              padding-bottom: 10px;
+              padding-left: 10px;
+              padding-right: 10px;
+            "
+          >
+            <span style="color: #939598"> Doc. Chofer: </span>
+            <span style="text-transform: uppercase">
+              {{chofer_numero_documento}}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        style="
+          display: flex;
+          border-bottom: 2px solid #d1d3d4;
+          box-sizing: border-box;
+          font-weight: bold;
+        "
+      >
+        <div
+          style="
+            border-right: 2px solid #d1d3d4;
+            flex: 1;
+            padding: 8px 10px 0px 10px;
+          "
+        >
+          <div style="display: flex; padding-bottom: 10px">
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Placa del camión:
+              </div>
+              <div style="text-transform: uppercase">{{camion_placa}}</div>
+            </div>
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Marca/Tipo:
+              </div>
+              <div style="text-transform: uppercase">{{camion_marca_tipo}}</div>
+            </div>
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Color:
+              </div>
+              <div style="text-transform: uppercase">{{camion_color}}</div>
+            </div>
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Tipo:
+              </div>
+              <div style="text-transform: uppercase">{{camion_tipo}}</div>
+            </div>
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Vto. Dinatran:
+              </div>
+              <div style="text-transform: uppercase">{{fecha_vencimiento}}</div>
+            </div>
+          </div>
+          <div style="display: flex; padding-bottom: 10px">
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Placa del Semi:
+              </div>
+              <div style="text-transform: uppercase">{{semi_placa}}</div>
+            </div>
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Marca/Tipo:
+              </div>
+              <div style="text-transform: uppercase">{{semi_marca_tipo}}</div>
+            </div>
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Color:
+              </div>
+              <div style="text-transform: uppercase">{{semi_color}}</div>
+            </div>
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Tipo:
+              </div>
+              <div style="text-transform: uppercase">{{semi_tipo}}</div>
+            </div>
+          </div>
+          <div style="display: flex; padding-bottom: 10px">
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Peso Bruto:
+              </div>
+              <div style="text-transform: uppercase">{{bruto}}</div>
+            </div>
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Peso Neto:
+              </div>
+              <div style="text-transform: uppercase">{{neto}}</div>
+            </div>
+            <div>
+              <div style="color: #939598; display: inline-block; width: 200px">
+                Cant. Nominada:
+              </div>
+              <div style="text-transform: uppercase">{{cantidad_nominada}}</div>
+            </div>
+          </div>
+        </div>
+        <div style="min-height: 120px; width: 120px">
+          {% if camion_foto %}
+          <img src="{{camion_foto}}" />
+          {% else %}
+          <div class="center fs4 lh3 gray flex1" style="font-weight: bold">
+            Imagen
+            <div class="fs4">CAMIÓN</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <div
+        style="
+          border-bottom: 2px solid #d1d3d4;
+          display: flex;
+          font-weight: bold;
+          line-height: 20px;
+        "
+      >
+        <div style="flex: 1; padding: 8px 0 7px 0">
+          <div style="padding-left: 10px; padding-right: 10px; width: 200px">
+            <div style="color: #939598">Origen:</div>
+            <div style="text-transform: uppercase">{{origen}}</div>
+          </div>
+          <div style="padding-left: 10px; padding-right: 10px; width: 200px">
+            <div style="color: #939598">Ubicación:</div>
+            <div style="text-transform: uppercase">{{origen_direccion}}</div>
+          </div>
+        </div>
+        <div style="flex: 1; padding: 8px 0 7px 0">
+          <div style="padding-left: 10px; padding-right: 10px; width: 200px">
+            <div style="color: #939598">Destino:</div>
+            <div style="text-transform: uppercase">{{destino}}</div>
+          </div>
+          <div style="padding-left: 10px; padding-right: 10px; width: 200px">
+            <div style="color: #939598">Ubicación:</div>
+            <div style="text-transform: uppercase">{{destino_direccion}}</div>
+          </div>
+        </div>
+        <div style="flex: 1; padding: 8px 0 7px 0">
+          <div style="padding-left: 10px; padding-right: 10px; width: 200px">
+            <div style="color: #939598">Producto:</div>
+            <div style="text-transform: uppercase">{{producto}}</div>
+          </div>
+        </div>
+      </div>
+      <div
+        style="
+          font-size: 11px;
+          display: flex;
+          font-weight: bold;
+          line-height: 20px;
+        "
+      >
+        <div style="padding-left: 10px; padding-right: 10px">
+          <span style="color: #939598">Comentarios:</span>
+          <span>{{destino_direccion}}</span>
+        </div>
+      </div>
+      <div
+        style="
+          border-bottom: 2px solid #d1d3d4;
+          display: flex;
+          font-size: 11px;
+          justify-content: space-between;
+          margin-top: 60px;
+          padding: 0 10px;
+        "
+      >
+        <div style="min-width: 400px">
+          <span style="line-height: 30px; font-size: 14px; font-weight: bold">
+            P/A: {{gestor_carga_nombre_corto}}
+          </span>
+          <span
+            style="display: inline-block; border: 1px dashed #444; width: 200px"
+          ></span>
+        </div>
+        <div style="min-width: 400px">
+          <span style="line-height: 30px; font-size: 14px; font-weight: bold">
+            Firma Chofer:
+          </span>
+          <span
+            style="display: inline-block; border: 1px dashed #444; width: 200px"
+          ></span>
+        </div>
+      </div>
+      <div
+        style="
+          border-bottom: 2px solid #d1d3d4;
+          box-sizing: border-box;
+          font-size: 11px;
+          display: flex;
+          line-height: 20px;
+          padding: 10px;
+        "
+      >
+        {{texto_legal}}
+      </div>
+      <div style="display: flex; align-items: center">
+        <div style="width: 150px; height: 60px">
+          <img src="{{logo}}" alt="iCargo" />
+        </div>
+        <div
+          style="
+            line-height: 14px;
+            font-size: 9px;
+            flex: 1;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-top: 0px;
+            margin-bottom: 0px;
+          "
+        >
+          iCargo es solo una Herramienta de Gestión y no constituye parte alguna
+          en la Cadena de Operaciones, limitándose su aporte solo al Registro,
+          Gestión y Publicación de la información que por ella se administra.
+          Las partes, Gestora de carga y Propietario, asumen total
+          responsabilidad por la Publicación de los Pedidos y por la Emisión de
+          las Ordenes de Carga que consideren apropiadas, dejando indemne a
+          iCargo de cualquier reclamo Judicial y/o Extra-Judicial en cualquier
+          litigio que pudiera surgir entre estas partes
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

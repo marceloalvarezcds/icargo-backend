@@ -10,6 +10,7 @@ class OrdenCargaAnticipoRetiradoBaseModel(BaseModel):
     flete_anticipo_id: int
     orden_carga_id: int
     punto_venta_id: int
+    orden_carga_anticipo_porcentaje_id: Optional[int] = None
     tipo_comprobante_id: Optional[int] = None
     numero_comprobante: Optional[str] = None
     moneda_id: int

@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from sqlalchemy import func  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
 
@@ -45,6 +46,11 @@ def get_contraparte_list_by_tipo_contraparte_id(
             Movimiento.id,
             Movimiento.contraparte,
             Movimiento.contraparte_numero_documento,
+            func.concat(
+                Movimiento.contraparte,
+                " - ",
+                Movimiento.contraparte_numero_documento,
+            ).label("info"),
             Movimiento.tipo_contraparte_id,
             TipoContraparte.descripcion.label("tipo_contraparte_descripcion"),
         )

@@ -1,3 +1,6 @@
+from decimal import Decimal
+from typing import Optional
+
 from sqlalchemy import (  # type: ignore
     Column,
     DateTime,
@@ -43,6 +46,7 @@ class Camion(AuditMixin, Base):
     limite_cantidad_oc_activas = Column(Integer, server_default=text("1"))
     # SE USA LA MONEDA DEL GESTOR, por el momento
     limite_monto_anticipos = Column(Numeric(38, 10))
+    total_anticipos_retirados_en_estado_pendiente_o_en_proceso = Column(Numeric(38, 10))
     # FIN Limitaciones del Camión
     # INICIO Habilitaciones del Camión
     # inicio - municipal
@@ -146,6 +150,19 @@ class Camion(AuditMixin, Base):
         )
 
     @hybrid_property
+    def monto_anticipo_disponible(self) -> Optional[Decimal]:
+        return (
+            self.limite_monto_anticipos
+            - (
+                self.total_anticipos_retirados_en_estado_pendiente_o_en_proceso
+                if self.total_anticipos_retirados_en_estado_pendiente_o_en_proceso
+                else 0
+            )
+            if self.limite_monto_anticipos
+            else None
+        )
+
+    @hybrid_property
     def info(self):
         return f"{self.placa} - {self.propietario_nombre}"
 
@@ -216,6 +233,10 @@ class Camion(AuditMixin, Base):
     @hybrid_property
     def propietario_puede_recibir_anticipos(self):
         return self.propietario.puede_recibir_anticipos
+
+    @hybrid_property
+    def propietario_telefono(self):
+        return self.propietario.telefono
 
     @hybrid_property
     def tipo_descripcion(self):

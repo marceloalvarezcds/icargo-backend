@@ -19,20 +19,23 @@ from .proveedor_contacto import update_proveedor_contacto_list
 
 
 def get_proveedor_detail(
-    obj: Proveedor, gestor_carga_id: Optional[int]
+    db: Session, obj: Proveedor, gestor_carga_id: Optional[int]
 ) -> schemas.Proveedor:
-    obj_dict = obj.as_dict(for_json=False)
-    contactos: List[ProveedorContactoGestorCarga] = obj.contactos
+    schema = schemas.Proveedor.from_orm(obj)
+    contactos: List[
+        ProveedorContactoGestorCarga
+    ] = repositories.get_proveedor_contacto_gestor_carga_list_by_proveedor_id(
+        db, obj.id, gestor_carga_id
+    )
     ges: List[GestorCargaProveedor] = obj.gestores
     gestores = [x for x in ges if x.gestor_carga_id == gestor_carga_id]
-    obj_dict["contactos"] = [
-        x for x in contactos if x.gestor_carga_id == gestor_carga_id
+    schema.contactos = [
+        schemas.ProveedorContactoGestorCargaList.from_orm(x)
+        for x in contactos
+        if x.gestor_carga_id == gestor_carga_id
     ]
-    obj_dict["gestor_carga_proveedor"] = gestores[0] if len(gestores) > 0 else None
-    obj_dict["tipo_documento"] = obj.tipo_documento
-    obj_dict["composicion_juridica"] = obj.composicion_juridica
-    obj_dict["ciudad"] = obj.ciudad
-    return schemas.Proveedor.parse_obj(obj_dict)
+    schema.gestor_carga_proveedor = gestores[0] if len(gestores) > 0 else None
+    return schema
 
 
 async def create_proveedor(
@@ -53,7 +56,7 @@ async def create_proveedor(
         db, data.contactos, obj, gestor_carga_id, modified_by
     )
     create_gestor_carga_proveedor(db, obj, gestor_carga_id, data.alias, modified_by)
-    return get_proveedor_detail(obj, gestor_carga_id)
+    return get_proveedor_detail(db, obj, gestor_carga_id)
 
 
 def get_proveedor_by_id(db: Session, id: int) -> Proveedor:
@@ -69,7 +72,7 @@ def get_proveedor_by_id_and_gestor_carga_id(
     obj = repositories.get_proveedor_by_id(db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Proveedor no encontrado")
-    return get_proveedor_detail(obj, gestor_carga_id)
+    return get_proveedor_detail(db, obj, gestor_carga_id)
 
 
 async def edit_proveedor(
@@ -95,7 +98,7 @@ async def edit_proveedor(
         db, data.contactos, obj, gestor_carga_id, modified_by
     )
     edit_gestor_carga_proveedor(db, obj, gestor_carga_id, data.alias, modified_by)
-    return get_proveedor_detail(obj, gestor_carga_id)
+    return get_proveedor_detail(db, obj, gestor_carga_id)
 
 
 def delete_proveedor(
@@ -103,7 +106,7 @@ def delete_proveedor(
 ) -> schemas.Proveedor:
     co = get_proveedor_by_id(db, id)
     obj = repositories.delete_proveedor(co, db, modified_by)
-    return get_proveedor_detail(obj, gestor_carga_id)
+    return get_proveedor_detail(db, obj, gestor_carga_id)
 
 
 def get_proveedor_reports(db: Session) -> str:

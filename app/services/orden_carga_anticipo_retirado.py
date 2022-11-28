@@ -10,11 +10,15 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
 from app.enums import TipoAnticipoEnum, TipoInsumoEnum
-from app.models import OrdenCargaAnticipoRetirado, TipoAnticipo, TipoInsumo
+from app.models import Camion, OrdenCargaAnticipoRetirado, TipoAnticipo, TipoInsumo
 from app.schemas.rounded_decimal_model import RoundedDecimal
 from app.utils import number_format
 
+from .camion import update_camion_anticipo_retirado
 from .movimiento import create_movimiento_by_anticipo
+from .orden_carga_anticipo_porcentaje_create import (
+    get_orden_carga_anticipo_porcentaje_by,
+)
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
 from .user import get_user_by_username
 
@@ -58,6 +62,10 @@ def create_orden_carga_anticipo_retirado(
             data.cantidad_retirada * data.precio_unitario
         )
     update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
+    porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
+        db, data.flete_anticipo_id, data.orden_carga_id
+    )
+    data.orden_carga_anticipo_porcentaje_id = porcentaje_anticipo.id
     anticipo = repositories.create_orden_carga_anticipo_retirado(
         db,
         data,
@@ -66,6 +74,8 @@ def create_orden_carga_anticipo_retirado(
     create_movimiento_by_anticipo(
         db, anticipo, anticipo.orden_carga.gestor_carga_id, modified_by
     )
+    camion: Camion = anticipo.orden_carga.camion
+    update_camion_anticipo_retirado(db, camion)
     return anticipo
 
 
@@ -92,6 +102,8 @@ def edit_orden_carga_anticipo_retirado(
     update_orden_carga_anticipo_saldo_by_form(
         db, data, to_edit_obj.monto_retirado, modified_by
     )
+    camion: Camion = to_edit_obj.orden_carga.camion
+    update_camion_anticipo_retirado(db, camion)
     return repositories.edit_orden_carga_anticipo_retirado(
         to_edit_obj,
         db,

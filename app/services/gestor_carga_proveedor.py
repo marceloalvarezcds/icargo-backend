@@ -14,9 +14,8 @@ def create_gestor_carga_proveedor(
     modified_by: str,
 ) -> Optional[GestorCargaProveedor]:
     if gestor_carga_id:
-        alias_or_nombre = alias if alias else proveedor.nombre
         return repositories.create_gestor_carga_proveedor(
-            db, proveedor.id, gestor_carga_id, alias_or_nombre, modified_by
+            db, proveedor.id, gestor_carga_id, alias, modified_by
         )
     return None
 
@@ -33,15 +32,12 @@ def edit_gestor_carga_proveedor(
             db, proveedor.id, gestor_carga_id
         )
         if obj:
-            alias_or_nombre = (
-                alias if alias else obj.alias if obj.alias else proveedor.nombre
-            )
             return repositories.edit_gestor_carga_proveedor(
                 obj,
                 db,
                 proveedor.id,
                 gestor_carga_id,
-                alias_or_nombre,
+                alias,
                 modified_by,
             )
         else:

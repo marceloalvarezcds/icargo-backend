@@ -26,7 +26,7 @@ def create_contacto(
         centro_operativo,
         contacto,
         gestor_carga_id,
-        data.alias if data.alias else f"{contacto.nombre} {contacto.apellido}",
+        data.alias,
         modified_by,
     )
     return contacto
@@ -63,13 +63,7 @@ def edit_contacto(
             centro_operativo,
             contacto,
             gestor_carga_id,
-            (
-                data.alias
-                if data.alias
-                else centro_operativo_contacto_obj.alias
-                if centro_operativo_contacto_obj.alias
-                else f"{contacto.nombre} {contacto.apellido}"
-            ),
+            data.alias,
             modified_by,
         )
     else:

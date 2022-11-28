@@ -1,5 +1,5 @@
 import os
-from typing import Optional, cast
+from typing import List, Optional, cast
 
 from fastapi import HTTPException, UploadFile  # type: ignore
 from openpyxl import Workbook  # type: ignore
@@ -12,6 +12,7 @@ from app.enums import EstadoEnum
 from app.models import Propietario
 from app.utils import get_gestor_carga_by_params
 
+from .camion import get_camion_by_id
 from .gestor_carga_propietario import (
     create_gestor_carga_propietario,
     edit_gestor_carga_propietario,
@@ -23,6 +24,7 @@ from .propietario_chofer import (
     disable_chofer_by_id,
 )
 from .propietario_contacto import update_propietario_contacto_list
+from .semi import get_semi_by_id
 
 
 async def create_propietario(
@@ -96,6 +98,28 @@ def get_propietario_by_id_and_gestor_cuenta_id(
     if not obj:
         raise HTTPException(status_code=404, detail="Propietario no encontrado")
     return get_propietario_detail(db, obj, gestor_cuenta_id)
+
+
+def get_propietario_list_by_gestor_cuenta_and_camion_id(
+    db: Session, camion_id: int, gestor_cuenta_id: Optional[int]
+) -> List[Propietario]:
+    camion = get_camion_by_id(db, camion_id)
+    lista = repositories.get_propietario_list_by_gestor_cuenta_id(db, gestor_cuenta_id)
+    if camion.propietario:
+        propietario: Propietario = camion.propietario
+        lista.append(propietario)
+    return lista
+
+
+def get_propietario_list_by_gestor_cuenta_and_semi_id(
+    db: Session, semi_id: int, gestor_cuenta_id: Optional[int]
+) -> List[Propietario]:
+    semi = get_semi_by_id(db, semi_id)
+    lista = repositories.get_propietario_list_by_gestor_cuenta_id(db, gestor_cuenta_id)
+    if semi.propietario:
+        propietario: Propietario = semi.propietario
+        lista.append(propietario)
+    return lista
 
 
 async def edit_propietario(

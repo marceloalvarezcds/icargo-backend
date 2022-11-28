@@ -7,6 +7,7 @@ from .rounded_decimal_model import RoundedDecimal
 class OrdenCargaAnticipoSaldoForm(BaseModel):
     flete_anticipo_id: int
     orden_carga_id: int
+    orden_carga_anticipo_porcentaje_id: int
     total_anticipo: RoundedDecimal
     total_complemento: RoundedDecimal
     total_retirado: RoundedDecimal

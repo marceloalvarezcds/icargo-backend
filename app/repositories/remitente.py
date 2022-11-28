@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import Remitente, RemitenteContactoGestorCarga
+from app.models import GestorCargaRemitente, Remitente
 from app.schemas import RemitenteForm
 
 
@@ -19,15 +19,15 @@ def get_remitente_list(db: Session) -> List[Remitente]:
 
 
 def get_remitente_list_by_gestor_cuenta_id(
-    db: Session, gestor_cuenta_id: int
+    db: Session, gestor_cuenta_id: Optional[int]
 ) -> List[Remitente]:
     return (
         db.query(Remitente)
         .filter(
             and_(
                 Remitente.estado != EstadoEnum.ELIMINADO.value,
-                Remitente.contactos.any(
-                    RemitenteContactoGestorCarga.gestor_carga_id == gestor_cuenta_id
+                Remitente.gestores.any(
+                    GestorCargaRemitente.gestor_carga_id == gestor_cuenta_id
                 ),
             )
         )

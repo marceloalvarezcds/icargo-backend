@@ -50,7 +50,7 @@ def create_propietario_contacto_gestor_carga(
     propietario: Propietario,
     contacto: Contacto,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> PropietarioContactoGestorCarga:
     obj = PropietarioContactoGestorCarga(
@@ -75,7 +75,7 @@ def edit_propietario_contacto_gestor_carga(
     propietario: Propietario,
     contacto: Contacto,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> PropietarioContactoGestorCarga:
     obj.cargo_id = cargo.id

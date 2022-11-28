@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -22,6 +22,21 @@ def get_punto_venta_contacto_gestor_carga_by(
             PuntoVentaContactoGestorCarga.gestor_carga_id == gestor_carga_id,
         )
         .first()
+    )
+
+
+def get_punto_venta_contacto_gestor_carga_list_by_punto_venta_id(
+    db: Session,
+    punto_venta_id: int,
+    gestor_carga_id: Optional[int],
+) -> List[PuntoVentaContactoGestorCarga]:
+    return (
+        db.query(PuntoVentaContactoGestorCarga)
+        .filter(
+            PuntoVentaContactoGestorCarga.punto_venta_id == punto_venta_id,
+            PuntoVentaContactoGestorCarga.gestor_carga_id == gestor_carga_id,
+        )
+        .all()
     )
 
 
@@ -50,7 +65,7 @@ def create_punto_venta_contacto_gestor_carga(
     punto_venta: PuntoVenta,
     contacto: Contacto,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> PuntoVentaContactoGestorCarga:
     obj = PuntoVentaContactoGestorCarga(
@@ -75,7 +90,7 @@ def edit_punto_venta_contacto_gestor_carga(
     punto_venta: PuntoVenta,
     contacto: Contacto,
     gestor_carga_id: int,
-    alias: str,
+    alias: Optional[str],
     modified_by: str,
 ) -> PuntoVentaContactoGestorCarga:
     obj.cargo_id = cargo.id

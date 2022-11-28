@@ -5,6 +5,10 @@ from sqlalchemy.orm import Session  # type: ignore
 from app.models import Moneda
 
 
+def get_moneda_by_id(db: Session, id: int) -> Optional[Moneda]:
+    return db.query(Moneda).get(id)
+
+
 def get_moneda_by_simbolo(db: Session, simbolo: str) -> Optional[Moneda]:
     return db.query(Moneda).filter(Moneda.simbolo == simbolo).first()
 

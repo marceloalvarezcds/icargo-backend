@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel, EmailStr, root_validator
 
@@ -7,6 +7,17 @@ from app.enums.estado import EstadoEnum
 from .date_model import Date
 from .permiso import Permiso
 from .rol import RolChecked
+
+
+class AuthUser(BaseModel):
+    id: int
+    username: str
+    first_name: str
+    last_name: str
+    gestor_carga_id: Optional[int] = None
+
+    class Config:
+        orm_mode = True
 
 
 # Shared properties
@@ -68,9 +79,21 @@ class UserInDBBase(UserBase):
 class User(UserInDBBase):
     roles: List[RolChecked] = []
 
+    @classmethod
+    def from_orm(cls, obj: Any) -> "User":
+        obj.roles = []
+        return super().from_orm(obj)
+
 
 class UserAccount(UserInDBBase):
     permisos: List[Permiso] = []
+    is_admin_icargo: bool
+
+    @classmethod
+    def from_orm(cls, obj: Any) -> "UserAccount":
+        obj.permisos = []
+        obj.is_admin_icargo = False
+        return super().from_orm(obj)
 
 
 # Additional properties stored in DB
