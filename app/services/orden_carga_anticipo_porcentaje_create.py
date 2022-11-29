@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -10,10 +11,11 @@ from . import generic_service as service
 
 def get_orden_carga_anticipo_porcentaje_by(
     db: Session, flete_anticipo_id: int, orden_carga_id: int
-) -> OrdenCargaAnticipoPorcentaje:
-    obj: OrdenCargaAnticipoPorcentaje = service.get_by_unique_columns(
+) -> Optional[OrdenCargaAnticipoPorcentaje]:
+    obj: Optional[OrdenCargaAnticipoPorcentaje] = service.get_by_unique_columns_or_none(
         OrdenCargaAnticipoPorcentaje,
         db,
+        False,
         flete_anticipo_id=flete_anticipo_id,
         orden_carga_id=orden_carga_id,
     )

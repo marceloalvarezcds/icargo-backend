@@ -65,7 +65,9 @@ def create_orden_carga_anticipo_retirado(
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, data.flete_anticipo_id, data.orden_carga_id
     )
-    data.orden_carga_anticipo_porcentaje_id = porcentaje_anticipo.id
+    data.orden_carga_anticipo_porcentaje_id = (
+        porcentaje_anticipo.id if porcentaje_anticipo else None
+    )
     anticipo = repositories.create_orden_carga_anticipo_retirado(
         db,
         data,

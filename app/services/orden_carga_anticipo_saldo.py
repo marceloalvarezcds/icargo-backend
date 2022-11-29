@@ -182,6 +182,13 @@ def update_orden_carga_anticipo_saldo(
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, flete_anticipo_id, orden_carga_id
     )
+    if not porcentaje_anticipo:
+        porcentaje_anticipo = create_orden_carga_anticipo_porcentaje(
+            db,
+            orden_carga_id,
+            flete_anticipo,
+            modified_by,
+        )
     if exists:
         schema = schemas.OrdenCargaAnticipoSaldoForm(
             flete_anticipo_id=flete_anticipo_id,
@@ -215,13 +222,6 @@ def update_orden_carga_anticipo_saldo(
         )
     if anticipo_saldo:
         # Se actualiza el porcentaje mínimo de la tabla OC anticipo porcentaje
-        if not porcentaje_anticipo:
-            porcentaje_anticipo = create_orden_carga_anticipo_porcentaje(
-                db,
-                anticipo_saldo.orden_carga_id,
-                anticipo_saldo.flete_anticipo,
-                modified_by,
-            )
         flete_proyectado = (
             orden_carga.flete_proyectado if orden_carga.flete_proyectado > 0 else 1
         )
