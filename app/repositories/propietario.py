@@ -13,7 +13,7 @@ def get_propietario_list(db: Session) -> List[Propietario]:
     return (
         db.query(Propietario)
         .filter(Propietario.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(Propietario.nombre)
+        .order_by(Propietario.created_at.desc(), Propietario.nombre)
         .all()
     )
 
@@ -29,7 +29,7 @@ def get_propietario_list_by_gestor_cuenta_id(
                 Propietario.estado == EstadoEnum.ACTIVO.value,
             )
         )
-        .order_by(Propietario.nombre)
+        .order_by(Propietario.created_at.desc(), Propietario.nombre)
         .all()
     )
 
