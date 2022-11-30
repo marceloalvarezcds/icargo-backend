@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
 from app.enums import EstadoEnum
-from app.models import Camion, CamionSemiNeto, Semi
+from app.models import Camion, CamionSemiNeto, Chofer, Semi
 from app.schemas import CamionSemiNetoForm
 from app.utils import number_format
 
@@ -51,7 +51,12 @@ def get_camion_list_by_producto_id(
     camion_list: List[Camion] = list(map(lambda x: x.camion, original_list))
     for item in camion_list:
         # check if exists in unique_list or not, and is estado ACTIVO
-        if item.id not in id_list and item.estado == EstadoEnum.ACTIVO.value:
+        chofer: Optional[Chofer] = item.chofer
+        if (
+            item.id not in id_list
+            and item.estado == EstadoEnum.ACTIVO.value
+            and (chofer and chofer.estado == EstadoEnum.ACTIVO.value)
+        ):
             id_list.append(item.id)
             filtered_list.append(item)
     return filtered_list
@@ -69,7 +74,7 @@ def get_semi_list_by_camion_id_and_producto_id(
         semi_list: List[Semi] = list(map(lambda x: x.semi, original_list))
         for item in semi_list:
             # check if exists in unique_list or not
-            if item.id not in id_list:
+            if item.id not in id_list and item.estado == EstadoEnum.ACTIVO.value:
                 id_list.append(item.id)
                 filtered_list.append(item)
         return filtered_list
