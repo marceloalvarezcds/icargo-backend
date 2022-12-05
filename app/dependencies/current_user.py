@@ -17,10 +17,13 @@ async def get_current_user(
         token_data = schemas.TokenPayload(**payload)
     except (jwt.JWTError, ValidationError):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token de autenticación expirada, por favor vuelva a ingresar",
         )
     user = token_data.user if token_data.user else None
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado en el Token",
+        )
     return user
