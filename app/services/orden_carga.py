@@ -400,8 +400,12 @@ def send_emision_orden_carga_mail(obj: OrdenCarga):
     create_at: datetime = obj.created_at
     fecha_vencimiento: datetime = obj.camion.vencimiento_habilitacion_transporte
     df = "%Y-%m-%d / %H:%M:%S"
-    bruto = obj.camion.bruto + obj.semi.bruto
-    neto = obj.camion.neto + obj.semi.neto
+    camion_bruto = obj.camion.bruto if obj.camion.bruto else 0
+    camion_neto = obj.camion.neto if obj.camion.neto else 0
+    semi_bruto = obj.semi.bruto if obj.semi.bruto else 0
+    semi_neto = obj.semi.neto if obj.semi.neto else 0
+    bruto = camion_bruto + semi_bruto
+    neto = camion_neto + semi_neto
     gestor_carga_nombre_corto = (
         gestor_carga.nombre_corto if gestor_carga.nombre_corto else gestor_carga.nombre
     )
@@ -430,7 +434,7 @@ def send_emision_orden_carga_mail(obj: OrdenCarga):
         "propietario_telefono": obj.camion.propietario.telefono,
         "chofer_nombre": obj.camion_chofer_nombre,
         "chofer_numero_documento": obj.camion_chofer_numero_documento,
-        "chofer_telefono": obj.camion.chofer.telefono,
+        "chofer_telefono": obj.camion.chofer.telefono if obj.camion.chofer else '',
         "camion_foto": obj.camion.foto,
         "camion_placa": obj.camion_placa,
         "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",
