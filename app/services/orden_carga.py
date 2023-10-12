@@ -183,7 +183,9 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",
         "camion_color": obj.camion.color_descripcion,
         "camion_tipo": obj.camion.tipo_descripcion,
-        "camion_fecha_vto": fecha_vencimiento.strftime(df),
+        "camion_fecha_vto": fecha_vencimiento.strftime(df)
+        if fecha_vencimiento
+        else "-",
         "semi_placa": obj.semi_placa,
         "semi_marca_tipo": f"{obj.semi.marca_descripcion}/{obj.semi.tipo_descripcion}",
         "semi_color": obj.semi.color_descripcion,
@@ -434,13 +436,15 @@ def send_emision_orden_carga_mail(obj: OrdenCarga):
         "propietario_telefono": obj.camion.propietario.telefono,
         "chofer_nombre": obj.camion_chofer_nombre,
         "chofer_numero_documento": obj.camion_chofer_numero_documento,
-        "chofer_telefono": obj.camion.chofer.telefono if obj.camion.chofer else '',
+        "chofer_telefono": obj.camion.chofer.telefono if obj.camion.chofer else "",
         "camion_foto": obj.camion.foto,
         "camion_placa": obj.camion_placa,
         "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",
         "camion_color": obj.camion.color_descripcion,
         "camion_tipo": obj.camion.tipo_descripcion,
-        "camion_fecha_vto": fecha_vencimiento.strftime(df) if fecha_vencimiento else "-",
+        "camion_fecha_vto": fecha_vencimiento.strftime(df)
+        if fecha_vencimiento
+        else "-",
         "semi_placa": obj.semi_placa,
         "semi_marca_tipo": f"{obj.semi.marca_descripcion}/{obj.semi.tipo_descripcion}",
         "semi_color": obj.semi.color_descripcion,
