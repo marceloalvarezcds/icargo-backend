@@ -130,7 +130,7 @@ def edit_user(
     request: Request,
 ) -> User:
     service.check_unique(
-        User, db, None, f"Ya existe Usuario con email {data.email}", email=data.email
+        User, db, id, f"Ya existe Usuario con email {data.email}", email=data.email
     )
     roles: List[RolChecked] = data.roles
     del data.roles
