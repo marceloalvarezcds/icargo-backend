@@ -69,6 +69,7 @@ from app.endpoints import (
     tipo_semi,
     unidad,
     user,
+    combinacion,
 )
 
 api = APIRouter()
@@ -91,6 +92,7 @@ api.include_router(
 api.include_router(chofer.api, prefix="/chofer", tags=["chofer"])
 api.include_router(ciudad.api, prefix="/ciudad", tags=["ciudad"])
 api.include_router(color.api, prefix="/color", tags=["color"])
+api.include_router(combinacion.api, prefix="/combinacion", tags=["combinacion"])
 api.include_router(
     composicion_juridica.api,
     prefix="/composicion_juridica",

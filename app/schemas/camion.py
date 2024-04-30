@@ -144,3 +144,6 @@ class CamionList(BaseModel):
     class Config:
         orm_mode = True
         use_enum_values = True
+
+class CamionCombinacion(BaseModel):
+    placa: str

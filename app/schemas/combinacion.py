@@ -1,0 +1,84 @@
+from datetime import datetime
+from typing import Any, List, Optional
+
+
+from .tipo_documento import TipoDocumento
+from .chofer import Chofer, ChoferCombinacion
+from. propietario import Propietario, PropietarioCombinacion
+from .camion import Camion, CamionCombinacion
+from .semi import Semi, SemiCominacion
+from app.schemas.contacto import ContactoForm
+from pydantic import BaseModel
+from app.enums import EstadoEnum
+
+
+class CombinacionBaseModel(BaseModel):
+    # id: int
+    # estado: EstadoEnum
+    propietario_id: int
+    camion_id: int
+    chofer_id: int
+    semi_id: int
+    comentario: str
+    capacidad_total_combinacion: int
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True
+
+class CombinacionForm(CombinacionBaseModel):
+    camion: Optional[Camion]
+    semi: Optional[Semi]
+    propietario: Optional[Propietario]
+    chofer: Optional[Chofer]
+        
+
+class CombinacionEditForm(BaseModel):
+    propietario_id: int
+    camion_id: int
+    chofer_id: int
+    semi_id: int
+    comentario: str
+    capacidad_total_combinacion: int
+    camion: Optional[Camion]
+    semi: Optional[Semi]
+    propietario: Optional[Propietario]
+    chofer: Optional[Chofer]
+        
+
+class CombinacionBase(BaseModel):
+    id: int
+    estado: str
+    propietario_id: int
+    camion_id: int
+    chofer_id: int
+    semi_id: int
+    comentario: str
+    capacidad_total_combinacion: int
+    estado: EstadoEnum
+    created_by: str
+    created_at: datetime
+    modified_by: str
+    modified_at: datetime
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True
+
+class CombinacionCreateModel(CombinacionBaseModel):
+    pass
+
+class CombinacionInDB(CombinacionBaseModel):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class Combinacion(CombinacionBase):
+    camion: Optional[Camion]
+    semi: Optional[Semi]
+    propietario: Optional[Propietario]
+    chofer: Optional[Chofer]
+
+ 

@@ -160,3 +160,8 @@ class Chofer(ChoferBase):
         obj.pais_origen = None
         obj.oc_with_anticipos_liberados = None
         return super().from_orm(obj)
+
+class ChoferCombinacion(BaseModel):
+    numero_documento: str
+    puede_recibir_anticipos: bool
+    estado: EstadoEnum

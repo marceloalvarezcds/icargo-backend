@@ -151,3 +151,9 @@ class Propietario(PropietarioBase):
         obj.gestor_carga_propietario = None
         obj.oc_with_anticipos_liberados = None
         return super().from_orm(obj)
+
+class PropietarioCombinacion(BaseModel):
+    nombre: Optional[str] = None
+    tipo_persona_id: Optional[int] = None
+    tipo_documento: Optional[TipoDocumento] = None
+    puede_recibir_anticipos: bool

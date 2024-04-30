@@ -322,3 +322,9 @@ from .user import (  # noqa
     get_user_list_with_rol_list_by_gestor_carga_id,
     get_user_with_rol_list_by_id,
 )
+from .combinacion import (
+    get_combinacion_by_id,
+    create_combinacion,
+    edit_combinacion,
+    get_combinacion_reports,
+)

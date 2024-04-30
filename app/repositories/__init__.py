@@ -505,3 +505,11 @@ from .user import (  # noqa
     get_user_by_username,
     get_user_id_by_rol_id,
 )
+from .combinacion import(
+    get_combinacion_list,
+    get_combinacion_by_id,
+    edit_combinacion,
+    create_combinacion,
+    get_combinacion_by,
+    get_combinacion_by_ids,
+)

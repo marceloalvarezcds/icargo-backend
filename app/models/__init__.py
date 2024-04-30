@@ -89,3 +89,4 @@ from .tipo_registro import TipoRegistro  # noqa
 from .tipo_semi import TipoSemi  # noqa
 from .unidad import Unidad  # noqa
 from .user import User, UserRol  # noqa
+from .combinacion import Combinacion

@@ -26,6 +26,7 @@ class PermisoModeloEnum(Enum):
     CAMION = "camion"
     CAMION_SEMI_NETO = "camion_semi_neto"
     CARGO = "cargo"
+    COMBINACION = "combinacion"
     CENTRO_OPERATIVO_CLASIFICACION = "centro_operativo_clasificacion"
     CENTRO_OPERATIVO = "centro_operativo"
     CHOFER = "chofer"
@@ -125,6 +126,7 @@ permisoModeloTitulo: Dict[str, str] = {
     "camion": "3 - Camión",
     "semirremolque": "4 - Semi",
     "camion_semi_neto": "5 - Neto de la Combinacion Camión-Semi",
+    "combinacion": "6 - Combinacion",
     # FLETE
     "flete": "Flete",
     "flete_anticipo": "Flete Anticipo",
