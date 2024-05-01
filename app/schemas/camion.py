@@ -146,4 +146,5 @@ class CamionList(BaseModel):
         use_enum_values = True
 
 class CamionCombinacion(BaseModel):
+    id: int
     placa: str

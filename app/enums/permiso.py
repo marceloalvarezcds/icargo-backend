@@ -162,6 +162,7 @@ permisoModeloTitulo: Dict[str, str] = {
     "centro_operativo_clasificacion": "Clasificación Centro Operativo",
     "semi_clasificacion": "Clasificación de Semi",
     "color": "Color",
+    "combinacion": "Combinacion",
     "composicion_juridica": "Composición Jurídica",
     "ente_emisor_automotor": "Ente emisor de Registro Automotor",
     "ente_emisor_transporte": "Ente emisor de Registro de Transporte",

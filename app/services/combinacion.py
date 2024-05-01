@@ -1,3 +1,4 @@
+from operator import and_
 import os
 from typing import List, Optional, cast
 
@@ -16,19 +17,39 @@ from .propietario_chofer import (
     create_or_edit_chofer_by_propietario,
     disable_chofer_by_id,
 )
+from .semi import get_semi_by_id
 
 def get_combinacion_by_id(db: Session, id: int) -> Combinacion:
     obj = repositories.get_combinacion_by_id(db, id)
     if not obj:
-        raise HTTPException(status_code=404, detail="Combinacio no encontrada")
+        raise HTTPException(status_code=404, detail="Combinacion no encontrada")
     return obj
 
-# def edit_combinacion(db: Session, combinacion_id: int, data: CombinacionEditForm):
-#     combinacion = repositories.get_combinacion_by_id(db, combinacion_id)
-#     if not combinacion:
-#         return None
-#     updated_data = data.dict(exclude_unset=True)
-#     return repositories.update_combinacion(db, combinacion, updated_data)
+def get_combinacion_by_gestor_cuenta_and_combinacion_id(
+    db: Session, semi_id: int, gestor_cuenta_id: Optional[int]
+) -> List[Combinacion]:
+    semi = get_semi_by_id(db, semi_id)
+    lista = repositories.get_propietario_list_by_gestor_cuenta_id(db, gestor_cuenta_id)
+    if semi.propietario:
+        combinacion: Combinacion = semi.combinacion
+        lista.append(combinacion)
+    return lista
+
+
+# def get_combinacion_by_gestor_cuenta_and_combinacion_id(
+#     db: Session, semi_id: int, gestor_cuenta_id: Optional[int]
+# ) -> List[Combinacion]:
+#     return (
+#         db.query(Combinacion)
+#         .filter(
+#             and_(
+#                 Combinacion.gestor_cuenta_id == gestor_cuenta_id,
+#                 Combinacion.estado == EstadoEnum.ACTIVO.value,
+#             )
+#         )
+#         .order_by(Combinacion.created_at.desc(),)
+#         .all()
+#     )
 
 
 async def create_combinacion(
@@ -90,7 +111,7 @@ def get_combinacion_reports(db: Session) -> str:
     wb = Workbook()
     # get worksheet
     ws = wb.active
-    print("Llega")
+    
 
     title_cell = ws.cell(row=1, column=2)
     title_cell.value = "Estado"

@@ -156,4 +156,4 @@ from .user import (  # noqa
     UserInDBBase,
     UserUpdate,
 )
-from .combinacion import CombinacionBaseModel, Combinacion, CombinacionBase, CombinacionEditForm, CombinacionForm, CombinacionCreateModel
+from .combinacion import CombinacionBaseModel, Combinacion, CombinacionBase, CombinacionEditForm, CombinacionForm, CombinacionCreateModel, CombinacionList

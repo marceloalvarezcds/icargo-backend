@@ -81,4 +81,6 @@ class Combinacion(CombinacionBase):
     propietario: Optional[Propietario]
     chofer: Optional[Chofer]
 
+class CombinacionList(CombinacionBase):
+    pass
  

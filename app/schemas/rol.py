@@ -35,6 +35,7 @@ class RolInDBBase(RolBase):
 
     class Config:
         orm_mode = True
+       
 
 
 # Additional properties to return via API

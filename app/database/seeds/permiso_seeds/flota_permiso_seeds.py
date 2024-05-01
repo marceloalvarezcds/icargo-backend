@@ -263,10 +263,11 @@ def permiso_semirremolque_seeds(db: Session) -> List[Permiso]:
 def permiso_combinacion_seeds(db: Session) -> List[Permiso]:
     permisos = []
     permisos.append(permiso_seeds(db, a.CAMBIAR_ESTADO, m.COMBINACION, u.FLOTA))
+    permisos.append(permiso_seeds(db, a.VER, m.COMBINACION, u.FLOTA))
     permisos.append(permiso_seeds(db, a.CREAR, m.COMBINACION, u.FLOTA))
     permisos.append(permiso_seeds(db, a.EDITAR, m.COMBINACION, u.FLOTA))
     permisos.append(permiso_seeds(db, a.ELIMINAR, m.COMBINACION, u.FLOTA))
     permisos.append(permiso_seeds(db, a.LISTAR, m.COMBINACION, u.FLOTA))
-    permisos.append(
-        permiso_seeds(db, a.REPORTE, m.COMBINACION, u.FLOTA, "Reporte de Combinacion")
+    permisos.append(permiso_seeds(db, a.REPORTE, m.COMBINACION, u.FLOTA, "Reporte de Combinacion")
     )
+    return permisos

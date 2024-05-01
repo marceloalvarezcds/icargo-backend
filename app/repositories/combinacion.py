@@ -1,4 +1,5 @@
 from datetime import datetime
+from operator import and_
 from typing import List, Optional
 
 from app import schemas
@@ -19,6 +20,7 @@ def get_combinacion_list(db: Session) -> List[Combinacion]:
     )
 
 
+
 def get_combinacion_by_ids(
     db: Session,
     propietario_id: int,
@@ -36,6 +38,22 @@ def get_combinacion_by_ids(
 
 def get_combinacion_by_id(db: Session, id: int) -> Optional[Combinacion]:
     return db.query(Combinacion).filter(Combinacion.id == id).first()
+
+def get_combinacion_list_by_gestor_cuenta_id(
+    db: Session, gestor_cuenta_id: Optional[int]
+) -> List[Combinacion]:
+    return (
+        db.query(Combinacion)
+        .filter(
+            and_(
+                Combinacion.id == gestor_cuenta_id,
+                Combinacion.estado == EstadoEnum.ACTIVO.value,
+            )
+        )
+        .order_by(Propietario.created_at.desc(), Propietario.nombre)
+        .all()
+    )
+
 
 def get_combinacion_by(
     db: Session,

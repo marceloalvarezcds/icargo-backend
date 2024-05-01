@@ -327,4 +327,5 @@ from .combinacion import (
     create_combinacion,
     edit_combinacion,
     get_combinacion_reports,
+    get_combinacion_by_gestor_cuenta_and_combinacion_id,
 )

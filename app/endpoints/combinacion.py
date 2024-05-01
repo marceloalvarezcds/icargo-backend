@@ -1,10 +1,5 @@
-from http.client import HTTPException
 from typing import List, Optional
-from urllib.request import Request
-from venv import logger
 
-
-from app.schemas.combinacion import CombinacionEditForm, CombinacionForm
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
@@ -19,13 +14,36 @@ api = APIRouter()
 
 
 
-
 @api.get("/", response_model=List[schemas.CombinacionBaseModel])
 async def read_combinacion_list(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.COMBINACION)),  # noqa: B008
 ):
     return repositories.get_combinacion_list(db)
+
+@api.get(
+    "/gestor_cuenta/camion/{camion_id}", response_model=List[schemas.CombinacionList]
+)
+
+
+@api.get("/reports")
+async def combinacion_reports(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.COMBINACION)), 
+     current_user: schemas.AuthUser = Depends(get_current_user), # noqa: B008
+):
+    return services.get_combinacion_reports(db)
+
+# @api.get("/gestor_cuenta/combinacion/{combinacion_id}", response_model=schemas.Combinacion)
+# async def read_combinacion_by_gestor_cuenta_and_combinacion_id(
+#     combinacion_id: int,
+#     db: Session = Depends(get_db_session),  # noqa: B008
+#     _: bool = Depends(Permiso(a.LISTAR, m.COMBINACION)),  # noqa: B008
+#     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+# ):
+#     return services.get_combinacion_by_gestor_cuenta_and_combinacion_id(
+#         db, combinacion_id, current_user.username
+#     )
 
 
 @api.get("/{id}", response_model=schemas.CombinacionBaseModel)
@@ -34,19 +52,10 @@ async def read_combinacion_by_id(
      db: Session = Depends(get_db_session),  # noqa: B008
      current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
      _: bool = Depends(Permiso(a.VER, m.COMBINACION)),  # noqa: B008
- ):
+ ):   
      return services.get_combinacion_by_id(
          db, id
      )
-
-@api.get("/reports")
-async def combinacion_reports(
-    db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.REPORTE, m.COMBINACION)),  # noqa: B008
-):
-    print("Llega al enpoint")
-    return services.get_combinacion_reports(db)
-
 
 
 @api.post("/", response_model=schemas.CombinacionBaseModel)
