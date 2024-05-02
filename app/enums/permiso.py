@@ -102,7 +102,7 @@ class PermisoModuloEnum(Enum):
     USUARIOS = "1 - Usuarios"
     ENTIDADES = "2 - Entidades"
     FLOTA = "3 - Flota"
-    FLETE = "4 - Flete" 
+    FLETE = "4 - Pedido" 
     OC = "5 - Orden de Carga"
     CAJA_BANCO = "6 - Caja & Banco"
     ESTADO_CUENTA = "7 - Estado de Cuenta"
@@ -172,13 +172,13 @@ permisoModeloTitulo: Dict[str, str] = {
     "instrumento_via": "Vía de Instrumento",
     "insumo": "Insumo",
     "localidad": "Localidad",
-    "marca_camion": "Marca de Camión",
+    "marca_camion": "Marca de Tracto",
     "marca_semi": "Marca de Semi",
     "moneda": "Moneda",
     "pais": "País",
     "producto": "Producto",
-    "tipo_anticipo": "Tipo de Anticipo",
-    "tipo_camion": "Tipo de Camión",
+    "tipo_anticipo": "Tipo de Tracto",
+    "tipo_camion": "Tipo de Tracto",
     "tipo_carga": "Tipo de Carga",
     "tipo_comprobante": "Tipo de Comprobante",
     "tipo_concepto_complemento": "Concepto de Complemento",
