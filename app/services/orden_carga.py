@@ -74,7 +74,7 @@ def create_orden_carga(
 ) -> schemas.OrdenCarga:
     flete = repositories.get_flete_by_id(db, data.flete_id)
     if not flete:
-        raise HTTPException(status_code=404, detail="Flete no encontrado")
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
     gestor_carga_id = current_user.gestor_carga_id
     modified_by = current_user.username
     camion_semi_neto = get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(

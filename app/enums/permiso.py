@@ -20,6 +20,7 @@ class PermisoAccionEnum(Enum):
     VER = "ver"
 
 
+
 class PermisoModeloEnum(Enum):
     BANCO = "banco"
     CAJA = "caja"
@@ -76,6 +77,7 @@ class PermisoModeloEnum(Enum):
     SEMI_CLASIFICACION = "semi_clasificacion"
     TIPO_ANTICIPO = "tipo_anticipo"
     TIPO_CAMION = "tipo_camion"
+    # TIPO_TRACTO = "tipo_tracto"
     TIPO_CARGA = "tipo_carga"
     TIPO_COMPROBANTE = "tipo_comprobante"
     TIPO_CONCEPTO_COMPLEMENTO = "tipo_concepto_complemento"
@@ -99,7 +101,7 @@ class PermisoModuloEnum(Enum):
     USUARIOS = "1 - Usuarios"
     ENTIDADES = "2 - Entidades"
     FLOTA = "3 - Flota"
-    FLETE = "4 - Flete"
+    FLETE = "4 - Pedido"
     OC = "5 - Orden de Carga"
     CAJA_BANCO = "6 - Caja & Banco"
     ESTADO_CUENTA = "7 - Estado de Cuenta"
@@ -114,8 +116,8 @@ permisoModeloTitulo: Dict[str, str] = {
     "rol": "2 - Rol",
     "permiso": "3 - Permiso",
     # ENTIDADES
-    "centro_operativo": "1 - Centro Operativo",
-    "remitente": "2 - Remitente",
+    "remitente": "1 - Remitente",
+    "centro_operativo": "2 - Centro Operativo",
     "proveedor": "3 - Proveedor",
     "punto_venta": "4 - Punto de Venta",
     "gestor_carga": "5 - Gestor de Carga",
@@ -123,9 +125,9 @@ permisoModeloTitulo: Dict[str, str] = {
     # FLOTA
     "propietario": "1 - Propietario",
     "chofer": "2 - Chofer",
-    "camion": "3 - Camión",
+    "camion": "3 - Tracto",
     "semirremolque": "4 - Semi",
-    "camion_semi_neto": "5 - Neto de la Combinacion Camión-Semi",
+    "camion_semi_neto": "5 - Neto de la Combinacion Tracto-Semi",
     "combinacion": "6 - Combinacion",
     # FLETE
     "flete": "Flete",

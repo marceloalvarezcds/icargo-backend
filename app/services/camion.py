@@ -35,7 +35,7 @@ async def create_camion(
     if repositories.get_camion_by(db, data.placa):
         raise HTTPException(
             status_code=409,
-            detail=f"El Camión con placa {data.placa} ya existe",
+            detail=f"El Tracto con placa {data.placa} ya existe",
         )
     (
         foto_url,
@@ -73,7 +73,7 @@ async def create_camion(
 def get_camion_by_id(db: Session, id: int) -> Camion:
     obj = repositories.get_camion_by_id(db, id)
     if not obj:
-        raise HTTPException(status_code=404, detail="Camion no encontrado")
+        raise HTTPException(status_code=404, detail="Tracto no encontrado")
     return obj
 
 
@@ -95,7 +95,7 @@ async def edit_camion(
         if exists and exists.id != id:
             raise HTTPException(
                 status_code=409,
-                detail=f"El Camión con placa {data.placa} ya existe",
+                detail=f"El Tracto con placa {data.placa} ya existe",
             )
     (
         foto_url,
