@@ -1,13 +1,10 @@
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Optional
 
-
-from .tipo_documento import TipoDocumento
-from .chofer import Chofer, ChoferCombinacion
-from. propietario import Propietario, PropietarioCombinacion
-from .camion import Camion, CamionCombinacion
-from .semi import Semi, SemiCominacion
-from app.schemas.contacto import ContactoForm
+from .chofer import Chofer
+from. propietario import Propietario
+from .camion import Camion
+from .semi import Semi
 from pydantic import BaseModel
 from app.enums import EstadoEnum
 

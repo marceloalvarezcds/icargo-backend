@@ -161,7 +161,11 @@ class Chofer(ChoferBase):
         obj.oc_with_anticipos_liberados = None
         return super().from_orm(obj)
 
-class ChoferCombinacion(BaseModel):
-    numero_documento: str
-    puede_recibir_anticipos: bool
-    estado: EstadoEnum
+# class ChoferCombinacion(BaseModel):
+#     numero_documento: str
+#     puede_recibir_anticipos: bool
+#     estado: EstadoEnum
+
+#     class Config:
+#         orm_mode = True
+#         use_enum_values = True

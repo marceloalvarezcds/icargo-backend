@@ -1,29 +1,22 @@
-from operator import and_
 import os
-from typing import List, Optional, cast
+from typing import List, Optional
 
 from app.config import REPORTS_FOLDER
-from app.enums.estado import EstadoEnum
-from app.schemas.combinacion import CombinacionBaseModel, CombinacionEditForm, CombinacionForm
-from app.services.camion_check_files import check_files
-from app.services.propietario_contacto import update_propietario_contacto_list
-from fastapi import HTTPException, UploadFile  # type: ignore
+from fastapi import HTTPException # type: ignore
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 from app.models import Combinacion
 from app import repositories, schemas
-from .propietario_chofer import (
-    create_or_edit_chofer_by_propietario,
-    disable_chofer_by_id,
-)
 from .semi import get_semi_by_id
+
 
 def get_combinacion_by_id(db: Session, id: int) -> Combinacion:
     obj = repositories.get_combinacion_by_id(db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Combinacion no encontrada")
     return obj
+
 
 def get_combinacion_by_gestor_cuenta_and_combinacion_id(
     db: Session, semi_id: int, gestor_cuenta_id: Optional[int]
@@ -34,22 +27,6 @@ def get_combinacion_by_gestor_cuenta_and_combinacion_id(
         combinacion: Combinacion = semi.combinacion
         lista.append(combinacion)
     return lista
-
-
-# def get_combinacion_by_gestor_cuenta_and_combinacion_id(
-#     db: Session, semi_id: int, gestor_cuenta_id: Optional[int]
-# ) -> List[Combinacion]:
-#     return (
-#         db.query(Combinacion)
-#         .filter(
-#             and_(
-#                 Combinacion.gestor_cuenta_id == gestor_cuenta_id,
-#                 Combinacion.estado == EstadoEnum.ACTIVO.value,
-#             )
-#         )
-#         .order_by(Combinacion.created_at.desc(),)
-#         .all()
-#     )
 
 
 async def create_combinacion(

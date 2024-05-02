@@ -138,6 +138,9 @@ class SemiList(BaseModel):
         orm_mode = True
         use_enum_values = True
 
-class SemiCominacion(BaseModel):
-    placa: str
-    estado: EstadoEnum
+# class SemiCominacion(BaseModel):
+#     placa: str
+#     estado: EstadoEnum
+#     class Config:
+#         orm_mode = True
+#         use_enum_values = True

@@ -145,6 +145,6 @@ class CamionList(BaseModel):
         orm_mode = True
         use_enum_values = True
 
-class CamionCombinacion(BaseModel):
-    id: int
-    placa: str
+# class CamionCombinacion(BaseModel):
+#     id: int
+#     placa: str

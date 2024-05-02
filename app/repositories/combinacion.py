@@ -3,13 +3,12 @@ from operator import and_
 from typing import List, Optional
 
 from app import schemas
-from app.schemas.combinacion import CombinacionCreateModel, CombinacionEditForm, CombinacionBaseModel, CombinacionForm
-from app.schemas.semi import Semi
+from app.schemas.combinacion import CombinacionCreateModel, CombinacionForm
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Combinacion
-from app.schemas import Chofer, Camion, Propietario
+from app.schemas import Chofer, Propietario
 
 def get_combinacion_list(db: Session) -> List[Combinacion]:
     return (
