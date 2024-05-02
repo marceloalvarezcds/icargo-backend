@@ -34,11 +34,11 @@ async def create_combinacion(
     data: schemas.CombinacionCreateModel,
     modified_by: str
 ) -> schemas.Combinacion:
-    if repositories.get_combinacion_by_ids(db, data.propietario_id, data.camion_id, data.chofer_id, data.semi_id):
-        raise HTTPException(
-            status_code=409,
-            detail="Ya existe una combinación con estos IDs de propietario, camión, chofer y semi."
-        )
+    # if repositories.get_combinacion_by_ids(db, data.propietario_id, data.camion_id, data.chofer_id):
+    #     raise HTTPException(
+    #         status_code=409,
+    #         detail="Ya existe una combinación con estos IDs de propietario, camión, chofer y semi."
+    #     )
     combinacion = repositories.create_combinacion(
         db,
         data,

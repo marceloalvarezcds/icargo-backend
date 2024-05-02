@@ -97,11 +97,12 @@ class PermisoModeloEnum(Enum):
     USER = "usuario"
 
 
+
 class PermisoModuloEnum(Enum):
     USUARIOS = "1 - Usuarios"
     ENTIDADES = "2 - Entidades"
     FLOTA = "3 - Flota"
-    FLETE = "4 - Pedido"
+    FLETE = "4 - Flete" 
     OC = "5 - Orden de Carga"
     CAJA_BANCO = "6 - Caja & Banco"
     ESTADO_CUENTA = "7 - Estado de Cuenta"
