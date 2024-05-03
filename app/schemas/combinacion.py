@@ -9,6 +9,21 @@ from pydantic import BaseModel
 from app.enums import EstadoEnum
 
 
+
+class CombinacionGet(BaseModel):
+    id: int
+    # estado: EstadoEnum
+    propietario_id: int
+    camion_id: int
+    chofer_id: int
+    semi_id: int
+    comentario: str
+    capacidad_total_combinacion: int
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True
+
 class CombinacionBaseModel(BaseModel):
     # id: int
     # estado: EstadoEnum

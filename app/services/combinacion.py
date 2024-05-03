@@ -1,3 +1,4 @@
+import asyncio
 import os
 from typing import List, Optional
 
@@ -34,11 +35,35 @@ async def create_combinacion(
     data: schemas.CombinacionCreateModel,
     modified_by: str
 ) -> schemas.Combinacion:
-    # if repositories.get_combinacion_by_ids(db, data.propietario_id, data.camion_id, data.chofer_id):
-    #     raise HTTPException(
-    #         status_code=409,
-    #         detail="Ya existe una combinación con estos IDs de propietario, camión, chofer y semi."
-    #     )
+    # Verificar si existen los propietarios, camiones, choferes y semirremolques
+    propietario_exists = (repositories.get_propietario_by_id(db, data.propietario_id))
+    camion_exists = (repositories.get_camion_by_id(db, data.camion_id))
+    chofer_exists = (repositories.get_chofer_by_id(db, data.chofer_id))
+    semi_exists = (repositories.get_chofer_by_id(db, data.semi_id))
+
+    # Si no existen alguno de los elementos, levanta una excepción
+    if not propietario_exists:
+        raise HTTPException(
+            status_code=404,
+            detail="El propietario especificado no existe."
+        )
+    if not camion_exists:
+        raise HTTPException(
+            status_code=404,
+            detail="El camión especificado no existe."
+        )
+    if not chofer_exists:
+        raise HTTPException(
+            status_code=404,
+            detail="El chofer especificado no existe."
+        )
+    if not semi_exists:
+        raise HTTPException(
+            status_code=404,
+            detail="El semirremolque especificado no existe."
+        )
+
+    # Si todos los elementos existen, procede a crear la combinación
     combinacion = repositories.create_combinacion(
         db,
         data,
@@ -46,7 +71,6 @@ async def create_combinacion(
     )
 
     return combinacion
-
 
 async def edit_combinacion(
     id: int,
@@ -59,6 +83,30 @@ async def edit_combinacion(
     if not combinacion:
         # Manejar el caso en que la combinación no exista
         raise HTTPException(status_code=404, detail="Combinación no encontrada")
+
+    # Verificar si existe el propietario
+    if data.propietario_id is not None:
+        propietario = repositories.get_propietario_by_id(db, data.propietario_id)
+        if not propietario:
+            raise HTTPException(status_code=404, detail="Propietario no encontrado")
+
+    # Verificar si existe el chofer
+    if data.chofer_id is not None:
+        chofer = repositories.get_chofer_by_id(db, data.chofer_id)
+        if not chofer:
+            raise HTTPException(status_code=404, detail="Chofer no encontrado")
+
+    # Verificar si existe el camion
+    if data.camion_id is not None:
+        camion = repositories.get_camion_by_id(db, data.camion_id)
+        if not camion:
+            raise HTTPException(status_code=404, detail="Camión no encontrado")
+
+    # Verificar si existe el semi
+    if data.semi_id is not None:
+        semi = repositories.get_semi_by_id(db, data.semi_id)
+        if not semi:
+            raise HTTPException(status_code=404, detail="Semi no encontrado")
 
     # Actualizar los campos de la combinación con los datos proporcionados
     if data.propietario_id is not None:
