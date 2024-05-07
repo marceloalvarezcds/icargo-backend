@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
+
 from pydantic import BaseModel
 
 from app.enums import EstadoEnum
@@ -145,6 +146,3 @@ class CamionList(BaseModel):
         orm_mode = True
         use_enum_values = True
 
-# class CamionCombinacion(BaseModel):
-#     id: int
-#     placa: str

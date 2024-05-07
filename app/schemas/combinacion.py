@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from .chofer import Chofer
 from. propietario import Propietario
@@ -12,14 +12,17 @@ from app.enums import EstadoEnum
 
 class CombinacionGet(BaseModel):
     id: int
-    # estado: EstadoEnum
+    estado: EstadoEnum
     propietario_id: int
     camion_id: int
     chofer_id: int
     semi_id: int
     comentario: str
     capacidad_total_combinacion: int
-
+    created_by: str
+    created_at: datetime
+    modified_by: str
+    modified_at: datetime
     class Config:
         orm_mode = True
         use_enum_values = True
@@ -96,3 +99,12 @@ class Combinacion(CombinacionBase):
 class CombinacionList(CombinacionBase):
     pass
  
+class Combinaciones(CombinacionGet):
+    camion: Camion
+    semi: Semi
+    propietario: Propietario
+    chofer: Chofer
+
+
+class CombinacionesBD(Combinaciones):
+    pass
