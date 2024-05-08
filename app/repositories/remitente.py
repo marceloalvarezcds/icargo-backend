@@ -21,18 +21,6 @@ def get_remitente_list(db: Session) -> List[Remitente]:
 def get_remitente_list_by_gestor_cuenta_id(
     db: Session, gestor_cuenta_id: Optional[int]
 ) -> List[Remitente]:
-    query = (
-        db.query(Remitente)
-        .filter(
-        and_(
-            Remitente.estado != EstadoEnum.ELIMINADO.value,
-            Remitente.gestores.any(
-                GestorCargaRemitente.gestor_carga_id == gestor_cuenta_id
-            ),
-        )
-    )
-    .order_by(Remitente.nombre))
-    print(query)
     return (
         db.query(Remitente)
         .filter(

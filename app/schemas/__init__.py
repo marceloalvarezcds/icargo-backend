@@ -1,7 +1,7 @@
 # should be imported to help code editor (vscode) for autocompletion
 from .banco import Banco, BancoForm  # noqa
 from .caja import Caja, CajaForm  # noqa
-from .camion import Camion, CamionForm, CamionList  # noqa
+from .camion import Camion, CamionForm, CamionList, CombinacionCamionSemi  # noqa
 from .camion_semi_neto import CamionSemiNeto, CamionSemiNetoForm  # noqa
 from .cargo import Cargo  # noqa
 from .centro_operativo import (  # noqa

@@ -104,7 +104,6 @@ class Combinaciones(CombinacionGet):
     semi: Semi
     propietario: Propietario
     chofer: Chofer
-
-
+        
 class CombinacionesBD(Combinaciones):
     pass
