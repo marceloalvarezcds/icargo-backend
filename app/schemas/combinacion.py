@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
 from .chofer import Chofer
 from. propietario import Propietario
