@@ -1,9 +1,11 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
+from .camion_semi_neto import CamionSemiNeto
 from .chofer import Chofer
+from .producto import Producto
 from. propietario import Propietario
-from .camion import Camion
+from .camion import Camion, CombinacionCamionSemi
 from .semi import Semi
 from pydantic import BaseModel
 from app.enums import EstadoEnum
