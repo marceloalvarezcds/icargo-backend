@@ -146,5 +146,3 @@ class CamionList(BaseModel):
         orm_mode = True
         use_enum_values = True
 
-class CombinacionCamionSemi(CamionList):
-    neto: RoundedDecimal

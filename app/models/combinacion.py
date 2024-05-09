@@ -1,9 +1,12 @@
+from app.models.gestor_carga import GestorCarga
+from app.models.producto import Producto
 from sqlalchemy import (  # type: ignore
     Column,
     ForeignKey,
     Integer,
     String,
     text,
+    Numeric,
 )
 from .propietario import Propietario
 from .chofer import Chofer
@@ -35,6 +38,13 @@ class Combinacion(AuditMixin, Base):
     comentario = Column(String(255))
     capacidad_total_combinacion = Column(Integer, server_default=text("0"))
 
+
+    producto_id = Column(Integer, ForeignKey("producto.id"))
+    producto = relationship(Producto, uselist=False)
+    gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
+    gestor_carga = relationship(GestorCarga, uselist=False)
+    neto = Column(Numeric(38, 10))
+    
     
    
 
