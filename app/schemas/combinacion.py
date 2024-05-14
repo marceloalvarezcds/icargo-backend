@@ -21,6 +21,11 @@ class CombinacionGet(BaseModel):
     semi_id: int
     producto_id: int
     gestor_carga_id: int
+    camion: Camion
+    semi: Semi
+    propietario: Propietario
+    chofer: Chofer
+    producto: Producto
     neto: int
     comentario: str
     capacidad_total_combinacion: int
@@ -84,11 +89,13 @@ class CombinacionCreateModel(CombinacionBaseModel):
 
 
 class Combinaciones(CombinacionGet):
-    camion: Camion
-    semi: Semi
-    propietario: Propietario
-    chofer: Chofer
-    producto: Producto
+    propietario_nombre: Optional[str] = None
+    chofer_nombre: str
+    producto_descripcion: Optional[str] = None
+    semi_placa: str
+    marca_descripcion: Optional[str] = None
+    camion_placa: str
+    marca_descripcion_semi: Optional[str] = None
 
     class Config:
         orm_mode = True

@@ -1,5 +1,6 @@
 from typing import List
 
+from app.enums.estado import EstadoEnum
 from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
@@ -72,4 +73,27 @@ async def edit_combinacion(
         db,
         data,
         current_user.username,
+    )
+
+@api.get("/{id}/active", response_model=schemas.CombinacionesBD)
+def active_combinacion_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.COMBINACION)),  # noqa: B008
+):
+    return services.change_combinacion_status(
+        db, id, EstadoEnum.ACTIVO, current_user.username
+    )
+
+
+@api.get("/{id}/inactive", response_model=schemas.CombinacionesBD)
+def inactive_combinacion_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.COMBINACION)),  # noqa: B008
+):
+    return services.change_combinacion_status(
+        db, id, EstadoEnum.INACTIVO, current_user.username
     )

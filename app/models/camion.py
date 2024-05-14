@@ -132,7 +132,15 @@ class Camion(AuditMixin, Base):
             else ""
         )
         return f"OC: {self.limite_cantidad_oc_activas if self.limite_cantidad_oc_activas else ''} {anticipos}"  # noqa: B950
-
+    
+    @hybrid_property
+    def limite_monto_anticipo(self):
+        return self.limite_monto_anticipos if self.limite_monto_anticipos else 0
+    
+    @hybrid_property
+    def oc_activa(self):
+        return self.limite_cantidad_oc_activas
+    
     @hybrid_property
     def localidad_habilitacion_municipal_id(self):
         return (

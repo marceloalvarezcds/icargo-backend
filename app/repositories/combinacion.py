@@ -54,6 +54,20 @@ def get_combinacion_list_by_gestor_cuenta_id(
     )
 
 
+def change_combinacion_status(
+    obj: Combinacion,
+    db: Session,
+    status: EstadoEnum,
+    modified_by: str,
+) -> Combinacion:
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
 def get_combinacion_by(
     db: Session,
     propietario_id: int,

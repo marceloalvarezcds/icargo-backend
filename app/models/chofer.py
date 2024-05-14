@@ -117,6 +117,11 @@ class Chofer(AuditMixin, Base):
     @hybrid_property
     def pais_nombre(self):
         return self.ciudad.localidad.pais.nombre if self.ciudad else None
+    
+    @hybrid_property
+    def telefono_chofer(self):
+        return self.telefono if self.telefono else None
+
 
     @hybrid_property
     def pais_nombre_corto(self):

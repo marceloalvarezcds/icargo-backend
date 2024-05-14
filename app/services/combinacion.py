@@ -3,6 +3,7 @@ import os
 from typing import List, Optional
 
 from app.config import REPORTS_FOLDER
+from app.enums.estado import EstadoEnum
 from fastapi import HTTPException # type: ignore
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
@@ -28,6 +29,12 @@ def get_combinacion_by_gestor_cuenta_and_combinacion_id(
         combinacion: Combinacion = semi.combinacion
         lista.append(combinacion)
     return lista
+
+def change_combinacion_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.Camion:
+    co = get_combinacion_by_id(db, id)
+    return repositories.change_chofer_status(co, db, status, modified_by)
 
 
 async def create_combinacion(

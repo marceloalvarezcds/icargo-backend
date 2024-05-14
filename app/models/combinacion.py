@@ -1,5 +1,6 @@
 from app.models.gestor_carga import GestorCarga
 from app.models.producto import Producto
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy import (  # type: ignore
     Column,
     ForeignKey,
@@ -45,10 +46,59 @@ class Combinacion(AuditMixin, Base):
     gestor_carga = relationship(GestorCarga, uselist=False)
     neto = Column(Numeric(38, 10))
     
+    @hybrid_property
+    def camion_placa(self):
+        return self.camion.placa 
+    
+    @hybrid_property
+    def marca_descripcion(self):
+        return self.camion.marca.descripcion if self.camion else None
+    
+    @hybrid_property
+    def marca_descripcion_semi(self):
+        return self.semi.marca.descripcion if self.semi else None    
+    
+    @hybrid_property
+    def chofer_estado(self):
+        return self.chofer.estado 
+
+    @hybrid_property
+    def chofer_nombre(self):
+        return self.chofer.nombre if self.chofer else None
+
+    @hybrid_property
+    def chofer_numero_documento(self):
+        return self.chofer.numero_documento 
+    
+    @hybrid_property
+    def propietario_nombre(self):
+        return self.propietario.nombre
+
+    @hybrid_property
+    def propietario_ruc(self):
+        return self.propietario.ruc
+
+    @hybrid_property
+    def propietario_puede_recibir_anticipos(self):
+        return self.propietario.puede_recibir_anticipos
+
+    @hybrid_property
+    def propietario_telefono(self):
+        return self.propietario.telefono
+
+    @hybrid_property
+    def tipo_descripcion(self):
+        return self.tipo.descripcion 
+    
+    @hybrid_property
+    def producto_descripcion(self):
+        return self.producto.descripcion 
+    
+    @hybrid_property
+    def semi_placa(self):
+        return self.semi.placa 
+    
+
+
     
    
-
-
-
-
-

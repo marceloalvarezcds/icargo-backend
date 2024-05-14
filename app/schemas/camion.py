@@ -137,6 +137,8 @@ class CamionList(BaseModel):
     pais_emisor_placa_nombre_corto: Optional[str] = None
     tipo_descripcion: Optional[str] = None
     limites: str
+    limite_monto_anticipo: Optional[int] = None
+    oc_activa: int
     created_by: str
     created_at: datetime
     modified_by: str
