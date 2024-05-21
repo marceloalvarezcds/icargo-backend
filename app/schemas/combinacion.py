@@ -94,7 +94,7 @@ class Combinaciones(CombinacionGet):
     marca_descripcion: Optional[str] = None
     camion_placa: str
     marca_descripcion_semi: Optional[str] = None
-
+    foto_camion: Optional[str] = None
     class Config:
         orm_mode = True
 

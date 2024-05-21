@@ -54,6 +54,10 @@ class Combinacion(AuditMixin, Base):
         return self.camion.marca.descripcion if self.camion else None
     
     @hybrid_property
+    def foto_camion(self):
+        return self.camion.foto if self.camion else None
+    
+    @hybrid_property
     def marca_descripcion_semi(self):
         return self.semi.marca.descripcion if self.semi else None    
     
