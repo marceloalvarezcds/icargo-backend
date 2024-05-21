@@ -19,16 +19,12 @@ class CombinacionGet(BaseModel):
     camion_id: int
     chofer_id: int
     semi_id: int
-    producto_id: int
-    gestor_carga_id: int
     camion: Camion
     semi: Semi
     propietario: Propietario
     chofer: Chofer
-    producto: Producto
     neto: int
     comentario: str
-    capacidad_total_combinacion: int
     created_by: str
     created_at: datetime
     modified_by: str
@@ -44,8 +40,10 @@ class CombinacionBaseModel(BaseModel):
     camion_id: int
     chofer_id: int
     semi_id: int
-    comentario: str
-    capacidad_total_combinacion: int
+    gestor_carga_id: Optional[int]
+   
+    comentario: Optional[str]
+    neto: int
 
     class Config:
         orm_mode = True
@@ -57,7 +55,7 @@ class CombinacionForm(CombinacionBaseModel):
     semi: Optional[Semi]
     propietario: Optional[Propietario]
     chofer: Optional[Chofer]
-    camion_semi_neto: Optional[CamionSemiNeto] = None
+ 
 
 
 class CombinacionEditForm(BaseModel):
@@ -66,7 +64,7 @@ class CombinacionEditForm(BaseModel):
     chofer_id: int
     semi_id: int
     comentario: str
-    capacidad_total_combinacion: int
+    gestor_carga_id: int
     camion: Optional[Camion]
     semi: Optional[Semi]
     propietario: Optional[Propietario]
@@ -119,7 +117,7 @@ class CombinacionList(CombinacionBase):
     chofer: Chofer
     camion_semi_neto: Optional[CamionSemiNeto] = None
     comentario: str
-    capacidad_total_combinacion: int
+    
     created_by: str
     created_at: datetime
     modified_by: str

@@ -117,6 +117,10 @@ class Camion(AuditMixin, Base):
         return self.color.descripcion if self.color else ""
 
     @hybrid_property
+    def foto_camion(self):
+        return self.camion.foto if self.camion else None
+
+    @hybrid_property
     def gestor_cuenta_id(self):
         return self.propietario.gestor_cuenta.id
 

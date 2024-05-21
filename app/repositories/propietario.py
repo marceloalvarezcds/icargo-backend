@@ -33,6 +33,21 @@ def get_propietario_list_by_gestor_cuenta_id(
         .all()
     )
 
+def get_propietario_list_by_tipo_persona_id(
+    db: Session, tipo_persona_id: int
+) -> List[Propietario]:
+    return (
+        db.query(Propietario)
+        .filter(
+            and_(
+                Propietario.tipo_persona_id == tipo_persona_id,
+            )
+        )
+        .order_by(Propietario.created_at.desc(), Propietario.nombre)
+        .all()
+    )
+
+
 
 def get_propietario_by(
     db: Session,
@@ -53,6 +68,15 @@ def get_propietario_by(
 
 def get_propietario_by_id(db: Session, id: int) -> Optional[Propietario]:
     return db.query(Propietario).filter(Propietario.id == id).first()
+
+def get_propietario_list_by_tipo_persona_id(
+    db: Session, tipo_persona_id: int
+) -> List[Propietario]:
+    return (
+        db.query(Propietario)
+        .filter_by(tipo_persona_id=tipo_persona_id)
+        .all()
+    )
 
 
 def create_propietario(

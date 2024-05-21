@@ -100,8 +100,6 @@ def edit_combinacion(
         obj.chofer_id = obj.chofer_id
     if obj.comentario:
         obj.comentario = obj.comentario
-    if obj.capacidad_total_combinacion:
-        obj.capacidad_total_combinacion = obj.capacidad_total_combinacion
     if chofer:
         obj.chofer_id = chofer.id
     obj.modified_by = modified_by
@@ -122,7 +120,9 @@ def create_combinacion(
         semi_id=data.semi_id,
         chofer_id=data.chofer_id,
         comentario=data.comentario,
-        capacidad_total_combinacion=data.capacidad_total_combinacion,
+        neto= data.neto,
+        gestor_carga_id=data.gestor_carga_id,
+        # producto_id=data.producto_id,
         modified_by=modified_by,
     )
     db.add(obj)

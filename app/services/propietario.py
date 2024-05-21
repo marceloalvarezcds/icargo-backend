@@ -1,6 +1,7 @@
 import os
 from typing import List, Optional, cast
 
+from app.models.tipo_persona import TipoPersona
 from fastapi import HTTPException, UploadFile  # type: ignore
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
@@ -110,6 +111,8 @@ def get_propietario_list_by_gestor_cuenta_and_camion_id(
         lista.append(propietario)
     return lista
 
+def get_tipo_persona_by_id(db: Session, id: int) -> Optional[TipoPersona]:
+    return db.query(TipoPersona).filter(TipoPersona.id == id).first()
 
 def get_propietario_list_by_gestor_cuenta_and_semi_id(
     db: Session, semi_id: int, gestor_cuenta_id: Optional[int]
@@ -120,6 +123,19 @@ def get_propietario_list_by_gestor_cuenta_and_semi_id(
         propietario: Propietario = semi.propietario
         lista.append(propietario)
     return lista
+
+
+
+def get_propietario_list_by_tipo_persona_id(
+    db: Session, id: int
+) -> schemas.Propietario:
+    obj = repositories.get_propietario_list_by_tipo_persona_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Propietario no encontrado")
+    return obj
+
+
+
 
 
 async def edit_propietario(

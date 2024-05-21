@@ -126,8 +126,8 @@ async def edit_combinacion(
         combinacion.semi_id = data.semi_id
     if data.comentario is not None:
         combinacion.comentario = data.comentario
-    if data.capacidad_total_combinacion is not None:
-        combinacion.capacidad_total_combinacion = data.capacidad_total_combinacion
+    if data.neto is not None:
+        combinacion.neto = data.neto
     # Actualizar otros campos según sea necesario
 
     # Guardar los cambios en la base de datos

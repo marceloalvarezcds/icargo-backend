@@ -99,7 +99,11 @@ class Semi(AuditMixin, Base):
     @hybrid_property
     def color_descripcion(self):
         return self.color.descripcion if self.color else ""
-
+    
+    @hybrid_property
+    def foto_semi(self):
+        return self.semi.foto if self.semi else None
+    
     @hybrid_property
     def gestor_cuenta_id(self):
         return self.propietario.gestor_cuenta.id

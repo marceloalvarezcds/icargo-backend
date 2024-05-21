@@ -37,8 +37,7 @@ class Combinacion(AuditMixin, Base):
     semi: Semi = relationship(Semi, uselist=False)
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     comentario = Column(String(255))
-    capacidad_total_combinacion = Column(Integer, server_default=text("0"))
-
+  
 
     producto_id = Column(Integer, ForeignKey("producto.id"))
     producto = relationship(Producto, uselist=False)
