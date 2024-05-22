@@ -138,6 +138,7 @@ class CamionList(BaseModel):
     tipo_descripcion: Optional[str] = None
     limites: str
     limite_monto_anticipo: Optional[int] = None
+    foto: Optional[str] = None
     foto_camion: Optional[str] =  None
     oc_activa: int
     created_by: str

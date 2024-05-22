@@ -121,7 +121,7 @@ class SemiList(BaseModel):
     localidad_habilitacion_municipal_nombre: Optional[str] = None
     info: str
     color_descripcion: Optional[str] = None
-    foto_semi:  Optional[str] = None
+    foto:  Optional[str] = None
     marca_descripcion: Optional[str] = None
     oficial_cuenta_nombre: Optional[str] = None
     pais_habilitacion_municipal_id: Optional[int] = None

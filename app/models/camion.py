@@ -13,6 +13,7 @@ from sqlalchemy import (  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 
+from app import logger
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums.estado import EstadoEnum
@@ -118,6 +119,7 @@ class Camion(AuditMixin, Base):
 
     @hybrid_property
     def foto_camion(self):
+        logger.info("foto_camion" + self.camion.foto)
         return self.camion.foto if self.camion else None
 
     @hybrid_property

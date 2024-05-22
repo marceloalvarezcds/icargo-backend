@@ -127,6 +127,8 @@ class ChoferList(BaseModel):
     es_propietario: Optional[bool] = False
     estado: EstadoEnum
     direccion: Optional[str] = None
+    foto_registro_reverso: Optional[str] = None
+    foto_perfil: Optional[str] = None
     ciudad: Optional[Ciudad] = None
     ciudad_nombre: Optional[str] = None
     info: Optional[str] = None
