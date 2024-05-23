@@ -42,13 +42,11 @@ async def create_combinacion(
     data: schemas.CombinacionCreateModel,
     modified_by: str
 ) -> schemas.Combinacion:
-    # Verificar si existen los propietarios, camiones, choferes y semirremolques
     propietario_exists = (repositories.get_propietario_by_id(db, data.propietario_id))
     camion_exists = (repositories.get_camion_by_id(db, data.camion_id))
     chofer_exists = (repositories.get_chofer_by_id(db, data.chofer_id))
     semi_exists = (repositories.get_chofer_by_id(db, data.semi_id))
 
-    # Si no existen alguno de los elementos, levanta una excepción
     if not propietario_exists:
         raise HTTPException(
             status_code=404,
@@ -69,14 +67,11 @@ async def create_combinacion(
             status_code=404,
             detail="El semirremolque especificado no existe."
         )
-
-    # Si todos los elementos existen, procede a crear la combinación
     combinacion = repositories.create_combinacion(
         db,
         data,
         modified_by,
     )
-
     return combinacion
 
 async def edit_combinacion(
