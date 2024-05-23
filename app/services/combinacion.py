@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from app.config import REPORTS_FOLDER
 from app.enums.estado import EstadoEnum
+from app.utils.gestor_carga import get_gestor_carga_by_params
 from fastapi import HTTPException # type: ignore
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
@@ -41,7 +42,7 @@ async def create_combinacion(
     db: Session,
     data: schemas.CombinacionCreateModel,
     modified_by: str,
-    gestor_cuenta_id: Optional[int],
+    gestor_carga_id: Optional[int],
 ) -> schemas.Combinacion:
     propietario_exists = (repositories.get_propietario_by_id(db, data.propietario_id))
     camion_exists = (repositories.get_camion_by_id(db, data.camion_id))
@@ -68,10 +69,11 @@ async def create_combinacion(
             status_code=404,
             detail="El semirremolque especificado no existe."
         )
+    gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
     combinacion = repositories.create_combinacion(
         db,
         data,
-        gestor_cuenta_id,
+        gestor_id,
         modified_by,
    
     )

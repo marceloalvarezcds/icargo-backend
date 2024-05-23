@@ -122,8 +122,9 @@ def create_combinacion(
         chofer_id=data.chofer_id,
         comentario=data.comentario,
         neto= data.neto,
-        gestor_carga_id=data.gestor_carga_id,
+        gestor_carga_id=gestor_carga_id,
         modified_by=modified_by,
+        created_by= modified_by,
     )
     db.add(obj)
     db.commit()
