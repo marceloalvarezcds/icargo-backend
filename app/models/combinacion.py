@@ -37,12 +37,8 @@ class Combinacion(AuditMixin, Base):
     semi: Semi = relationship(Semi, uselist=False)
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     comentario = Column(String(255))
-  
-
-    # producto_id = Column(Integer, ForeignKey("producto.id"))
-    # producto = relationship(Producto, uselist=False)
-    # gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
-    # gestor_carga = relationship(GestorCarga, uselist=False)
+    gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
+    gestor_carga = relationship(GestorCarga, uselist=False)
     neto = Column(Numeric(38, 10))
     
     @hybrid_property

@@ -40,7 +40,8 @@ def change_combinacion_status(
 async def create_combinacion(
     db: Session,
     data: schemas.CombinacionCreateModel,
-    modified_by: str
+    modified_by: str,
+    gestor_cuenta_id: Optional[int],
 ) -> schemas.Combinacion:
     propietario_exists = (repositories.get_propietario_by_id(db, data.propietario_id))
     camion_exists = (repositories.get_camion_by_id(db, data.camion_id))
@@ -70,7 +71,9 @@ async def create_combinacion(
     combinacion = repositories.create_combinacion(
         db,
         data,
+        gestor_cuenta_id,
         modified_by,
+   
     )
     return combinacion
 
@@ -80,37 +83,30 @@ async def edit_combinacion(
     data: schemas.CombinacionCreateModel,
     modified_by: str,
 ) -> schemas.Combinacion:
-    # Obtener la combinación existente de la base de datos
     combinacion = repositories.get_combinacion_by_id(db, id)
     if not combinacion:
-        # Manejar el caso en que la combinación no exista
         raise HTTPException(status_code=404, detail="Combinación no encontrada")
 
-    # Verificar si existe el propietario
     if data.propietario_id is not None:
         propietario = repositories.get_propietario_by_id(db, data.propietario_id)
         if not propietario:
             raise HTTPException(status_code=404, detail="Propietario no encontrado")
 
-    # Verificar si existe el chofer
     if data.chofer_id is not None:
         chofer = repositories.get_chofer_by_id(db, data.chofer_id)
         if not chofer:
             raise HTTPException(status_code=404, detail="Chofer no encontrado")
-
-    # Verificar si existe el camion
+        
     if data.camion_id is not None:
         camion = repositories.get_camion_by_id(db, data.camion_id)
         if not camion:
             raise HTTPException(status_code=404, detail="Camión no encontrado")
 
-    # Verificar si existe el semi
     if data.semi_id is not None:
         semi = repositories.get_semi_by_id(db, data.semi_id)
         if not semi:
             raise HTTPException(status_code=404, detail="Semi no encontrado")
 
-    # Actualizar los campos de la combinación con los datos proporcionados
     if data.propietario_id is not None:
         combinacion.propietario_id = data.propietario_id
     if data.camion_id is not None:
@@ -123,9 +119,6 @@ async def edit_combinacion(
         combinacion.comentario = data.comentario
     if data.neto is not None:
         combinacion.neto = data.neto
-    # Actualizar otros campos según sea necesario
-
-    # Guardar los cambios en la base de datos
     db.add(combinacion)
     db.commit()
     db.refresh(combinacion)

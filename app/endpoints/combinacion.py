@@ -56,6 +56,7 @@ async def add_new_combinacion(
         db,
         data,
         current_user.username,
+        current_user.gestor_carga_id,
     )
 
 @api.put("/{id}", response_model=schemas.CombinacionBaseModel)

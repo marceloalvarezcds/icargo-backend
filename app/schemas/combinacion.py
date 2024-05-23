@@ -41,7 +41,6 @@ class CombinacionBaseModel(BaseModel):
     chofer_id: int
     semi_id: int
     gestor_carga_id: Optional[int]
-   
     comentario: Optional[str]
     neto: int
 
