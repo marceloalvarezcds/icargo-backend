@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Optional
 
-from .producto import Producto
 from pydantic import BaseModel
 
 from .camion import Camion
@@ -40,7 +39,7 @@ class CombinacionBaseModel(BaseModel):
     camion_id: int
     chofer_id: int
     semi_id: int
-    gestor_carga_id: Optional[int]
+    
    
     comentario: Optional[str]
     neto: int
@@ -64,7 +63,6 @@ class CombinacionEditForm(BaseModel):
     chofer_id: int
     semi_id: int
     comentario: str
-    gestor_carga_id: int
     camion: Optional[Camion]
     semi: Optional[Semi]
     propietario: Optional[Propietario]
@@ -89,7 +87,6 @@ class CombinacionCreateModel(CombinacionBaseModel):
 class Combinaciones(CombinacionGet):
     propietario_nombre: Optional[str] = None
     chofer_nombre: str
-    producto_descripcion: Optional[str] = None
     semi_placa: str
     marca_descripcion: Optional[str] = None
     camion_placa: str

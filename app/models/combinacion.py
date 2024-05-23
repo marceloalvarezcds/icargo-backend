@@ -39,10 +39,10 @@ class Combinacion(AuditMixin, Base):
     comentario = Column(String(255))
   
 
-    producto_id = Column(Integer, ForeignKey("producto.id"))
-    producto = relationship(Producto, uselist=False)
-    gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
-    gestor_carga = relationship(GestorCarga, uselist=False)
+    # producto_id = Column(Integer, ForeignKey("producto.id"))
+    # producto = relationship(Producto, uselist=False)
+    # gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
+    # gestor_carga = relationship(GestorCarga, uselist=False)
     neto = Column(Numeric(38, 10))
     
     @hybrid_property
