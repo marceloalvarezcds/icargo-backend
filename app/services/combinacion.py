@@ -33,9 +33,9 @@ def get_combinacion_by_gestor_cuenta_and_combinacion_id(
 
 def change_combinacion_status(
     db: Session, id: int, status: EstadoEnum, modified_by: str
-) -> schemas.Camion:
+) -> schemas.CombinacionesBD:
     co = get_combinacion_by_id(db, id)
-    return repositories.change_chofer_status(co, db, status, modified_by)
+    return repositories.change_combinacion_status(co, db, status, modified_by)
 
 
 async def create_combinacion(

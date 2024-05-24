@@ -513,4 +513,5 @@ from .combinacion import(
     create_combinacion,
     get_combinacion_by,
     get_combinacion_by_ids,
+    change_combinacion_status,
 )
