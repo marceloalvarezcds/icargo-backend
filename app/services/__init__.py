@@ -331,4 +331,5 @@ from .combinacion import (
     get_combinacion_reports,
     get_combinacion_by_gestor_cuenta_and_combinacion_id,
     change_combinacion_status,
+    get_combinacion_list,
 )

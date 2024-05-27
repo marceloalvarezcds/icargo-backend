@@ -14,6 +14,14 @@ from app import repositories, schemas
 from .semi import get_semi_by_id
 
 
+def get_combinacion_list(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[Combinacion]:
+    if gestor_carga_id:
+        return repositories.get_combinacion_list_by_gestor_carga_id(db, gestor_carga_id)
+    return repositories.get_combinacion_list(db)
+
+
 def get_combinacion_by_id(db: Session, id: int) -> Combinacion:
     obj = repositories.get_combinacion_by_id(db, id)
     if not obj:
@@ -44,10 +52,9 @@ async def create_combinacion(
     modified_by: str,
     gestor_carga_id: Optional[int],
 ) -> schemas.Combinacion:
-    propietario_exists = (repositories.get_propietario_by_id(db, data.propietario_id))
-    camion_exists = (repositories.get_camion_by_id(db, data.camion_id))
-    chofer_exists = (repositories.get_chofer_by_id(db, data.chofer_id))
-    semi_exists = (repositories.get_chofer_by_id(db, data.semi_id))
+    propietario_exists = repositories.get_propietario_by_id(db, data.propietario_id)
+    camion_exists = repositories.get_camion_by_id(db, data.camion_id)
+    chofer_exists = repositories.get_chofer_by_id(db, data.chofer_id)
 
     if not propietario_exists:
         raise HTTPException(
@@ -64,20 +71,39 @@ async def create_combinacion(
             status_code=404,
             detail="El chofer especificado no existe."
         )
-    if not semi_exists:
+    combinacion_exists = repositories.get_combinacion_by_ids(
+        db, data.propietario_id, data.camion_id, data.chofer_id, gestor_carga_id
+    )
+    combinacion_tracto_chofer = repositories.get_combinacion_tracto_chofer_by_ids(
+        db, data.camion_id, data.chofer_id, gestor_carga_id
+    )
+    combinacion_tracto_propietario = repositories.get_combinacion_tracto_propietario_ids(
+        db, data.camion_id, data.propietario_id, gestor_carga_id
+    )
+    if combinacion_exists:
         raise HTTPException(
-            status_code=404,
-            detail="El semirremolque especificado no existe."
+            status_code=409,
+            detail="La combinación de beneficiario, tracto y chofer ya existe para este gestor de carga."
         )
-    gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
+    if combinacion_tracto_chofer:
+        raise HTTPException(
+            status_code=409,
+            detail="La combinación de tracto y chofer ya existe para este gestor de carga."
+        )
+    if combinacion_tracto_propietario:
+        raise HTTPException(
+            status_code=409,
+            detail="La combinación de tracto y beneficiario ya existe para este gestor de carga."
+        )
+
     combinacion = repositories.create_combinacion(
         db,
         data,
-        gestor_id,
+        gestor_carga_id,
         modified_by,
-   
     )
     return combinacion
+
 
 async def edit_combinacion(
     id: int,

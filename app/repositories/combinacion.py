@@ -2,7 +2,7 @@ from datetime import datetime
 from operator import and_
 from typing import List, Optional
 
-from app import schemas
+from app import repositories, schemas
 from app.schemas.combinacion import CombinacionCreateModel, CombinacionForm
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -14,24 +14,80 @@ def get_combinacion_list(db: Session) -> List[Combinacion]:
     return (
         db.query(Combinacion)
         .filter(Combinacion.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(Combinacion.created_at.desc())
+        .order_by(Combinacion.created_by)
         .all()
     )
 
+
+def get_combinacion_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[Combinacion]:
+    return (
+        db.query(Combinacion)
+        .filter(
+            and_(
+                Combinacion.gestor_carga_id == gestor_carga_id,
+                Combinacion.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(Combinacion.created_by)
+        .all()
+    )
+
+def get_combinacion_by_params(
+    db: Session,
+    propietario_id: int,
+    camion_id: int,
+    chofer_id: int,
+    gestor_carga_id: Optional[int]
+) -> Optional[Combinacion]:
+    return db.query(Combinacion).filter(
+        and_(
+            Combinacion.propietario_id == propietario_id,
+            Combinacion.camion_id == camion_id,
+            Combinacion.chofer_id == chofer_id,
+            Combinacion.gestor_carga_id == gestor_carga_id
+        )
+    ).first()
 
 def get_combinacion_by_ids(
     db: Session,
     propietario_id: int,
     camion_id: int,
     chofer_id: int,
-    semi_id: int,
+    gestor_carga_id: int,
 ) -> Combinacion:
     return db.query(Combinacion).filter(
         Combinacion.propietario_id == propietario_id,
         Combinacion.camion_id == camion_id,
         Combinacion.chofer_id == chofer_id,
-        Combinacion.semi_id == semi_id
+        Combinacion.gestor_carga_id == gestor_carga_id
     ).first()
+
+def get_combinacion_tracto_chofer_by_ids(
+    db: Session,
+    camion_id: int,
+    chofer_id: int,
+    gestor_carga_id: int,
+) -> Combinacion:
+    return db.query(Combinacion).filter(
+        Combinacion.camion_id == camion_id,
+        Combinacion.chofer_id == chofer_id,
+        Combinacion.gestor_carga_id == gestor_carga_id
+    ).first()
+
+def get_combinacion_tracto_propietario_ids(
+    db: Session,
+    camion_id: int,
+    propietario_id: int,
+    gestor_carga_id: int,
+) -> Combinacion:
+    return db.query(Combinacion).filter(
+        Combinacion.camion_id == camion_id,
+        Combinacion.propietario_id == propietario_id,
+        Combinacion.gestor_carga_id == gestor_carga_id
+    ).first()
+
 
 
 def get_combinacion_by_id(db: Session, id: int) -> Optional[Combinacion]:
@@ -115,7 +171,7 @@ def create_combinacion(
     modified_by: str,
 ) -> Combinacion:
     obj = Combinacion(
-        estado=EstadoEnum.PENDIENTE.value,
+        estado=EstadoEnum.NUEVO.value,
         propietario_id=data.propietario_id,
         camion_id=data.camion_id,
         semi_id=data.semi_id,

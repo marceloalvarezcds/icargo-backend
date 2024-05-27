@@ -514,4 +514,8 @@ from .combinacion import(
     get_combinacion_by,
     get_combinacion_by_ids,
     change_combinacion_status,
+    get_combinacion_list_by_gestor_carga_id,
+    get_combinacion_by_params,
+    get_combinacion_tracto_chofer_by_ids,
+    get_combinacion_tracto_propietario_ids,
 )

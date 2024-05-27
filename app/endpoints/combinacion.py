@@ -14,13 +14,13 @@ from app.enums import PermisoModeloEnum as m
 api = APIRouter()
 
 
-
 @api.get("/", response_model=List[schemas.CombinacionesBD])
 async def read_combinacion_list(
     db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.COMBINACION)),  # noqa: B008
 ):
-    return repositories.get_combinacion_list(db)
+    return services.get_combinacion_list(db, current_user.gestor_carga_id)
 
 
 
@@ -51,13 +51,13 @@ async def add_new_combinacion(
     current_user: schemas.AuthUser = Depends(get_current_user),
     _: bool = Depends(Permiso(a.CREAR, m.COMBINACION)),
 ):
-    print("Crear ")
     return await services.create_combinacion(
         db,
         data,
         current_user.username,
         current_user.gestor_carga_id,
     )
+
 
 @api.put("/{id}", response_model=schemas.CombinacionBaseModel)
 async def edit_combinacion(
