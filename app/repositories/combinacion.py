@@ -1,9 +1,12 @@
 from datetime import datetime
+
 from operator import and_
 from typing import List, Optional
 
 from app import repositories, schemas
+from app.enums.permiso import PermisoAccionEnum
 from app.schemas.combinacion import CombinacionCreateModel, CombinacionForm
+from app.schemas.rol import Rol
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums import EstadoEnum
@@ -14,7 +17,7 @@ def get_combinacion_list(db: Session) -> List[Combinacion]:
     return (
         db.query(Combinacion)
         .filter(Combinacion.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(Combinacion.created_by)
+        .order_by(Combinacion.id.desc()) 
         .all()
     )
 
@@ -30,7 +33,7 @@ def get_combinacion_list_by_gestor_carga_id(
                 Combinacion.estado != EstadoEnum.ELIMINADO.value,
             )
         )
-        .order_by(Combinacion.created_by)
+        .order_by(Combinacion.id.desc()) 
         .all()
     )
 
@@ -50,6 +53,7 @@ def get_combinacion_by_params(
         )
     ).first()
 
+
 def get_combinacion_by_ids(
     db: Session,
     propietario_id: int,
@@ -63,6 +67,7 @@ def get_combinacion_by_ids(
         Combinacion.chofer_id == chofer_id,
         Combinacion.gestor_carga_id == gestor_carga_id
     ).first()
+
 
 def get_combinacion_tracto_chofer_by_ids(
     db: Session,
@@ -162,6 +167,7 @@ def edit_combinacion(
     obj.modified_at = datetime.now()
 
     return obj
+
 
 
 def create_combinacion(

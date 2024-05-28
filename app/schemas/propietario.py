@@ -136,6 +136,7 @@ class PropietarioList(PropietarioBase):
     localidad_nombre: Optional[str] = None
     foto_perfil: Optional[str] = None
     pais_nombre: Optional[str] = None
+    foto_documento_frente: Optional[str] = None
     pais_nombre_corto: Optional[str] = None
     pais_origen_nombre: Optional[str] = None
     pais_origen_nombre_corto: Optional[str] = None

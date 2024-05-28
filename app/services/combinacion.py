@@ -73,13 +73,13 @@ async def create_combinacion(
         )
     combinacion_exists = repositories.get_combinacion_by_ids(
         db, data.propietario_id, data.camion_id, data.chofer_id, gestor_carga_id
-    )
+        )
     combinacion_tracto_chofer = repositories.get_combinacion_tracto_chofer_by_ids(
         db, data.camion_id, data.chofer_id, gestor_carga_id
-    )
+        )
     combinacion_tracto_propietario = repositories.get_combinacion_tracto_propietario_ids(
         db, data.camion_id, data.propietario_id, gestor_carga_id
-    )
+        )
     if combinacion_exists:
         raise HTTPException(
             status_code=409,
@@ -101,7 +101,7 @@ async def create_combinacion(
         data,
         gestor_carga_id,
         modified_by,
-    )
+        )
     return combinacion
 
 
