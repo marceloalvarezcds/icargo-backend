@@ -46,6 +46,22 @@ def change_combinacion_status(
     return repositories.change_combinacion_status(co, db, status, modified_by)
 
 
+async def rol_tiene_permiso_cambiar_estado(
+    db: Session,
+    rol_id: int
+) -> bool:
+   
+    gestor_carga_rol = repositories.get_rol_list(db, rol_id)
+    if not gestor_carga_rol:
+        return False 
+    
+    for permiso in gestor_carga_rol.permisos:
+        if permiso.accion == "cambiar_estado":
+            return True
+
+    return False  
+
+
 async def create_combinacion(
     db: Session,
     data: schemas.CombinacionCreateModel,
@@ -55,7 +71,7 @@ async def create_combinacion(
     propietario_exists = repositories.get_propietario_by_id(db, data.propietario_id)
     camion_exists = repositories.get_camion_by_id(db, data.camion_id)
     chofer_exists = repositories.get_chofer_by_id(db, data.chofer_id)
-
+ 
     if not propietario_exists:
         raise HTTPException(
             status_code=404,
@@ -80,17 +96,17 @@ async def create_combinacion(
     combinacion_tracto_propietario = repositories.get_combinacion_tracto_propietario_ids(
         db, data.camion_id, data.propietario_id, gestor_carga_id
         )
-    if combinacion_exists:
+    if combinacion_exists and combinacion_exists.estado != EstadoEnum.INACTIVO.value:
         raise HTTPException(
             status_code=409,
             detail="La combinación de beneficiario, tracto y chofer ya existe para este gestor de carga."
         )
-    if combinacion_tracto_chofer:
+    if combinacion_tracto_chofer and combinacion_tracto_chofer.estado != EstadoEnum.INACTIVO.value:
         raise HTTPException(
             status_code=409,
             detail="La combinación de tracto y chofer ya existe para este gestor de carga."
         )
-    if combinacion_tracto_propietario:
+    if combinacion_tracto_propietario and combinacion_tracto_propietario.estado != EstadoEnum.INACTIVO.value:
         raise HTTPException(
             status_code=409,
             detail="La combinación de tracto y beneficiario ya existe para este gestor de carga."

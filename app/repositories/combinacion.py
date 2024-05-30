@@ -1,12 +1,16 @@
 from datetime import datetime
 
 from operator import and_
+
+from sqlalchemy.sql.expression import update
+
 from typing import List, Optional
 
-from app import repositories, schemas
-from app.enums.permiso import PermisoAccionEnum
+from app import schemas
+from app.models.gestor_carga import GestorCarga
 from app.schemas.combinacion import CombinacionCreateModel, CombinacionForm
-from app.schemas.rol import Rol
+from app.models.permiso import Permiso
+from app.models.rol import Rol
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums import EstadoEnum
@@ -169,6 +173,42 @@ def edit_combinacion(
     return obj
 
 
+def gestor_carga_tiene_permiso(gestor_carga_id: int, permiso_descripcion: str, db: Session) -> bool:
+    gestor_carga = db.query(GestorCarga).filter_by(id=gestor_carga_id).first()
+    
+    if not gestor_carga:
+        return False
+    
+    for rol in gestor_carga.roles:
+        permiso = db.query(Permiso).filter_by(descripcion=permiso_descripcion).first()
+        if permiso and permiso in rol.permisos:
+            return True
+
+    return False
+
+
+
+def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> bool:
+    print(f"Verificando permisos para rol_id: {rol_id}, permiso: {permiso_descripcion}")
+    rol = db.query(Rol).filter_by(id=rol_id).first()
+    
+    if not rol:
+        return False
+
+    permiso = db.query(Permiso).filter_by(descripcion=permiso_descripcion).first()
+
+    print("Permiso", permiso)
+    if permiso and permiso in rol.permisos:
+        return True
+
+    return False
+
+
+def get_rol_id_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> Optional[int]:
+    rol = db.query(Rol).filter_by(gestor_carga_id=gestor_carga_id).first()
+    print(rol)
+    return rol.id if rol else None
+
 
 def create_combinacion(
     db: Session,
@@ -176,19 +216,34 @@ def create_combinacion(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Combinacion:
-    obj = Combinacion(
-        estado=EstadoEnum.NUEVO.value,
+    # Obtener el rol_id asociado con el gestor_carga_id
+    rol_id = get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
+
+    # Verificar si el rol tiene el permiso "Cambiar_estado 6 - combinaciones"
+    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 6 - combinaciones", db)
+    # print("rol_id ", rol_id)
+    # print("roles_permisos ", roles_permisos)
+    if roles_permisos:
+        estado_inicial = EstadoEnum.ACTIVO.value
+        # print("Estado ACTIVO", estado_inicial)
+    else:
+        estado_inicial = EstadoEnum.NUEVO.value
+        # print("Estado Nuevo", estado_inicial)
+
+    combinacion = Combinacion(
+        estado=estado_inicial,
         propietario_id=data.propietario_id,
         camion_id=data.camion_id,
         semi_id=data.semi_id,
         chofer_id=data.chofer_id,
         comentario=data.comentario,
-        neto= data.neto,
+        neto=data.neto,
         gestor_carga_id=gestor_carga_id,
         modified_by=modified_by,
-        created_by= modified_by,
+        created_by=modified_by,
     )
-    db.add(obj)
+
+    db.add(combinacion)
     db.commit()
-    db.refresh(obj)
-    return obj
+    db.refresh(combinacion)
+    return combinacion
