@@ -21,6 +21,7 @@ class CombinacionGet(BaseModel):
     semi_id: int
     camion: Camion
     semi: Semi
+
     propietario: Propietario
     chofer: Chofer
     neto: int
@@ -43,7 +44,7 @@ class CombinacionBaseModel(BaseModel):
     gestor_carga_id: Optional[int]
     comentario: Optional[str]
     neto: int
-
+    limite_monto_anticipo = int
     class Config:
         orm_mode = True
         use_enum_values = True
@@ -82,7 +83,9 @@ class CombinacionBase(BaseModel):
 
 
 class CombinacionCreateModel(CombinacionBaseModel):
-    pass
+    oc_activa: Optional[int]
+    puede_recibir_anticipos: bool
+    anticipo_propietario: bool
 
 
 class Combinaciones(CombinacionGet):

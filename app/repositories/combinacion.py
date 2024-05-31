@@ -2,6 +2,7 @@ from datetime import datetime
 
 from operator import and_
 
+from app.models.camion import Camion
 from sqlalchemy.sql.expression import update
 
 from typing import List, Optional
@@ -11,11 +12,12 @@ from app.models.gestor_carga import GestorCarga
 from app.schemas.combinacion import CombinacionCreateModel, CombinacionForm
 from app.models.permiso import Permiso
 from app.models.rol import Rol
+from app.models.propietario import Propietario
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Combinacion
-from app.schemas import Chofer, Propietario
+from app.models.chofer import Chofer
 
 def get_combinacion_list(db: Session) -> List[Combinacion]:
     return (
@@ -114,7 +116,7 @@ def get_combinacion_list_by_gestor_cuenta_id(
                 Combinacion.estado == EstadoEnum.ACTIVO.value,
             )
         )
-        .order_by(Propietario.created_at.desc(), Propietario.nombre)
+        # .order_by(Propietario.created_at.desc(), Propietario.nombre)
         .all()
     )
 
@@ -151,7 +153,6 @@ def get_combinacion_by(
 def edit_combinacion(
     obj: CombinacionForm,
     db: Session,
-    chofer: Optional[Chofer],
     modified_by: str,
 ) ->Combinacion:
 
@@ -165,8 +166,6 @@ def edit_combinacion(
         obj.chofer_id = obj.chofer_id
     if obj.comentario:
         obj.comentario = obj.comentario
-    if chofer:
-        obj.chofer_id = chofer.id
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
 
@@ -189,7 +188,6 @@ def gestor_carga_tiene_permiso(gestor_carga_id: int, permiso_descripcion: str, d
 
 
 def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> bool:
-    print(f"Verificando permisos para rol_id: {rol_id}, permiso: {permiso_descripcion}")
     rol = db.query(Rol).filter_by(id=rol_id).first()
     
     if not rol:
@@ -197,7 +195,6 @@ def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> boo
 
     permiso = db.query(Permiso).filter_by(descripcion=permiso_descripcion).first()
 
-    print("Permiso", permiso)
     if permiso and permiso in rol.permisos:
         return True
 
@@ -206,7 +203,7 @@ def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> boo
 
 def get_rol_id_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> Optional[int]:
     rol = db.query(Rol).filter_by(gestor_carga_id=gestor_carga_id).first()
-    print(rol)
+  
     return rol.id if rol else None
 
 
@@ -216,20 +213,15 @@ def create_combinacion(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Combinacion:
-    # Obtener el rol_id asociado con el gestor_carga_id
     rol_id = get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
 
-    # Verificar si el rol tiene el permiso "Cambiar_estado 6 - combinaciones"
     roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 6 - combinaciones", db)
-    # print("rol_id ", rol_id)
-    # print("roles_permisos ", roles_permisos)
+
     if roles_permisos:
         estado_inicial = EstadoEnum.ACTIVO.value
-        # print("Estado ACTIVO", estado_inicial)
     else:
         estado_inicial = EstadoEnum.NUEVO.value
-        # print("Estado Nuevo", estado_inicial)
-
+  
     combinacion = Combinacion(
         estado=estado_inicial,
         propietario_id=data.propietario_id,
@@ -246,4 +238,25 @@ def create_combinacion(
     db.add(combinacion)
     db.commit()
     db.refresh(combinacion)
+    db.execute(
+        update(Camion)
+        .where(Camion.id == data.camion_id)
+        .values(limite_cantidad_oc_activas= data.oc_activa)
+    )
+    db.commit()
+    
+    db.execute(
+        update(Propietario)
+        .where(Propietario.id == data.propietario_id)
+        .values(puede_recibir_anticipos= data.anticipo_propietario)
+    )
+    db.commit()
+
+    db.execute(
+        update(Chofer)
+        .where(Chofer.id == data.chofer_id)
+        .values(puede_recibir_anticipos= data.puede_recibir_anticipos)
+    )
+    db.commit()
+    
     return combinacion

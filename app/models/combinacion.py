@@ -46,6 +46,14 @@ class Combinacion(AuditMixin, Base):
         return self.camion.placa 
     
     @hybrid_property
+    def camion_oc_activa(self):
+        return self.camion.limite_cantidad_oc_activas if self.camion else None
+    
+    @hybrid_property
+    def limite_anticipos(self):
+        return self.camion.limite_monto_anticipos if self.camion.limite_monto_anticipos else 0
+    
+    @hybrid_property
     def marca_descripcion(self):
         return self.camion.marca.descripcion if self.camion else None
     
@@ -70,6 +78,10 @@ class Combinacion(AuditMixin, Base):
         return self.chofer.numero_documento 
     
     @hybrid_property
+    def puede_recibir_anticipos(self):
+        return self.chofer.puede_recibir_anticipos 
+    
+    @hybrid_property
     def propietario_nombre(self):
         return self.propietario.nombre
 
@@ -78,8 +90,8 @@ class Combinacion(AuditMixin, Base):
         return self.propietario.ruc
 
     @hybrid_property
-    def propietario_puede_recibir_anticipos(self):
-        return self.propietario.puede_recibir_anticipos
+    def anticipo_propietario(self):
+        return self.propietario.puede_recibir_anticipos 
 
     @hybrid_property
     def propietario_telefono(self):
