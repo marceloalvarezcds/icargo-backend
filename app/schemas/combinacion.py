@@ -44,7 +44,6 @@ class CombinacionBaseModel(BaseModel):
     gestor_carga_id: Optional[int]
     comentario: Optional[str]
     neto: int
-    limite_monto_anticipo = int
     class Config:
         orm_mode = True
         use_enum_values = True
@@ -84,6 +83,7 @@ class CombinacionBase(BaseModel):
 
 class CombinacionCreateModel(CombinacionBaseModel):
     oc_activa: Optional[int]
+    limite_anticipos: Optional[int]
     puede_recibir_anticipos: bool
     anticipo_propietario: bool
 

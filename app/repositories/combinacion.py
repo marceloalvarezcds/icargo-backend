@@ -241,7 +241,8 @@ def create_combinacion(
     db.execute(
         update(Camion)
         .where(Camion.id == data.camion_id)
-        .values(limite_cantidad_oc_activas= data.oc_activa)
+        .values(limite_cantidad_oc_activas= data.oc_activa, 
+                limite_monto_anticipos=data.limite_anticipos)
     )
     db.commit()
     
