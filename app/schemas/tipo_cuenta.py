@@ -4,7 +4,7 @@ from .seleccionable_base_model import SeleccionableBaseModel, SeleccionableFormB
 
 
 class TipoCuenta(SeleccionableBaseModel):
-    # codigo: str
+    codigo: str
     codigo_descripcion: str
 
 
