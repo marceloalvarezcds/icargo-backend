@@ -142,7 +142,7 @@ async def read_movimiento_by_id(
     return services.get_movimiento_by_id(db, id)
 
 
-@api.post("/", response_model=Optional[schemas.Movimiento])
+@api.post("movimiento/", response_model=Optional[schemas.Movimiento])
 async def add_new_movimiento_by_tipo_documento_relacionado_otro(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.MovimientoForm] = Form(...),  # type: ignore  # noqa: B008
