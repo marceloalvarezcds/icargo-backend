@@ -113,6 +113,7 @@ def create_flete(
         vigencia_anticipos=data.vigencia_anticipos,
         estado=EstadoEnum.ACTIVO.value,
         modified_by=modified_by,
+        created_by=modified_by,
     )
     db.add(obj)
     db.commit()

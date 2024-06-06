@@ -90,6 +90,7 @@ def create_semi(
         volumen=data.volumen,
         estado=EstadoEnum.PENDIENTE.value,
         modified_by=modified_by,
+        created_by=modified_by,
     )
     db.add(obj)
     db.commit()

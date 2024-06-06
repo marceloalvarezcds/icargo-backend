@@ -110,6 +110,7 @@ def create_propietario(
         ciudad_id=data.ciudad_id,
         chofer_id=chofer.id if chofer else None,
         modified_by=modified_by,
+        created_by=modified_by,
     )
     db.add(obj)
     db.commit()

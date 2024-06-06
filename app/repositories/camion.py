@@ -109,6 +109,7 @@ def create_camion(
         tara=data.tara,
         estado=EstadoEnum.PENDIENTE.value,
         modified_by=modified_by,
+        created_by=modified_by,
     )
     db.add(obj)
     db.commit()

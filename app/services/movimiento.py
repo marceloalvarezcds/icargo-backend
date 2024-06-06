@@ -398,7 +398,7 @@ def create_movimiento_by_descuento(
     ):
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
+            detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe ooooo",
         )
     if descuento.habilitar_pago_proveedor and descuento.proveedor:
         create_movimiento(

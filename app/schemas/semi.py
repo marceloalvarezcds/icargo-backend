@@ -131,7 +131,7 @@ class SemiList(BaseModel):
     pais_emisor_placa_nombre_corto: Optional[str] = None
     tipo_descripcion: Optional[str] = None
     tipo_carga_descripcion: Optional[str] = None
-    created_by: str
+    created_by: Optional [str] = None
     created_at: datetime
     modified_by: str
     modified_at: datetime
