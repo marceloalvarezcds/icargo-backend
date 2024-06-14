@@ -43,6 +43,17 @@ async def read_camion_list_by_producto_id(
         db, producto_id, current_user.gestor_carga_id
     )
 
+@api.get("/combinacion/{camion_id}", response_model=List[schemas.CamionList])
+async def read_camion_list_by_combinacion_id(
+    camion_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.CAMION)),  # noqa: B008
+):
+    return services.get_camion_list_by_combinacion_id(
+        db, camion_id, current_user.gestor_carga_id
+    )
+
 
 @api.get("/propietario/{propietario_id}", response_model=List[schemas.CamionList])
 async def read_camion_list_by_propietario_id(

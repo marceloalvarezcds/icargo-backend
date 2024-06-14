@@ -15,6 +15,7 @@ from app.models.rol import Rol
 from app.models.propietario import Propietario
 from sqlalchemy.orm import Session  # type: ignore
 
+
 from app.enums import EstadoEnum
 from app.models import Combinacion
 from app.models.chofer import Chofer
@@ -42,6 +43,140 @@ def get_combinacion_list_by_gestor_carga_id(
         .order_by(Combinacion.id.desc()) 
         .all()
     )
+
+
+
+
+
+####################################################################################
+
+def get_camion_list_by_combinacion_id(
+    db: Session, camion_id: int, gestor_carga_id: Optional[int]
+) -> List[Combinacion]:
+    return (
+        db.query(Combinacion)
+        .filter(
+            and_(
+                # Combinacion.camion_id == camion_id,
+                Combinacion.gestor_carga_id == gestor_carga_id,
+                Combinacion.estado == EstadoEnum.ACTIVO.value,
+            )
+        )
+        .order_by(
+            Combinacion.camion_id, Combinacion.semi_id
+        )
+        
+        .all()
+    )
+
+
+def get_camion_combinacion_id_null(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[Combinacion]:
+    return (
+        db.query(Combinacion)
+        .filter(
+            and_(
+                # Combinacion.camion_id == null(),
+                Combinacion.gestor_carga_id == gestor_carga_id,
+                Combinacion.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(
+            Combinacion.camion_id, Combinacion.semi_id
+        )
+        .all()
+    )
+
+
+def get_semi_list_by_camion_id(
+    db: Session, camion_id: int, gestor_carga_id: int
+) -> List[Combinacion]:
+    return (
+        db.query(Combinacion)
+        .filter(
+            and_(
+                # Combinacion.camion_id == camion_id,
+                
+                Combinacion.gestor_carga_id == gestor_carga_id,
+                Combinacion.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(
+            Combinacion.camion_id, Combinacion.semi_id
+        )
+        .all()
+        
+    )
+
+def get_semi_list_by_camion_id_null(
+    db: Session, camion_id: int, gestor_carga_id: int
+) -> List[Combinacion]:
+    return (
+        db.query(Combinacion)
+        .filter(
+            and_(
+                # Combinacion.camion_id == camion_id,
+            
+                Combinacion.gestor_carga_id == gestor_carga_id,
+                Combinacion.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(
+            Combinacion.camion_id, Combinacion.semi_id
+        )
+        .all()
+    )
+
+
+def get_combinacion_by_camion_id_and_semi_id(
+    db: Session,
+    camion_id: int,
+    semi_id: int,
+    gestor_carga_id: Optional[int],
+) -> Optional[Combinacion]:
+    return (
+        db.query(Combinacion)
+        .filter(
+            and_(
+                Combinacion.camion_id == camion_id,
+                Combinacion.semi_id == semi_id,
+                Combinacion.gestor_carga_id == gestor_carga_id,
+                Combinacion.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(
+            Combinacion.created_at.desc(),
+            Combinacion.camion_id,
+            Combinacion.semi_id,
+        )
+        .first()
+    )
+
+
+def get_camion_id_and_semi_id(
+    db: Session,
+    camion_id: int,
+    semi_id: int,
+    gestor_carga_id: Optional[int],
+) -> Optional[Combinacion]:
+    return (
+        db.query(Combinacion)
+        .filter(
+            and_(
+
+                Combinacion.gestor_carga_id == gestor_carga_id,
+                Combinacion.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(
+            Combinacion.created_at.desc(),
+            Combinacion.camion_id,
+            Combinacion.semi_id,
+        )
+        .first()
+    )
+##################################
 
 def get_combinacion_by_params(
     db: Session,

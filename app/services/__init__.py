@@ -332,4 +332,7 @@ from .combinacion import (
     get_combinacion_by_gestor_cuenta_and_combinacion_id,
     change_combinacion_status,
     get_combinacion_list,
+    get_camion_list_by_combinacion_id,
+    get_semi_list_by_camion_id,
+    get_combinacion_by_camion_id_and_semi_id_,
 )

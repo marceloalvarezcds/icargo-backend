@@ -43,7 +43,7 @@ from app.repositories import (
 )
 from app.services import get_user_list_by_gestor_carga_id
 
-from .camion_seeds import camion_seeds
+# from .camion_seeds import camion_seeds
 from .gestor_carga_propietario_seeds import gestor_carga_propietario_seeds
 from .propietario_contacto_gestor_carga_seeds import (
     propietario_contacto_gestor_carga_seeds,

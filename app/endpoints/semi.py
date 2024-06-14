@@ -35,6 +35,21 @@ async def read_semi_list_by_camion_id(
         db, camion_id, producto_id, current_user.gestor_carga_id
     )
 
+@api.get(
+    "/camion/{camion_id}", response_model=List[schemas.SemiList]
+)
+async def read_semi_list_by_combinacion_camion_id(
+    camion_id: int,
+  
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.SEMIRREMOLQUE)),  # noqa: B008
+):
+    return services.get_semi_list_by_camion_id(
+        db, camion_id, current_user.gestor_carga_id
+    )
+
+
 
 @api.get("/propietario/{propietario_id}", response_model=List[schemas.SemiList])
 async def read_semi_list_by_propietario_id(

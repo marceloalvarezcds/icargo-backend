@@ -10,7 +10,7 @@ from .propietario import Propietario
 from .chofer import Chofer
 from .camion_semi_neto import CamionSemiNeto
 from app.enums import EstadoEnum
-
+from .rounded_decimal_model import RoundedDecimal
 
 class CombinacionGet(BaseModel):
     id: int
@@ -43,7 +43,7 @@ class CombinacionBaseModel(BaseModel):
     semi_id: int
     gestor_carga_id: Optional[int]
     comentario: Optional[str]
-    neto: int
+    neto: RoundedDecimal
     class Config:
         orm_mode = True
         use_enum_values = True

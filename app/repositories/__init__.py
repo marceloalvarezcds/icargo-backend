@@ -518,4 +518,10 @@ from .combinacion import(
     get_combinacion_by_params,
     get_combinacion_tracto_chofer_by_ids,
     get_combinacion_tracto_propietario_ids,
+    get_camion_list_by_combinacion_id,
+    get_camion_combinacion_id_null,
+    get_semi_list_by_camion_id,
+    get_semi_list_by_camion_id_null,
+    get_combinacion_by_camion_id_and_semi_id,
+    get_camion_id_and_semi_id,
 )

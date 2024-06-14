@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from app.enums.estado import EstadoEnum
 from fastapi import APIRouter, Depends, Form
@@ -22,6 +22,21 @@ async def read_combinacion_list(
 ):
     return services.get_combinacion_list(db, current_user.gestor_carga_id)
 
+
+@api.get(
+    "/camion/{camion_id}/semi/{semi_id}",
+    response_model=Optional[schemas.CombinacionBaseModel],
+)
+async def read_combinacion_by_camion_id_and_semi_id(
+    camion_id: int,
+    semi_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.COMBINACION)),  # noqa: B008
+):
+    return services.get_combinacion_by_camion_id_and_semi_id_(
+        db, camion_id, semi_id, current_user.gestor_carga_id
+    )
 
 
 @api.get("/reports")

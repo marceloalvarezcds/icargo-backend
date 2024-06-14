@@ -4,6 +4,8 @@ from typing import List, Optional
 
 from app.config import REPORTS_FOLDER
 from app.enums.estado import EstadoEnum
+from app.models.camion import Camion
+from app.models.semi import Semi
 from app.utils.gestor_carga import get_gestor_carga_by_params
 from fastapi import HTTPException # type: ignore
 from openpyxl import Workbook  # type: ignore
@@ -12,6 +14,9 @@ from sqlalchemy.orm import Session  # type: ignore
 from app.models import Combinacion
 from app import repositories, schemas
 from .semi import get_semi_by_id
+
+
+
 
 
 def get_combinacion_list(
@@ -39,6 +44,7 @@ def get_combinacion_by_gestor_cuenta_and_combinacion_id(
         lista.append(combinacion)
     return lista
 
+
 def change_combinacion_status(
     db: Session, id: int, status: EstadoEnum, modified_by: str
 ) -> schemas.CombinacionesBD:
@@ -62,6 +68,93 @@ async def rol_tiene_permiso_cambiar_estado(
     return False  
 
 
+
+###################################
+
+def get_camion_by_combinacion_id(
+    db: Session, camion_id: int, gestor_carga_id: Optional[int]
+) -> List[Combinacion]:
+    camion_semi_neto_list = repositories.get_camion_list_by_combinacion_id(
+        db, camion_id, gestor_carga_id
+    )
+    # camion_semi_neto_list.extend(
+    #     repositories.get_camion_combinacion_id_null(db, gestor_carga_id)
+    # )
+    return camion_semi_neto_list
+
+
+def get_camion_list_by_combinacion_id(
+    db: Session, camion_id: int, gestor_carga_id: Optional[int]
+) -> List[Camion]:
+    # Obtener la lista original de combinaciones activas
+    original_list = get_camion_by_combinacion_id(
+        db, camion_id, gestor_carga_id
+    )
+
+    # Filtrar los camiones por combinaciones activas
+    camion_list: List[Camion] = [
+        combinacion.camion for combinacion in original_list if combinacion.estado == EstadoEnum.ACTIVO.value
+    ]
+
+    return camion_list
+
+
+def get_combinacion_semi_list_by_camion_id(
+    db: Session, camion_id: int, gestor_carga_id: int
+) -> List[Combinacion]:
+    camion_semi_neto_list = (
+        repositories.get_semi_list_by_camion_id(
+            db, camion_id, gestor_carga_id
+        )
+    )
+    # camion_semi_neto_list.extend(
+    #     repositories.get_semi_list_by_camion_id_null(
+    #         db, camion_id, gestor_carga_id
+    #     )
+    # )
+    return camion_semi_neto_list
+
+
+def get_semi_list_by_camion_id(
+    db: Session, camion_id: int, gestor_carga_id: Optional[int]
+) -> List[Semi]:
+    # Obtener las combinaciones activas que corresponden al camion_id y gestor_carga_id
+    combinaciones = (
+        db.query(Combinacion)
+        .filter(
+            Combinacion.camion_id == camion_id,
+            Combinacion.gestor_carga_id == gestor_carga_id if gestor_carga_id is not None else Combinacion.gestor_carga_id != None,
+            Combinacion.estado == EstadoEnum.ACTIVO.value
+        )
+        .all()
+    )
+
+    # Obtener los semis asociados a las combinaciones activas encontradas
+    semi_list: List[Semi] = [combinacion.semi for combinacion in combinaciones]
+
+    return semi_list
+
+
+
+def get_combinacion_by_camion_id_and_semi_id_(
+    db: Session,
+    camion_id: int,
+    semi_id: int,
+    gestor_carga_id: Optional[int],
+) -> Optional[Combinacion]:
+    obj = None
+    obj = (
+        repositories.get_camion_id_and_semi_id(
+            db, camion_id, semi_id, gestor_carga_id
+        )
+    )
+    if not obj:
+        obj = repositories.get_camion_id_and_semi_id(
+            db, camion_id, semi_id, gestor_carga_id
+        )
+    return obj
+
+######################################
 async def create_combinacion(
     db: Session,
     data: schemas.CombinacionCreateModel,
