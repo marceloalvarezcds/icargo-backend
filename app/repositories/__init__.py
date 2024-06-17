@@ -524,4 +524,5 @@ from .combinacion import(
     get_semi_list_by_camion_id_null,
     get_combinacion_by_camion_id_and_semi_id,
     get_camion_id_and_semi_id,
+    get_combinacion_semi_ids,
 )

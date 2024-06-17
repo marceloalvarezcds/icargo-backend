@@ -164,7 +164,7 @@ async def create_combinacion(
     propietario_exists = repositories.get_propietario_by_id(db, data.propietario_id)
     camion_exists = repositories.get_camion_by_id(db, data.camion_id)
     chofer_exists = repositories.get_chofer_by_id(db, data.chofer_id)
- 
+    semi_exists = repositories.get_semi_by_id(db, data.semi_id)
     if not propietario_exists:
         raise HTTPException(
             status_code=404,
@@ -184,10 +184,13 @@ async def create_combinacion(
         db, data.propietario_id, data.camion_id, data.chofer_id, gestor_carga_id
         )
     combinacion_tracto_chofer = repositories.get_combinacion_tracto_chofer_by_ids(
-        db, data.camion_id, data.chofer_id, gestor_carga_id
+        db, data.chofer_id, gestor_carga_id
         )
     combinacion_tracto_propietario = repositories.get_combinacion_tracto_propietario_ids(
         db, data.camion_id, data.propietario_id, gestor_carga_id
+        )
+    combinacion_semi = repositories.get_combinacion_semi_ids(
+        db, data.semi_id, gestor_carga_id
         )
     if combinacion_exists and combinacion_exists.estado != EstadoEnum.INACTIVO.value:
         raise HTTPException(
@@ -197,12 +200,17 @@ async def create_combinacion(
     if combinacion_tracto_chofer and combinacion_tracto_chofer.estado != EstadoEnum.INACTIVO.value:
         raise HTTPException(
             status_code=409,
-            detail="La combinación de tracto y chofer ya existe para este gestor de carga."
+            detail="La combinación de chofer ya existe para este gestor de carga."
         )
     if combinacion_tracto_propietario and combinacion_tracto_propietario.estado != EstadoEnum.INACTIVO.value:
         raise HTTPException(
             status_code=409,
             detail="La combinación de tracto y beneficiario ya existe para este gestor de carga."
+        )
+    if combinacion_semi and combinacion_semi.estado != EstadoEnum.INACTIVO.value:
+        raise HTTPException(
+            status_code=409,
+            detail="La combinación de semi ya existe para este gestor de carga."
         )
 
     combinacion = repositories.create_combinacion(
