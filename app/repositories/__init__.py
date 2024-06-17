@@ -525,4 +525,5 @@ from .combinacion import(
     get_combinacion_by_camion_id_and_semi_id,
     get_camion_id_and_semi_id,
     get_combinacion_semi_ids,
+    get_combinacion_chofer_propietario_ids,
 )

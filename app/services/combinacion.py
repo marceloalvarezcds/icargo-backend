@@ -5,6 +5,7 @@ from typing import List, Optional
 from app.config import REPORTS_FOLDER
 from app.enums.estado import EstadoEnum
 from app.models.camion import Camion
+from app.models.chofer import Chofer
 from app.models.semi import Semi
 from app.utils.gestor_carga import get_gestor_carga_by_params
 from fastapi import HTTPException # type: ignore
@@ -83,17 +84,24 @@ def get_camion_by_combinacion_id(
 def get_camion_list_by_combinacion_id(
     db: Session, camion_id: int, gestor_carga_id: Optional[int]
 ) -> List[Camion]:
-    # Obtener la lista original de combinaciones activas
+    id_list: List[int] = []
+    filtered_list: List[Camion] = []
     original_list = get_camion_by_combinacion_id(
         db, camion_id, gestor_carga_id
     )
+    camion_list: List[Camion] = list(map(lambda x: x.camion, original_list))
+    for item in camion_list:
+        # check if exists in unique_list or not, and is estado ACTIVO
+        chofer: Optional[Chofer] = item.chofer
+        if (
+            item.id not in id_list
+            and item.estado == EstadoEnum.ACTIVO.value
+            and (chofer and chofer.estado == EstadoEnum.ACTIVO.value)
+        ):
+            id_list.append(item.id)
+            filtered_list.append(item)
+    return filtered_list
 
-    # Filtrar los camiones por combinaciones activas
-    camion_list: List[Camion] = [
-        combinacion.camion for combinacion in original_list if combinacion.estado == EstadoEnum.ACTIVO.value
-    ]
-
-    return camion_list
 
 
 def get_combinacion_semi_list_by_camion_id(
@@ -178,13 +186,16 @@ async def create_combinacion(
             detail="El chofer especificado no existe."
         )
     combinacion_exists = repositories.get_combinacion_by_ids(
-        db, data.propietario_id, data.camion_id, data.chofer_id, gestor_carga_id
+        db, data.propietario_id, data.camion_id, data.semi_id, data.chofer_id, gestor_carga_id
         )
     combinacion_tracto_chofer = repositories.get_combinacion_tracto_chofer_by_ids(
         db, data.chofer_id, gestor_carga_id
         )
     combinacion_tracto_propietario = repositories.get_combinacion_tracto_propietario_ids(
         db, data.camion_id, data.propietario_id, gestor_carga_id
+        )
+    combinacion_chofer_propietario = repositories.get_combinacion_chofer_propietario_ids(
+        db, data.propietario_id, gestor_carga_id
         )
     combinacion_semi = repositories.get_combinacion_semi_ids(
         db, data.semi_id, gestor_carga_id
@@ -198,6 +209,11 @@ async def create_combinacion(
         raise HTTPException(
             status_code=409,
             detail="La combinación de chofer ya existe para este gestor de carga."
+        )
+    if combinacion_chofer_propietario and combinacion_chofer_propietario.estado != EstadoEnum.INACTIVO.value:
+        raise HTTPException(
+            status_code=409,
+            detail="La combinación de beneficiario ya existe para este gestor de carga."
         )
     if combinacion_tracto_propietario and combinacion_tracto_propietario.estado != EstadoEnum.INACTIVO.value:
         raise HTTPException(
