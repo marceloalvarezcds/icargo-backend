@@ -16,9 +16,6 @@ from app import repositories, schemas
 from .semi import get_semi_by_id
 
 
-
-
-
 def get_combinacion_list(
     db: Session, gestor_carga_id: Optional[int]
 ) -> List[Combinacion]:
@@ -207,11 +204,11 @@ async def create_combinacion(
             status_code=409,
             detail="La combinación de tracto y beneficiario ya existe para este gestor de carga."
         )
-    # if combinacion_semi and combinacion_semi.estado != EstadoEnum.INACTIVO.value:
-    #     raise HTTPException(
-    #         status_code=409,
-    #         detail="La combinación de semi ya existe para este gestor de carga."
-    #     )
+    if combinacion_semi and combinacion_semi.estado != EstadoEnum.INACTIVO.value:
+        raise HTTPException(
+            status_code=409,
+            detail="La combinación de semi ya existe para este gestor de carga."
+        )
 
     combinacion = repositories.create_combinacion(
         db,
