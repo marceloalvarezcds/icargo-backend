@@ -194,8 +194,8 @@ async def create_combinacion(
     combinacion_tracto_propietario = repositories.get_combinacion_tracto_propietario_ids(
         db, data.camion_id, data.propietario_id, gestor_carga_id
         )
-    combinacion_chofer_propietario = repositories.get_combinacion_chofer_propietario_ids(
-        db, data.propietario_id, gestor_carga_id
+    combinacion_tracto_semi_chofer_propietario = repositories.get_combinacion_tracto_semi_chofer_propietario_ids(
+        db, data.camion_id, data.semi_id, data.chofer_id, gestor_carga_id
         )
     combinacion_tracto = repositories.get_combinacion_tracto_ids(
         db, data.camion_id, gestor_carga_id
@@ -208,15 +208,15 @@ async def create_combinacion(
             status_code=409,
             detail="La combinación de beneficiario, tracto y chofer ya existe para este gestor de carga."
         )
-    if combinacion_tracto_chofer and combinacion_tracto_chofer.estado != EstadoEnum.INACTIVO.value:
+    # if combinacion_tracto_chofer and combinacion_tracto_chofer.estado != EstadoEnum.INACTIVO.value:
+    #     raise HTTPException(
+    #         status_code=409,
+    #         detail="La combinación de tracto y chofer ya existe para este gestor de carga."
+    #     )
+    if combinacion_tracto_semi_chofer_propietario and combinacion_tracto_semi_chofer_propietario.estado != EstadoEnum.INACTIVO.value:
         raise HTTPException(
             status_code=409,
-            detail="La combinación de chofer ya existe para este gestor de carga."
-        )
-    if combinacion_chofer_propietario and combinacion_chofer_propietario.estado != EstadoEnum.INACTIVO.value:
-        raise HTTPException(
-            status_code=409,
-            detail="La combinación de beneficiario ya existe para este gestor de carga."
+            detail="La combinación de tracto, semi y chofer ya existe para este gestor de carga."
         )
     if combinacion_tracto_propietario and combinacion_tracto_propietario.estado != EstadoEnum.INACTIVO.value:
         raise HTTPException(
