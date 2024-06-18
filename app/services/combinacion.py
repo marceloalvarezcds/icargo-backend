@@ -197,6 +197,9 @@ async def create_combinacion(
     combinacion_chofer_propietario = repositories.get_combinacion_chofer_propietario_ids(
         db, data.propietario_id, gestor_carga_id
         )
+    combinacion_tracto = repositories.get_combinacion_tracto_ids(
+        db, data.camion_id, gestor_carga_id
+        )
     combinacion_semi = repositories.get_combinacion_semi_ids(
         db, data.semi_id, gestor_carga_id
         )
@@ -225,7 +228,12 @@ async def create_combinacion(
             status_code=409,
             detail="La combinación de semi ya existe para este gestor de carga."
         )
-
+    
+    if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
+        raise HTTPException(
+            status_code=409,
+            detail="La combinación de tracto ya existe para este gestor de carga."
+        )
     combinacion = repositories.create_combinacion(
         db,
         data,

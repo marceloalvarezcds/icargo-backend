@@ -258,6 +258,16 @@ def get_combinacion_semi_ids(
     ).first()
 
 
+def get_combinacion_tracto_ids(
+    db: Session,
+    camion_id: int,
+    gestor_carga_id: int,
+) -> Combinacion:
+    return db.query(Combinacion).filter(
+        Combinacion.camion_id == camion_id,
+        Combinacion.gestor_carga_id == gestor_carga_id
+    ).first()
+
 
 def get_combinacion_by_id(db: Session, id: int) -> Optional[Combinacion]:
     return db.query(Combinacion).filter(Combinacion.id == id).first()
