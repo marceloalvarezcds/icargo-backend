@@ -46,6 +46,7 @@ class CentroOperativoList(CentroOperativoBase):
     localidad_nombre: Optional[str] = None
     pais_nombre: Optional[str] = None
     pais_nombre_corto: Optional[str] = None
+    created_by: str #Agregar para vista CO
 
     class Config:
         orm_mode = True

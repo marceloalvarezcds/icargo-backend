@@ -209,6 +209,7 @@ class OrdenCargaList(OrdenCargaForm):
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
+    condicion_propietario_tarifa: int #Agregar para vista OC
     # Campos para la edición
     estado: EstadoEnum
     orden_carga_estado: OrdenCargaEstadoEnum

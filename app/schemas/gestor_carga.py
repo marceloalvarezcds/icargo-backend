@@ -54,3 +54,4 @@ class GestorCargaList(GestorCarga):
     pais_nombre: Optional[str] = None
     pais_nombre_corto: Optional[str] = None
     tipo_documento_descripcion: Optional[str] = None
+    created_by: str #Agregar para vista GC

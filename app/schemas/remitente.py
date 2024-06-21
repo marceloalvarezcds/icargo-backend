@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 
@@ -42,6 +43,7 @@ class RemitenteBase(RemitenteBaseModel):
     logo: Optional[str] = None
     estado: EstadoEnum
     ciudad: Optional[Ciudad] = None
+    
 
 
 class RemitenteList(RemitenteBase):
@@ -51,7 +53,8 @@ class RemitenteList(RemitenteBase):
     pais_nombre: Optional[str] = None
     pais_nombre_corto: Optional[str] = None
     tipo_documento_descripcion: Optional[str] = None
-
+    created_at: datetime #Agregar para vista remitente
+    created_by: str #Agregar para vista remitente
     class Config:
         orm_mode = True
         use_enum_values = True
