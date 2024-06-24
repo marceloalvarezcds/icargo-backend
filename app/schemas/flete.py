@@ -169,6 +169,7 @@ class FleteList(FleteFormBaseModel):
     merma_propietario_es_porcentual_descripcion: str
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
+    condicion_cantidad: RoundedDecimal
     tipo_flete: Optional[TipoFleteEnum] = None
     info: str
     created_by: str
