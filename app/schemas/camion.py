@@ -141,6 +141,7 @@ class CamionList(BaseModel):
     foto: Optional[str] = None
     foto_camion: Optional[str] =  None
     oc_activa: int
+    anho: Optional[int] = None
     created_by: str
     created_at: datetime
     modified_by: str
