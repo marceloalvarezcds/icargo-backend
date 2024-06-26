@@ -119,3 +119,8 @@ class Instrumento(AuditMixin, Base):
     @hybrid_property
     def via_descripcion(self):
         return self.via.descripcion
+    
+    @hybrid_property
+    def fecha_cobro(self):
+        return self.liquidacion.fecha_cobro
+

@@ -41,3 +41,15 @@ class Caja(AuditMixin, Base):
     @hybrid_property
     def moneda_simbolo(self):
         return self.moneda.simbolo
+    
+    @hybrid_property
+    def credito(self):
+        if self.instrumentos:
+            return self.instrumentos[0].credito
+        return None
+    
+    @hybrid_property
+    def debito(self):
+        if self.instrumentos:
+            return self.instrumentos[0].debito
+        return None    

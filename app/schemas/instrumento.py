@@ -13,6 +13,7 @@ class InstrumentoFormBaseModel(BaseModel):
     caja_id: Optional[int]
     banco_id: Optional[int]
     fecha_instrumento: Date
+    fecha_cobro: Optional[Date]
     numero_referencia: Optional[str] = None
     comentario: Optional[str] = None
     # Solo para cheque

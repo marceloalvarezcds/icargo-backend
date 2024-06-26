@@ -24,6 +24,8 @@ class Banco(BancoForm):
     estado: EstadoEnum
     instrumentos: List[Instrumento]
     # Campos calculados
+    credito: Optional[RoundedDecimal]
+    debito: Optional[RoundedDecimal]
     moneda_nombre: str
     moneda_simbolo: str
     saldo_confirmado: Optional[RoundedDecimal]
@@ -44,6 +46,15 @@ class Banco(BancoForm):
     def set_saldo_confirmado(cls, saldo_confirmado):
         return saldo_confirmado or Decimal(0)
 
+    
     @validator("saldo_provisional")
     def set_saldo_provisional(cls, saldo_provisional):
         return saldo_provisional or Decimal(0)
+    
+    @validator("credito")
+    def set_credito(cls, credito):
+        return credito or Decimal(0)    
+    
+    @validator("debito")
+    def set_debito(cls, debito):
+        return debito or Decimal(0)      
