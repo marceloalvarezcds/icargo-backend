@@ -90,6 +90,7 @@ class CombinacionCreateModel(CombinacionBaseModel):
 
 class Combinaciones(CombinacionGet):
     propietario_nombre: Optional[str] = None
+    propietario_ruc: Optional[str] = None
     chofer_nombre: str
     producto_descripcion: Optional[str] = None
     semi_placa: str
@@ -97,6 +98,10 @@ class Combinaciones(CombinacionGet):
     camion_placa: str
     marca_descripcion_semi: Optional[str] = None
     foto_camion: Optional[str] = None
+    color_camion: Optional[str] = None
+    chofer_numero_documento: Optional[str] = None
+    puede_recibir_anticipos: bool
+    anticipo_propietario: bool
     class Config:
         orm_mode = True
 
