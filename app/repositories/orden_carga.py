@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List, Optional
 
+from app.models.permiso import Permiso
+from app.models.rol import Rol
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from sqlalchemy.sql.expression import true  # type: ignore
@@ -58,6 +60,10 @@ def get_orden_carga_list_by_gestor_carga_id(
 
 def get_orden_carga_by_id(db: Session, id: int) -> Optional[OrdenCarga]:
     return db.query(OrdenCarga).filter(OrdenCarga.id == id).first()
+
+
+def get_combinacion_by_orden_carga(db: Session, id: int) -> Optional[OrdenCarga]:
+    return db.query(OrdenCarga).filter(OrdenCarga.combinacion_id == id).first()
 
 
 def get_orden_carga_with_anticipo_liberado_by_chofer_id_query(
@@ -133,6 +139,22 @@ def get_orden_carga_with_anticipo_liberado_list_by_propietario_id(
         db, propietario_id
     ).all()
 
+def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> bool:
+    rol = db.query(Rol).filter_by(id=rol_id).first()
+    if not rol:
+        return False
+
+    permiso = db.query(Permiso).filter_by(descripcion=permiso_descripcion).first()
+
+    if permiso and permiso in rol.permisos:
+        return True
+    return False
+
+
+def get_rol_id_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> Optional[int]:
+    rol = db.query(Rol).filter_by(gestor_carga_id=gestor_carga_id).first()
+    return rol.id if rol else None
+
 
 def create_orden_carga(
     db: Session,
@@ -141,11 +163,21 @@ def create_orden_carga(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> OrdenCarga:
+    rol_id = get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
+
+    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 1 - orden de carga", db)
+
+    if roles_permisos:
+        estado_inicial = EstadoEnum.ACEPTADO
+    else:
+        estado_inicial = EstadoEnum.NUEVO
+
     obj = OrdenCarga(
         camion_id=data.camion_id,
         camion_semi_neto_id=data.camion_semi_neto_id,
         semi_id=data.semi_id,
         flete_id=data.flete_id,
+        combinacion_id=data.combinacion_id,
         cantidad_nominada=data.cantidad_nominada,
         comentarios=data.comentarios,
         origen_id=flete.origen_id,
@@ -181,8 +213,9 @@ def create_orden_carga(
     db.add(obj)
     db.commit()
     db.refresh(obj)
-    create_orden_carga_estado_historial(db, obj.id, EstadoEnum.NUEVO, modified_by)
-    return obj
+    create_orden_carga_estado_historial(db, obj.id, estado_inicial, modified_by)
+    return change_orden_carga_status(obj, db, estado_inicial, modified_by)
+    
 
 
 def edit_orden_carga(

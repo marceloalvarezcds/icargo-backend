@@ -38,26 +38,42 @@ def get_combinacion_list_by_gestor_carga_id(
             and_(
                 Combinacion.gestor_carga_id == gestor_carga_id,
                 Combinacion.estado != EstadoEnum.ELIMINADO.value,
-            )
+            ),
+            Combinacion.estado != EstadoEnum.ELIMINADO.value,
         )
         .order_by(Combinacion.id.desc()) 
         .all()
     )
 
 
+def get_combinacion_list_by_camion_id(
+    db: Session, camion_id: int
+) -> List[Combinacion]:
+    return (
+        db.query(Combinacion)
+        .filter(
+            and_(
+                Combinacion.camion_id == camion_id,
+                Combinacion.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(
+            Combinacion.camion_id, Combinacion.semi_id
+        )
+        .all()
+    )
 
 
 
 ####################################################################################
 
 def get_camion_list_by_combinacion_id(
-    db: Session, camion_id: int, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int]
 ) -> List[Combinacion]:
     return (
         db.query(Combinacion)
         .filter(
             and_(
-                # Combinacion.camion_id == camion_id,
                 Combinacion.gestor_carga_id == gestor_carga_id,
                 Combinacion.estado == EstadoEnum.ACTIVO.value,
             )

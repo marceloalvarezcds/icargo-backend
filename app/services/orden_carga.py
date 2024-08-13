@@ -65,7 +65,7 @@ def create_complementos_and_descuentos(
         create_orden_carga_complemento_by_flete(db, obj, c, modified_by)
     for d in flete.descuentos:
         create_orden_carga_descuento_by_flete(db, obj, d, modified_by)
-
+        
 
 def create_orden_carga(
     db: Session,
@@ -131,6 +131,12 @@ def get_orden_carga_detail(
     db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
+
+def get_orden_carga_combinacion_detail(
+    db: Session, id: int, current_user: schemas.AuthUser
+) -> schemas.OrdenCarga:
+    obj = repositories.get_combinacion_by_orden_carga(db, id)
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 

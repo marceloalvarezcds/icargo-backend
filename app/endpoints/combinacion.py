@@ -13,6 +13,17 @@ from app.enums import PermisoModeloEnum as m
 
 api = APIRouter()
 
+@api.get(
+    "/camion/{camion_id}",
+    response_model=List[schemas.CombinacionGet],
+)
+async def read_combinacion_by_camion_id(
+    camion_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.COMBINACION)),  # noqa: B008
+):
+    return repositories.get_combinacion_list_by_camion_id(db, camion_id)
+
 
 @api.get("/", response_model=List[schemas.CombinacionesBD])
 async def read_combinacion_list(

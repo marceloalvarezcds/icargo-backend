@@ -51,6 +51,8 @@ def get_orden_carga_by_id(db: Session, id: int) -> OrdenCarga:
     return obj
 
 
+
+
 def get_orden_carga_anticipo_saldo_by_id(
     db: Session, id: int
 ) -> OrdenCargaAnticipoSaldo:

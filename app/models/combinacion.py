@@ -45,8 +45,6 @@ class Combinacion(AuditMixin, Base):
     def camion_placa(self):
         return self.camion.placa 
     
-
-    
     @hybrid_property
     def camion_oc_activa(self):
         return self.camion.limite_cantidad_oc_activas if self.camion else None
@@ -62,6 +60,14 @@ class Combinacion(AuditMixin, Base):
     @hybrid_property
     def foto_camion(self):
         return self.camion.foto if self.camion else None
+    
+    @hybrid_property
+    def camion_propietario_nombre(self):
+        return self.camion.propietario.nombre
+    
+    @hybrid_property
+    def camion_propietario_documento(self):
+        return self.camion.propietario.ruc
     
     @hybrid_property
     def marca_descripcion_semi(self):

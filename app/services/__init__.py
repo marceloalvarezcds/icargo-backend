@@ -27,6 +27,7 @@ from .camion import (  # noqa
     edit_camion,
     get_camion_by_id,
     get_camion_reports,
+
 )
 from .camion_semi_neto import (  # noqa
     create_camion_semi_neto,
@@ -195,6 +196,7 @@ from .orden_carga import (  # noqa
     get_orden_carga_resumen_pdf_by_id,
     liquidar_orden_carga,
     send_oc_mail,
+    get_orden_carga_combinacion_detail,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
@@ -332,7 +334,7 @@ from .combinacion import (
     get_combinacion_by_gestor_cuenta_and_combinacion_id,
     change_combinacion_status,
     get_combinacion_list,
-    get_camion_list_by_combinacion_id,
+    get_camion_list_combinacion,
     get_semi_list_by_camion_id,
     get_combinacion_by_camion_id_and_semi_id_,
 )

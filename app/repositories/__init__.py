@@ -297,6 +297,7 @@ from .orden_carga import (  # noqa
     get_orden_carga_with_anticipo_liberado_list_by_chofer_id,
     get_orden_carga_with_anticipo_liberado_list_by_propietario_id,
     liquidar_orden_carga,
+    get_combinacion_by_orden_carga
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
@@ -527,4 +528,5 @@ from .combinacion import(
     get_combinacion_semi_ids,
     get_combinacion_tracto_semi_chofer_propietario_ids,
     get_combinacion_tracto_ids,
+    get_combinacion_list_by_camion_id,
 )

@@ -93,6 +93,8 @@ class Combinaciones(CombinacionGet):
     propietario_ruc: Optional[str] = None
     chofer_nombre: str
     producto_descripcion: Optional[str] = None
+    camion_propietario_nombre: Optional[str] = None
+    camion_propietario_documento: Optional[str] = None
     semi_placa: str
     marca_descripcion: Optional[str] = None
     camion_placa: str

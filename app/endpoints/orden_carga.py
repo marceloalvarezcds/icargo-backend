@@ -1,10 +1,11 @@
 from typing import List
 
+from app.enums.estado import EstadoEnum
 from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import schemas, services
+from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
@@ -38,6 +39,16 @@ async def read_orden_carga_by_id(
     _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.get_orden_carga_detail(db, id, current_user)
+
+
+@api.get("/{id}/combinacion", response_model=schemas.OrdenCarga)
+async def read_combinacion_by_orden_carga_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_orden_carga_combinacion_detail(db, id, current_user)
 
 
 @api.post("/", response_model=schemas.OrdenCarga)
@@ -215,3 +226,25 @@ async def send_mail_orden_carga(
     _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.send_oc_mail(db, id)
+
+
+@api.get("/{id}/active", response_model=schemas.OrdenCarga)
+def active_combinacion_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return repositories.change_orden_carga_status(db, id, EstadoEnum.CONCILIADO, current_user.username)
+
+
+@api.get("/{id}/inactive", response_model=schemas.OrdenCarga)
+def inactive_combinacion_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.COMBINACION)),  # noqa: B008
+):
+    return services.change_combinacion_status(
+        db, id, EstadoEnum.INACTIVO, current_user.username
+    )

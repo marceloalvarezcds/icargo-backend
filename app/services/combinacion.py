@@ -70,10 +70,10 @@ async def rol_tiene_permiso_cambiar_estado(
 ###################################
 
 def get_camion_by_combinacion_id(
-    db: Session, camion_id: int, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int]
 ) -> List[Combinacion]:
     camion_semi_neto_list = repositories.get_camion_list_by_combinacion_id(
-        db, camion_id, gestor_carga_id
+        db,  gestor_carga_id
     )
     # camion_semi_neto_list.extend(
     #     repositories.get_camion_combinacion_id_null(db, gestor_carga_id)
@@ -81,13 +81,13 @@ def get_camion_by_combinacion_id(
     return camion_semi_neto_list
 
 
-def get_camion_list_by_combinacion_id(
-    db: Session, camion_id: int, gestor_carga_id: Optional[int]
+def get_camion_list_combinacion(
+    db: Session, gestor_carga_id: Optional[int]
 ) -> List[Camion]:
     id_list: List[int] = []
     filtered_list: List[Camion] = []
     original_list = get_camion_by_combinacion_id(
-        db, camion_id, gestor_carga_id
+        db, gestor_carga_id
     )
     camion_list: List[Camion] = list(map(lambda x: x.camion, original_list))
     for item in camion_list:

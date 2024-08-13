@@ -31,9 +31,13 @@ class OrdenCargaForm(BaseModel):
     semi_id: int
     flete_id: int
     camion_semi_neto_id: Optional[int] = None
+    combinacion_id: Optional[int] = None
     cantidad_nominada: RoundedDecimal
     comentarios: Optional[str] = None
-
+   
+    class Config:
+        orm_mode = True
+        use_enum_values = True    
 
 class OrdenCargaBaseModel(BaseModel):
     camion_id: Optional[int] = None
@@ -78,6 +82,9 @@ class OrdenCargaEditForm(OrdenCargaBaseModel):
 class OrdenCarga(OrdenCargaBaseModel):
     id: int
     # Datos de camion
+    camion_marca: Optional[str] = None
+    combinacion_id: Optional[int] = None
+    camion_color: Optional[str] = None
     camion_chofer_nombre: Optional[str] = None
     camion_chofer_numero_documento: Optional[str] = None
     camion_chofer_puede_recibir_anticipos: bool
@@ -87,11 +94,19 @@ class OrdenCarga(OrdenCargaBaseModel):
     camion_total_anticipos_retirados_en_estado_pendiente_o_en_proceso: Optional[
         RoundedDecimal
     ] = None
+    # Combinacion
     camion_placa: str
     camion_propietario_nombre: str
     camion_propietario_puede_recibir_anticipos: bool
+    combinacion_chofer_doc: Optional[str] = None
+    camion_beneficiario_nombre: Optional[str] = None
+    camion_beneficiario_documento: Optional[str] = None
+    camion_propietario_documento: Optional[str] = None
+    neto: Optional[int] = None
     # Datos de semi
     semi_placa: str
+    semi_marca: Optional[str] = None
+    semi_color: Optional[str] = None
     # Datos de fletes
     flete_anticipo_maximo: RoundedDecimal
     flete_destino_id: Optional[int] = None
@@ -110,9 +125,13 @@ class OrdenCarga(OrdenCargaBaseModel):
     flete_remitente_numero_documento: str
     flete_tarifa: RoundedDecimal
     flete_tipo: Optional[TipoFleteEnum] = None
+    flete_saldo: Optional[int] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
+    condicion_gestor_cuenta_tarifa: Optional[int] = None
+    resultado_gestor_carga_saldo_total: Optional[int] = None
+
     # Historial de Estados
     is_aceptado: bool
     is_cancelado: bool
@@ -196,6 +215,7 @@ class OrdenCargaList(OrdenCargaForm):
     camion_propietario_nombre: str
     # Datos de semi
     semi_placa: str
+    beneficiario_descripcion: Optional[str] = None
     # Datos de fletes
     flete_destino_nombre: Optional[str] = None
     flete_gestor_carga_id: int

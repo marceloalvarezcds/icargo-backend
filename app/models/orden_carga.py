@@ -30,6 +30,7 @@ from app.utils import get_flete_detalle, get_merma_detalle
 
 from .camion import Camion
 from .camion_semi_neto import CamionSemiNeto
+from .combinacion import Combinacion
 from .centro_operativo import CentroOperativo
 from .flete import Flete
 from .gestor_carga import GestorCarga
@@ -43,6 +44,8 @@ class OrdenCarga(AuditMixin, Base):
     camion = relationship(Camion, uselist=False)
     camion_semi_neto_id = Column(Integer, ForeignKey("camion_semi_neto.id"))
     camion_semi_neto = relationship(CamionSemiNeto, uselist=False)
+    combinacion_id = Column(Integer, ForeignKey("combinacion.id"))
+    combinacion = relationship(Combinacion, uselist=False)
     semi_id = Column(Integer, ForeignKey("semi.id"))
     semi = relationship(Semi, uselist=False)
     flete_id = Column(Integer, ForeignKey("flete.id"))
@@ -115,6 +118,7 @@ class OrdenCarga(AuditMixin, Base):
         "OrdenCargaRemisionDestino", back_populates="orden_carga"
     )
 
+
     @hybrid_property
     def anticipos_liberados_descripcion(self):
         return "Liberados" if self.anticipos_liberados else "Bloqueados"
@@ -122,6 +126,18 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def camion_chofer_nombre(self):
         return self.camion.chofer_nombre
+    
+    @hybrid_property
+    def combinacion_chofer_doc(self):
+        return self.combinacion.chofer.ruc
+    
+    @hybrid_property
+    def camion_marca(self):
+        return self.camion.marca.descripcion
+    
+    @hybrid_property
+    def camion_color(self):
+        return self.camion.color.descripcion
 
     @hybrid_property
     def camion_chofer_numero_documento(self):
@@ -162,11 +178,32 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def camion_propietario_nombre(self):
         return self.camion.propietario_nombre
+    
+    @hybrid_property
+    def camion_propietario_documento(self):
+        return self.camion.propietario.ruc
 
     @hybrid_property
     def camion_propietario_puede_recibir_anticipos(self):
         return self.camion.propietario_puede_recibir_anticipos
-
+    
+    @hybrid_property
+    def camion_beneficiario_nombre(self):
+        return self.combinacion.propietario.nombre
+    
+    @hybrid_property
+    def camion_beneficiario_documento(self):
+        return self.combinacion.propietario.ruc
+    
+    
+    @hybrid_property
+    def neto(self):
+      return self.combinacion.neto
+    
+    @hybrid_property
+    def condicion_gestor_cuenta_tarifa(self):
+        return self.flete.condicion_gestor_cuenta_tarifa
+    
     @hybrid_property
     def cantidad_destino(self):
         return self.get_remision_cantidad_total_kg(self.remisiones_destino)
@@ -202,6 +239,11 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def total_anticipo_complemento(self):
         return sum(x.propietario_monto for x in self.complementos if x.anticipado)
+    
+
+    @hybrid_property
+    def flete_saldo(self):
+      return self.flete.condicion_cantidad
 
     @hybrid_property
     def flete_anticipo_maximo(self):
@@ -408,6 +450,14 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def semi_placa(self):
         return self.semi.placa
+    
+    @hybrid_property
+    def marca_semi(self):
+        return self.semi.marca.descripcion
+    
+    @hybrid_property
+    def semi_color(self):
+        return self.semi.color.descripcion
 
     # INICIO RESULTADO
 
@@ -502,6 +552,7 @@ class OrdenCarga(AuditMixin, Base):
             self.resultado_propietario_saldo
             + self.resultado_propietario_total_anticipos_retirados
         )
+
 
     @hybrid_property
     def resultado_propietario_tarifa_flete(self):
