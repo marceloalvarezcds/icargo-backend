@@ -3,9 +3,9 @@ from typing import List, Optional, Tuple
 from sqlalchemy import case, func, literal_column, null  # type: ignore
 from sqlalchemy.engine.row import Row  # type: ignore
 from sqlalchemy.orm import Query, Session  # type: ignore
-from sqlalchemy.sql.elements import and_  # type: ignore
+from sqlalchemy.sql.elements import and_, or_  # type: ignore
 
-from app.enums import EstadoEnum, TipoContraparteEnum
+from app.enums import EstadoEnum, TipoContraparteEnum, LiquidacionEstadoEnum
 from app.models import (
     Chofer,
     Liquidacion,
@@ -105,13 +105,98 @@ def get_estado_cuenta_case_statement() -> Tuple:
     )
 
 
+def get_estado_cuenta_case_statement_new() -> Tuple:
+    return (
+        Movimiento.tipo_contraparte_id.label("tipo_contraparte_id"),
+        TipoContraparte.descripcion.label("tipo_contraparte_descripcion"),
+        Movimiento.gestor_carga_id.label("gestor_carga_id"),
+        case(
+            (
+                and_(
+                    or_(
+                        Movimiento.liquidacion_id == null(),
+                        Liquidacion.estado == LiquidacionEstadoEnum.CANCELADO.value
+                        ),
+                    Movimiento.estado == EstadoEnum.PENDIENTE.value,
+                ),
+                Movimiento.monto,
+            ),
+            else_=literal_column("0"),
+        ).label("pendiente"),
+        case(
+            (
+                and_(
+                    or_(
+                        Liquidacion.etapa == LiquidacionEstadoEnum.SALDO_ABIERTO,
+                        Liquidacion.etapa == LiquidacionEstadoEnum.SALDO_CERRADO
+                        ),
+                    Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                ),
+                Movimiento.monto,
+            ),
+            else_=literal_column("0"),
+        ).label("confirmado"),
+        case(
+            (
+                and_(
+                    Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+                    Movimiento.estado == EstadoEnum.FINALIZADO.value,
+                ),
+                Movimiento.monto,
+            ),
+            else_=literal_column("0"),
+        ).label("finalizado"),
+
+        case(
+            (
+                and_(
+                    Movimiento.liquidacion_id == null(),
+                    Movimiento.estado == EstadoEnum.PENDIENTE.value,
+                ),
+                literal_column("1"),
+            ),
+            else_=literal_column("0"),
+        ).label("cantidad_pendiente"),
+        case(
+            (
+                and_(
+                    Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
+                    Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                ),
+                literal_column("1"),
+            ),
+            else_=literal_column("0"),
+        ).label("cantidad_en_proceso"),
+        case(
+            (
+                and_(
+                    Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
+                    Movimiento.estado == EstadoEnum.CONFIRMADO.value,
+                ),
+                literal_column("1"),
+            ),
+            else_=literal_column("0"),
+        ).label("cantidad_confirmado"),
+        case(
+            (
+                and_(
+                    Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+                    Movimiento.estado == EstadoEnum.FINALIZADO.value,
+                ),
+                literal_column("1"),
+            ),
+            else_=literal_column("0"),
+        ).label("cantidad_finalizado"),
+    )
+
+
 def get_estado_cuenta_chofer(db: Session) -> Query:
     return (
         db.query(
             Movimiento.chofer_id.label("contraparte_id"),
             Chofer.nombre.label("contraparte"),
             Chofer.numero_documento.label("contraparte_numero_documento"),
-            *get_estado_cuenta_case_statement(),
+            *get_estado_cuenta_case_statement_new(),
         )
         .join(Movimiento.chofer)
         .join(Movimiento.tipo_contraparte)
@@ -178,6 +263,7 @@ def get_estado_cuenta_otro(db: Session) -> Query:
 
 
 def get_estado_cuenta_subquery(db: Session) -> Query:
+    # en reu deben definirme los tipos
     chofer = get_estado_cuenta_chofer(db)
     propietario = get_estado_cuenta_propietario(db)
     proveedor = get_estado_cuenta_proveedor(db)
