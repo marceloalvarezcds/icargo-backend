@@ -11,13 +11,26 @@ from app.config import REPORTS_FOLDER
 from app.enums import TipoContraparteEnum
 from app.schemas import EstadoCuenta
 
+from app.logger import logger
+
 
 def get_estado_cuenta_list(
-    db: Session, gestor_carga_id: Optional[int] = None
+    db: Session, gestor_carga_id: Optional[int] = None,
+    tipo_contraparte: Optional[str] = None,
+    contraparte: Optional[str] = None,
+    orderBy: Optional[str] = None,
+    orderdir: Optional[str] = None
 ) -> List[EstadoCuenta]:
+
+    logger.info("test")
+    logger.info("metodo get_estado_cuenta_list")
+    logger.info(f"param1 {gestor_carga_id}")
+    logger.info(f"param2 {tipo_contraparte}")
+    logger.info(f"param3 {contraparte}")
+
     if gestor_carga_id:
         results = repositories.get_estado_cuenta_list_by_gestor_carga_id(
-            db, gestor_carga_id
+            db, gestor_carga_id, tipo_contraparte, contraparte, orderBy, orderdir
         )
     else:
         results = repositories.get_estado_cuenta_list(db)

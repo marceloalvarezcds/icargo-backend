@@ -16,6 +16,7 @@ from app.models import (
     TipoContraparte,
 )
 
+from app.logger import logger
 
 def get_estado_cuenta_case_statement() -> Tuple:
     return (
@@ -127,8 +128,8 @@ def get_estado_cuenta_case_statement_new() -> Tuple:
             (
                 and_(
                     or_(
-                        Liquidacion.etapa == LiquidacionEstadoEnum.SALDO_ABIERTO,
-                        Liquidacion.etapa == LiquidacionEstadoEnum.SALDO_CERRADO
+                        Liquidacion.etapa == LiquidacionEstadoEnum.SALDO_ABIERTO.value,
+                        Liquidacion.etapa == LiquidacionEstadoEnum.SALDO_CERRADO.value
                         ),
                     Movimiento.estado == EstadoEnum.EN_PROCESO.value,
                 ),
@@ -210,7 +211,7 @@ def get_estado_cuenta_propietario(db: Session) -> Query:
             Movimiento.propietario_id.label("contraparte_id"),
             Propietario.nombre.label("contraparte"),
             Propietario.ruc.label("contraparte_numero_documento"),
-            *get_estado_cuenta_case_statement(),
+            *get_estado_cuenta_case_statement_new(),
         )
         .join(Movimiento.propietario)
         .join(Movimiento.tipo_contraparte)
@@ -224,7 +225,7 @@ def get_estado_cuenta_proveedor(db: Session) -> Query:
             Movimiento.proveedor_id.label("contraparte_id"),
             Proveedor.nombre.label("contraparte"),
             Proveedor.numero_documento.label("contraparte_numero_documento"),
-            *get_estado_cuenta_case_statement(),
+            *get_estado_cuenta_case_statement_new(),
         )
         .join(Movimiento.proveedor)
         .join(Movimiento.tipo_contraparte)
@@ -238,7 +239,7 @@ def get_estado_cuenta_remitente(db: Session) -> Query:
             Movimiento.remitente_id.label("contraparte_id"),
             Remitente.nombre.label("contraparte"),
             Remitente.numero_documento.label("contraparte_numero_documento"),
-            *get_estado_cuenta_case_statement(),
+            *get_estado_cuenta_case_statement_new(),
         )
         .join(Movimiento.remitente)
         .join(Movimiento.tipo_contraparte)
@@ -254,7 +255,7 @@ def get_estado_cuenta_otro(db: Session) -> Query:
             Movimiento.contraparte_numero_documento.label(
                 "contraparte_numero_documento"
             ),
-            *get_estado_cuenta_case_statement(),
+            *get_estado_cuenta_case_statement_new(),
         )
         .join(Movimiento.tipo_contraparte)
         .outerjoin(Movimiento.liquidacion)
@@ -272,9 +273,9 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
     return chofer.union_all(propietario, proveedor, remitente, otro)
 
 
-def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
-    return (
-        db.query(
+def get_estado_cuenta_group_by_query(db: Session, table: Query, \
+                    orderBy: Optional[str] = None, orderdir: Optional[str] = None) -> Query:
+    query = db.query(
             table.c.contraparte_id.label("contraparte_id"),
             table.c.contraparte.label("contraparte"),
             table.c.contraparte_numero_documento.label("contraparte_numero_documento"),
@@ -282,15 +283,14 @@ def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
             table.c.tipo_contraparte_descripcion.label("tipo_contraparte_descripcion"),
             table.c.gestor_carga_id.label("gestor_carga_id"),
             func.sum(table.c.pendiente).label("pendiente"),
-            func.sum(table.c.en_proceso).label("en_proceso"),
+            #func.sum(table.c.en_proceso).label("en_proceso"),
             func.sum(table.c.confirmado).label("confirmado"),
             func.sum(table.c.finalizado).label("finalizado"),
             func.sum(table.c.cantidad_pendiente).label("cantidad_pendiente"),
             func.sum(table.c.cantidad_en_proceso).label("cantidad_en_proceso"),
             func.sum(table.c.cantidad_confirmado).label("cantidad_confirmado"),
-            func.sum(table.c.cantidad_finalizado).label("cantidad_finalizado"),
-        )
-        .group_by(
+            func.sum(table.c.cantidad_finalizado).label("cantidad_finalizado")
+        ).group_by(
             table.c.contraparte_id,
             table.c.contraparte,
             table.c.contraparte_numero_documento,
@@ -298,7 +298,12 @@ def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
             table.c.tipo_contraparte_descripcion,
             table.c.gestor_carga_id,
         )
-        .order_by(
+
+    if orderBy:
+        #if orderBy == 'contraparte':
+        return query
+
+    query = query.order_by(
             table.c.contraparte,
             table.c.contraparte_numero_documento,
             table.c.tipo_contraparte_id,
@@ -306,7 +311,43 @@ def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
             table.c.contraparte_id,
             table.c.gestor_carga_id,
         )
-    )
+
+    return query
+
+    # return (
+    #     db.query(
+    #         table.c.contraparte_id.label("contraparte_id"),
+    #         table.c.contraparte.label("contraparte"),
+    #         table.c.contraparte_numero_documento.label("contraparte_numero_documento"),
+    #         table.c.tipo_contraparte_id.label("tipo_contraparte_id"),
+    #         table.c.tipo_contraparte_descripcion.label("tipo_contraparte_descripcion"),
+    #         table.c.gestor_carga_id.label("gestor_carga_id"),
+    #         func.sum(table.c.pendiente).label("pendiente"),
+    #         #func.sum(table.c.en_proceso).label("en_proceso"),
+    #         func.sum(table.c.confirmado).label("confirmado"),
+    #         func.sum(table.c.finalizado).label("finalizado"),
+    #         func.sum(table.c.cantidad_pendiente).label("cantidad_pendiente"),
+    #         func.sum(table.c.cantidad_en_proceso).label("cantidad_en_proceso"),
+    #         func.sum(table.c.cantidad_confirmado).label("cantidad_confirmado"),
+    #         func.sum(table.c.cantidad_finalizado).label("cantidad_finalizado"),
+    #     )
+    #     .group_by(
+    #         table.c.contraparte_id,
+    #         table.c.contraparte,
+    #         table.c.contraparte_numero_documento,
+    #         table.c.tipo_contraparte_id,
+    #         table.c.tipo_contraparte_descripcion,
+    #         table.c.gestor_carga_id,
+    #     )
+    #     .order_by(
+    #         table.c.contraparte,
+    #         table.c.contraparte_numero_documento,
+    #         table.c.tipo_contraparte_id,
+    #         table.c.tipo_contraparte_descripcion,
+    #         table.c.contraparte_id,
+    #         table.c.gestor_carga_id,
+    #     )
+    # )
 
 
 def get_estado_cuenta_query(db: Session) -> Query:
@@ -319,14 +360,43 @@ def get_estado_cuenta_list(db: Session) -> List[Row]:
 
 
 def get_estado_cuenta_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: int
+    db: Session, gestor_carga_id: int,
+    tipo_contraparte: Optional[str],
+    contraparte: Optional[str],
+    orderBy: Optional[str],
+    orderdir: Optional[str] = None
 ) -> List[Row]:
-    table = (
-        get_estado_cuenta_subquery(db)
-        .filter(Movimiento.gestor_carga_id == gestor_carga_id)
-        .subquery()
-    )
-    return get_estado_cuenta_group_by_query(db, table).all()
+    # solo si tiene los filtros se debe agregar sino no agregar
+
+    logger.info(f"gestor_carga_id {gestor_carga_id}")
+    logger.info(f"tipo_contraparte {tipo_contraparte}")
+
+    query = get_estado_cuenta_subquery(db)\
+            .filter(Movimiento.gestor_carga_id == gestor_carga_id)
+
+    if tipo_contraparte and tipo_contraparte != 'TODOS' :
+        query = query.filter(TipoContraparte.descripcion.ilike(tipo_contraparte))
+
+    if contraparte and contraparte != 'TODOS' :
+        logger.info(f"contraparte {contraparte}")
+        query = query.filter(Movimiento.contraparte.ilike(contraparte))
+
+    table = (query.subquery())
+
+    # table = (
+    #     get_estado_cuenta_subquery(db)
+    #     .filter(Movimiento.gestor_carga_id == gestor_carga_id)
+    #     .filter(TipoContraparte.descripcion.ilike(tipo_contraparte))
+    #     .subquery()
+    # )
+
+    query = get_estado_cuenta_group_by_query(db, table, orderBy, orderdir)
+
+    query = query.order_by()
+
+    return query.all()
+
+    #return get_estado_cuenta_group_by_query(db, table, orderBy).all()
 
 
 def get_estado_cuenta_by_contraparte_and_tipo(

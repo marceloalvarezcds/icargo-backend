@@ -21,11 +21,16 @@ async def read_estado_cuenta_list(
 
 @api.get("/gestor_carga_id", response_model=List[schemas.EstadoCuenta])
 async def read_estado_cuenta_list_by_gestor_carga_id(
+    tipo_contraparte : str = None,
+    contraparte : str = None,
+    orderBy: str = None,
+    orderdir: str = None,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.ESTADO_CUENTA)),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
-    return services.get_estado_cuenta_list(db, current_user.gestor_carga_id)
+    return services.get_estado_cuenta_list(db, current_user.gestor_carga_id,\
+                        tipo_contraparte, contraparte, orderBy, orderdir)
 
 
 @api.get(
