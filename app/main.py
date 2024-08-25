@@ -1,4 +1,4 @@
-import sentry_sdk
+# import sentry_sdk
 import uvicorn  # type: ignore
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
@@ -15,11 +15,11 @@ from app.config import (
 from app.endpoints import api
 from app.middlewares import AuditRequestMiddleware
 
-if SENTRY_URL:
-    sentry_sdk.init(
-        dsn=SENTRY_URL,
-        traces_sample_rate=1.0,
-    )
+# if SENTRY_URL:
+#    sentry_sdk.init(
+#        dsn=SENTRY_URL,
+#        traces_sample_rate=1.0,
+#    )
 
 app.mount(
     f"/{REPORTS_FOLDER_NAME}",
