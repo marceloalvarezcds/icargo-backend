@@ -3,6 +3,7 @@ from datetime import datetime
 from http import HTTPStatus
 from typing import List, Optional, cast
 
+from app.models.combinacion import Combinacion
 from fastapi import HTTPException
 from jinja2 import Template
 from openpyxl import Workbook  # type: ignore
@@ -27,7 +28,7 @@ from .orden_carga_anticipo_porcentaje import (
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list,
     edit_orden_carga_anticipo_porcentaje_by_oc_porcentaje_anticipos,
 )
-from .orden_carga_anticipo_saldo import get_orden_carga_by_id
+from .orden_carga_anticipo_saldo import get_orden_carga_by_id, get_orden_carga_by_combinacion_id
 from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete
 from .orden_carga_remision_resultado import (
@@ -41,6 +42,13 @@ def get_orden_carga_list(
 ) -> List[OrdenCarga]:
     if gestor_carga_id:
         return repositories.get_orden_carga_list_by_gestor_carga_id(db, gestor_carga_id)
+    return repositories.get_orden_carga_list(db)
+
+def get_orden_carga_list_combinacion(
+    db: Session, combinacion_id, gestor_carga_id: Optional[int]
+) -> List[OrdenCarga]:
+    if gestor_carga_id:
+        return repositories.get_orden_de_carga_by_combinacion_id(db, combinacion_id, gestor_carga_id)
     return repositories.get_orden_carga_list(db)
 
 
@@ -133,11 +141,34 @@ def get_orden_carga_detail(
     obj = get_orden_carga_by_id(db, id)
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
+
 def get_orden_carga_combinacion_detail(
     db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
-    obj = repositories.get_combinacion_by_orden_carga(db, id)
+    obj =  get_orden_carga_by_combinacion_id(db, id)
     return get_orden_carga_with_resultado(db, obj, current_user.id)
+
+
+def get_ordenes_carga_by_combinacion_id(db: Session, combinacion_id: int) -> List[OrdenCarga]:
+    ordenes_carga = (
+        db.query(OrdenCarga)
+        .filter(OrdenCarga.combinacion_id == combinacion_id)
+        .all()
+    )
+    if not ordenes_carga:
+        raise HTTPException(status_code=404, detail="No se encontraron órdenes de carga para esta combinación")
+
+    return ordenes_carga
+
+
+def get_orden_carga_list_by_combinacion_id(
+    db: Session, id: int
+) -> List[OrdenCarga]:
+    obj = repositories.get_orden_carga_by_combinacion_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Combinacion no encontrada")
+    return obj
+
 
 
 def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:

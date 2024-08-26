@@ -216,6 +216,7 @@ class OrdenCargaList(OrdenCargaForm):
     # Datos de semi
     semi_placa: str
     beneficiario_descripcion: Optional[str] = None
+    combinacion_id: Optional[int] = None
     # Datos de fletes
     flete_destino_nombre: Optional[str] = None
     flete_gestor_carga_id: int
@@ -226,10 +227,13 @@ class OrdenCargaList(OrdenCargaForm):
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
     flete_tipo: Optional[TipoFleteEnum] = None
+    flete_saldo: Optional[int] = None
+    resultado_flete_gestor_carga_merma_valor: Optional[int] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
     condicion_propietario_tarifa: int #Agregar para vista OC
+    condicion_gestor_cuenta_tarifa: Optional[int] = None
     # Campos para la edición
     estado: EstadoEnum
     orden_carga_estado: OrdenCargaEstadoEnum
@@ -255,3 +259,17 @@ class OrdenCargaList(OrdenCargaForm):
     class Config:
         orm_mode = True
         use_enum_values = True
+
+class OrdenCargaBase(BaseModel):
+    # Incluye aquí los campos necesarios para mostrar en la respuesta
+    id: Optional[int] = None
+    combinacion_id: Optional[int] = None
+
+    # Agrega más campos según sea necesario
+
+    class Config:
+        orm_mode = True
+
+class OrdenCargaGetList(OrdenCargaBase):
+    # Puedes añadir campos adicionales si lo necesitas
+    pass

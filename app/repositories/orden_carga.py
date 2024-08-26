@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
+from app.models.combinacion import Combinacion
 from app.models.permiso import Permiso
 from app.models.rol import Rol
 from sqlalchemy.orm import Query, Session  # type: ignore
@@ -19,6 +20,15 @@ def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
         db.query(OrdenCarga)
         .filter(OrdenCarga.estado != EstadoEnum.ELIMINADO.value)
         .order_by(OrdenCarga.created_by)
+        .all()
+    )
+
+def get_orden_carga_by_combinacion_id(
+    db: Session, combinacion_id: int
+) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter_by(combinacion_id=combinacion_id)
         .all()
     )
 
@@ -54,6 +64,23 @@ def get_orden_carga_list_by_gestor_carga_id(
             )
         )
         .order_by(OrdenCarga.created_by)
+        .all()
+    )
+
+def get_orden_de_carga_by_combinacion_id(
+    db: Session, combinacion_id: int, gestor_carga_id: Optional[int]
+) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter(
+            and_(
+                OrdenCarga.combinacion_id == combinacion_id,
+                OrdenCarga.gestor_carga_id == gestor_carga_id,
+            )
+        )
+        .order_by(
+            OrdenCarga.id  
+        )
         .all()
     )
 

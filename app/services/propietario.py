@@ -125,7 +125,6 @@ def get_propietario_list_by_gestor_cuenta_and_semi_id(
     return lista
 
 
-
 def get_propietario_list_by_tipo_persona_id(
     db: Session, id: int
 ) -> schemas.Propietario:
@@ -133,9 +132,6 @@ def get_propietario_list_by_tipo_persona_id(
     if not obj:
         raise HTTPException(status_code=404, detail="Propietario no encontrado")
     return obj
-
-
-
 
 
 async def edit_propietario(

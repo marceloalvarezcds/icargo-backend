@@ -21,6 +21,14 @@ async def read_orden_carga_list(
 ):
     return services.get_orden_carga_list(db, current_user.gestor_carga_id)
 
+@api.get("/anticipo", response_model=List[schemas.OrdenCargaList])
+async def read_orden_carga_list(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_orden_carga_list(db, current_user.gestor_carga_id)
+
 
 @api.get("/reports")
 async def orden_carga_reports(
@@ -41,14 +49,24 @@ async def read_orden_carga_by_id(
     return services.get_orden_carga_detail(db, id, current_user)
 
 
-@api.get("/{id}/combinacion", response_model=schemas.OrdenCarga)
-async def read_combinacion_by_orden_carga_id(
-    id: int,
+@api.get("/combinaciones/{combinacion_id}",  response_model=schemas.OrdenCarga)
+async def read_combinacion_no_list_by_orden_carga_id(
+    combinacion_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.get_orden_carga_combinacion_detail(db, id, current_user)
+    return services.get_orden_carga_combinacion_detail(db, combinacion_id, current_user)
+
+
+@api.get("/combinacion/{combinacion_id}", response_model=List[schemas.OrdenCargaList])
+async def read_combinacion_by_orden_carga_id(
+    combinacion_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_ordenes_carga_by_combinacion_id(db, combinacion_id)
 
 
 @api.post("/", response_model=schemas.OrdenCarga)
@@ -57,6 +75,19 @@ async def add_new_orden_carga(
     data: Json[schemas.OrdenCargaForm] = Form(...),  # type: ignore  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.create_orden_carga(
+        db,
+        data,  # type: ignore
+        current_user,
+    )
+
+@api.post("/{anticipo}", response_model=schemas.OrdenCarga)
+async def add_new_anticipo(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.OrdenCargaForm] = Form(...),  # type: ignore  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.create_orden_carga(
         db,

@@ -1,6 +1,7 @@
 from decimal import Decimal
 from typing import List, Optional
 
+from app.models.combinacion import Combinacion
 from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -50,6 +51,12 @@ def get_orden_carga_by_id(db: Session, id: int) -> OrdenCarga:
         raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
     return obj
 
+
+def get_orden_carga_by_combinacion_id(db: Session, combinacion_id: int)  -> OrdenCarga:
+    obj = repositories.get_combinacion_by_orden_carga(db, combinacion_id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Combinacion no encontrada")
+    return obj
 
 
 

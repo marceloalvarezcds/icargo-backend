@@ -66,6 +66,8 @@ from .orden_carga import (  # noqa
     OrdenCargaEditForm,
     OrdenCargaForm,
     OrdenCargaList,
+    OrdenCargaBase,
+    OrdenCargaGetList,
 )
 from .orden_carga_anticipo_porcentaje import (  # noqa
     OrdenCargaAnticipoPorcentaje,

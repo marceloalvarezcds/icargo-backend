@@ -195,7 +195,6 @@ class OrdenCarga(AuditMixin, Base):
     def camion_beneficiario_documento(self):
         return self.combinacion.propietario.ruc
     
-    
     @hybrid_property
     def neto(self):
       return self.combinacion.neto
