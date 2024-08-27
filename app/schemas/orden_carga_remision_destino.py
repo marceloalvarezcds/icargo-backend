@@ -24,6 +24,7 @@ class OrdenCargaRemisionDestino(OrdenCargaRemisionDestinoForm):
     unidad_descripcion: str
     destino_nombre: Optional[str] = None
     gestor_carga_moneda_nombre: str
+    lugar_descarga: str
     # Auditoría
     created_by: str
     created_at: Date

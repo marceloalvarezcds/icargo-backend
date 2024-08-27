@@ -21,6 +21,7 @@ class OrdenCargaRemisionOrigen(OrdenCargaRemisionOrigenForm):
     unidad_abreviatura: str
     unidad_descripcion: str
     gestor_carga_moneda_nombre: str
+    lugar_carga: Optional[str]
     # Auditoría
     created_by: str
     created_at: Date

@@ -36,3 +36,7 @@ class OrdenCargaRemisionOrigen(OrdenCargaRemisionMixin, Base):
     @hybrid_property
     def unidad_descripcion(self):
         return self.unidad.descripcion
+    
+    @hybrid_property
+    def lugar_carga(self):
+        return self.orden_carga.origen_nombre

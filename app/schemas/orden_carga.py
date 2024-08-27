@@ -131,6 +131,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     gestor_carga_moneda_nombre: str
     condicion_gestor_cuenta_tarifa: Optional[int] = None
     resultado_gestor_carga_saldo_total: Optional[int] = None
+    resultado_propietario_total_anticipos_retirados: Optional[int] = None
 
     # Historial de Estados
     is_aceptado: bool
@@ -188,6 +189,8 @@ class OrdenCarga(OrdenCargaBaseModel):
     total_anticipo_complemento: RoundedDecimal
     total_anticipo_retirado: RoundedDecimal
     total_anticipo_disponible: RoundedDecimal
+    resultado_propietario_total_anticipos_retirados_combustible:  Optional[RoundedDecimal] = None
+    resultado_propietario_total_anticipos_retirados_efectivo:  Optional[RoundedDecimal] = None
     # Auditoría
     created_by: str
     created_at: Date
@@ -227,6 +230,7 @@ class OrdenCargaList(OrdenCargaForm):
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
     flete_tipo: Optional[TipoFleteEnum] = None
+    monto_anticipo_retirado:  Optional[RoundedDecimal] = None
     flete_saldo: Optional[int] = None
     resultado_flete_gestor_carga_merma_valor: Optional[int] = None
     gestor_carga_id: int

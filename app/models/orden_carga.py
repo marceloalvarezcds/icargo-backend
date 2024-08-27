@@ -552,6 +552,16 @@ class OrdenCarga(AuditMixin, Base):
             + self.resultado_propietario_total_anticipos_retirados
         )
 
+    # Define una propiedad que devuelva el monto retirado específico para cada tipo
+    @hybrid_property
+    def resultado_propietario_total_anticipos_retirados_efectivo(self):
+        lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
+        return sum(x.monto_retirado for x in lista if x.concepto == 'EFECTIVO')
+
+    @hybrid_property
+    def resultado_propietario_total_anticipos_retirados_combustible(self):
+        lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
+        return sum(x.monto_retirado for x in lista if x.concepto == 'COMBUSTIBLE')
 
     @hybrid_property
     def resultado_propietario_tarifa_flete(self):
@@ -569,6 +579,11 @@ class OrdenCarga(AuditMixin, Base):
     def resultado_propietario_total_anticipos_retirados(self):
         lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
         return sum(x.monto_retirado for x in lista)
+    
+    @hybrid_property
+    def monto_anticipo_retirado(self):
+        lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
+        return lista.anticipo.monto_retirado.monto_retirado
 
     @hybrid_property
     def resultado_propietario_total_complemento(self):
