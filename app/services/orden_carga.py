@@ -150,14 +150,9 @@ def get_orden_carga_combinacion_detail(
 
 
 def get_ordenes_carga_by_combinacion_id(db: Session, combinacion_id: int) -> List[OrdenCarga]:
-    ordenes_carga = (
-        db.query(OrdenCarga)
-        .filter(OrdenCarga.combinacion_id == combinacion_id)
-        .all()
-    )
-    if not ordenes_carga:
+    ordenes_carga = db.query(OrdenCarga).filter(OrdenCarga.combinacion_id == combinacion_id).all()
+    if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontraron órdenes de carga para esta combinación")
-
     return ordenes_carga
 
 
