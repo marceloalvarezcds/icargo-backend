@@ -52,6 +52,7 @@ class Proveedor(AuditMixin, Base):
     ciudad = relationship(Ciudad, uselist=False)
     contactos = relationship("ProveedorContactoGestorCarga", back_populates="proveedor")
     gestores = relationship("GestorCargaProveedor", back_populates="proveedor")
+    puntosVenta = relationship("PuntoVenta", back_populates="proveedor")
 
     @hybrid_property
     def ciudad_nombre(self):

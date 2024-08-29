@@ -60,6 +60,7 @@ from .movimiento import (  # noqa
     MovimientoFleteEditForm,
     MovimientoForm,
     MovimientoMermaEditForm,
+    MovimientoEstadoCuenta
 )
 from .orden_carga import (  # noqa
     OrdenCarga,

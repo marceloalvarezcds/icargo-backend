@@ -26,7 +26,7 @@ from app.models import (
     TipoCuenta,
     TipoMovimiento,
 )
-from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm
+from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm, MovimientoEstadoCuenta
 from app.schemas.date_model import Date
 from app.schemas.orden_carga import OrdenCargaEditForm
 from app.schemas.rounded_decimal_model import RoundedDecimal
@@ -75,7 +75,7 @@ def get_movimiento_list_by_estado_cuenta(
     contraparte_numero_documento: str,
     estado: str,
     gestor_carga_id: Optional[int],
-) -> List[Movimiento]:
+) -> List[MovimientoEstadoCuenta]:
     if gestor_carga_id:
         return repositories.get_movimiento_list_by_contraparte_and_gestor_carga_id(
             db,
