@@ -7,6 +7,7 @@ from app.models.rol import Rol
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from sqlalchemy.sql.expression import true  # type: ignore
+from sqlalchemy import desc
 
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
 from app.models import Camion, Flete, OrdenCarga
@@ -19,7 +20,7 @@ def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
     return (
         db.query(OrdenCarga)
         .filter(OrdenCarga.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(OrdenCarga.id)
+        .order_by(desc(OrdenCarga.id)) 
         .all()
     )
 
@@ -63,7 +64,7 @@ def get_orden_carga_list_by_gestor_carga_id(
                 OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
             )
         )
-        .order_by(OrdenCarga.created_by)
+        .order_by(desc(OrdenCarga.id)) 
         .all()
     )
 
