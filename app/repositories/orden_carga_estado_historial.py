@@ -18,13 +18,6 @@ def create_orden_carga_estado_historial(
         orden_carga_id=orden_carga_id
     ).order_by(OrdenCargaEstadoHistorial.created_at.desc()).first()
     
-    if current_estado and current_estado.estado == EstadoEnum.ACEPTADO.value:
-        raise HTTPException(status_code=400, detail="La orden de carga ya ha sido aceptada.")
-
-    if current_estado and current_estado.estado == EstadoEnum.CANCELADO.value:
-        raise HTTPException(status_code=400, detail="La orden de carga ya ha sido cancelada.")
-
-    # Si no está aceptado, se procede a crear el historial
     obj = OrdenCargaEstadoHistorial(
         estado=estado.value,
         orden_carga_id=orden_carga_id,

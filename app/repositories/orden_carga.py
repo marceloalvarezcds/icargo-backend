@@ -19,7 +19,7 @@ def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
     return (
         db.query(OrdenCarga)
         .filter(OrdenCarga.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(OrdenCarga.created_by)
+        .order_by(OrdenCarga.id)
         .all()
     )
 
