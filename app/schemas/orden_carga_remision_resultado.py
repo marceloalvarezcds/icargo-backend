@@ -19,3 +19,6 @@ class OrdenCargaRemisionResultado(BaseModel):
     total_descuento: Optional[RoundedDecimal] = None
     total_anticipo: Optional[RoundedDecimal] = None
     saldo: RoundedDecimal
+    total_efectivo: Optional[RoundedDecimal] = None
+    total_combustible: Optional[RoundedDecimal] = None
+    saldo_bruto: Optional[RoundedDecimal] = None

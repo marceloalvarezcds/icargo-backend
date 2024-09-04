@@ -32,6 +32,7 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
                         orden_carga.resultado_gestor_carga_merma_valor_total_moneda_local
                     ),
                     saldo=orden_carga.resultado_gestor_carga_total_flete,
+                    saldo_bruto=orden_carga.resultado_gestor_carga_total_flete_saldo_bruto
                     # resultado_gestor_carga_saldo (calculo anterior),
                 )
             )
@@ -52,6 +53,9 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
                 total_descuento=orden_carga.resultado_propietario_total_descuento,
                 total_anticipo=orden_carga.resultado_propietario_total_anticipos_retirados,
                 saldo=orden_carga.resultado_propietario_saldo,
+                total_efectivo=orden_carga.resultado_propietario_total_anticipos_retirados_efectivo,
+                total_combustible=orden_carga.resultado_propietario_total_anticipos_retirados_combustible,
+                saldo_bruto=orden_carga.resultado_propietario_saldo_bruto
             )
         )
     return lista

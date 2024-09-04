@@ -512,6 +512,10 @@ class OrdenCarga(AuditMixin, Base):
     def resultado_gestor_carga_total_flete(self):
         return self.resultado_gestor_carga_tarifa_flete * self.cantidad_destino
 
+    @hybrid_property
+    def resultado_gestor_carga_total_flete_saldo_bruto(self):
+        return self.resultado_gestor_carga_tarifa_flete * self.cantidad_destino
+
     # fin - gestor carga
 
     # inicio - propietario
@@ -543,6 +547,19 @@ class OrdenCarga(AuditMixin, Base):
                 - self.resultado_propietario_total_descuento
             )
             - self.resultado_propietario_total_anticipos_retirados
+        )
+    
+    @hybrid_property
+    def resultado_propietario_saldo_bruto(self):
+        return (
+            (
+                self.resultado_propietario_total_flete
+                - self.resultado_propietario_merma_valor_total
+            )
+            + (
+                self.resultado_propietario_total_complemento
+                - self.resultado_propietario_total_descuento
+            )
         )
 
     @hybrid_property
