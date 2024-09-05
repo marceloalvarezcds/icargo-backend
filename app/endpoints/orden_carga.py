@@ -22,13 +22,51 @@ async def read_orden_carga_list(
     return services.get_orden_carga_list(db, current_user.gestor_carga_id)
 
 
-@api.get("/anticipo", response_model=List[schemas.OrdenCargaList])
-async def read_orden_carga_list(
+@api.post("/recepcion", response_model=List[schemas.OrdenCargaList])
+async def read_orden_carga_list_recepcion(
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.get_orden_carga_list(db, current_user.gestor_carga_id)
+
+
+@api.post("/nuevo/anticipo", response_model=List[schemas.OrdenCargaList])
+async def read_orden_carga_list_anticipo(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_orden_carga_list(db, current_user.gestor_carga_id)
+
+
+
+@api.post("/aceptar/oc/nuevas", response_model=List[schemas.OrdenCargaList])
+async def read_orden_carga_list_aceptar(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_orden_carga_list(db, current_user.gestor_carga_id)
+
+
+@api.post("/nuevo/finalizar/ocs/aceptadas", response_model=List[schemas.OrdenCargaList])
+async def read_orden_carga_list_finalizar(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_orden_carga_list(db, current_user.gestor_carga_id)
+
+
+@api.post("/nuevo/conciliar/ocs/conciliacion/final", response_model=List[schemas.OrdenCargaList])
+async def read_orden_carga_list_conciliar(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_orden_carga_list(db, current_user.gestor_carga_id)
+
 
 
 @api.get("/reports")
@@ -60,6 +98,7 @@ async def read_combinacion_by_orden_carga_id(
     return services.get_ordenes_carga_by_combinacion_id(db, combinacion_id)
 
 
+
 @api.post("/", response_model=schemas.OrdenCarga)
 async def add_new_orden_carga(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -73,14 +112,6 @@ async def add_new_orden_carga(
         current_user,
     )
 
-
-@api.get("/aceptar/oc", response_model=List[schemas.OrdenCargaList])
-async def read_orden_carga_list(
-    db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
-):
-    return services.get_orden_carga_list(db, current_user.gestor_carga_id)
 
 
 @api.put("/{id}", response_model=schemas.OrdenCarga)
@@ -107,15 +138,6 @@ async def delete_orden_carga(
     _: bool = Depends(Permiso(a.ELIMINAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.delete_orden_carga(db, id, current_user)
-
-
-@api.get("/finalizar", response_model=List[schemas.OrdenCargaList])
-async def read_orden_carga_list(
-    db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
-):
-    return services.get_orden_carga_list(db, current_user.gestor_carga_id)
 
 
 @api.get("/{id}/pdf")

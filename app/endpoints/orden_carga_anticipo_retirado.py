@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
@@ -72,3 +73,5 @@ async def delete_orden_carga_anticipo_retirado(
     ),
 ):
     return services.delete_orden_carga_anticipo_retirado(db, id, current_user.username)
+
+

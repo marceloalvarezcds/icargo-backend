@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -24,3 +25,5 @@ async def read_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
     return services.get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
         db, flete_anticipo_id, orden_carga_id, current_user.username
     )
+
+

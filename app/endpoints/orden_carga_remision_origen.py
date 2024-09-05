@@ -77,3 +77,12 @@ async def delete_orden_carga_remision_origen(
     _: bool = Depends(Permiso(a.ELIMINAR, m.ORDEN_CARGA_REMISION_ORIGEN)),  # noqa: B008
 ):
     return services.delete_orden_carga_remision_origen(db, id, current_user.username)
+
+
+@api.get("/oc/recepcion/directa", response_model=schemas.OrdenCarga)
+async def read_orden_carga_list(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_orden_carga_list(db, current_user.gestor_carga_id)
