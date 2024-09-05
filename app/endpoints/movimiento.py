@@ -251,3 +251,23 @@ async def delete_movimiento(
     _: bool = Depends(Permiso(a.ELIMINAR, m.MOVIMIENTO)),  # noqa: B008
 ):
     return services.delete_movimiento(db, id, current_user.username)
+
+
+@api.get(
+    "/reports/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}",  # noqa: B950
+)
+async def get_movimiento_reports_by_estado(
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008
+):
+    return services.get_movimiento_estado_cuenta_reports_by_contraparte(
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento
+    )

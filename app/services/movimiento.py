@@ -1,5 +1,6 @@
-from app.schemas.movimiento import MovimientoEstadoCuenta
 import os
+from typing import Union
+from app.schemas.movimiento import MovimientoEstadoCuenta
 from datetime import datetime
 from http import HTTPStatus
 from typing import List, Optional, cast
@@ -863,7 +864,7 @@ def get_movimiento_reports(
 
 
 def generate_movimiento_reports(
-    datalist: List[Movimiento], is_for_listado: bool = False
+    datalist: List[Union[MovimientoEstadoCuenta, Movimiento]], is_for_listado: bool = False, is_with_saldos: bool = False
 ) -> str:
     wb = Workbook()
     ws = wb.active
@@ -932,9 +933,10 @@ def generate_movimiento_reports(
     title_cell.value = "Nº Doc Relac."
     title_cell.font = Font(bold=True)
 
-    title_cell = ws.cell(row=1, column=(i := i + 1))
-    title_cell.value = "Monto"
-    title_cell.font = Font(bold=True)
+    if not is_with_saldos:
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Monto"
+        title_cell.font = Font(bold=True)
 
     title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Detalle"
@@ -943,6 +945,20 @@ def generate_movimiento_reports(
     title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Usuario"
     title_cell.font = Font(bold=True)
+
+    if is_with_saldos:
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Pendiente"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Confirmado"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Pagos/Cobros"
+        title_cell.font = Font(bold=True)
 
     for row, item in enumerate(datalist):
         i = 0
@@ -995,14 +1011,26 @@ def generate_movimiento_reports(
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.numero_documento_relacionado
 
-        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
-        value_cell.value = item.monto
+        if not is_with_saldos:
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.monto
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.detalle
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.created_by
+
+        if is_with_saldos:
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.pendiente
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.confirmado
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.finalizado
+
 
     ws.auto_filter.ref = ws.dimensions
     filename = "movimiento_reports.xls"
@@ -1029,10 +1057,38 @@ def get_all_movimiento_list_by_estado_cuenta(
             gestor_carga_id,
         )
 
-    return repositories.get_movimiento_estado_cuenta_list_by_contraparte(
+    return repositories.get_all_movimiento_estado_cuenta_list_by_contraparte(
         db,
         tipo_contraparte_id,
         contraparte_id,
         contraparte,
         contraparte_numero_documento
     )
+
+
+def get_movimiento_estado_cuenta_reports_by_contraparte(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    gestor_carga_id: Optional[int] = None,
+) -> str:
+    datalist = []
+    if gestor_carga_id:
+        datalist = repositories.get_all_movimiento_list_by_contraparte_and_gestor_carga_id(  # noqa: B950
+            db,
+            tipo_contraparte_id,
+            contraparte_id,
+            contraparte,
+            contraparte_numero_documento,
+            gestor_carga_id,
+        )
+    datalist = repositories.get_all_movimiento_estado_cuenta_list_by_contraparte(
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+    )
+    return generate_movimiento_reports(datalist, True, True)

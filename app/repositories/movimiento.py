@@ -507,17 +507,6 @@ def get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
     respuesta = []
 
     for row in results:
-        print ("obj: ",row)
-        # print ("obj: ",row.__dir__())
-        print ("obj: ", type(row))
-        print ("obj: ", row._mapping)
-        print ("obj: ", row[0])
-        print ("obj: ", row[1])
-        print ("obj: ", type(row[0]))
-        print ("obj: ", type(row[1]))
-        print ("obj: ", row[0].orden_carga)
-        print ("obj: ", row[1])
-
         obj = MovimientoSchema.from_orm(row[0])
         obj2 = MovimientoEstadoCuenta(**obj.__dict__)
         obj2.pendiente = row[1]
@@ -537,7 +526,7 @@ def get_all_movimiento_estado_cuenta_list_by_contraparte(
     contraparte_numero_documento: str
 ) -> List[MovimientoEstadoCuenta]:
 
-    results = db.query(Movimiento)\
+    results = db.query(Movimiento).outerjoin(Movimiento.liquidacion)\
         .add_columns(*get_cols_estado_cuenta_case_statement())\
         .filter(
             and_(

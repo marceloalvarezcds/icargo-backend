@@ -174,6 +174,7 @@ from .movimiento import (  # noqa
     get_movimiento_reports_by_contraparte,
     get_movimiento_reports_by_gestor_carga_id,
     get_all_movimiento_list_by_estado_cuenta,
+    get_movimiento_estado_cuenta_reports_by_contraparte
 )
 from .orden_carga import (  # noqa
     aceptar_orden_carga,
