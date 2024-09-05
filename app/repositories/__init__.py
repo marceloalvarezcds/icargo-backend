@@ -120,6 +120,8 @@ from .estado_cuenta import (  # noqa
     get_estado_cuenta_by_contraparte_tipo_otro,
     get_estado_cuenta_list,
     get_estado_cuenta_list_by_gestor_carga_id,
+    get_estado_cuenta_movimiento,
+    get_cols_estado_cuenta_case_statement
 )
 from .factura import (  # noqa
     change_factura_status,
@@ -271,6 +273,8 @@ from .movimiento import (  # noqa
     get_movimiento_list_for_reports_by_contraparte,
     get_movimiento_list_for_reports_by_contraparte_and_gestor_carga_id,
     get_movimiento_list_for_reports_by_liquidacion_id,
+    get_all_movimiento_list_by_contraparte_and_gestor_carga_id,
+    get_all_movimiento_estado_cuenta_list_by_contraparte,
 )
 from .orden_carga import (  # noqa
     aceptar_orden_carga,

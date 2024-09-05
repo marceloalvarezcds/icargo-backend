@@ -1,15 +1,17 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
-
 from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
-
 from app.enums import MovimientoEstadoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
+from app.models.liquidacion import Liquidacion
 from app.models import Movimiento
 from app.models.tipo_movimiento import TipoMovimiento
 from app.schemas import MovimientoForm
+from app.schemas import MovimientoEstadoCuenta
+from app.schemas import Movimiento as MovimientoSchema
+from app.repositories import get_cols_estado_cuenta_case_statement
 
 
 def get_movimiento_list(db: Session) -> List[Movimiento]:
@@ -467,3 +469,94 @@ def delete_movimiento(
     return change_movimiento_status(
         obj, db, MovimientoEstadoEnum.ELIMINADO, modified_by
     )
+
+
+def get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    gestor_carga_id: int,
+) -> List[MovimientoEstadoCuenta]:
+
+    query = db.query(Movimiento).outerjoin(Movimiento.liquidacion)
+    query = query.add_columns(
+        *get_cols_estado_cuenta_case_statement()
+    )
+    query = query.filter(
+            and_(
+                Movimiento.tipo_contraparte_id == tipo_contraparte_id,
+                or_(
+                    Movimiento.propietario_id == contraparte_id,
+                    Movimiento.remitente_id == contraparte_id,
+                    Movimiento.proveedor_id == contraparte_id,
+                    and_(
+                        Movimiento.contraparte == contraparte,
+                        Movimiento.contraparte_numero_documento
+                        == contraparte_numero_documento,
+                    ),
+                    Movimiento.chofer_id == contraparte_id,
+                ),
+                Movimiento.gestor_carga_id == gestor_carga_id,
+            )
+        )
+
+    results = query.order_by(Movimiento.id.desc(), Movimiento.contraparte).all()
+
+    respuesta = []
+
+    for row in results:
+        obj = MovimientoSchema.from_orm(row[0])
+        obj2 = MovimientoEstadoCuenta(**obj.__dict__)
+        obj2.pendiente = row[1]
+        obj2.confirmado = row[3]
+        obj2.finalizado = row[4]
+
+        respuesta.append(obj2)
+
+    return respuesta
+
+
+def get_all_movimiento_estado_cuenta_list_by_contraparte(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str
+) -> List[MovimientoEstadoCuenta]:
+
+    results = db.query(Movimiento).outerjoin(Movimiento.liquidacion)\
+        .add_columns(*get_cols_estado_cuenta_case_statement())\
+        .filter(
+            and_(
+                Movimiento.tipo_contraparte_id == tipo_contraparte_id,
+                or_(
+                    Movimiento.propietario_id == contraparte_id,
+                    Movimiento.remitente_id == contraparte_id,
+                    Movimiento.proveedor_id == contraparte_id,
+                    and_(
+                        Movimiento.contraparte == contraparte,
+                        Movimiento.contraparte_numero_documento
+                        == contraparte_numero_documento,
+                    ),
+                    Movimiento.chofer_id == contraparte_id,
+                ),
+                Movimiento.contraparte == contraparte,
+                Movimiento.contraparte_numero_documento == contraparte_numero_documento,
+            )
+        )\
+        .order_by(Movimiento.id.desc(), Movimiento.contraparte)\
+        .all()
+
+    respuesta = []
+
+    for row in results:
+        obj = MovimientoSchema.from_orm(row[0])
+        obj2 = MovimientoEstadoCuenta(**obj.__dict__)
+        obj2.pendiente = row[1]
+        obj2.confirmado = row[3]
+        obj2.finalizado = row[4]
+        respuesta.append(obj2)
+
+    return respuesta
