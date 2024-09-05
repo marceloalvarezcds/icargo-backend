@@ -96,18 +96,12 @@ async def read_movimiento_list_by_estado_cuenta_det(
     _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
-
-    logger.info(f"read_movimiento_list_by_estado_cuenta_det {current_user}")
-    logger.info(f"tipo_contraparte {tipo_contraparte_id}")
-    logger.info(f"contraparte {contraparte}")
-
-    return services.get_movimiento_list_by_estado_cuenta(
+    return services.get_all_movimiento_list_by_estado_cuenta(
         db,
         tipo_contraparte_id,
         contraparte_id,
         contraparte,
         contraparte_numero_documento,
-        MovimientoEstadoEnum.PENDIENTE.value,
         current_user.gestor_carga_id,
     )
 

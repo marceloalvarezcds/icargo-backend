@@ -75,7 +75,7 @@ def get_movimiento_list_by_estado_cuenta(
     contraparte_numero_documento: str,
     estado: str,
     gestor_carga_id: Optional[int],
-) -> List[MovimientoEstadoCuenta]:
+) -> List[Movimiento]:
     if gestor_carga_id:
         return repositories.get_movimiento_list_by_contraparte_and_gestor_carga_id(
             db,
@@ -180,6 +180,7 @@ def create_movimiento_by_anticipo(
             fecha_cambio_moneda=datetime.now(),
             anticipo_id=anticipo.id,
             proveedor_id=anticipo.punto_venta.proveedor_id,
+            punto_venta_id=anticipo.punto_venta.id,
         ),
         gestor_carga_id,
         modified_by,
@@ -1008,3 +1009,30 @@ def generate_movimiento_reports(
     # Save the file
     wb.save(os.path.join(REPORTS_FOLDER, filename))
     return filename
+
+
+def get_all_movimiento_list_by_estado_cuenta(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    gestor_carga_id: Optional[int],
+) -> List[MovimientoEstadoCuenta]:
+    if gestor_carga_id:
+        return repositories.get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
+            db,
+            tipo_contraparte_id,
+            contraparte_id,
+            contraparte,
+            contraparte_numero_documento,
+            gestor_carga_id,
+        )
+
+    return repositories.get_movimiento_estado_cuenta_list_by_contraparte(
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento
+    )

@@ -49,6 +49,7 @@ class MovimientoBaseModel(BaseModel):
 class MovimientoForm(MovimientoBaseModel):
     es_cobro: Optional[bool] = False
     es_creacion_contraparte: Optional[bool] = False
+    punto_venta_id: Optional[int]
 
 
 class MovimientoFleteEditForm(BaseModel):
@@ -135,7 +136,6 @@ class Movimiento(MovimientoBaseModel):
 
 
 class MovimientoEstadoCuenta(Movimiento):
-    pendiente: RoundedDecimal
-    en_proceso: RoundedDecimal
-    confirmado: RoundedDecimal
-    finalizado: RoundedDecimal
+    pendiente: Optional[RoundedDecimal]
+    confirmado: Optional[RoundedDecimal]
+    finalizado: Optional[RoundedDecimal]
