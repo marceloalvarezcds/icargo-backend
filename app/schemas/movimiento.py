@@ -132,3 +132,9 @@ class Movimiento(MovimientoBaseModel):
     class Config:
         orm_mode = True
         use_enum_values = True
+
+
+class MovimientoEstadoCuenta(Movimiento):
+    pendiente: Optional[RoundedDecimal]
+    confirmado: Optional[RoundedDecimal]
+    finalizado: Optional[RoundedDecimal]
