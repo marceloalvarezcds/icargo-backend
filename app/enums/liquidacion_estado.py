@@ -6,6 +6,7 @@ class LiquidacionEstadoEnum(Enum):
     CANCELADO = "Cancelado"
     PENDIENTE = "Pendiente"
     EN_PROCESO = "En Proceso"
+    NUEVO = "Nuevo"
     EN_REVISION = "En Revisión"
     CONFIRMADO = "Confirmado"
     FINALIZADO = "Finalizado"
