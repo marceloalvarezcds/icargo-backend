@@ -149,7 +149,6 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
         "propietario_nombre": orden_carga.camion_propietario_nombre,
         "chofer_nombre": orden_carga.combinacion.chofer_nombre,
         "chofer_numero_documento": orden_carga.combinacion.chofer_numero_documento,
-        "chofer_telefono": orden_carga.camion.chofer.telefono,
         "camion_placa": orden_carga.camion_placa,
         "proveedor_nombre": obj.proveedor_nombre,
         "proveedor_numero_documento": obj.punto_venta.proveedor.numero_documento,
