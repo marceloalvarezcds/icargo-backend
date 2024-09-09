@@ -134,16 +134,6 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
     usuario_nombre = (
         f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
     )
-    
-    # Validar que camion y chofer existan antes de acceder a sus atributos
-    camion = orden_carga.camion
-    chofer = camion.chofer if camion else None
-
-    if not camion:
-        raise HTTPException(status_code=404, detail="Camión no encontrado")
-    if not chofer:
-        raise HTTPException(status_code=404, detail="Chofer no encontrado")
-
     OUTPUT_FILENAME = f"anticipo_{id}.pdf"
     TEMPLATE_FILENAME = "pdf_anticipo.html"
     template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
@@ -159,7 +149,6 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
         "propietario_nombre": orden_carga.camion_propietario_nombre,
         "chofer_nombre": orden_carga.combinacion.chofer_nombre,
         "chofer_numero_documento": orden_carga.combinacion.chofer_numero_documento,
-        "chofer_telefono": chofer.telefono,  # Ahora accedemos a chofer.telefono de forma segura
         "camion_placa": orden_carga.camion_placa,
         "proveedor_nombre": obj.proveedor_nombre,
         "proveedor_numero_documento": obj.punto_venta.proveedor.numero_documento,
