@@ -1,4 +1,3 @@
-from typing import List
 from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
@@ -20,7 +19,7 @@ async def read_orden_carga_anticipo_retirado_by_id(
     return services.get_orden_carga_anticipo_retirado_by_id(db, id)
 
 
-@api.get("/{id}/pdf")
+@api.get("/{id}/pdf/retirados")
 async def read_orden_carga_anticipo_retirado_pdf_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008

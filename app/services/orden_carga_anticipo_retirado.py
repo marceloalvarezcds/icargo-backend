@@ -22,6 +22,9 @@ from .orden_carga_anticipo_porcentaje_create import (
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
 from .user import get_user_by_username
 
+import time
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
+
 
 def get_tipo_anticipo_by_id(db: Session, id: int) -> TipoAnticipo:
     obj = repositories.get_tipo_anticipo_by_id(db, id)
@@ -120,16 +123,62 @@ def delete_orden_carga_anticipo_retirado(
     return repositories.delete_orden_carga_anticipo_retirado(db, id, modified_by)
 
 
+def generate_pdf(source_html: str, pdf_filename: str) -> None:
+    from_string(source_html, pdf_filename, {"page-size": "Legal"})
+
 def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
     obj = repositories.get_orden_carga_anticipo_retirado_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Anticipo no encontrado")
+    orden_carga = repositories.get_orden_carga_by_id(db, obj.orden_carga_id)
+    if not orden_carga:
+        raise HTTPException(status_code=404, detail="Anticipo no encontrado")
+    gestor_carga = repositories.get_gestor_carga_by_id(db, orden_carga.gestor_carga_id)
+    if not gestor_carga:
+        raise HTTPException(status_code=404, detail="Anticipo no encontrado")
+    usuario = get_user_by_username(db, obj.created_by)
+    usuario_nombre = (
+        f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
+    )
     OUTPUT_FILENAME = f"anticipo_{id}.pdf"
     TEMPLATE_FILENAME = "pdf_anticipo.html"
     template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
     data = {
         "id": id,
-    
+        "orden_carga_id": orden_carga.id,
+        "flete_id": orden_carga.flete_id,
+        "gestor_carga_logo": gestor_carga.logo,
+        "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_direccion": gestor_carga.direccion,
+        "anticipo_fecha": obj.created_at.strftime("%Y-%m-%d / %H:%M:%S"),
+        "anticipo_usuario": usuario_nombre,
+        "propietario_nombre": orden_carga.camion_propietario_nombre,
+        "chofer_nombre": orden_carga.combinacion.chofer_nombre,
+        "chofer_numero_documento": orden_carga.combinacion.chofer_numero_documento,
+        "camion_placa": orden_carga.camion_placa,
+        "proveedor_nombre": obj.proveedor_nombre,
+        "proveedor_numero_documento": obj.punto_venta.proveedor.numero_documento,
+        "proveedor_direccion": obj.punto_venta.proveedor.direccion,
+        "insumo_descripcion": obj.insumo_descripcion
+        if obj.insumo_descripcion
+        else "Viático",
+        "insumo_precio": number_format(obj.insumo_precio) if obj.insumo_precio else 1,
+        "insumo_unidad": obj.insumo_unidad_abreviatura
+        if obj.insumo_unidad_abreviatura
+        else "",
+        "monto": number_format(obj.monto_retirado),
+        "unidad": obj.unidad_abreviatura if obj.unidad_abreviatura else "",
     }
     source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
-    from_string(source_html, pdf_filename, {"page-size": "Legal"})
+
+    # Configuración del tiempo de espera
+    timeout_seconds = 5
+    with ThreadPoolExecutor() as executor:
+        future = executor.submit(generate_pdf, source_html, pdf_filename)
+        try:
+            future.result(timeout=timeout_seconds)
+        except TimeoutError:
+            raise HTTPException(status_code=500, detail="La generación del PDF tardó demasiado tiempo.")
+    
     return OUTPUT_FILENAME
