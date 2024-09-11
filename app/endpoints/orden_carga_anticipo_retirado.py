@@ -6,6 +6,9 @@ from app import schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+import cProfile
+import pstats
+from io import StringIO
 
 api = APIRouter()
 
@@ -22,10 +25,22 @@ async def read_orden_carga_anticipo_retirado_by_id(
 @api.get("/{id}/pdf/retirados")
 async def read_orden_carga_anticipo_retirado_pdf_by_id(
     id: int,
-    db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA_ANTICIPO_RETIRADO)),  # noqa: B008
+    db: Session = Depends(get_db_session),
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA_ANTICIPO_RETIRADO)),
 ):
-    return services.get_orden_carga_anticipo_retirado_pdf_by_id(db, id)
+    profiler = cProfile.Profile()
+    profiler.enable()
+
+    try:
+        result = services.get_orden_carga_anticipo_retirado_pdf_by_id(db, id)
+    finally:
+        profiler.disable()
+        s = StringIO()
+        ps = pstats.Stats(profiler, stream=s).sort_stats('cumulative')
+        ps.print_stats()
+        print(s.getvalue())
+
+    return result
 
 
 @api.post("/", response_model=schemas.OrdenCargaAnticipoRetirado)

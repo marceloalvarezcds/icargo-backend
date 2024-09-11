@@ -1,6 +1,7 @@
 import os
 from decimal import Decimal
 from typing import cast
+import logging
 
 from fastapi import HTTPException
 from jinja2 import Template
@@ -123,9 +124,6 @@ def delete_orden_carga_anticipo_retirado(
     return repositories.delete_orden_carga_anticipo_retirado(db, id, modified_by)
 
 
-def generate_pdf(source_html: str, pdf_filename: str) -> None:
-    from_string(source_html, pdf_filename, {"page-size": "Legal"})
-
 def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
     obj = repositories.get_orden_carga_anticipo_retirado_by_id(db, id)
     if not obj:
@@ -171,14 +169,5 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
     }
     source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
-
-    # Configuración del tiempo de espera
-    timeout_seconds = 5
-    with ThreadPoolExecutor() as executor:
-        future = executor.submit(generate_pdf, source_html, pdf_filename)
-        try:
-            future.result(timeout=timeout_seconds)
-        except TimeoutError:
-            raise HTTPException(status_code=500, detail="La generación del PDF tardó demasiado tiempo.")
-    
+    from_string(source_html, pdf_filename, {"page-size": "Legal"})
     return OUTPUT_FILENAME
