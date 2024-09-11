@@ -8,7 +8,7 @@ from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 import cProfile
 import pstats
-from io import StringIO
+
 
 api = APIRouter()
 
