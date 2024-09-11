@@ -1,7 +1,6 @@
 import os
 from decimal import Decimal
 from typing import cast
-import logging
 
 from fastapi import HTTPException
 from jinja2 import Template
@@ -22,9 +21,6 @@ from .orden_carga_anticipo_porcentaje_create import (
 )
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
 from .user import get_user_by_username
-
-import time
-from concurrent.futures import ThreadPoolExecutor, TimeoutError
 
 
 def get_tipo_anticipo_by_id(db: Session, id: int) -> TipoAnticipo:
