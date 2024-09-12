@@ -563,3 +563,11 @@ def get_instrumento_list_by_liquidacion_create_form(
         instrumento = create_instrumento(db, id, i, modified_by)
         instrumentos.append(instrumento)
     return instrumentos
+
+
+def someter_liquidacion(
+    db: Session, id: int, comentario: str, current_user: schemas.AuthUser
+) -> Liquidacion:
+    return change_liquidacion_status(
+        db, id, comentario, LiquidacionEstadoEnum.PENDIENTE, current_user
+    )

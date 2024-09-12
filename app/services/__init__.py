@@ -154,6 +154,7 @@ from .liquidacion import (  # noqa
     get_liquidacion_resumen_pdf_by_id,
     rechazar_liquidacion,
     remove_movimiento,
+    someter_liquidacion
 )
 from .movimiento import (  # noqa
     create_movimiento,

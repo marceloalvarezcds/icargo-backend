@@ -9,13 +9,16 @@ from app.models import Liquidacion
 from app.schemas import LiquidacionForm
 
 
-def get_liquidacion_list(db: Session) -> List[Liquidacion]:
-    return (
-        db.query(Liquidacion)
-        .filter(Liquidacion.estado != LiquidacionEstadoEnum.ELIMINADO.value)
-        .order_by(Liquidacion.contraparte, Liquidacion.created_at)
-        .all()
-    )
+def get_liquidacion_list(db: Session, gestor_carga_id: Optional[int] = None) -> List[Liquidacion]:
+    if gestor_carga_id:
+        return get_liquidacion_list_by_gestor_carga_id(db, gestor_carga_id)
+    else:
+        return (
+            db.query(Liquidacion)
+            .filter(Liquidacion.estado != LiquidacionEstadoEnum.ELIMINADO.value)
+            .order_by(Liquidacion.created_at.desc(), Liquidacion.contraparte)
+            .all()
+        )
 
 
 def get_liquidacion_list_by_contraparte(
@@ -97,7 +100,7 @@ def get_liquidacion_list_by_gestor_carga_id(
                 Liquidacion.estado != LiquidacionEstadoEnum.ELIMINADO.value,
             )
         )
-        .order_by(Liquidacion.contraparte, Liquidacion.created_at)
+        .order_by(Liquidacion.created_at.desc(), Liquidacion.contraparte )
         .all()
     )
 
