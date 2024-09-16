@@ -1,94 +1,200 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Resumen</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            overflow: auto;
+            font-family: "Georgia", serif;
         }
-        .container {
-            padding: 10px;
+
+        /* Variables de color y estilos generales */
+        :root {
+            --blue-color: #3399ff;
+            --gray-color: #939598;
+            --border-color: #d1d3d4;
         }
-        .header, .section {
-            margin-bottom: 20px;
+
+        .align-center {
+            display: flex;
+            justify-content: center;
         }
-        .header img {
-            width: 150px;
+
+        .bold {
+            font-weight: bold;
         }
-        .header p {
-            margin: 5px 0;
+
+        .blue {
+            color: var(--blue-color);
         }
-        .section {
-            border: 1px solid #ddd;
-            padding: 10px;
+
+        .gray {
+            color: var(--gray-color);
         }
-        .section p {
-            margin: 5px 0;
+
+        .box {
+            border: 2px solid var(--border-color);
+            box-sizing: border-box;
         }
-        .footer {
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-            margin-top: 20px;
+
+        .firma-container, .table-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 100px;
+        }
+
+        .firma {
+            border-top: 2px solid #444;
             text-align: center;
-            font-size: 12px;
+            width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Tipografía */
+        .fs1 { font-size: 34px; }
+        .fs2 { font-size: 24px; }
+        .fs3 { font-size: 20px; }
+        .fs4 { font-size: 18px; }
+        .fs5 { font-size: 16px; }
+        .fs6 { font-size: 11px; }
+
+        .lh1 { line-height: 40px; }
+        .lh2 { line-height: 28px; }
+        .lh3 { line-height: 25px; }
+        .lh4 { line-height: 16px; }
+
+        p {
+            padding: 0 10px;
+            margin: 0;
+        }
+
+        .logo img, .gestor-logo img {
+            width: 100%;
+            height: auto;
+        }
+
+        .table {
+            display: flex;
+        }
+
+        .table .box {
+            border-right-width: 0;
+        }
+
+        .table .box:last-of-type {
+            border-right-width: 2px;
+        }
+
+        .table.gap .box {
+            margin-bottom: 10px;
+            margin-right: 8px;
+            border-right-width: 2px;
+        }
+
+        .dashed {
+            border: 1px dashed;
+            margin: 20px 0;
         }
     </style>
 </head>
 <body>
     {% for x in times %}
-    <div class="container">
-        <div class="header">
-            {% if gestor_carga_logo %}
-            <img src="{{gestor_carga_logo}}" alt="Logo">
-            {% else %}
-            <p>LOGO</p>
-            <p>Gestora Carga</p>
-            {% endif %}
-            <p><strong>{{gestor_carga_nombre}}</strong></p>
-            <p>Dirección: {{gestor_carga_direccion}}</p>
-            <p>Fecha/Hora: {{anticipo_fecha}}</p>
-            <p>Usuario: {{anticipo_usuario}}</p>
-            <p><strong>Anticipo Nro. {{id}}</strong></p>
-            <p>Orden de carga Nro: {{orden_carga_id}}</p>
-            <p>Pedido Nro: {{flete_id}}</p>
+    <div>
+        <!-- Encabezado -->
+        <div class="table fs2 table0">
+            <div class="box gestor-logo">
+                {% if gestor_carga_logo %}
+                <img src="{{gestor_carga_logo}}" alt="Logo" />
+                {% else %}
+                <div class="center gray">
+                    <p class="bold fs3 lh3">LOGO</p>
+                    <p class="fs4">Gestora Carga</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="box flex1">
+                <p class="bold fs3 lh3">{{gestor_carga_nombre}}</p>
+                <p class="fs5 lh3">
+                    <span class="bold">Dirección:</span> {{gestor_carga_direccion}}
+                </p>
+                <p class="fs5 lh3">
+                    <span class="bold">Fecha/Hora:</span> {{anticipo_fecha}}
+                </p>
+                <p class="fs5 lh3">
+                    <span class="bold">Usuario:</span> {{anticipo_usuario}}
+                </p>
+            </div>
+            <div class="box">
+                <p class="blue bold fs1 lh1">Anticipo Nro. {{id}}</p>
+                <p class="bold fs5 lh3">Orden de carga Nro: <span>{{orden_carga_id}}</span></p>
+                <p class="bold fs5 lh3">Pedido Nro: <span>{{flete_id}}</span></p>
+            </div>
         </div>
-        <div class="section">
-            <p><strong>Propietario</strong></p>
-            <p>Nombre: {{propietario_nombre}}</p>
+
+        <!-- Información del Propietario y Chofer -->
+        <div class="gap table mt10">
+            <div class="box flex1">
+                <p class="bold fs4 lh3">Propietario</p>
+                <p class="fs4 lh3">Nombre: {{propietario_nombre}}</p>
+            </div>
+            <div class="box flex1">
+                <p class="bold fs4 lh3">Chofer</p>
+                <p class="fs4 lh3">Nombre: {{chofer_nombre}}</p>
+                <p class="fs4 lh3">Cédula de Identidad: {{chofer_numero_documento}}</p>
+                <p class="fs4 lh3">Teléfono: {{chofer_telefono}}</p>
+            </div>
+            <div class="box flex1">
+                <p class="bold fs5 lh3">Placa del camión</p>
+                <p class="blue bold fs2 lh2">{{camion_placa}}</p>
+            </div>
         </div>
-        <div class="section">
-            <p><strong>Chofer</strong></p>
-            <p>Nombre: {{chofer_nombre}}</p>
-            <p>Cédula de Identidad: {{chofer_numero_documento}}</p>
-            <p>Teléfono: {{chofer_telefono}}</p>
+
+        <!-- Proveedor, Producto, Importe -->
+        <div class="gap table">
+            <div class="box flex1">
+                <p class="bold fs5 lh3">Proveedor</p>
+                <p class="fs5 lh3">Nombre: {{proveedor_nombre}}</p>
+                <p class="fs5 lh3">Documento: {{proveedor_numero_documento}}</p>
+                <p class="fs5 lh3">Dirección: {{proveedor_direccion}}</p>
+            </div>
+            <div class="box flex1">
+                <p class="bold fs5 lh3">Producto</p>
+                <p class="blue bold fs2 lh2">{{insumo_descripcion}}</p>
+                <p class="blue bold fs2 lh2">Precio: {{insumo_precio}} {{insumo_unidad}}</p>
+            </div>
+            <div class="box flex1">
+                <p class="bold fs5 lh3">Importe</p>
+                <p class="blue bold fs2 lh2">{{unidad}} {{monto}}</p>
+            </div>
         </div>
-        <div class="section">
-            <p><strong>Placa del camión</strong></p>
-            <p>{{camion_placa}}</p>
+
+        <!-- Firmas -->
+        <div class="firma-container">
+            <div class="firma">
+                <p class="bold fs5 lh3">Firma de la Transportadora</p>
+            </div>
+            <div class="firma">
+                <p class="bold fs5 lh3">Firma del Chofer</p>
+            </div>
         </div>
-        <div class="section">
-            <p><strong>Proveedor</strong></p>
-            <p>Nombre: {{proveedor_nombre}}</p>
-            <p>Documento: {{proveedor_numero_documento}}</p>
-            <p>Dirección: {{proveedor_direccion}}</p>
+
+        <!-- Logo y Descargo -->
+        <div class="logo-container align-center mt10">
+            <div class="logo">
+                <img src="{{logo}}" alt="iCargo" />
+            </div>
+            <p class="fs6 lh4 flex1">
+                iCargo es solo una Herramienta de Gestión y no constituye parte alguna en la Cadena de Operaciones...
+            </p>
         </div>
-        <div class="section">
-            <p><strong>Producto</strong></p>
-            <p>{{insumo_descripcion}}</p>
-            <p>Precio: {{insumo_precio}} {{insumo_unidad}}</p>
-        </div>
-        <div class="section">
-            <p><strong>Importe</strong></p>
-            <p>{{unidad}} {{monto}}</p>
-        </div>
-        <div class="footer">
-            <p>iCargo es solo una Herramienta de Gestión y no constituye parte alguna en la Cadena de Operaciones...</p>
-        </div>
+
+        <!-- Línea Divisoria -->
         {% if x == 0 %}
-        <hr>
+        <div class="dashed"></div>
         {% endif %}
     </div>
     {% endfor %}
