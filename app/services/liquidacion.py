@@ -117,6 +117,8 @@ def create_liquidacion_pendiente(
             propietario_id=propietario_id,
             proveedor_id=proveedor_id,
             remitente_id=remitente_id,
+            es_pago_cobro=data.es_pago_cobro,
+            monto=data.monto
         ),
         gestor_id,
         modified_by,
@@ -566,8 +568,14 @@ def get_instrumento_list_by_liquidacion_create_form(
 
 
 def someter_liquidacion(
-    db: Session, id: int, comentario: str, current_user: schemas.AuthUser
+    db: Session, id: int, data: schemas.LiquidacionSometer, current_user: schemas.AuthUser
 ) -> Liquidacion:
+    to_edit_obj = get_liquidacion_by_id(db, id)
+    to_edit_obj.modified_by = current_user.username
+    to_edit_obj.modified_at = datetime.now()
+    to_edit_obj.pago_cobro = data.monto
+    db.commit()
+    db.refresh(to_edit_obj)    
     return change_liquidacion_status(
-        db, id, comentario, LiquidacionEstadoEnum.PENDIENTE, current_user
+        db, id, data.comentario, LiquidacionEstadoEnum.PENDIENTE, current_user
     )

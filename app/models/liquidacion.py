@@ -7,7 +7,8 @@ from sqlalchemy import (  # type: ignore
     Text,
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
-from sqlalchemy.orm import relationship  # type: ignore
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql.sqltypes import Numeric  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
@@ -49,6 +50,8 @@ class Liquidacion(AuditMixin, Base):
     proveedor = relationship(Proveedor, uselist=False)
     remitente_id = Column(Integer, ForeignKey("remitente.id"))
     remitente = relationship(Remitente, uselist=False)
+    pago_cobro = Column(Numeric(38, 10))
+    #es_pago_cobro = Column(Numeric(38, 10))
     # Listas
     movimientos = relationship(
         "Movimiento", back_populates="liquidacion", order_by="Movimiento.created_at"

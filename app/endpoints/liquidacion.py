@@ -223,7 +223,7 @@ async def add_instrumentos(
 async def someter(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    data: Json[str] = Form(...),  # type: ignore  # noqa: B008
+    data: Json[schemas.LiquidacionSometer] = Form(...),  # type: ignore  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.LIQUIDACION)),  # noqa: B008
 ):

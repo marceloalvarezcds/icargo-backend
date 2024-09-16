@@ -91,7 +91,7 @@ class Movimiento(AuditMixin, Base):
     proveedor = relationship(Proveedor, uselist=False)
     remitente_id = Column(Integer, ForeignKey("remitente.id"))
     remitente = relationship(Remitente, uselist=False)
-
+    
     @hybrid_property
     def credito(self):
         return self.monto if self.monto > 0 else 0
