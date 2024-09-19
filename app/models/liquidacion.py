@@ -52,6 +52,11 @@ class Liquidacion(AuditMixin, Base):
     remitente = relationship(Remitente, uselist=False)
     pago_cobro = Column(Numeric(38, 10))
     #es_pago_cobro = Column(Numeric(38, 10))
+    aprobado_at = Column(DateTime)
+    user_aprueba = Column(String(100))
+    punto_venta_id = Column(Integer, ForeignKey("punto_venta.id"))
+
+
     # Listas
     movimientos = relationship(
         "Movimiento", back_populates="liquidacion", order_by="Movimiento.created_at"

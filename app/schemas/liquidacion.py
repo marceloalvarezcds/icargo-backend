@@ -35,6 +35,7 @@ class LiquidacionForm(BaseModel):
     propietario_id: Optional[int]
     proveedor_id: Optional[int]
     remitente_id: Optional[int]
+    punto_venta_id: Optional[int]
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
 
@@ -70,6 +71,9 @@ class Liquidacion(LiquidacionForm):
     modified_by: str
     modified_at: Date
     pago_cobro: Optional[RoundedDecimal]
+    aprobado_at: Optional[Date]
+    user_aprueba: Optional[str]
+
 
     class Config:
         orm_mode = True

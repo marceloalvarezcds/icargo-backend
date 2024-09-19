@@ -44,6 +44,8 @@ class MovimientoBaseModel(BaseModel):
     propietario_id: Optional[int]
     proveedor_id: Optional[int]
     remitente_id: Optional[int]
+    punto_venta_id: Optional[int]
+    es_punto_venta: Optional[bool]
 
 
 class MovimientoForm(MovimientoBaseModel):
