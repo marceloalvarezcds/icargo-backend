@@ -109,6 +109,9 @@ def get_estado_cuenta_case_statement() -> Tuple:
 
 def get_estado_cuenta_case_statement_new() -> Tuple:
     return (
+        literal_column('0').label('punto_venta_id'),
+        null().label('contraparte_pdv'),
+        null().label('contraparte_numero_documento_pdv'),
         Movimiento.tipo_contraparte_id.label("tipo_contraparte_id"),
         TipoContraparte.descripcion.label("tipo_contraparte_descripcion"),
         Movimiento.gestor_carga_id.label("gestor_carga_id"),
@@ -192,13 +195,16 @@ def get_estado_cuenta_otro(db: Session) -> Query:
 def get_estado_cuenta_proveedor_pdv(db: Session) -> Query:
     return (
         db.query(
-            PuntoVenta.id.label("contraparte_id"),
-            PuntoVenta.nombre.label("contraparte"),
-            PuntoVenta.numero_documento.label("contraparte_numero_documento"),
+            Movimiento.proveedor_id.label("contraparte_id"),
+            Proveedor.nombre.label("contraparte"),
+            Proveedor.numero_documento.label("contraparte_numero_documento"),
+            PuntoVenta.id.label("punto_venta_id"),
+            PuntoVenta.nombre.label("contraparte_pdv"),
+            PuntoVenta.numero_documento.label("contraparte_numero_documento_pdv"),
             Movimiento.tipo_contraparte_id.label("tipo_contraparte_id"),
-            TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " -  PDV",
+            TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",
             Movimiento.gestor_carga_id.label("gestor_carga_id"),
-            *get_cols_estado_cuenta_case_statement(),            
+            *get_cols_estado_cuenta_case_statement(),
         )
         .join(Movimiento.proveedor)
         .join(Movimiento.anticipo)
@@ -216,6 +222,8 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
     remitente = get_estado_cuenta_remitente(db)
     otro = get_estado_cuenta_otro(db)
     return chofer.union_all(propietario, proveedor, proveedorPdv, remitente, otro)
+    # return proveedorPdv.union_all( chofer, proveedor, remitente)
+    # return chofer.union_all(proveedor, proveedorPdv)
 
 
 def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
@@ -224,6 +232,9 @@ def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
             table.c.contraparte_id.label("contraparte_id"),
             table.c.contraparte.label("contraparte"),
             table.c.contraparte_numero_documento.label("contraparte_numero_documento"),
+            table.c.punto_venta_id.label("punto_venta_id"),
+            table.c.contraparte_pdv.label("contraparte_pdv"),
+            table.c.contraparte_numero_documento_pdv.label("contraparte_numero_documento_pdv"),
             table.c.tipo_contraparte_id.label("tipo_contraparte_id"),
             table.c.tipo_contraparte_descripcion.label("tipo_contraparte_descripcion"),
             table.c.gestor_carga_id.label("gestor_carga_id"),
@@ -240,6 +251,9 @@ def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
             table.c.contraparte_id,
             table.c.contraparte,
             table.c.contraparte_numero_documento,
+            table.c.punto_venta_id,
+            table.c.contraparte_pdv,
+            table.c.contraparte_numero_documento_pdv,
             table.c.tipo_contraparte_id,
             table.c.tipo_contraparte_descripcion,
             table.c.gestor_carga_id,
@@ -275,6 +289,7 @@ def get_estado_cuenta_by_contraparte_and_tipo(
     db: Session,
     contraparte_id: int,
     tipo_contraparte_id: int,
+    punto_venta_id: int = None
 ) -> Optional[Row]:
     subquery = get_estado_cuenta_subquery(db).subquery()
     table = (
@@ -282,6 +297,10 @@ def get_estado_cuenta_by_contraparte_and_tipo(
         .filter(
             subquery.c.contraparte_id == contraparte_id,
             subquery.c.tipo_contraparte_id == tipo_contraparte_id,
+            or_(
+                subquery.c.punto_venta_id == punto_venta_id,
+                punto_venta_id == None
+            )
         )
         .subquery()
     )

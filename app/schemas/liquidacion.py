@@ -16,6 +16,8 @@ from .tipo_contraparte import TipoContraparte
 
 class LiquidacionAddMovimientosForm(BaseModel):
     movimientos: List[Movimiento]
+    monto: Optional[RoundedDecimal]
+    es_pago_cobro: Optional[str]
 
 
 class LiquidacionAddInstrumentosForm(BaseModel):
@@ -33,6 +35,9 @@ class LiquidacionForm(BaseModel):
     propietario_id: Optional[int]
     proveedor_id: Optional[int]
     remitente_id: Optional[int]
+    punto_venta_id: Optional[int]
+    monto: Optional[RoundedDecimal]
+    es_pago_cobro: Optional[str]
 
 
 class Liquidacion(LiquidacionForm):
@@ -65,6 +70,10 @@ class Liquidacion(LiquidacionForm):
     created_at: Date
     modified_by: str
     modified_at: Date
+    pago_cobro: Optional[RoundedDecimal]
+    aprobado_at: Optional[Date]
+    user_aprueba: Optional[str]
+
 
     class Config:
         orm_mode = True
@@ -73,3 +82,8 @@ class Liquidacion(LiquidacionForm):
     @validator("instrumentos_saldo")
     def set_instrumentos_saldo(cls, instrumentos_saldo):
         return instrumentos_saldo or Decimal(0)
+
+
+class LiquidacionSometer(BaseModel):
+    comentario: Optional[str]
+    monto: Optional[RoundedDecimal]

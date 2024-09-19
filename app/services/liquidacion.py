@@ -34,6 +34,7 @@ from app.utils import get_gestor_carga_by_params, number_format
 
 from .camion import update_camion_anticipo_retirado
 from .instrumento import create_instrumento
+from app.logger import logger
 
 
 def get_liquidacion_list(
@@ -96,11 +97,22 @@ def create_liquidacion_pendiente(
     propietario_id = None
     proveedor_id = None
     remitente_id = None
-    if movimiento.tipo_contraparte_descripcion == TipoContraparteEnum.CHOFER:
+    punto_venta = None
+    nombre_contraparte = movimiento.contraparte
+    contraparte_documento = movimiento.contraparte_numero_documento
+
+    # logger.info("create_liquidacion_pendiente")
+    # logger.info(f"tipo_contraparte_descripcion {movimiento.tipo_contraparte_descripcion}")
+
+    if movimiento.es_chofer:
         chofer_id = movimiento.chofer_id
-    elif movimiento.tipo_contraparte_descripcion == TipoContraparteEnum.PROVEEDOR:
+    elif movimiento.es_proveedor:
         proveedor_id = movimiento.proveedor_id
-    elif movimiento.tipo_contraparte_descripcion == TipoContraparteEnum.REMITENTE:
+        if movimiento.es_punto_venta:
+            punto_venta = movimiento.punto_venta_id
+            nombre_contraparte = movimiento.punto_venta_nombre
+            contraparte_documento = movimiento.punto_venta_documento
+    elif movimiento.es_gestor:
         remitente_id = movimiento.remitente_id
     else:
         propietario_id = movimiento.propietario_id
@@ -108,8 +120,8 @@ def create_liquidacion_pendiente(
         db,
         LiquidacionForm(
             tipo_contraparte_id=movimiento.tipo_contraparte_id,
-            contraparte=movimiento.contraparte,
-            contraparte_numero_documento=movimiento.contraparte_numero_documento,
+            contraparte=nombre_contraparte,
+            contraparte_numero_documento=contraparte_documento,
             moneda_id=movimiento.moneda_id,
             # IDs para referencia a las tablas de las contraparte
             chofer_id=chofer_id,
@@ -117,6 +129,9 @@ def create_liquidacion_pendiente(
             propietario_id=propietario_id,
             proveedor_id=proveedor_id,
             remitente_id=remitente_id,
+            punto_venta_id=punto_venta,
+            es_pago_cobro=data.es_pago_cobro,
+            monto=data.monto
         ),
         gestor_id,
         modified_by,
@@ -193,6 +208,33 @@ def remove_movimiento(
     to_edit_obj.modified_by = modified_by
     to_edit_obj.modified_at = datetime.now()
     db.commit()
+    return to_edit_obj
+
+
+def remove_movimientos(
+    id: int,
+    db: Session,
+    data: schemas.LiquidacionAddMovimientosForm,
+    modified_by: str,
+) -> Liquidacion:
+    to_edit_obj = get_liquidacion_by_id(db, id)
+    delete_movimientos = []
+    for m in data.movimientos:
+        mov = get_movimiento_by_schema(db, m)
+        if mov:
+            mov.liquidacion_id = None
+            mov.estado = LiquidacionEstadoEnum.PENDIENTE.value
+            mov.modified_by = modified_by
+            mov.modified_at = datetime.now()
+            delete_movimientos.append(mov)
+
+    old_movimientos: List[Movimiento] = to_edit_obj.movimientos
+    result = [mov for mov in old_movimientos if mov not in delete_movimientos]
+    to_edit_obj.movimientos = result
+    to_edit_obj.modified_by = modified_by
+    to_edit_obj.modified_at = datetime.now()
+    db.commit()
+
     return to_edit_obj
 
 
@@ -563,3 +605,17 @@ def get_instrumento_list_by_liquidacion_create_form(
         instrumento = create_instrumento(db, id, i, modified_by)
         instrumentos.append(instrumento)
     return instrumentos
+
+
+def someter_liquidacion(
+    db: Session, id: int, data: schemas.LiquidacionSometer, current_user: schemas.AuthUser
+) -> Liquidacion:
+    to_edit_obj = get_liquidacion_by_id(db, id)
+    to_edit_obj.modified_by = current_user.username
+    to_edit_obj.modified_at = datetime.now()
+    to_edit_obj.pago_cobro = data.monto
+    db.commit()
+    db.refresh(to_edit_obj)
+    return change_liquidacion_status(
+        db, id, data.comentario, LiquidacionEstadoEnum.PENDIENTE, current_user
+    )

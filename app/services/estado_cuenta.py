@@ -30,6 +30,7 @@ def get_estado_cuenta_by_contraparte(
     contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
+    punto_venta_id: int = None,
 ) -> Optional[EstadoCuenta]:
     tipo_contraparte = repositories.get_tipo_comprobante_by_id(db, tipo_contraparte_id)
     if not tipo_contraparte:
@@ -40,7 +41,7 @@ def get_estado_cuenta_by_contraparte(
         )
     else:
         result = repositories.get_estado_cuenta_by_contraparte_and_tipo(
-            db, contraparte_id, tipo_contraparte_id
+            db, contraparte_id, tipo_contraparte_id, punto_venta_id
         )
     if result:
         return EstadoCuenta.from_orm_row(result)

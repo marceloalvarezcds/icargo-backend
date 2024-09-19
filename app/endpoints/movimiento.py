@@ -271,3 +271,55 @@ async def get_movimiento_reports_by_estado(
         contraparte,
         contraparte_numero_documento
     )
+
+
+@api.get(
+    "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/punto_venta_id/{punto_venta_id}",  # noqa
+    response_model=List[schemas.MovimientoEstadoCuenta],
+)
+async def read_movimiento_list_by_estado_cuenta_det(
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    punto_venta_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_all_movimiento_list_by_estado_cuenta(
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        current_user.gestor_carga_id,
+        punto_venta_id
+    )
+
+
+@api.get(
+    "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}/punto_venta_id/{punto_venta_id}",  # noqa
+    response_model=List[schemas.Movimiento],
+)
+async def read_movimiento_list_by_estado_cuenta(
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    etapa: str,
+    punto_venta_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_movimiento_list_by_estado_cuenta(
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        etapa,
+        current_user.gestor_carga_id,
+        punto_venta_id
+    )

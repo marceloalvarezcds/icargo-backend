@@ -16,8 +16,9 @@ api = APIRouter()
 async def read_liquidacion_list(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.LIQUIDACION)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
-    return repositories.get_liquidacion_list(db)
+    return repositories.get_liquidacion_list(db, current_user.gestor_carga_id)
 
 
 @api.get(
@@ -164,6 +165,18 @@ async def remove_movimiento(
     return services.remove_movimiento(id, db, data, current_user.username)  # type: ignore
 
 
+@api.patch("/{id}/remove_movimientos", response_model=schemas.Liquidacion)
+async def remove_movimientos(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.LiquidacionAddMovimientosForm] = Form(...),  # type: ignore  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.MOVIMIENTO)),  # noqa: B008
+    __: bool = Depends(Permiso(a.EDITAR, m.LIQUIDACION)),  # noqa: B008
+):
+    return services.remove_movimientos(id, db, data, current_user.username)  # type: ignore
+
+
 @api.get("/{id}/aceptar", response_model=schemas.Liquidacion)
 async def aceptar_liquidacion(
     id: int,
@@ -216,3 +229,14 @@ async def add_instrumentos(
     __: bool = Depends(Permiso(a.EDITAR, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.add_instrumentos(id, db, data, current_user.username)  # type: ignore
+
+
+@api.patch("/{id}/someter", response_model=schemas.Liquidacion)
+async def someter(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.LiquidacionSometer] = Form(...),  # type: ignore  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.LIQUIDACION)),  # noqa: B008
+):
+    return services.someter_liquidacion(db, id, data, current_user)
