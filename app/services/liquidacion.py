@@ -90,39 +90,62 @@ def create_liquidacion_pendiente(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Movimiento:
-    movimientos = get_movimiento_list_by_liquidacion_create_form(db, data)
-    movimiento = movimientos[0]
-    gestor_id = get_gestor_carga_by_params(movimiento, gestor_carga_id)
+    gestor_id = None
     chofer_id = None
     propietario_id = None
     proveedor_id = None
     remitente_id = None
     punto_venta = None
-    nombre_contraparte = movimiento.contraparte
-    contraparte_documento = movimiento.contraparte_numero_documento
+    nombre_contraparte = None
+    contraparte_documento = None
+    moneda = None
+# camino con movimientos    
+    if len(data.movimientos) > 0:
+        movimientos = get_movimiento_list_by_liquidacion_create_form(db, data)
+        movimiento = movimientos[0]
+        gestor_id = get_gestor_carga_by_params(movimiento, gestor_carga_id)
+        nombre_contraparte = movimiento.contraparte
+        contraparte_documento = movimiento.contraparte_numero_documento
+        moneda = movimiento.moneda_id
+        if movimiento.es_chofer:
+            chofer_id = movimiento.chofer_id
+        elif movimiento.es_proveedor:
+            proveedor_id = movimiento.proveedor_id
+            if movimiento.es_punto_venta:
+                punto_venta = movimiento.punto_venta_id
+                nombre_contraparte = movimiento.punto_venta_nombre
+                contraparte_documento = movimiento.punto_venta_documento
+        elif movimiento.es_gestor:
+            remitente_id = movimiento.remitente_id
+        else:
+            propietario_id = movimiento.propietario_id    
+    else:
+        moneda = data.cabecera.moneda_id
+        nombre_contraparte = data.cabecera.contraparte
+        contraparte_documento = data.cabecera.contraparte_numero_documento
+        if data.cabecera.tipo_contraparte_descripcion == TipoContraparteEnum.CHOFER.value:
+            chofer_id = data.cabecera.contraparte_id
+        elif data.cabecera.tipo_contraparte_descripcion == TipoContraparteEnum.REMITENTE.value:
+            remitente_id = data.cabecera.contraparte_id
+        elif data.cabecera.tipo_contraparte_descripcion == TipoContraparteEnum.PROVEEDOR.value:
+            proveedor_id = data.cabecera.contraparte_id
+            if data.cabecera.punto_venta_id:
+                punto_venta = data.cabecera.punto_venta_id
+                nombre_contraparte = data.cabecera.contraparte_pdv
+                contraparte_documento = data.cabecera.contraparte_numero_documento_pdv
+        else:
+            propietario_id = data.cabecera.contraparte_id
 
     # logger.info("create_liquidacion_pendiente")
     # logger.info(f"tipo_contraparte_descripcion {movimiento.tipo_contraparte_descripcion}")
 
-    if movimiento.es_chofer:
-        chofer_id = movimiento.chofer_id
-    elif movimiento.es_proveedor:
-        proveedor_id = movimiento.proveedor_id
-        if movimiento.es_punto_venta:
-            punto_venta = movimiento.punto_venta_id
-            nombre_contraparte = movimiento.punto_venta_nombre
-            contraparte_documento = movimiento.punto_venta_documento
-    elif movimiento.es_gestor:
-        remitente_id = movimiento.remitente_id
-    else:
-        propietario_id = movimiento.propietario_id
     liquidacion = create_liquidacion(
         db,
         LiquidacionForm(
-            tipo_contraparte_id=movimiento.tipo_contraparte_id,
+            tipo_contraparte_id=data.cabecera.tipo_contraparte_id,
             contraparte=nombre_contraparte,
             contraparte_numero_documento=contraparte_documento,
-            moneda_id=movimiento.moneda_id,
+            moneda_id= moneda,
             # IDs para referencia a las tablas de las contraparte
             chofer_id=chofer_id,
             gestor_carga_id=gestor_carga_id,
@@ -136,7 +159,8 @@ def create_liquidacion_pendiente(
         gestor_id,
         modified_by,
     )
-    liquidacion.movimientos = movimientos
+    if len(data.movimientos) > 0:
+        liquidacion.movimientos = movimientos
     db.commit()
     return liquidacion
 

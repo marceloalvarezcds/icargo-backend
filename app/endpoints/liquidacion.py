@@ -109,7 +109,7 @@ async def read_liquidacion_by_id(
 @api.post("/", response_model=schemas.Liquidacion)
 async def add_new_liquidacion(
     db: Session = Depends(get_db_session),  # noqa: B008
-    data: Json[schemas.LiquidacionAddMovimientosForm] = Form(...),  # type: ignore  # noqa: B008
+    data: Json[schemas.LiquidacionNewMovimientosForm] = Form(...),  # type: ignore  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.LIQUIDACION)),  # noqa: B008
 ):
