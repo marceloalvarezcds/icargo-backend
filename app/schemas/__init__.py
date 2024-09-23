@@ -48,6 +48,7 @@ from .insumo_punto_venta_precio import (  # noqa
 from .liquidacion import (  # noqa
     Liquidacion,
     LiquidacionAddInstrumentosForm,
+    LiquidacionNewMovimientosForm,
     LiquidacionAddMovimientosForm,
     LiquidacionForm,
     LiquidacionSometer
