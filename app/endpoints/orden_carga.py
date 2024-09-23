@@ -1,7 +1,7 @@
 from typing import List
 
 from app.enums.estado import EstadoEnum
-from fastapi import APIRouter, Depends, Form
+from fastapi import APIRouter, Depends, Form, Body
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -98,6 +98,37 @@ async def read_combinacion_by_orden_carga_id(
     return services.get_ordenes_carga_by_combinacion_id(db, combinacion_id)
 
 
+@api.get("/combinacion/crear/nuevo/aceptar/{combinacion_id}", response_model=List[schemas.OrdenCargaList])
+async def read_combinacion_by_orden_carga_id(
+    combinacion_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_ordenes_carga_by_combinacion_id_and_nuevo(db, combinacion_id)
+
+
+
+@api.get("/combinacion/finalizar/{combinacion_id}", response_model=List[schemas.OrdenCargaList])
+async def read_combinacion_by_orden_carga_id(
+    combinacion_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_ordenes_carga_by_combinacion_id_and_finalizar(db, combinacion_id)
+
+
+@api.get("/combinacion/finalizar/aceptado/{combinacion_id}", response_model=List[schemas.OrdenCargaList])
+async def read_combinacion_by_orden_carga_id(
+    combinacion_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_ordenes_carga_by_combinacion_id_and_aceptado(db, combinacion_id)
+
+
 
 @api.post("/", response_model=schemas.OrdenCarga)
 async def add_new_orden_carga(
@@ -126,6 +157,22 @@ async def edit_orden_carga(
         id,
         db,
         data,  # type: ignore
+        current_user,
+    )
+
+
+@api.put("/{id}/comentarios", response_model=schemas.OrdenCarga)
+async def update_comentarios(
+    id: int,
+    data: schemas.OrdenCargaUpdateForm = Body(...),
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA)),
+):
+    return services.update_comentarios(
+        id,
+        db,
+        data,
         current_user,
     )
 

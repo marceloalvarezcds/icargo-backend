@@ -14,6 +14,7 @@ from app.models import Camion, Flete, OrdenCarga
 from app.schemas import OrdenCargaEditForm, OrdenCargaForm
 
 from .orden_carga_estado_historial import create_orden_carga_estado_historial
+from .orden_carga_comentarios_historial import create_orden_carga_comentarios_historial
 
 
 def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
@@ -167,6 +168,7 @@ def get_orden_carga_with_anticipo_liberado_list_by_propietario_id(
         db, propietario_id
     ).all()
 
+
 def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> bool:
     rol = db.query(Rol).filter_by(id=rol_id).first()
     if not rol:
@@ -238,10 +240,20 @@ def create_orden_carga(
         created_by=modified_by,
         modified_by=modified_by,
     )
+    if estado_inicial == EstadoEnum.ACEPTADO:
+        obj.anticipos_liberados = True
     db.add(obj)
     db.commit()
     db.refresh(obj)
     create_orden_carga_estado_historial(db, obj.id, estado_inicial, modified_by)
+    comentario = data.comentarios or ""
+    # create_orden_carga_comentarios_historial(
+    #     db=db,
+    #     orden_carga_id=obj.id,
+    #     comentario=comentario,  # Usamos un valor por defecto si está vacío
+    #     created_by=modified_by,
+    #     modified_by=modified_by,
+    # )
     return change_orden_carga_status(obj, db, estado_inicial, modified_by)
     
 

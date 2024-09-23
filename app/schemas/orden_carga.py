@@ -185,6 +185,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     remisiones_resultado_flete: List[OrdenCargaRemisionResultado]
     cantidad_destino: RoundedDecimal
     cantidad_origen: RoundedDecimal
+    diferencia_origen_destino: RoundedDecimal
     total_anticipo: RoundedDecimal
     total_anticipo_complemento: RoundedDecimal
     total_anticipo_retirado: RoundedDecimal
@@ -252,6 +253,7 @@ class OrdenCargaList(OrdenCargaForm):
     # FIN Tramo de OC
     cantidad_destino: RoundedDecimal
     cantidad_origen: RoundedDecimal
+    diferencia_origen_destino: RoundedDecimal
     remisiones: str
     nro_tickets: str
     # Auditoría
@@ -277,3 +279,6 @@ class OrdenCargaBase(BaseModel):
 class OrdenCargaGetList(OrdenCargaBase):
     # Puedes añadir campos adicionales si lo necesitas
     pass
+
+class OrdenCargaUpdateForm(BaseModel):
+    comentarios: Optional[str] = None

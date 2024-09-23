@@ -204,6 +204,10 @@ from .orden_carga import (  # noqa
     get_orden_carga_list_by_combinacion_id,
     get_orden_carga_list_combinacion,
     get_ordenes_carga_by_combinacion_id,
+    get_ordenes_carga_by_combinacion_id_and_finalizar,
+    get_ordenes_carga_by_combinacion_id_and_aceptado,
+    get_ordenes_carga_by_combinacion_id_and_nuevo,
+    update_comentarios,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,

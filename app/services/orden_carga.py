@@ -127,6 +127,25 @@ def edit_orden_carga(
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
+def update_comentarios(
+    id: int,
+    db: Session,
+    data: schemas.OrdenCargaUpdateForm,
+    current_user: schemas.AuthUser,
+) -> schemas.OrdenCarga:
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == id).first()
+    if not orden_carga:
+        raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
+
+    if data.comentarios is not None:
+        orden_carga.comentarios = data.comentarios
+
+    db.commit()
+    db.refresh(orden_carga)
+
+    return orden_carga
+
+
 def delete_orden_carga(
     db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
@@ -153,6 +172,45 @@ def get_ordenes_carga_by_combinacion_id(db: Session, combinacion_id: int) -> Lis
     ordenes_carga = db.query(OrdenCarga).filter(OrdenCarga.combinacion_id == combinacion_id).all()
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontraron órdenes de carga para esta combinación")
+    return ordenes_carga
+
+
+def get_ordenes_carga_by_combinacion_id_and_nuevo(db: Session, combinacion_id: int) -> List[OrdenCarga]:
+    if not combinacion_id:
+        raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
+    
+    # Filtrar por combinacion_id y estado "Aceptado"
+    ordenes_carga = db.query(OrdenCarga).filter(
+        OrdenCarga.combinacion_id == combinacion_id,
+        OrdenCarga.estado == "Nuevo"  # Ajusta este valor si el estado se almacena de manera diferente
+    ).all()
+    
+    return ordenes_carga
+
+
+def get_ordenes_carga_by_combinacion_id_and_finalizar(db: Session, combinacion_id: int) -> List[OrdenCarga]:
+    if not combinacion_id:
+        raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
+    
+    # Filtrar por combinacion_id y estado "Aceptado"
+    ordenes_carga = db.query(OrdenCarga).filter(
+        OrdenCarga.combinacion_id == combinacion_id,
+        OrdenCarga.estado == "Finalizado"  # Ajusta este valor si el estado se almacena de manera diferente
+    ).all()
+    
+    return ordenes_carga
+
+
+def get_ordenes_carga_by_combinacion_id_and_aceptado(db: Session, combinacion_id: int) -> List[OrdenCarga]:
+    if not combinacion_id:
+        raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
+    
+    # Filtrar por combinacion_id y estado "Aceptado"
+    ordenes_carga = db.query(OrdenCarga).filter(
+        OrdenCarga.combinacion_id == combinacion_id,
+        OrdenCarga.estado == "Aceptado"  # Ajusta este valor si el estado se almacena de manera diferente
+    ).all()
+    
     return ordenes_carga
 
 
