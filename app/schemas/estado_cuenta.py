@@ -11,6 +11,9 @@ class EstadoCuenta(BaseModel):
     contraparte_id: Optional[int]
     contraparte: str
     contraparte_numero_documento: str
+    punto_venta_id: Optional[int]
+    contraparte_pdv: Optional[str]
+    contraparte_numero_documento_pdv: Optional[str]
     tipo_contraparte_id: int
     tipo_contraparte_descripcion: str
     pendiente: RoundedDecimal
@@ -35,6 +38,10 @@ class EstadoCuenta(BaseModel):
             "contraparte": dic["contraparte"],
             "contraparte_numero_documento": dic["contraparte_numero_documento"],
             "tipo_contraparte_id": dic["tipo_contraparte_id"],
+
+            "punto_venta_id": dic["punto_venta_id"],
+            "contraparte_pdv": dic["contraparte_pdv"],
+            "contraparte_numero_documento_pdv": dic["contraparte_numero_documento_pdv"],
         }
         dic["q"] = urlencode(qdic)
         return cls.from_dict(dic)

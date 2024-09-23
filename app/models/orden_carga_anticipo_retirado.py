@@ -154,6 +154,12 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         )
 
     @hybrid_property
+    def es_punto_venta(self):
+        return (
+            self.punto_venta_id is not None
+        )
+
+    @hybrid_property
     def moneda_nombre(self):
         return self.moneda.nombre
 
@@ -172,6 +178,10 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     @hybrid_property
     def punto_venta_nombre(self):
         return self.punto_venta.nombre
+
+    @hybrid_property
+    def punto_venta_documento(self):
+        return self.punto_venta.numero_documento
 
     @hybrid_property
     def punto_venta_pais_nombre(self):

@@ -44,6 +44,8 @@ class MovimientoBaseModel(BaseModel):
     propietario_id: Optional[int]
     proveedor_id: Optional[int]
     remitente_id: Optional[int]
+    punto_venta_id: Optional[int]
+    es_punto_venta: Optional[bool]
 
 
 class MovimientoForm(MovimientoBaseModel):
@@ -123,6 +125,9 @@ class Movimiento(MovimientoBaseModel):
     merma_propietario_tolerancia: Optional[RoundedDecimal] = None
     # En caso de ser movimiento de anticipo
     anticipo: Optional[OrdenCargaAnticipoRetirado] = None
+    # importe de pago cobro y sentido
+    monto: Optional[RoundedDecimal] = None
+    es_pago_cobro: Optional[RoundedDecimal] = None
     # Auditoría
     created_by: str
     created_at: Date

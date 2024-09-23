@@ -5,8 +5,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from app.enums import MovimientoEstadoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
-from app.models.liquidacion import Liquidacion
-from app.models import Movimiento
+from app.models import Movimiento, OrdenCargaAnticipoRetirado
 from app.models.tipo_movimiento import TipoMovimiento
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
@@ -209,9 +208,11 @@ def get_movimiento_list_by_contraparte_and_gestor_carga_id(
     contraparte_numero_documento: str,
     estado: str,
     gestor_carga_id: int,
+    punto_venta_id: Optional[int]
 ) -> List[Movimiento]:
     return (
         db.query(Movimiento)
+        .outerjoin(Movimiento.anticipo)
         .filter(
             and_(
                 Movimiento.tipo_contraparte_id == tipo_contraparte_id,
@@ -225,6 +226,10 @@ def get_movimiento_list_by_contraparte_and_gestor_carga_id(
                         == contraparte_numero_documento,
                     ),
                     Movimiento.chofer_id == contraparte_id,
+                ),
+                or_(
+                    OrdenCargaAnticipoRetirado.punto_venta_id == punto_venta_id,
+                    punto_venta_id == None
                 ),
                 Movimiento.estado == estado,
                 Movimiento.gestor_carga_id == gestor_carga_id,
@@ -478,9 +483,12 @@ def get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
     contraparte: str,
     contraparte_numero_documento: str,
     gestor_carga_id: int,
+    punto_venta_id: Optional[int]
 ) -> List[MovimientoEstadoCuenta]:
 
-    query = db.query(Movimiento).outerjoin(Movimiento.liquidacion)
+    query = db.query(Movimiento)\
+                .outerjoin(Movimiento.liquidacion)\
+                .outerjoin(Movimiento.anticipo)
     query = query.add_columns(
         *get_cols_estado_cuenta_case_statement()
     )
@@ -497,6 +505,10 @@ def get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
                         == contraparte_numero_documento,
                     ),
                     Movimiento.chofer_id == contraparte_id,
+                ),
+                or_(
+                    OrdenCargaAnticipoRetirado.punto_venta_id == punto_venta_id,
+                    punto_venta_id == None
                 ),
                 Movimiento.gestor_carga_id == gestor_carga_id,
             )

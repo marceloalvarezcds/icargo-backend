@@ -77,6 +77,7 @@ def get_movimiento_list_by_estado_cuenta(
     contraparte_numero_documento: str,
     estado: str,
     gestor_carga_id: Optional[int],
+    punto_venta_id: Optional[int] = None,
 ) -> List[Movimiento]:
     if gestor_carga_id:
         return repositories.get_movimiento_list_by_contraparte_and_gestor_carga_id(
@@ -87,6 +88,7 @@ def get_movimiento_list_by_estado_cuenta(
             contraparte_numero_documento,
             estado,
             gestor_carga_id,
+            punto_venta_id
         )
     return repositories.get_movimiento_list_by_contraparte(
         db,
@@ -1046,6 +1048,7 @@ def get_all_movimiento_list_by_estado_cuenta(
     contraparte: str,
     contraparte_numero_documento: str,
     gestor_carga_id: Optional[int],
+    punto_venta_id: Optional[int] = None,
 ) -> List[MovimientoEstadoCuenta]:
     if gestor_carga_id:
         return repositories.get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
@@ -1055,6 +1058,7 @@ def get_all_movimiento_list_by_estado_cuenta(
             contraparte,
             contraparte_numero_documento,
             gestor_carga_id,
+            punto_venta_id,
         )
 
     return repositories.get_all_movimiento_estado_cuenta_list_by_contraparte(
