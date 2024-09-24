@@ -128,6 +128,9 @@ class Movimiento(MovimientoBaseModel):
     # importe de pago cobro y sentido
     monto: Optional[RoundedDecimal] = None
     es_pago_cobro: Optional[RoundedDecimal] = None
+    descuento_concepto: Optional[str]
+    complemento_concepto: Optional[str]
+
     # Auditoría
     created_by: str
     created_at: Date
