@@ -86,6 +86,7 @@ class PermisoModeloEnum(Enum):
     TIPO_CUENTA = "tipo_cuenta"
     TIPO_DOCUMENTO = "tipo_documento"
     TIPO_DOCUMENTO_RELACIONADO = "tipo_documento_relacionado"
+    TIPO_EVALUACION = 'tipo_evaluacion'
     TIPO_INSTRUMENTO = "tipo_instrumento"
     TIPO_INSUMO = "tipo_insumo"
     TIPO_IVA = "tipo_iva"
@@ -188,6 +189,7 @@ permisoModeloTitulo: Dict[str, str] = {
     "tipo_documento": "Tipo de Documento",
     "tipo_documento_relacionado": "Tipo de Documento Relacionado",
     "tipo_instrumento": "Tipo de Instrumento",
+    "tipo_evaluacion": "Tipo de Evaluacion",
     "tipo_insumo": "Tipo de Insumo",
     "tipo_iva": "Tipo de IVA",
     "tipo_movimiento": "Tipo de Movimiento",

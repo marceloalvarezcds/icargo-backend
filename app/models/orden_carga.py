@@ -103,6 +103,7 @@ class OrdenCarga(AuditMixin, Base):
     # FIN Mermas de Fletes
     # Relaciones Listas
     historial = relationship("OrdenCargaEstadoHistorial", back_populates="orden_carga")
+    comentario = relationship("OrdenCargaComentariosHistorial", back_populates="orden_carga")
     anticipos = relationship("OrdenCargaAnticipoRetirado", back_populates="orden_carga")
     movimientos = relationship("Movimiento", back_populates="orden_carga")
     complementos = relationship("OrdenCargaComplemento", back_populates="orden_carga")
