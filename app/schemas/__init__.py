@@ -145,6 +145,7 @@ from .tipo_contraparte import TipoContraparte  # noqa
 from .tipo_cuenta import TipoCuenta, TipoCuentaForm  # noqa
 from .tipo_documento import TipoDocumento  # noqa
 from .tipo_documento_relacionado import TipoDocumentoRelacionado  # noqa
+from .tipo_incidente import TipoIncidente  # noqa
 from .tipo_instrumento import TipoInstrumento  # noqa
 from .tipo_insumo import TipoInsumo  # noqa
 from .tipo_iva import TipoIva  # noqa
