@@ -1,10 +1,9 @@
-from decimal import Decimal
-from typing import List, Optional
-
 from pydantic import BaseModel, validator
 
+from app.schemas.estado_cuenta import EstadoCuenta, EstadoCuentaForm
+from decimal import Decimal
+from typing import List, Optional
 from app.enums import LiquidacionEstadoEnum, LiquidacionEtapaEnum
-
 from .date_model import Date
 from .factura import Factura
 from .instrumento import Instrumento, InstrumentoForm
@@ -13,6 +12,11 @@ from .movimiento import Movimiento
 from .rounded_decimal_model import RoundedDecimal
 from .tipo_contraparte import TipoContraparte
 
+class LiquidacionNewMovimientosForm(BaseModel):
+    movimientos: List[Movimiento]
+    cabecera: EstadoCuentaForm
+    monto: Optional[RoundedDecimal]
+    es_pago_cobro: Optional[str]
 
 class LiquidacionAddMovimientosForm(BaseModel):
     movimientos: List[Movimiento]

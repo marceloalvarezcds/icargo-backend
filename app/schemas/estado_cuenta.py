@@ -6,6 +6,17 @@ from sqlalchemy.engine.row import Row  # type: ignore
 
 from .rounded_decimal_model import RoundedDecimal
 
+class EstadoCuentaForm(BaseModel):
+    contraparte_id: int
+    contraparte: str
+    contraparte_numero_documento: str
+    punto_venta_id: Optional[int]
+    contraparte_pdv: Optional[str]
+    contraparte_numero_documento_pdv: Optional[str]
+    tipo_contraparte_id: int
+    tipo_contraparte_descripcion: str
+    moneda_id: int
+
 
 class EstadoCuenta(BaseModel):
     contraparte_id: Optional[int]

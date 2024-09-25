@@ -8,6 +8,7 @@ from sqlalchemy import case
 from app.enums import LiquidacionEstadoEnum, LiquidacionEtapaEnum
 from app.models import Liquidacion
 from app.schemas import LiquidacionForm
+from app.logger import logger
 
 
 def get_liquidacion_list(db: Session, gestor_carga_id: Optional[int] = None) -> List[Liquidacion]:
@@ -185,7 +186,7 @@ def change_liquidacion_status(
     obj.estado = status.value
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
-    if status == LiquidacionEstadoEnum.ACEPTADO:
+    if obj.etapa == LiquidacionEstadoEnum.CONFIRMADO.value:
         obj.user_aprueba = modified_by
         obj.aprobado_at = datetime.now()
     db.commit()
