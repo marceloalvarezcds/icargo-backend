@@ -1,6 +1,6 @@
 import os
 from typing import Union
-from app.schemas.movimiento import MovimientoEstadoCuenta
+from app.schemas.movimiento import EstadoCuentaMovimiento
 from datetime import datetime
 from http import HTTPStatus
 from typing import List, Optional, cast
@@ -866,7 +866,7 @@ def get_movimiento_reports(
 
 
 def generate_movimiento_reports(
-    datalist: List[Union[MovimientoEstadoCuenta, Movimiento]], is_for_listado: bool = False, is_with_saldos: bool = False
+    datalist: List[Union[EstadoCuentaMovimiento, Movimiento]], is_for_listado: bool = False, is_with_saldos: bool = False
 ) -> str:
     wb = Workbook()
     ws = wb.active
@@ -1049,7 +1049,7 @@ def get_all_movimiento_list_by_estado_cuenta(
     contraparte_numero_documento: str,
     gestor_carga_id: Optional[int],
     punto_venta_id: Optional[int] = None,
-) -> List[MovimientoEstadoCuenta]:
+) -> List[EstadoCuentaMovimiento]:
     if gestor_carga_id:
         return repositories.get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
             db,
@@ -1077,6 +1077,7 @@ def get_movimiento_estado_cuenta_reports_by_contraparte(
     contraparte: str,
     contraparte_numero_documento: str,
     gestor_carga_id: Optional[int] = None,
+    punto_venta_id: Optional[int] = None,
 ) -> str:
     datalist = []
     if gestor_carga_id:
@@ -1087,6 +1088,7 @@ def get_movimiento_estado_cuenta_reports_by_contraparte(
             contraparte,
             contraparte_numero_documento,
             gestor_carga_id,
+            punto_venta_id
         )
     datalist = repositories.get_all_movimiento_estado_cuenta_list_by_contraparte(
         db,
@@ -1094,5 +1096,6 @@ def get_movimiento_estado_cuenta_reports_by_contraparte(
         contraparte_id,
         contraparte,
         contraparte_numero_documento,
+        punto_venta_id
     )
     return generate_movimiento_reports(datalist, True, True)

@@ -39,15 +39,17 @@ async def get_movimiento_reports_by_estado(
     contraparte_numero_documento: str,
     etapa: str,
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008,
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
-    return services.get_movimiento_reports_by_contraparte(
+    return services.get_movimiento_list_by_estado_cuenta(
         db,
         tipo_contraparte_id,
         contraparte_id,
         contraparte,
         contraparte_numero_documento,
         etapa,
+        current_user.gestor_carga_id,
     )
 
 
@@ -262,14 +264,16 @@ async def get_movimiento_reports_by_estado(
     contraparte: str,
     contraparte_numero_documento: str,
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.MOVIMIENTO)),  # noqa: B008,
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_movimiento_estado_cuenta_reports_by_contraparte(
         db,
         tipo_contraparte_id,
         contraparte_id,
         contraparte,
-        contraparte_numero_documento
+        contraparte_numero_documento,
+        current_user.gestor_carga_id,
     )
 
 

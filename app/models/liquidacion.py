@@ -69,16 +69,22 @@ class Liquidacion(AuditMixin, Base):
     )
 
     @hybrid_property
-    def credito(self):
-        return self.movimientos_saldo if self.movimientos_saldo > 0 else 0
-
-    @hybrid_property
     def es_cobro(self):
         return self.movimientos_saldo > 0
 
     @hybrid_property
     def esta_pagado(self):
         return not self.saldo_residual > 0
+
+    @hybrid_property
+    def movimientos_saldo(self):
+        return sum(
+            x.saldo for x in self.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+        )
+
+    @hybrid_property
+    def credito(self):
+        return self.movimientos_saldo if self.movimientos_saldo > 0 else 0
 
     @hybrid_property
     def debito(self):
@@ -95,26 +101,21 @@ class Liquidacion(AuditMixin, Base):
         )
 
     @hybrid_property
+    def saldo(self):
+        return self.credito - self.debito
+
+    @hybrid_property
+    def saldo_residual(self):
+        # return abs(self.movimientos_saldo) - self.instrumentos_saldo
+        return abs(self.pago_cobro) - self.instrumentos_saldo
+
+    @hybrid_property
     def moneda_nombre(self):
         return self.moneda.nombre
 
     @hybrid_property
     def moneda_simbolo(self):
         return self.moneda.simbolo
-
-    @hybrid_property
-    def movimientos_saldo(self):
-        return sum(
-            x.saldo for x in self.movimientos if x.estado != EstadoEnum.ELIMINADO.value
-        )
-
-    @hybrid_property
-    def saldo(self):
-        return self.credito - self.debito
-
-    @hybrid_property
-    def saldo_residual(self):
-        return abs(self.movimientos_saldo) - self.instrumentos_saldo
 
     @hybrid_property
     def tipo_contraparte_descripcion(self):

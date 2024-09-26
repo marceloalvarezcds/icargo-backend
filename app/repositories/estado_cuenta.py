@@ -8,6 +8,7 @@ from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from app.enums import EstadoEnum, TipoContraparteEnum
 from app.models import (
     Chofer,
+    Instrumento,
     Liquidacion,
     Movimiento,
     Propietario,
@@ -15,9 +16,10 @@ from app.models import (
     Remitente,
     TipoContraparte,
     PuntoVenta,
-    OrdenCargaAnticipoRetirado
+    OrdenCargaAnticipoRetirado,
 )
-
+from app.schemas import MovimientoEstadoCuenta
+from app.repositories.movimiento import get_query_movimientos_by_contraparte_and_gestor_carga_id
 
 def get_estado_cuenta_case_statement() -> Tuple:
     return (
@@ -484,3 +486,88 @@ def get_estado_cuenta_movimiento() -> Tuple:
             else_=literal_column("0"),
         ).label("finalizado"),
     )
+
+
+def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    gestor_carga_id: int,
+    punto_venta_id: Optional[int]
+) -> Query:
+    # columnas especificas
+    query = db.query(
+            Liquidacion.id,
+            Liquidacion.contraparte,
+            Liquidacion.contraparte_numero_documento,
+            Liquidacion.tipo_operacion_descripcion,
+            literal_column("0"),
+            literal_column("0"),
+            literal_column("0"),
+            Instrumento.monto
+        )\
+        .join(Liquidacion.instrumentos)\
+        .filter(
+            and_(
+                Liquidacion.tipo_contraparte_id == tipo_contraparte_id,
+                or_(
+                    Liquidacion.propietario_id == contraparte_id,
+                    Liquidacion.remitente_id == contraparte_id,
+                    Liquidacion.proveedor_id == contraparte_id,
+                    and_(
+                        Liquidacion.contraparte == contraparte,
+                        Liquidacion.contraparte_numero_documento
+                        == contraparte_numero_documento,
+                    ),
+                    Liquidacion.chofer_id == contraparte_id,
+                ),
+                or_(
+                    Liquidacion.punto_venta_id == punto_venta_id,
+                    punto_venta_id == None
+                ),
+                Liquidacion.gestor_carga_id == gestor_carga_id,
+            )
+        )
+
+    return query
+
+
+def nuevo_endpint(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    gestor_carga_id: int,
+    punto_venta_id: Optional[int]
+    ) -> List[Row]:
+
+    query_movimientos = get_query_movimientos_by_contraparte_and_gestor_carga_id(
+        db, tipo_contraparte_id, contraparte_id, contraparte, contraparte_numero_documento,
+        gestor_carga_id, punto_venta_id
+    )
+    query_instrumentos = get_query_instrumentos_by_contraparte_and_gestor_carga_id(
+        db, tipo_contraparte_id, contraparte_id, contraparte, contraparte_numero_documento,
+        gestor_carga_id, punto_venta_id
+    )
+
+    table = query_movimientos.union_all(query_instrumentos).subquery()
+
+    # columnas que se retorna
+    db.query(
+        table.c.id.label("movimiento_id"),
+        table.c.contraparte.label("contraparte"),
+        table.c.contraparte_numero_documento.label("contraparte_numero_documento"),
+        table.c.tipo_movimiento_descripcion.label("tipo_movimiento_descripcion"),
+        table.c.pendiente.label("pendiente"),
+        table.c.en_proceso.label("en_proceso"),
+        table.c.confirmado.label("confirmado"),
+        table.c.finalizado.label("finalizado"),
+        )
+        #.order_by(table.c.liquidacion_id)
+
+    return db.all()
+
+

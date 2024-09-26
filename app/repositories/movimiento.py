@@ -1,16 +1,16 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
-from sqlalchemy.orm import Session  # type: ignore
-from sqlalchemy.sql.elements import and_, or_  # type: ignore
-from app.enums import MovimientoEstadoEnum
+from sqlalchemy.orm import Query, Session # type: ignore
+from sqlalchemy import case, null
+from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
+from app.enums import MovimientoEstadoEnum, EstadoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
-from app.models import Movimiento, OrdenCargaAnticipoRetirado
+from app.models import Movimiento, OrdenCargaAnticipoRetirado, Liquidacion
 from app.models.tipo_movimiento import TipoMovimiento
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
 from app.schemas import Movimiento as MovimientoSchema
-from app.repositories import get_cols_estado_cuenta_case_statement
 
 
 def get_movimiento_list(db: Session) -> List[Movimiento]:
@@ -476,7 +476,7 @@ def delete_movimiento(
     )
 
 
-def get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
+def get_query_movimientos_by_contraparte_and_gestor_carga_id(
     db: Session,
     tipo_contraparte_id: int,
     contraparte_id: int,
@@ -484,14 +484,20 @@ def get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
     contraparte_numero_documento: str,
     gestor_carga_id: int,
     punto_venta_id: Optional[int]
-) -> List[MovimientoEstadoCuenta]:
-
-    query = db.query(Movimiento)\
+    ) -> Query:
+    # columnas especificas
+    query = db.query(
+                Movimiento.id,
+                Movimiento.contraparte,
+                Movimiento.contraparte_numero_documento,
+                Movimiento.tipo_movimiento_descripcion,
+                 *get_cols_estado_cuenta_case_statement()
+                )\
                 .outerjoin(Movimiento.liquidacion)\
                 .outerjoin(Movimiento.anticipo)
-    query = query.add_columns(
-        *get_cols_estado_cuenta_case_statement()
-    )
+    # query = query.add_columns(
+    #     *get_cols_estado_cuenta_case_statement()
+    # )
     query = query.filter(
             and_(
                 Movimiento.tipo_contraparte_id == tipo_contraparte_id,
@@ -513,21 +519,37 @@ def get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
                 Movimiento.gestor_carga_id == gestor_carga_id,
             )
         )
+    return query
+
+
+def get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    gestor_carga_id: int,
+    punto_venta_id: Optional[int]
+) -> List[MovimientoEstadoCuenta]:
+
+    query = get_query_movimientos_by_contraparte_and_gestor_carga_id(
+        db, tipo_contraparte_id, contraparte_id, contraparte, contraparte_numero_documento,
+        gestor_carga_id, punto_venta_id)
 
     results = query.order_by(Movimiento.id.desc(), Movimiento.contraparte).all()
 
-    respuesta = []
+    # respuesta = []
 
-    for row in results:
-        obj = MovimientoSchema.from_orm(row[0])
-        obj2 = MovimientoEstadoCuenta(**obj.__dict__)
-        obj2.pendiente = row[1]
-        obj2.confirmado = row[3]
-        obj2.finalizado = row[4]
+    # for row in results:
+    #     obj = MovimientoSchema.from_orm(row[0])
+    #     obj2 = MovimientoEstadoCuenta(**obj.__dict__)
+    #     obj2.pendiente = row[1]
+    #     obj2.confirmado = row[3]
+    #     obj2.finalizado = row[4]
 
-        respuesta.append(obj2)
+    #     respuesta.append(obj2)
 
-    return respuesta
+    return results
 
 
 def get_all_movimiento_estado_cuenta_list_by_contraparte(
@@ -535,31 +557,38 @@ def get_all_movimiento_estado_cuenta_list_by_contraparte(
     tipo_contraparte_id: int,
     contraparte_id: int,
     contraparte: str,
-    contraparte_numero_documento: str
+    contraparte_numero_documento: str,
+    punto_venta_id: Optional[int]
 ) -> List[MovimientoEstadoCuenta]:
 
-    results = db.query(Movimiento).outerjoin(Movimiento.liquidacion)\
-        .add_columns(*get_cols_estado_cuenta_case_statement())\
-        .filter(
-            and_(
-                Movimiento.tipo_contraparte_id == tipo_contraparte_id,
-                or_(
-                    Movimiento.propietario_id == contraparte_id,
-                    Movimiento.remitente_id == contraparte_id,
-                    Movimiento.proveedor_id == contraparte_id,
-                    and_(
-                        Movimiento.contraparte == contraparte,
-                        Movimiento.contraparte_numero_documento
-                        == contraparte_numero_documento,
+    results = db.query(Movimiento)\
+            .outerjoin(Movimiento.liquidacion)\
+            .outerjoin(Movimiento.anticipo)\
+            .add_columns(*get_cols_estado_cuenta_case_statement())\
+            .filter(
+                and_(
+                    Movimiento.tipo_contraparte_id == tipo_contraparte_id,
+                    or_(
+                        Movimiento.propietario_id == contraparte_id,
+                        Movimiento.remitente_id == contraparte_id,
+                        Movimiento.proveedor_id == contraparte_id,
+                        and_(
+                            Movimiento.contraparte == contraparte,
+                            Movimiento.contraparte_numero_documento
+                            == contraparte_numero_documento,
+                        ),
+                        Movimiento.chofer_id == contraparte_id,
                     ),
-                    Movimiento.chofer_id == contraparte_id,
-                ),
-                Movimiento.contraparte == contraparte,
-                Movimiento.contraparte_numero_documento == contraparte_numero_documento,
-            )
-        )\
-        .order_by(Movimiento.id.desc(), Movimiento.contraparte)\
-        .all()
+                    Movimiento.contraparte == contraparte,
+                    Movimiento.contraparte_numero_documento == contraparte_numero_documento,
+                    or_(
+                        OrdenCargaAnticipoRetirado.punto_venta_id == punto_venta_id,
+                        punto_venta_id == None
+                    ),
+                )
+            )\
+            .order_by(Movimiento.id.desc(), Movimiento.contraparte)\
+            .all()
 
     respuesta = []
 
@@ -572,3 +601,115 @@ def get_all_movimiento_estado_cuenta_list_by_contraparte(
         respuesta.append(obj2)
 
     return respuesta
+
+
+def get_all_movimiento_instrumento_estado_cuenta_list(
+
+) -> List[MovimientoEstadoCuenta]:
+
+    return []
+
+
+def get_cols_estado_cuenta_case_statement() -> tuple:
+    return (
+        case(
+            (
+                and_(
+                    Movimiento.liquidacion_id == null(),
+                    Movimiento.estado == EstadoEnum.PENDIENTE.value,
+                ),
+                Movimiento.monto,
+            ),
+            else_=literal_column("0"),
+        ).label("pendiente"),
+        case(
+            (
+                and_(
+                    Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
+                    Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                ),
+                Movimiento.monto,
+            ),
+            else_=literal_column("0"),
+        ).label("en_proceso"),
+        case(
+            (
+                or_(
+                    and_(
+                        Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
+                        Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                    ),
+                    and_(
+                        Liquidacion.etapa == EstadoEnum.PENDIENTE.value,
+                        Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                    ),
+                    and_(
+                        Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
+                        Movimiento.estado == EstadoEnum.CONFIRMADO.value,
+                    )
+                ),
+                Movimiento.monto,
+            ),
+            else_=literal_column("0"),
+        ).label("confirmado"),
+        case(
+            (
+                and_(
+                    Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+                    Movimiento.estado == EstadoEnum.FINALIZADO.value,
+                ),
+                Movimiento.monto,
+            ),
+            else_=literal_column("0"),
+        ).label("finalizado")
+        # case(
+        #     (
+        #         and_(
+        #             Movimiento.liquidacion_id == null(),
+        #             Movimiento.estado == EstadoEnum.PENDIENTE.value,
+        #         ),
+        #         literal_column("1"),
+        #     ),
+        #     else_=literal_column("0"),
+        # ).label("cantidad_pendiente"),
+        # case(
+        #     (
+        #         and_(
+        #             Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
+        #             Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+        #         ),
+        #         literal_column("1"),
+        #     ),
+        #     else_=literal_column("0"),
+        # ).label("cantidad_en_proceso"),
+        # case(
+        #     (
+        #         or_(
+        #             and_(
+        #                 Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
+        #                 Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+        #             ),
+        #             and_(
+        #                 Liquidacion.etapa == EstadoEnum.PENDIENTE.value,
+        #                 Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+        #             ),
+        #             and_(
+        #                 Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
+        #                 Movimiento.estado == EstadoEnum.CONFIRMADO.value,
+        #             )
+        #         ),
+        #         literal_column("1"),
+        #     ),
+        #     else_=literal_column("0"),
+        # ).label("cantidad_confirmado"),
+        # case(
+        #     (
+        #         and_(
+        #             Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+        #             Movimiento.estado == EstadoEnum.FINALIZADO.value,
+        #         ),
+        #         literal_column("1"),
+        #     ),
+        #     else_=literal_column("0"),
+        # ).label("cantidad_finalizado"),
+    )

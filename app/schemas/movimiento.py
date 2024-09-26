@@ -139,7 +139,8 @@ class Movimiento(MovimientoBaseModel):
         use_enum_values = True
 
 
-class MovimientoEstadoCuenta(Movimiento):
+class EstadoCuentaMovimiento(Movimiento):
     pendiente: Optional[RoundedDecimal]
+    en_proceso: Optional[RoundedDecimal]
     confirmado: Optional[RoundedDecimal]
     finalizado: Optional[RoundedDecimal]
