@@ -17,7 +17,8 @@ from app.models import (
     TipoContraparte,
     PuntoVenta,
     OrdenCargaAnticipoRetirado,
-    TipoInstrumento
+    TipoInstrumento,
+    Factura
 )
 from app.schemas import MovimientoEstadoCuenta
 from app.repositories.movimiento import get_query_movimientos_by_contraparte_and_gestor_carga_id
@@ -498,7 +499,14 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
     gestor_carga_id: int,
     punto_venta_id: Optional[int]
 ) -> Query:
-    # columnas especificas
+
+    # TODO: en caso que las liquidaciones puedan tener mas de una factura
+    # array_to_string(array(select f.numero_factura from factura f where f.liquidacion_id = l.id), ', ' ) as factura,
+    # su equivalente podria ser func.aggregate_strings()
+
+    subQueryFactura = db.query(Factura.numero_factura)\
+        .filter(Factura.liquidacion_id == Liquidacion.id).label('numero_factura')
+
     query = db.query(
             null().label('movimiento_id'),
             Liquidacion.id,
@@ -507,15 +515,22 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             literal_column("'Pago/Cobro'").label("tipo_movimiento_concepto"),
             Liquidacion.es_pago_cobro.label("detalle"),
             Liquidacion.id.label("nro_documento_relacionado"),
-            literal_column("'pendiente-factura'").label("info"),
+            Factura.numero_factura,
             Instrumento.estado,
             literal_column("0"),
             literal_column("0"),
             literal_column("0"),
-            Instrumento.saldo_confirmado
+            case(
+                (
+                    Instrumento.credito == null(),
+                    Instrumento.debito*-1,
+                ),
+                else_= Instrumento.credito
+            ).label("finalizado"),
         )\
         .join(Liquidacion.instrumentos)\
         .join(Instrumento.tipo_instrumento)\
+        .outerjoin(Liquidacion.facturas)\
         .filter(
             and_(
                 Liquidacion.tipo_contraparte_id == tipo_contraparte_id,
@@ -572,7 +587,7 @@ def nuevo_endpint(
         table.c.nro_documento_relacionado.label("nro_documento_relacionado"),
         table.c.detalle.label("detalle"),
         table.c.info.label("info"),
-        table.c.estado.label("estado"),        
+        table.c.estado.label("estado"),
         table.c.pendiente.label("pendiente"),
         table.c.en_proceso.label("en_proceso"),
         table.c.confirmado.label("confirmado"),

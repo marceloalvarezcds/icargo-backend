@@ -6,8 +6,7 @@ from sqlalchemy import case, null
 from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
 from app.enums import MovimientoEstadoEnum, EstadoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
-from app.models import Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta
-from app.models.tipo_movimiento import TipoMovimiento
+from app.models import Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta, TipoMovimiento, OrdenCargaAnticipoRetirado, TipoAnticipo
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
 from app.schemas import Movimiento as MovimientoSchema
@@ -492,7 +491,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                 Movimiento.created_at.label("fecha"),
                 TipoCuenta.descripcion.label("tipo_cuenta_descripcion"),
                 TipoMovimiento.descripcion.label("tipo_movimiento_concepto"),
-                literal_column("'pendiente-detalle'").label("detalle"),
+                literal_column("'pendiente-detalle-insert'").label("detalle"),
                 Movimiento.orden_carga_id.label("nro_documento_relacionado"),
                 Movimiento.detalle.label("info"),
                 Movimiento.estado.label("estado"),
@@ -501,7 +500,8 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                 .join(Movimiento.tipo_movimiento)\
                 .join(Movimiento.cuenta)\
                 .outerjoin(Movimiento.liquidacion)\
-                .outerjoin(Movimiento.anticipo)
+                .outerjoin(Movimiento.anticipo)\
+                .outerjoin(OrdenCargaAnticipoRetirado.flete_anticipo)
     # query = query.add_columns(
     #     *get_cols_estado_cuenta_case_statement()
     # )
@@ -653,22 +653,27 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
                     and_(
                         Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
                         Movimiento.estado == EstadoEnum.CONFIRMADO.value,
-                    )
+                    ),
+                    and_(
+                        Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+                        Movimiento.estado == EstadoEnum.FINALIZADO.value,
+                    ),
                 ),
                 Movimiento.monto,
             ),
             else_=literal_column("0"),
         ).label("confirmado"),
-        case(
-            (
-                and_(
-                    Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
-                    Movimiento.estado == EstadoEnum.FINALIZADO.value,
-                ),
-                Movimiento.monto,
-            ),
-            else_=literal_column("0"),
-        ).label("finalizado")
+        literal_column("0").label("finalizado"),
+        # case(
+        #     (
+        #         and_(
+        #             Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+        #             Movimiento.estado == EstadoEnum.FINALIZADO.value,
+        #         ),
+        #         Movimiento.monto,
+        #     ),
+        #     else_=literal_column("0"),
+        # ).label("finalizado")
         # case(
         #     (
         #         and_(

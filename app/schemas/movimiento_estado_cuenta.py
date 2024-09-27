@@ -25,14 +25,14 @@ class MovimientoEstadoCuenta(BaseModel):
     fecha: Optional[Date]
     tipo_cuenta_descripcion: str
     tipo_movimiento_concepto: str
-    nro_documento_relacionado: int
+    nro_documento_relacionado: Optional[int]
     detalle: str
     info: Optional[str]
     estado: str
     pendiente: RoundedDecimal
     en_proceso: RoundedDecimal
     confirmado: RoundedDecimal
-    finalizado: RoundedDecimal 
+    finalizado: RoundedDecimal
     saldo: Optional[RoundedDecimal]
     # q: str
 
