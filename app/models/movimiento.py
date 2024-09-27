@@ -8,7 +8,9 @@ from sqlalchemy import (  # type: ignore
     String,
     Text,
     text,
+    select
 )
+
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 
@@ -215,6 +217,10 @@ class Movimiento(AuditMixin, Base):
     @hybrid_property
     def tipo_movimiento_descripcion(self):
         return self.tipo_movimiento.descripcion
+
+    @tipo_movimiento_descripcion.expression
+    def tipo_movimiento_descripcion(cls):
+        return select(TipoMovimiento.descripcion).where(TipoMovimiento.id == cls.id).label("tipo_movimiento_descripcion")
 
     @hybrid_property
     def tipo_operacion_descripcion(self):

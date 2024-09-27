@@ -1,3 +1,4 @@
+from app.schemas.date_model import Date
 from typing import Dict, List, Optional
 from urllib.parse import urlencode
 
@@ -19,25 +20,21 @@ class MovimientoEstadoCuentaForm(BaseModel):
 
 
 class MovimientoEstadoCuenta(BaseModel):
-    movimiento_id: int
-    #contraparte_id: Optional[int]
-    contraparte: str
-    contraparte_numero_documento: str
-    tipo_movimiento_descripcion: str
-    #punto_venta_id: Optional[int]
-    #contraparte_pdv: Optional[str]
-    #contraparte_numero_documento_pdv: Optional[str]
-    #tipo_contraparte_id: int
-    #tipo_contraparte_descripcion: str
+    movimiento_id: Optional[int]
+    liquidacion_id: Optional[int]
+    fecha: Optional[Date]
+    tipo_cuenta_descripcion: str
+    tipo_movimiento_concepto: str
+    nro_documento_relacionado: int
+    detalle: str
+    info: Optional[str]
+    estado: str
     pendiente: RoundedDecimal
     en_proceso: RoundedDecimal
     confirmado: RoundedDecimal
-    finalizado: RoundedDecimal
-    #cantidad_pendiente: int
-    #cantidad_en_proceso: int
-    #cantidad_confirmado: int
-    #cantidad_finalizado: int
-    q: str
+    finalizado: RoundedDecimal 
+    saldo: Optional[RoundedDecimal]
+    # q: str
 
     @classmethod
     def from_dict(cls, dic: Dict) -> "MovimientoEstadoCuenta":
@@ -65,3 +62,4 @@ class MovimientoEstadoCuenta(BaseModel):
         for row in results:
             list_to_return.append(cls.from_orm_row(row))
         return list_to_return
+

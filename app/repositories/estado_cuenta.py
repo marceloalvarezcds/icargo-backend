@@ -1,6 +1,6 @@
 from typing import List, Optional, Tuple
 
-from sqlalchemy import case, exists, func, literal_column, null  # type: ignore
+from sqlalchemy import case, exists, func, literal_column, null, desc, nullsfirst  # type: ignore
 from sqlalchemy.engine.row import Row  # type: ignore
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
@@ -17,6 +17,7 @@ from app.models import (
     TipoContraparte,
     PuntoVenta,
     OrdenCargaAnticipoRetirado,
+    TipoInstrumento
 )
 from app.schemas import MovimientoEstadoCuenta
 from app.repositories.movimiento import get_query_movimientos_by_contraparte_and_gestor_carga_id
@@ -499,16 +500,22 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
 ) -> Query:
     # columnas especificas
     query = db.query(
+            null().label('movimiento_id'),
             Liquidacion.id,
-            Liquidacion.contraparte,
-            Liquidacion.contraparte_numero_documento,
-            Liquidacion.tipo_operacion_descripcion,
+            Liquidacion.created_at,
+            TipoInstrumento.descripcion,
+            literal_column("'Pago/Cobro'").label("tipo_movimiento_concepto"),
+            Liquidacion.es_pago_cobro.label("detalle"),
+            Liquidacion.id.label("nro_documento_relacionado"),
+            literal_column("'pendiente-factura'").label("info"),
+            Instrumento.estado,
             literal_column("0"),
             literal_column("0"),
             literal_column("0"),
-            Instrumento.monto
+            Instrumento.saldo_confirmado
         )\
         .join(Liquidacion.instrumentos)\
+        .join(Instrumento.tipo_instrumento)\
         .filter(
             and_(
                 Liquidacion.tipo_contraparte_id == tipo_contraparte_id,
@@ -556,18 +563,22 @@ def nuevo_endpint(
     table = query_movimientos.union_all(query_instrumentos).subquery()
 
     # columnas que se retorna
-    db.query(
-        table.c.id.label("movimiento_id"),
-        table.c.contraparte.label("contraparte"),
-        table.c.contraparte_numero_documento.label("contraparte_numero_documento"),
-        table.c.tipo_movimiento_descripcion.label("tipo_movimiento_descripcion"),
+    query = db.query(
+        table.c.movimiento_id.label("movimiento_id"),
+        table.c.liquidacion_id.label("liquidacion_id"),
+        table.c.fecha.label("fecha"),
+        table.c.tipo_cuenta_descripcion.label("tipo_cuenta_descripcion"),
+        table.c.tipo_movimiento_concepto.label("tipo_movimiento_concepto"),
+        table.c.nro_documento_relacionado.label("nro_documento_relacionado"),
+        table.c.detalle.label("detalle"),
+        table.c.info.label("info"),
+        table.c.estado.label("estado"),        
         table.c.pendiente.label("pendiente"),
         table.c.en_proceso.label("en_proceso"),
         table.c.confirmado.label("confirmado"),
         table.c.finalizado.label("finalizado"),
-        )
-        #.order_by(table.c.liquidacion_id)
+        ).order_by(nullsfirst(desc(table.c.liquidacion_id)), desc(table.c.movimiento_id))
 
-    return db.all()
+    return query.all()
 
 

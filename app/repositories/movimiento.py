@@ -6,7 +6,7 @@ from sqlalchemy import case, null
 from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
 from app.enums import MovimientoEstadoEnum, EstadoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
-from app.models import Movimiento, OrdenCargaAnticipoRetirado, Liquidacion
+from app.models import Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta
 from app.models.tipo_movimiento import TipoMovimiento
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
@@ -487,12 +487,19 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
     ) -> Query:
     # columnas especificas
     query = db.query(
-                Movimiento.id,
-                Movimiento.contraparte,
-                Movimiento.contraparte_numero_documento,
-                Movimiento.tipo_movimiento_descripcion,
-                 *get_cols_estado_cuenta_case_statement()
+                Movimiento.id.label("movimiento_id"),
+                Movimiento.liquidacion_id.label("liquidacion_id"),
+                Movimiento.created_at.label("fecha"),
+                TipoCuenta.descripcion.label("tipo_cuenta_descripcion"),
+                TipoMovimiento.descripcion.label("tipo_movimiento_concepto"),
+                literal_column("'pendiente-detalle'").label("detalle"),
+                Movimiento.orden_carga_id.label("nro_documento_relacionado"),
+                Movimiento.detalle.label("info"),
+                Movimiento.estado.label("estado"),
+                *get_cols_estado_cuenta_case_statement(),
                 )\
+                .join(Movimiento.tipo_movimiento)\
+                .join(Movimiento.cuenta)\
                 .outerjoin(Movimiento.liquidacion)\
                 .outerjoin(Movimiento.anticipo)
     # query = query.add_columns(
