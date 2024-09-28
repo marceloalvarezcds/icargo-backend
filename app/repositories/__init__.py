@@ -485,6 +485,11 @@ from .tipo_documento_relacionado import (  # noqa
     get_tipo_documento_relacionado_by_descripcion,
     get_tipo_documento_relacionado_list,
 )
+
+from .tipo_incidente import (  # noqa
+    get_tipo_incidente_by_descripcion,
+    get_tipo_incidente_list,
+)
 from .tipo_instrumento import (  # noqa
     get_tipo_instrumento_by_descripcion,
     get_tipo_instrumento_list,

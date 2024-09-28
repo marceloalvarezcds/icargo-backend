@@ -144,6 +144,24 @@ async def add_new_orden_carga(
     )
 
 
+@api.post("/comentarios", response_model=schemas.OrdenCargaComentariosHistorial)
+async def add_comentario_orden_carga(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.OrdenCargaComentariosHistorial] = Form(...),  # type: ignore  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    # Llama a la función para crear el historial de comentarios
+    comentario_historial = services.create_orden_carga_comentarios_historial(
+        db=db,
+        orden_carga_id=data.orden_carga_id,  # Asegúrate de incluir este campo en el esquema
+        comentario=data.comentario,  # Asegúrate de incluir este campo en el esquema
+        created_by=current_user.username,
+        modified_by=current_user.username,
+    )
+    return comentario_historial
+
+
 
 @api.put("/{id}", response_model=schemas.OrdenCarga)
 async def edit_orden_carga(

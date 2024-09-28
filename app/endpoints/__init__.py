@@ -60,6 +60,7 @@ from app.endpoints import (
     tipo_contraparte,
     tipo_cuenta,
     tipo_documento,
+    tipo_incidente,
     tipo_instrumento,
     tipo_insumo,
     tipo_iva,
@@ -204,6 +205,9 @@ api.include_router(
 api.include_router(
     tipo_documento.api, prefix="/tipo_documento", tags=["tipo_documento"]
 )
+
+api.include_router(tipo_incidente.api, prefix="/tipo_incidente", tags=["tipo_incidente"])
+
 api.include_router(
     tipo_instrumento.api, prefix="/tipo_instrumento", tags=["tipo_instrumento"]
 )

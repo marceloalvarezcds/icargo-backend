@@ -246,15 +246,20 @@ def create_orden_carga(
     db.commit()
     db.refresh(obj)
     create_orden_carga_estado_historial(db, obj.id, estado_inicial, modified_by)
-    comentario = data.comentarios or ""
-    # create_orden_carga_comentarios_historial(
-    #     db=db,
-    #     orden_carga_id=obj.id,
-    #     comentario=comentario,  # Usamos un valor por defecto si está vacío
-    #     created_by=modified_by,
-    #     modified_by=modified_by,
-    # )
+
+    # Solo crear el historial de comentarios si hay un comentario
+    comentario = data.comentarios
+    if comentario:  # Si el comentario no es vacío ni None
+        create_orden_carga_comentarios_historial(
+            db=db,
+            orden_carga_id=obj.id,
+            comentario=comentario,
+            created_by=modified_by,
+            modified_by=modified_by,
+        )
+        
     return change_orden_carga_status(obj, db, estado_inicial, modified_by)
+
     
 
 

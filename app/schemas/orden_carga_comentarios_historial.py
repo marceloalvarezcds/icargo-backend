@@ -11,13 +11,11 @@ from typing import Optional
 class OrdenCargaComentariosHistorial(BaseModel):
     id: Optional[int]
     orden_carga_id: Optional[int]
-    comentario: Optional[str]
-    # Auditoría
-    created_by: Optional[str]
-    created_at: Date
-    modified_by: Optional[str]
-    modified_at: Date
+    comentario: Optional[str] = None  # Asegúrate de que puede ser None
+    created_by: Optional[str] = None
+    created_at: Optional[Date] = None
+    modified_by: Optional[str] = None
+    modified_at: Optional[Date] = None
 
     class Config:
         orm_mode = True
-        use_enum_values = True

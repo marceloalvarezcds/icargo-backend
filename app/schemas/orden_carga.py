@@ -20,6 +20,7 @@ from .orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from .orden_carga_complemento import OrdenCargaComplemento
 from .orden_carga_descuento import OrdenCargaDescuento
 from .orden_carga_estado_historial import OrdenCargaEstadoHistorial
+from .orden_carga_comentarios_historial import OrdenCargaComentariosHistorial
 from .orden_carga_remision_destino import OrdenCargaRemisionDestino
 from .orden_carga_remision_origen import OrdenCargaRemisionOrigen
 from .orden_carga_remision_resultado import OrdenCargaRemisionResultado
@@ -172,6 +173,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     # Relaciones Listas
     auditorias: List[AuditDatabase]
     historial: List[OrdenCargaEstadoHistorial]
+    comentario: List[OrdenCargaComentariosHistorial] = [] 
     saldos: List[OrdenCargaAnticipoSaldo]
     anticipos: List[OrdenCargaAnticipoRetirado]
     porcentaje_anticipos: List[OrdenCargaAnticipoPorcentaje]

@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, STATICS_URL, templateEnv
 from app.enums import EstadoEnum
-from app.models import Camion, Flete, GestorCarga, OrdenCarga
+from app.models import Camion, Flete, GestorCarga, OrdenCarga, OrdenCargaComentariosHistorial
 from app.schemas.audit_database import AuditDatabase as A
 from app.utils import number_format, send_email_with_template_by_thread
 
@@ -101,6 +101,28 @@ def create_orden_carga(
     )
     create_complementos_and_descuentos(db, obj, flete, modified_by)
     return get_orden_carga_with_resultado(db, obj, current_user.id)
+
+
+def create_orden_carga_comentarios_historial(
+    db: Session,
+    orden_carga_id: int,
+    comentario: str,
+    created_by: str,
+    modified_by: str
+) -> schemas.OrdenCargaComentariosHistorial:
+    # Lógica para crear el historial del comentario
+    nuevo_comentario = OrdenCargaComentariosHistorial(
+        orden_carga_id=orden_carga_id,
+        comentario=comentario,
+        created_by=created_by,
+        modified_by=modified_by,
+    )
+    # Guardar en la base de datos
+    db.add(nuevo_comentario)
+    db.commit()
+    db.refresh(nuevo_comentario)
+    return nuevo_comentario
+
 
 
 def edit_orden_carga(

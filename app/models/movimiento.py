@@ -275,6 +275,10 @@ class Movimiento(AuditMixin, Base):
             self.tipo_movimiento_descripcion == TipoMovimientoEnum.COMPLEMENTO.value
             and self.complemento is not None
         )
+    
+    @hybrid_property
+    def complemento_concepto(self):
+        return self.complemento.concepto_descripcion
 
     @hybrid_property
     def es_chofer(self):
@@ -289,6 +293,10 @@ class Movimiento(AuditMixin, Base):
             self.tipo_movimiento_descripcion == TipoMovimientoEnum.DESCUENTO.value
             and self.descuento is not None
         )
+
+    @hybrid_property
+    def descuento_concepto(self):
+        return self.descuento.concepto_descripcion
 
     @hybrid_property
     def es_flete(self):
