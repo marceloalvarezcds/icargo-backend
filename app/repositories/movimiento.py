@@ -384,6 +384,7 @@ def create_movimiento(
         remitente_id=data.remitente_id,
         created_by=modified_by,
         modified_by=modified_by,
+        tipo_movimiento_info=data.tipo_movimiento_info,
     )
     db.add(obj)
     db.commit()
@@ -484,6 +485,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
     gestor_carga_id: int,
     punto_venta_id: Optional[int]
     ) -> Query:
+    
     # columnas especificas
     query = db.query(
                 Movimiento.id.label("movimiento_id"),
@@ -491,7 +493,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                 Movimiento.created_at.label("fecha"),
                 TipoCuenta.descripcion.label("tipo_cuenta_descripcion"),
                 TipoMovimiento.descripcion.label("tipo_movimiento_concepto"),
-                literal_column("'pendiente-detalle-insert'").label("detalle"),
+                Movimiento.tipo_movimiento_info.label("detalle"),
                 Movimiento.orden_carga_id.label("nro_documento_relacionado"),
                 Movimiento.detalle.label("info"),
                 Movimiento.estado.label("estado"),
@@ -502,9 +504,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                 .outerjoin(Movimiento.liquidacion)\
                 .outerjoin(Movimiento.anticipo)\
                 .outerjoin(OrdenCargaAnticipoRetirado.flete_anticipo)
-    # query = query.add_columns(
-    #     *get_cols_estado_cuenta_case_statement()
-    # )
+
     query = query.filter(
             and_(
                 Movimiento.tipo_contraparte_id == tipo_contraparte_id,

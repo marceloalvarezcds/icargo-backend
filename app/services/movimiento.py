@@ -184,6 +184,7 @@ def create_movimiento_by_anticipo(
             fecha_cambio_moneda=datetime.now(),
             anticipo_id=anticipo.id,
             proveedor_id=anticipo.punto_venta.proveedor_id,
+            tipo_movimiento_info=anticipo.concepto
         ),
         gestor_carga_id,
         modified_by,
@@ -207,6 +208,7 @@ def create_movimiento_by_anticipo(
             fecha_cambio_moneda=datetime.now(),
             anticipo_id=anticipo.id,
             propietario_id=anticipo.orden_carga.camion.propietario_id,
+            tipo_movimiento_info=anticipo.concepto
         ),
         gestor_carga_id,
         modified_by,
@@ -263,6 +265,7 @@ def create_movimiento_by_flete(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             remitente_id=orden_carga.flete.remitente_id,
+            tipo_movimiento_info=tipo_movimiento.descripcion,
         ),
         gestor_carga_id,
         modified_by,
@@ -285,6 +288,7 @@ def create_movimiento_by_flete(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             propietario_id=orden_carga.camion.propietario_id,
+            tipo_movimiento_info=tipo_movimiento.descripcion
         ),
         gestor_carga_id,
         modified_by,
@@ -343,6 +347,7 @@ def create_movimiento_by_complemento(
                 fecha_cambio_moneda=datetime.now(),
                 complemento_id=complemento.id,
                 remitente_id=complemento.orden_carga.flete.remitente_id,
+                tipo_movimiento_info=complemento.concepto_descripcion,
             ),
             gestor_carga_id,
             modified_by,
@@ -366,6 +371,7 @@ def create_movimiento_by_complemento(
             fecha_cambio_moneda=datetime.now(),
             complemento_id=complemento.id,
             propietario_id=complemento.orden_carga.camion.propietario_id,
+            tipo_movimiento_info=complemento.concepto_descripcion,
         ),
         gestor_carga_id,
         modified_by,
@@ -424,6 +430,7 @@ def create_movimiento_by_descuento(
                 fecha_cambio_moneda=datetime.now(),
                 descuento_id=descuento.id,
                 proveedor_id=descuento.proveedor_id,
+                tipo_movimiento_info=descuento.concepto_descripcion,
             ),
             gestor_carga_id,
             modified_by,
@@ -447,6 +454,7 @@ def create_movimiento_by_descuento(
             fecha_cambio_moneda=datetime.now(),
             descuento_id=descuento.id,
             propietario_id=descuento.orden_carga.camion.propietario_id,
+            tipo_movimiento_info=descuento.concepto_descripcion,
         ),
         gestor_carga_id,
         modified_by,
@@ -503,6 +511,7 @@ def create_movimiento_by_merma(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             remitente_id=orden_carga.flete.remitente_id,
+            tipo_movimiento_info=tipo_movimiento.descripcion,
         ),
         gestor_carga_id,
         modified_by,
@@ -525,6 +534,7 @@ def create_movimiento_by_merma(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             propietario_id=orden_carga.camion.propietario_id,
+            tipo_movimiento_info=tipo_movimiento.descripcion,
         ),
         gestor_carga_id,
         modified_by,

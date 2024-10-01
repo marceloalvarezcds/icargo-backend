@@ -46,6 +46,7 @@ class MovimientoBaseModel(BaseModel):
     remitente_id: Optional[int]
     punto_venta_id: Optional[int]
     es_punto_venta: Optional[bool]
+    tipo_movimiento_info: Optional[str]
 
 
 class MovimientoForm(MovimientoBaseModel):

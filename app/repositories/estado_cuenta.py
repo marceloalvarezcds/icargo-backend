@@ -245,7 +245,9 @@ def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
             func.sum(table.c.pendiente).label("pendiente"),
             func.sum(table.c.en_proceso).label("en_proceso"),
             func.sum(table.c.confirmado).label("confirmado"),
+            #table.c.confirmado.label("confirmado"),
             func.sum(table.c.finalizado).label("finalizado"),
+            #table.c.finalizado.label("finalizado"),
             func.sum(table.c.cantidad_pendiente).label("cantidad_pendiente"),
             func.sum(table.c.cantidad_en_proceso).label("cantidad_en_proceso"),
             func.sum(table.c.cantidad_confirmado).label("cantidad_confirmado"),
@@ -500,13 +502,6 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
     punto_venta_id: Optional[int]
 ) -> Query:
 
-    # TODO: en caso que las liquidaciones puedan tener mas de una factura
-    # array_to_string(array(select f.numero_factura from factura f where f.liquidacion_id = l.id), ', ' ) as factura,
-    # su equivalente podria ser func.aggregate_strings()
-
-    subQueryFactura = db.query(Factura.numero_factura)\
-        .filter(Factura.liquidacion_id == Liquidacion.id).label('numero_factura')
-
     query = db.query(
             null().label('movimiento_id'),
             Liquidacion.id,
@@ -522,7 +517,7 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             literal_column("0"),
             case(
                 (
-                    Instrumento.credito == null(),
+                    Instrumento.credito == 0,
                     Instrumento.debito*-1,
                 ),
                 else_= Instrumento.credito
