@@ -338,6 +338,11 @@ from .orden_carga_descuento import (  # noqa
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete  # noqa
 from .orden_carga_estado_historial import create_orden_carga_estado_historial  # noqa
 from .orden_carga_comentarios_historial import create_orden_carga_comentarios_historial  # noqa
+from .orden_carga_evaluacion import (  # noqa
+    get_orden_carga_evaluaciones_historial_by_id,
+    create_orden_carga_evaluacion,
+)
+
 from .orden_carga_remision_destino import (  # noqa
     create_orden_carga_remision_destino,
     delete_orden_carga_remision_destino,
@@ -345,6 +350,7 @@ from .orden_carga_remision_destino import (  # noqa
     get_orden_carga_remision_destino_by,
     get_orden_carga_remision_destino_by_id,
 )
+
 from .orden_carga_remision_origen import (  # noqa
     create_orden_carga_remision_origen,
     delete_orden_carga_remision_origen,
@@ -353,6 +359,11 @@ from .orden_carga_remision_origen import (  # noqa
     get_orden_carga_remision_origen_by_id,
     get_orden_carga_remision_origen_list_by_orden_carga_id,
 )
+
+from .orden_carga_evaluacion import (  # noqa
+    get_orden_carga_evaluaciones_historial_by_id,
+)
+
 from .pais import get_pais_by_nombre_corto, get_pais_list  # noqa
 from .permiso import (  # noqa
     exists_permiso_for_user,

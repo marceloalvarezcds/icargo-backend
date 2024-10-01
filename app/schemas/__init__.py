@@ -89,10 +89,15 @@ from .orden_carga_complemento import (  # noqa
     OrdenCargaComplemento,
     OrdenCargaComplementoForm,
 )
+
+from .orden_carga_comentarios_historial import OrdenCargaComentariosHistorial  
 from .orden_carga_descuento import OrdenCargaDescuento, OrdenCargaDescuentoForm  # noqa
 from .orden_carga_estado_historial import OrdenCargaEstadoHistorial  # noqa
 
-from .orden_carga_comentarios_historial import OrdenCargaComentariosHistorial  
+from .orden_carga_evaluacion import (  # noqa
+    OrdenCargaEvaluacionesHistorial,
+    OrdenCargaEvaluacionesHistorialForm,
+)
 
 from .orden_carga_remision_destino import (  # noqa
     OrdenCargaRemisionDestino,

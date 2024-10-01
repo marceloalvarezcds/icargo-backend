@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship  # type: ignore
 from app.database.base import Base
 from .orden_carga import OrdenCarga
 from .tipo_incidente import TipoIncidente
-
+from app.audits.audit_mixin import AuditMixin
 
 class OrdenCargaEvaluacionesHistorial(AuditMixin, Base):
     """
@@ -17,16 +17,23 @@ class OrdenCargaEvaluacionesHistorial(AuditMixin, Base):
     id = Column(Integer, primary_key=True)
     orden_carga_id = Column(Integer, ForeignKey("orden_carga.id"))
     orden_carga = relationship(
-        OrdenCarga, uselist=False, back_populates="evaluaciones_historial"
+        "OrdenCarga", uselist=False, back_populates="evaluaciones_historial"
     )
     comentario = Column(String(255))
-    created_by = Column(String(100))  
-    modified_by = Column(String(100))  
-    
     tipo_incidente_id = Column(Integer, ForeignKey("tipo_incidente.id"))
-    tipo_incidente = relationship(TipoIncidente, uselist=False)
+    tipo_incidente = relationship("TipoIncidente", uselist=False)
     
     comentarios = Column(String(255))
+    gestor_carga_id = Column(Integer)
+    camion_id = Column(Integer)
+    semi_id = Column(Integer) 
+    propietario_id = Column(Integer)
+    chofer_id = Column(Integer)
+    concepto = Column(String(255))
+    nota = Column(String(255))
+    origen_id = Column(Integer)
+    destino_id = Column(Integer)
+    producto_id = Column(Integer)
 
     # Hybrid properties for accessing related data
     @hybrid_property

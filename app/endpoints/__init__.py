@@ -38,6 +38,7 @@ from app.endpoints import (
     orden_carga_anticipo_saldo,
     orden_carga_complemento,
     orden_carga_descuento,
+    orden_carga_evaluacion,
     orden_carga_remision_destino,
     orden_carga_remision_origen,
     pais,
@@ -158,6 +159,11 @@ api.include_router(
     orden_carga_descuento.api,
     prefix="/orden_carga_descuento",
     tags=["orden_carga_descuento"],
+)
+api.include_router(
+    orden_carga_evaluacion.api,
+    prefix="/orden_carga_evaluacion",
+    tags=["orden_carga_evaluacion"],
 )
 api.include_router(
     orden_carga_remision_destino.api,

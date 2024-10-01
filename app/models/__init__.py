@@ -52,9 +52,10 @@ from .orden_carga_anticipo_porcentaje import OrdenCargaAnticipoPorcentaje  # noq
 from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado  # noqa
 from .orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo  # noqa
 from .orden_carga_complemento import OrdenCargaComplemento  # noqa
+from .orden_carga_comentarios_historial import OrdenCargaComentariosHistorial  # noqa
 from .orden_carga_descuento import OrdenCargaDescuento  # noqa
 from .orden_carga_estado_historial import OrdenCargaEstadoHistorial  # noqa
-from .orden_carga_comentarios_historial import OrdenCargaComentariosHistorial  # noqa
+from .orden_carga_evaluacion import OrdenCargaEvaluacionesHistorial  # noqa
 from .orden_carga_remision_destino import OrdenCargaRemisionDestino  # noqa
 from .orden_carga_remision_origen import OrdenCargaRemisionOrigen  # noqa
 from .pais import Pais  # noqa

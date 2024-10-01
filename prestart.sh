@@ -13,4 +13,4 @@ python /app/app/database/check_is_ready.py
 alembic upgrade head
 
 # Create initial data in DB
-python /app/app/database/initial_data.py
+# python /app/app/database/initial_data.py

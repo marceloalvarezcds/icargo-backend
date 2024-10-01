@@ -104,6 +104,7 @@ class OrdenCarga(AuditMixin, Base):
     # Relaciones Listas
     historial = relationship("OrdenCargaEstadoHistorial", back_populates="orden_carga")
     comentario = relationship("OrdenCargaComentariosHistorial", back_populates="orden_carga")
+    evaluaciones_historial = relationship("OrdenCargaEvaluacionesHistorial", back_populates="orden_carga")
     anticipos = relationship("OrdenCargaAnticipoRetirado", back_populates="orden_carga")
     movimientos = relationship("Movimiento", back_populates="orden_carga")
     complementos = relationship("OrdenCargaComplemento", back_populates="orden_carga")
@@ -197,6 +198,14 @@ class OrdenCarga(AuditMixin, Base):
         return self.combinacion.propietario.ruc
     
     @hybrid_property
+    def combinacion_propietario_id(self):
+        return self.combinacion.propietario_id
+    
+    @hybrid_property
+    def combinacion_chofer_id(self):
+        return self.combinacion.combinacion_chofer_id
+    
+    @hybrid_property
     def neto(self):
       return self.combinacion.neto
     
@@ -240,7 +249,6 @@ class OrdenCarga(AuditMixin, Base):
     def total_anticipo_complemento(self):
         return sum(x.propietario_monto for x in self.complementos if x.anticipado)
     
-
     @hybrid_property
     def flete_saldo(self):
       return self.flete.condicion_cantidad
@@ -301,6 +309,10 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_origen_nombre(self):
         return self.flete.origen_nombre
+    
+    @hybrid_property
+    def flete_producto_id(self):
+        return self.flete.producto_id
 
     @hybrid_property
     def flete_producto_descripcion(self):
@@ -819,3 +831,7 @@ class OrdenCarga(AuditMixin, Base):
 
     def find_estado_in_historial(self, estado: EstadoEnum) -> bool:
         return self.get_estado_in_historial(estado) is not None
+
+    @hybrid_property
+    def tipo_evaluacion_id(self):
+      return self.evaluaciones_historial.tipo_incidente_id
