@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas
 from app.models import OrdenCargaRemisionDestino
 from app.services.pictshare import upload_and_get_image_url
-
+from datetime import datetime
 
 async def create_orden_carga_remision_destino(
     db: Session,
@@ -59,7 +59,22 @@ async def edit_orden_carga_remision_destino(
     )
 
 
-def delete_orden_carga_remision_destino(
-    db: Session, id: int, modified_by: str
-) -> schemas.OrdenCargaRemisionDestino:
-    return repositories.delete_orden_carga_remision_destino(db, id, modified_by)
+def delete_orden_carga_remision_destino(db: Session, id: int, modified_by: str) -> schemas.OrdenCargaRemisionDestino:
+    obj = db.query(OrdenCargaRemisionDestino).get(id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="OrdenCargaRemisionDestino not found")
+    
+    # Actualizar los campos de auditoría
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    
+    # Serializar los datos antes de eliminar
+    result = schemas.OrdenCargaRemisionDestino.from_orm(obj)
+    
+    # Eliminar el objeto
+    db.delete(obj)
+    db.commit()
+    
+    return result
+
