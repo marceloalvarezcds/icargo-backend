@@ -453,6 +453,7 @@ def get_cols_estado_cuenta_case_statement() -> Tuple:
                     #and_(
                         #Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
                         Movimiento.estado == EstadoEnum.CONFIRMADO.value,
+                        Movimiento.estado == EstadoEnum.FINALIZADO.value,
                     #)
                 ),
                 Movimiento.monto,

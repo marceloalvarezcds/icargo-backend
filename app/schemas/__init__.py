@@ -62,8 +62,9 @@ from .movimiento import (  # noqa
     MovimientoFleteEditForm,
     MovimientoForm,
     MovimientoMermaEditForm,
-    MovimientoEstadoCuenta,
+    EstadoCuentaMovimiento,
 )
+from .movimiento_estado_cuenta import MovimientoEstadoCuenta
 from .orden_carga import (  # noqa
     OrdenCarga,
     OrdenCargaEditForm,

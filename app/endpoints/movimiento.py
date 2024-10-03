@@ -85,7 +85,7 @@ async def movimiento_reports_by_gestor_carga_id(
 
 @api.get(
     "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}",  # noqa
-    response_model=List[schemas.MovimientoEstadoCuenta],
+    response_model=List[schemas.EstadoCuentaMovimiento],
 )
 async def read_movimiento_list_by_estado_cuenta_det(
     tipo_contraparte_id: int,
@@ -279,7 +279,7 @@ async def get_movimiento_reports_by_estado(
 
 @api.get(
     "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/punto_venta_id/{punto_venta_id}",  # noqa
-    response_model=List[schemas.MovimientoEstadoCuenta],
+    response_model=List[schemas.EstadoCuentaMovimiento],
 )
 async def read_movimiento_list_by_estado_cuenta_det(
     tipo_contraparte_id: int,
