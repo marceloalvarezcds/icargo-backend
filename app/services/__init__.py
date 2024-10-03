@@ -233,6 +233,10 @@ from .orden_carga_descuento import (  # noqa
     edit_orden_carga_descuento,
     get_orden_carga_descuento_by_id,
 )
+from .orden_carga_evaluacion import (  # noqa
+    get_orden_carga_evaluaciones_historial_by_id,
+    create_orden_carga_evaluacion,
+)
 from .orden_carga_remision_destino import (  # noqa
     create_orden_carga_remision_destino,
     delete_orden_carga_remision_destino,

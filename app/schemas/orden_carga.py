@@ -21,6 +21,7 @@ from .orden_carga_complemento import OrdenCargaComplemento
 from .orden_carga_descuento import OrdenCargaDescuento
 from .orden_carga_estado_historial import OrdenCargaEstadoHistorial
 from .orden_carga_comentarios_historial import OrdenCargaComentariosHistorial
+from .orden_carga_evaluacion import OrdenCargaEvaluacionesHistorial
 from .orden_carga_remision_destino import OrdenCargaRemisionDestino
 from .orden_carga_remision_origen import OrdenCargaRemisionOrigen
 from .orden_carga_remision_resultado import OrdenCargaRemisionResultado
@@ -99,6 +100,8 @@ class OrdenCarga(OrdenCargaBaseModel):
     camion_placa: str
     camion_propietario_nombre: str
     camion_propietario_puede_recibir_anticipos: bool
+    combinacion_propietario_id: Optional[int] = None
+    combinacion_chofer_id: Optional[int] = None
     combinacion_chofer_doc: Optional[str] = None
     camion_beneficiario_nombre: Optional[str] = None
     camion_beneficiario_documento: Optional[str] = None
@@ -109,6 +112,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     semi_marca: Optional[str] = None
     semi_color: Optional[str] = None
     # Datos de fletes
+    flete_producto_id: Optional[int] = None
     flete_anticipo_maximo: RoundedDecimal
     flete_destino_id: Optional[int] = None
     flete_destino_nombre: Optional[str] = None
@@ -174,6 +178,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     auditorias: List[AuditDatabase]
     historial: List[OrdenCargaEstadoHistorial]
     comentario: List[OrdenCargaComentariosHistorial] = [] 
+    evaluaciones_historial: List[OrdenCargaEvaluacionesHistorial] = [] 
     saldos: List[OrdenCargaAnticipoSaldo]
     anticipos: List[OrdenCargaAnticipoRetirado]
     porcentaje_anticipos: List[OrdenCargaAnticipoPorcentaje]
@@ -194,6 +199,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     total_anticipo_disponible: RoundedDecimal
     resultado_propietario_total_anticipos_retirados_combustible:  Optional[RoundedDecimal] = None
     resultado_propietario_total_anticipos_retirados_efectivo:  Optional[RoundedDecimal] = None
+    tipo_evaluacion_id: Optional[int] = None
     # Auditoría
     created_by: str
     created_at: Date

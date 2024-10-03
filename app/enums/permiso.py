@@ -60,6 +60,7 @@ class PermisoModeloEnum(Enum):
     ORDEN_CARGA_ANTICIPO_SALDO = "orden_carga_anticipo_saldo"
     ORDEN_CARGA_COMPLEMENTO = "orden_carga_complemento"
     ORDEN_CARGA_DESCUENTO = "orden_carga_descuento"
+    ORDEN_CARGA_EVALUACION = "orden_carga_evaluacion"
     ORDEN_CARGA_REMISION_DESTINO = "orden_carga_remision_destino"
     ORDEN_CARGA_REMISION_ORIGEN = "orden_carga_remision_origen"
     ORDEN_CARGA_REMISION_RESULTADO = "orden_carga_remision_resultado"
@@ -146,6 +147,7 @@ permisoModeloTitulo: Dict[str, str] = {
     "orden_carga_remision_origen": "7 - Remisión Origen",
     "orden_carga_remision_resultado": "8 - Resultado de Remisión",
     "orden_carga_remision_resultado_gestor": "9 - Resultado de Remisión de la Gestora",
+    "orden_carga_evaluacion": "10 - Evaluacion",
     # CAJA_BANCO
     "caja": "1 - Caja",
     "banco": "2 - Banco",
