@@ -26,7 +26,7 @@ class MovimientoEstadoCuenta(BaseModel):
     tipo_cuenta_descripcion: str
     tipo_movimiento_concepto: str
     nro_documento_relacionado: Optional[int]
-    detalle: str
+    detalle: Optional[str]
     info: Optional[str]
     estado: str
     pendiente: RoundedDecimal
