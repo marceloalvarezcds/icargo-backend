@@ -46,6 +46,7 @@ class MovimientoBaseModel(BaseModel):
     remitente_id: Optional[int]
     punto_venta_id: Optional[int]
     es_punto_venta: Optional[bool]
+    tipo_movimiento_info: Optional[str]
 
 
 class MovimientoForm(MovimientoBaseModel):
@@ -142,7 +143,8 @@ class Movimiento(MovimientoBaseModel):
         use_enum_values = True
 
 
-class MovimientoEstadoCuenta(Movimiento):
+class EstadoCuentaMovimiento(Movimiento):
     pendiente: Optional[RoundedDecimal]
+    en_proceso: Optional[RoundedDecimal]
     confirmado: Optional[RoundedDecimal]
     finalizado: Optional[RoundedDecimal]

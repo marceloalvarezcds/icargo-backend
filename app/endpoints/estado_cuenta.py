@@ -78,3 +78,55 @@ async def estado_cuenta_reports(
     _: bool = Depends(Permiso(a.REPORTE, m.ESTADO_CUENTA)),  # noqa: B008
 ):
     return services.get_estado_cuenta_reports(db)
+
+
+
+# add nuevo servicio de estado de cuenta detallado aqui
+@api.get(
+    "/movimiento/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}",  # noqa",  # noqa
+    response_model=List[schemas.MovimientoEstadoCuenta],
+)
+async def read_movimiento_list_by_estado_cuenta_det(
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_nuevo_servicio(
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        current_user.gestor_carga_id,
+        None
+    )
+
+
+# add nuevo servicio de estado de cuenta detallado aqui
+@api.get(
+    "/movimiento/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/punto_venta_id/{punto_venta_id}",  # noqa",  # noqa
+    response_model=List[schemas.MovimientoEstadoCuenta],
+)
+async def read_movimiento_list_by_estado_cuenta_det(
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    punto_venta_id: Optional[int] = None,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_nuevo_servicio(
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        current_user.gestor_carga_id,
+        punto_venta_id
+    )

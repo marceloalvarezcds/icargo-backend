@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories
 from app.config import REPORTS_FOLDER
 from app.enums import TipoContraparteEnum
-from app.schemas import EstadoCuenta
+from app.schemas import EstadoCuenta, MovimientoEstadoCuenta
 
 
 def get_estado_cuenta_list(
@@ -108,3 +108,22 @@ def get_estado_cuenta_reports(db: Session) -> str:
     # Save the file
     wb.save(os.path.join(REPORTS_FOLDER, filename))
     return filename
+
+
+def get_nuevo_servicio(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    gestor_carga_id: Optional[int],
+    punto_venta_id: Optional[int] = None,
+) -> List[MovimientoEstadoCuenta]:
+    results = []
+    if gestor_carga_id:
+        results = repositories.nuevo_endpint(
+            db, tipo_contraparte_id, contraparte_id, contraparte,
+            contraparte_numero_documento, gestor_carga_id, punto_venta_id
+        )
+
+    return MovimientoEstadoCuenta.result_of_query_to_list(results)

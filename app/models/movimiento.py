@@ -8,7 +8,9 @@ from sqlalchemy import (  # type: ignore
     String,
     Text,
     text,
+    select
 )
+
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 
@@ -69,6 +71,7 @@ class Movimiento(AuditMixin, Base):
     es_editable = Column(Boolean, server_default=text("false"))
     fecha = Column(DateTime)
     detalle = Column(Text)
+    tipo_movimiento_info = Column(Text)
     monto = Column(Numeric(38, 10))
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
     moneda = relationship(Moneda, uselist=False)
@@ -93,8 +96,20 @@ class Movimiento(AuditMixin, Base):
     remitente = relationship(Remitente, uselist=False)
 
     @hybrid_property
+    def es_cobro(self):
+        return self.monto > 0
+
+    @hybrid_property
     def credito(self):
         return self.monto if self.monto > 0 else 0
+
+    @hybrid_property
+    def debito(self):
+        return self.monto * -1 if self.monto < 0 else 0
+
+    @hybrid_property
+    def saldo(self):
+        return self.credito - self.debito
 
     @hybrid_property
     def camion_placa(self):
@@ -119,18 +134,10 @@ class Movimiento(AuditMixin, Base):
     @hybrid_property
     def cuenta_codigo_descripcion(self):
         return self.cuenta.codigo_descripcion
-
-    @hybrid_property
-    def debito(self):
-        return self.monto * -1 if self.monto < 0 else 0
-
+  
     @hybrid_property
     def destino_nombre(self):
         return self.orden_carga.destino_nombre
-
-    @hybrid_property
-    def es_cobro(self):
-        return self.monto > 0
 
     @hybrid_property
     def fecha_pago_cobro(self):
@@ -192,9 +199,7 @@ class Movimiento(AuditMixin, Base):
     def remitente_numero_documento(self):
         return self.orden_carga.flete_remitente_numero_documento
 
-    @hybrid_property
-    def saldo(self):
-        return self.credito - self.debito
+    
 
     @hybrid_property
     def semi_placa(self):
@@ -215,6 +220,10 @@ class Movimiento(AuditMixin, Base):
     @hybrid_property
     def tipo_movimiento_descripcion(self):
         return self.tipo_movimiento.descripcion
+
+    @tipo_movimiento_descripcion.expression
+    def tipo_movimiento_descripcion(cls):
+        return select(TipoMovimiento.descripcion).where(TipoMovimiento.id == cls.id).label("tipo_movimiento_descripcion")
 
     @hybrid_property
     def tipo_operacion_descripcion(self):

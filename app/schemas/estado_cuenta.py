@@ -30,6 +30,7 @@ class EstadoCuenta(BaseModel):
     pendiente: RoundedDecimal
     en_proceso: RoundedDecimal
     confirmado: RoundedDecimal
+    saldo_pendiente: RoundedDecimal
     finalizado: RoundedDecimal
     cantidad_pendiente: int
     cantidad_en_proceso: int
