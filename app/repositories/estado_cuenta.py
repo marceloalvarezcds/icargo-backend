@@ -624,9 +624,9 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             case(
                 (
                     Instrumento.credito == 0,
-                    Instrumento.debito*-1,
+                    ((Instrumento.debito*-1) + Instrumento.provision),
                 ),
-                else_= Instrumento.credito
+                else_= (Instrumento.credito + Instrumento.provision)
             ).label("finalizado"),
         )\
         .join(Liquidacion.instrumentos)\
@@ -697,4 +697,75 @@ def nuevo_endpint(
 
     return query.all()
 
+
+# saldo = confirmados - pagos cobros
+# suma de liquidaciones - suma de instrumentos
+def get_saldo_cuenta_contraparte(
+    db: Session,
+    gestor_carga_id: int,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    punto_venta_id: Optional[int]
+    ) -> List[Row]:
+
+    #  obtenemos la contraparte id por tipo contraparte
+    tipo_contraparte = db.query(TipoContraparte)\
+                    .filter(TipoContraparte.id == tipo_contraparte_id)\
+                    .first()
+
+    # segun tipo contraparte filtramos
+    query = db.query(
+                func.sum(
+                    case(
+                        (
+                            #and_(
+                                Liquidacion.etapa != EstadoEnum.FINALIZADO.value,
+                            #),
+                            Liquidacion.pago_cobro,
+                        ),
+                        else_=literal_column("0"),
+                    )
+                ).label("confirmado"),
+                func.sum(
+                    case(
+                        (
+                            #and_(
+                                # Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
+                                Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+                            #),
+                            Liquidacion.pago_cobro,
+                        ),
+                        else_=literal_column("0"),
+                    )
+                ).label("finalizado"),
+            )\
+            .filter(
+                Liquidacion.tipo_contraparte_id == tipo_contraparte_id
+            )
+
+    if TipoContraparteEnum.PROVEEDOR.value == tipo_contraparte.descripcion:
+        query = query.filter(
+            Liquidacion.proveedor_id == contraparte_id
+        )
+        if punto_venta_id is not None:
+            query = query.filter(
+               Liquidacion.punto_venta_id == punto_venta_id
+            )
+
+    if TipoContraparteEnum.REMITENTE.value == tipo_contraparte.descripcion:
+        query = query.filter(
+            Liquidacion.remitente_id == contraparte_id
+        )
+
+    if TipoContraparteEnum.PROPIETARIO.value == tipo_contraparte.descripcion:
+        query = query.filter(
+            Liquidacion.propietario_id == contraparte_id
+        )
+
+    if TipoContraparteEnum.CHOFER.value == tipo_contraparte.descripcion:
+        query = query.filter(
+            Liquidacion.chofer_id == contraparte_id
+        )
+
+    return query.first()
 

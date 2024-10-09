@@ -7,6 +7,7 @@ from app import schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+from app.logger import logger
 
 api = APIRouter()
 
@@ -129,4 +130,46 @@ async def read_movimiento_list_by_estado_cuenta_det(
         contraparte_numero_documento,
         current_user.gestor_carga_id,
         punto_venta_id
+    )
+
+
+
+@api.get(
+    "/saldo/{tipo_contraparte_id}/id/{contraparte_id}",  # noqa",  # noqa
+    response_model=schemas.ContraparteEstadoCuenta,
+)
+async def get_saldo_cuenta_contraparte(
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_saldo_cuenta_contraparte(
+        db,
+        current_user.gestor_carga_id,
+        tipo_contraparte_id,
+        contraparte_id,
+    )
+
+
+@api.get(
+    "/saldo/{tipo_contraparte_id}/id/{contraparte_id}/punto_venta_id/{punto_venta_id}",  # noqa",  # noqa
+    response_model=schemas.ContraparteEstadoCuenta,
+)
+async def get_saldo_cuenta_contraparte(
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    punto_venta_id: Optional[int] = None,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+):
+    logger.info(f"get_saldo_cuenta_contraparte {tipo_contraparte_id}  {contraparte_id}  {punto_venta_id}")
+    return services.get_saldo_cuenta_contraparte(
+        db,
+        current_user.gestor_carga_id,
+        tipo_contraparte_id,
+        contraparte_id,
+        punto_venta_id,
     )

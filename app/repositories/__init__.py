@@ -121,7 +121,8 @@ from .estado_cuenta import (  # noqa
     get_estado_cuenta_list,
     get_estado_cuenta_list_by_gestor_carga_id,
     get_estado_cuenta_movimiento,
-    nuevo_endpint
+    nuevo_endpint,
+    get_saldo_cuenta_contraparte
 )
 from .factura import (  # noqa
     change_factura_status,

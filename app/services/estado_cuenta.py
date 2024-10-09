@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories
 from app.config import REPORTS_FOLDER
 from app.enums import TipoContraparteEnum
-from app.schemas import EstadoCuenta, MovimientoEstadoCuenta
+from app.schemas import EstadoCuenta, MovimientoEstadoCuenta, ContraparteEstadoCuenta
+from app.schemas.rounded_decimal_model import RoundedDecimal
 
 
 def get_estado_cuenta_list(
@@ -127,3 +128,18 @@ def get_nuevo_servicio(
         )
 
     return MovimientoEstadoCuenta.result_of_query_to_list(results)
+
+
+def get_saldo_cuenta_contraparte(
+    db: Session,
+    gestor_carga_id: Optional[int],
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    punto_venta_id: Optional[int] = None,
+) -> ContraparteEstadoCuenta :
+
+    results = repositories.get_saldo_cuenta_contraparte(
+            db, gestor_carga_id, tipo_contraparte_id, contraparte_id, punto_venta_id
+        )
+
+    return ContraparteEstadoCuenta.from_orm_row(results)
