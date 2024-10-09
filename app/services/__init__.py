@@ -63,7 +63,8 @@ from .estado_cuenta import (  # noqa
     get_estado_cuenta_by_contraparte,
     get_estado_cuenta_list,
     get_estado_cuenta_reports,
-    get_nuevo_servicio
+    get_nuevo_servicio,
+    get_saldo_cuenta_contraparte,
 )
 from .factura import (  # noqa
     create_factura,
