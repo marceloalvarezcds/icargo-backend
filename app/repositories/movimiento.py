@@ -497,6 +497,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                 Movimiento.orden_carga_id.label("nro_documento_relacionado"),
                 Movimiento.detalle.label("info"),
                 Movimiento.estado.label("estado"),
+                Liquidacion.estado.label("estado_liquidacion"),
                 *get_cols_estado_cuenta_case_statement(),
                 )\
                 .join(Movimiento.tipo_movimiento)\
