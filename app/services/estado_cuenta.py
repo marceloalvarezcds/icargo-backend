@@ -143,3 +143,127 @@ def get_saldo_cuenta_contraparte(
         )
 
     return ContraparteEstadoCuenta.from_orm_row(results)
+
+
+def get_report_nuevo_servicio(
+    db: Session,
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    gestor_carga_id: Optional[int],
+    punto_venta_id: Optional[int] = None,
+) -> str:
+    results = []
+
+    if gestor_carga_id:
+        results = repositories.nuevo_endpint(
+            db, tipo_contraparte_id, contraparte_id, contraparte,
+            contraparte_numero_documento, gestor_carga_id, punto_venta_id
+        )
+
+    return get_movimiento_estado_cuenta_reports(results)
+
+
+def get_movimiento_estado_cuenta_reports(datalist: List[MovimientoEstadoCuenta],) -> str:
+
+    wb = Workbook()
+    ws = wb.active
+    i = 0
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Nº de Movimiento"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Estado"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Fecha"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Cuenta"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Concepto"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Detalle"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "N°OC"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Info"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "N°Liq"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Pendiente"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Confirmado"
+    title_cell.font = Font(bold=True)
+
+    title_cell = ws.cell(row=1, column=(i := i + 1))
+    title_cell.value = "Pago/Cobro"
+    title_cell.font = Font(bold=True)
+
+    for row, item in enumerate(datalist):
+        i = 0
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.movimiento_id
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.estado
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.fecha
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.tipo_cuenta_descripcion
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.tipo_movimiento_concepto
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.detalle
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.nro_documento_relacionado
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.info
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.liquidacion_id
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.estado_liquidacion
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.pendiente
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.confirmado
+
+        value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+        value_cell.value = item.finalizado
+
+    ws.auto_filter.ref = ws.dimensions
+    filename = "estado_cuenta_movimiento_reports.xls"
+    # Save the file
+    wb.save(os.path.join(REPORTS_FOLDER, filename))
+
+    return filename
