@@ -25,6 +25,7 @@ class InstrumentoForm(InstrumentoFormBaseModel):
     tipo_instrumento_id: Optional[int]
     liquidacion_id: Optional[int]
     monto: RoundedDecimal
+    saldo_cc: Optional[RoundedDecimal]
 
 
 class InstrumentoSaldoForm(InstrumentoForm):

@@ -55,6 +55,7 @@ class Liquidacion(AuditMixin, Base):
     aprobado_at = Column(DateTime)
     user_aprueba = Column(String(100))
     punto_venta_id = Column(Integer, ForeignKey("punto_venta.id"))
+    saldo_cc = Column(Numeric(38, 10))
 
 
     # Listas
