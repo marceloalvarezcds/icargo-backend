@@ -173,3 +173,31 @@ async def get_saldo_cuenta_contraparte(
         contraparte_id,
         punto_venta_id,
     )
+
+
+# add nuevo servicio de estado de cuenta detallado aqui
+@api.get(
+    "/report/movimiento/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}",  # noqa",  # noqa
+)
+# add nuevo servicio de estado de cuenta detallado aqui
+@api.get(
+    "/report/movimiento/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/punto_venta_id/{punto_venta_id}",  # noqa",  # noqa
+)
+async def read_report_movimiento_list_by_estado_cuenta_det(
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_report_nuevo_servicio(
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        current_user.gestor_carga_id,
+        None
+    )
