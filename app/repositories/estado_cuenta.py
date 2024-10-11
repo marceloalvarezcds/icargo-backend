@@ -252,8 +252,21 @@ def get_estado_cuenta_otro(db: Session) -> Query:
             *get_estado_cuenta_case_statement_new(),
         )
         .join(Movimiento.tipo_contraparte)
-        .outerjoin(Movimiento.liquidacion)
+        # .outerjoin(Movimiento.liquidacion)
         .filter(TipoContraparte.descripcion == TipoContraparteEnum.OTRO.value)
+    )
+
+
+def get_estado_cuenta_otro_liquidacion(db: Session) -> Query:
+    return (
+        db.query(
+            Liquidacion.tipo_contraparte_id.label("contraparte_id"),
+            Liquidacion.contraparte.label("contraparte"),
+            Liquidacion.contraparte_numero_documento.label("contraparte_numero_documento"),
+            *get_estado_cuenta_liquidacion_case_statement_new(),
+        )
+        .join(Liquidacion.remitente)
+        .join(Liquidacion.tipo_contraparte)
     )
 
 
@@ -309,9 +322,11 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
     proveedorPdvLiquidacion = get_estado_cuenta_proveedor_pdv_liquidacion(db)
     remitente = get_estado_cuenta_remitente(db)
     remitenteLiquidacion = get_estado_cuenta_remitente_liquidacion(db)
-    #otro = get_estado_cuenta_otro(db)
+    otro = get_estado_cuenta_otro(db)
+    otroLiquidacion = get_estado_cuenta_otro_liquidacion(db)
     return chofer.union_all(choferLiquidacion, propietario, propietarioLiquidacion,
-            proveedor, proveedorLiquidacion, proveedorPdv, proveedorPdvLiquidacion, remitente, remitenteLiquidacion)
+            proveedor, proveedorLiquidacion, proveedorPdv, proveedorPdvLiquidacion,
+            remitente, remitenteLiquidacion, otro, otroLiquidacion)
     # return proveedorPdv.union_all( chofer, proveedor, remitente)
     # return chofer.union_all(proveedor, proveedorPdv)
 
