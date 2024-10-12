@@ -265,8 +265,8 @@ def get_estado_cuenta_otro_liquidacion(db: Session) -> Query:
             Liquidacion.contraparte_numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_liquidacion_case_statement_new(),
         )
-        .join(Liquidacion.remitente)
         .join(Liquidacion.tipo_contraparte)
+        .filter(TipoContraparte.descripcion == TipoContraparteEnum.OTRO.value)
     )
 
 
