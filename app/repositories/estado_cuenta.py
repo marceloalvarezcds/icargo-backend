@@ -158,6 +158,7 @@ def get_estado_cuenta_chofer_liquidacion(db: Session) -> Query:
         )
         .join(Liquidacion.chofer)
         .join(Liquidacion.tipo_contraparte)
+        .filter(Liquidacion.estado != 'Cancelado')
     )
 
 
@@ -184,6 +185,7 @@ def get_estado_cuenta_propietario_liquidacion(db: Session) -> Query:
         )
         .join(Liquidacion.propietario)
         .join(Liquidacion.tipo_contraparte)
+        .filter(Liquidacion.estado != 'Cancelado')
     )
 
 
@@ -212,6 +214,7 @@ def get_estado_cuenta_proveedor_liquidacion(db: Session) -> Query:
         .join(Liquidacion.proveedor)
         .filter(~exists().where(PuntoVenta.proveedor_id == Proveedor.id))
         .join(Liquidacion.tipo_contraparte)
+        .filter(Liquidacion.estado != 'Cancelado')
     )
 
 
@@ -238,6 +241,7 @@ def get_estado_cuenta_remitente_liquidacion(db: Session) -> Query:
         )
         .join(Liquidacion.remitente)
         .join(Liquidacion.tipo_contraparte)
+        .filter(Liquidacion.estado != 'Cancelado')
     )
 
 
@@ -265,8 +269,9 @@ def get_estado_cuenta_otro_liquidacion(db: Session) -> Query:
             Liquidacion.contraparte_numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_liquidacion_case_statement_new(),
         )
-        .join(Liquidacion.remitente)
         .join(Liquidacion.tipo_contraparte)
+        .filter(TipoContraparte.descripcion == TipoContraparteEnum.OTRO.value)
+        .filter(Liquidacion.estado != 'Cancelado')
     )
 
 
@@ -308,6 +313,7 @@ def get_estado_cuenta_proveedor_pdv_liquidacion(db: Session) -> Query:
         .join(Liquidacion.proveedor)
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.punto_venta_id != null())
+        .filter(Liquidacion.estado != 'Cancelado')
     )
 
 
@@ -344,12 +350,12 @@ def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
             table.c.tipo_contraparte_descripcion.label("tipo_contraparte_descripcion"),
             table.c.gestor_carga_id.label("gestor_carga_id"),
             func.sum(table.c.pendiente).label("pendiente"),
-            func.sum(table.c.en_proceso).label("en_proceso"),
+            #func.sum(table.c.en_proceso).label("en_proceso"),
             func.sum(table.c.confirmado).label("confirmado"),
-            func.sum(table.c.saldo_pendiente).label("saldo_pendiente"),
+            #func.sum(table.c.saldo_pendiente).label("saldo_pendiente"),
             func.sum(table.c.finalizado).label("finalizado"),
             func.sum(table.c.cantidad_pendiente).label("cantidad_pendiente"),
-            func.sum(table.c.cantidad_en_proceso).label("cantidad_en_proceso"),
+            #func.sum(table.c.cantidad_en_proceso).label("cantidad_en_proceso"),
             func.sum(table.c.cantidad_confirmado).label("cantidad_confirmado"),
             func.sum(table.c.cantidad_finalizado).label("cantidad_finalizado"),
         )
@@ -444,16 +450,16 @@ def get_cols_estado_cuenta_case_statement() -> Tuple:
             ),
             else_=literal_column("0"),
         ).label("pendiente"),
-        case(
-            (
+        #case(
+        #    (
                 #and_(
                     # Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
-                    Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+        #            Movimiento.estado == EstadoEnum.EN_PROCESO.value,
                 #),
-                Movimiento.monto,
-            ),
-            else_=literal_column("0"),
-        ).label("en_proceso"),
+        #        Movimiento.monto,
+        #    ),
+        #    else_=literal_column("0"),
+        #).label("en_proceso"),
         case(
             (
                 or_(
@@ -475,14 +481,6 @@ def get_cols_estado_cuenta_case_statement() -> Tuple:
             ),
             else_=literal_column("0"),
         ).label("confirmado"),
-         case(
-             (
-                 Movimiento.estado == EstadoEnum.FINALIZADO.value,
-                 Movimiento.monto,
-             ),
-             else_=literal_column("0"),
-         ).label("saldo_pendiente"),
-        #Movimiento.monto.label("saldo_pendiente"),
         literal_column("0").label("finalizado"),
         case(
             (
@@ -494,16 +492,16 @@ def get_cols_estado_cuenta_case_statement() -> Tuple:
             ),
             else_=literal_column("0"),
         ).label("cantidad_pendiente"),
-        case(
-            (
-                #and_(
-                #    Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
-                    Movimiento.estado == EstadoEnum.EN_PROCESO.value,
-                #),
-                literal_column("1"),
-            ),
-            else_=literal_column("0"),
-        ).label("cantidad_en_proceso"),
+        # case(
+        #     (
+        #         #and_(
+        #         #    Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
+        #             Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+        #         #),
+        #         literal_column("1"),
+        #     ),
+        #     else_=literal_column("0"),
+        # ).label("cantidad_en_proceso"),
         case(
             (
                 or_(
@@ -513,11 +511,11 @@ def get_cols_estado_cuenta_case_statement() -> Tuple:
                     #),
                     #and_(
                     #    Liquidacion.etapa == EstadoEnum.PENDIENTE.value,
-                    #    Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                        Movimiento.estado == EstadoEnum.EN_PROCESO.value,
                     #),
                     #and_(
                     #    Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
-                        Movimiento.estado == EstadoEnum.CONFIRMADO.value,
+                        Movimiento.estado == EstadoEnum.FINALIZADO.value,
                     #)
                 ),
                 literal_column("1"),
@@ -531,9 +529,8 @@ def get_cols_estado_cuenta_case_statement() -> Tuple:
 def get_cols_estado_cuenta_liquidacion_case_statement() -> Tuple:
     return (
         literal_column("0").label("pendiente"),
-        literal_column("0").label("en_proceso"),
+        #literal_column("0").label("en_proceso"),
         literal_column("0").label("confirmado"),
-        literal_column("0").label("saldo_pendiente"),
         case(
             (
                 and_(
@@ -544,7 +541,7 @@ def get_cols_estado_cuenta_liquidacion_case_statement() -> Tuple:
             else_=literal_column("0"),
         ).label("finalizado"),
         literal_column("0").label("cantidad_pendiente"),
-        literal_column("0").label("cantidad_en_proceso"),
+        #literal_column("0").label("cantidad_en_proceso"),
         literal_column("0").label("cantidad_confirmado"),
         case(
             (
