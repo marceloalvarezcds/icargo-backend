@@ -27,8 +27,9 @@ from app.models import (
     OrdenCargaDescuento,
     TipoCuenta,
     TipoMovimiento,
+    Propietario
 )
-from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm
+from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm, FacturaForm
 from app.schemas.date_model import Date
 from app.schemas.orden_carga import OrdenCargaEditForm
 from app.schemas.rounded_decimal_model import RoundedDecimal
@@ -1109,3 +1110,88 @@ def get_movimiento_estado_cuenta_reports_by_contraparte(
         punto_venta_id
     )
     return generate_movimiento_reports(datalist, True, True)
+
+
+
+def create_movimiento_by_factura(
+    db: Session,
+    factura: FacturaForm,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+) -> Optional[Movimiento]:
+
+    tipo_contraparte = repositories.get_tipo_comprobante_by_id(
+        db, factura.tipo_contraparte_id
+    )
+    tipo_documento_relacionado = (
+        repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
+    )
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
+    tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
+        db, TipoMovimientoEnum.FISCAL.value
+    )
+    if (
+        not tipo_contraparte
+        or not tipo_documento_relacionado
+        or not tipo_cuenta
+        or not tipo_movimiento
+    ):
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
+        )
+
+    contraparte = service.get_by_id(Propietario, db, factura.contraparte_id)
+
+    create_movimiento(
+        db,
+        MovimientoForm(
+            liquidacion_id=factura.liquidacion_id,
+            tipo_contraparte_id=tipo_contraparte.id,
+            contraparte_id=contraparte.id,
+            propietario_id=contraparte.id,
+            contraparte=factura.contribuyente,
+            contraparte_numero_documento=factura.ruc,
+            tipo_documento_relacionado_id=tipo_documento_relacionado.id,
+            #numero_documento_relacionado=anticipo.orden_carga_id,
+            cuenta_id=tipo_cuenta.id,
+            tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.EN_PROCESO,
+            detalle=tipo_movimiento.descripcion,
+            monto=-factura.iva,
+            moneda_id=factura.moneda_id,
+            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+            fecha= datetime.now(),
+            fecha_cambio_moneda=datetime.now(),
+            tipo_movimiento_info='IVA'
+        ),
+        gestor_carga_id,
+        modified_by,
+    )
+    return create_movimiento(
+        db,
+        MovimientoForm(
+            liquidacion_id=factura.liquidacion_id,
+            tipo_contraparte_id=tipo_contraparte.id,
+            contraparte_id=contraparte.id,
+            propietario_id=contraparte.id,
+            contraparte=factura.contribuyente,
+            contraparte_numero_documento=factura.ruc,
+            tipo_documento_relacionado_id=tipo_documento_relacionado.id,
+            #numero_documento_relacionado=anticipo.orden_carga_id,
+            cuenta_id=tipo_cuenta.id,
+            tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.EN_PROCESO,
+            detalle=tipo_movimiento.descripcion,
+            monto=-factura.retencion,
+            moneda_id=factura.moneda_id,
+            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+            fecha= datetime.now(),
+            fecha_cambio_moneda=datetime.now(),
+            tipo_movimiento_info='RETENCION'
+        ),
+        gestor_carga_id,
+        modified_by,
+    )

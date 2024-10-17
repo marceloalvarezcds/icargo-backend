@@ -13,8 +13,16 @@ class FacturaForm(BaseModel):
     moneda_id: int
     iva_id: int
     numero_factura: str
+    timbrado: str
+    contribuyente: str
+    ruc: str
     monto: RoundedDecimal
+    iva: RoundedDecimal
+    retencion: RoundedDecimal
     fecha_vencimiento: Date
+    fecha_factura: Date
+    tipo_contraparte_id: int
+    contraparte_id: int
 
 
 class Factura(FacturaForm):

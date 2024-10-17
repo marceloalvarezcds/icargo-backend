@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app import repositories
 from app.models import Factura
 from app.schemas import FacturaForm
-
+from . import movimiento as service
 from .pictshare import upload_and_get_image_url
 
 
@@ -15,6 +15,7 @@ async def create_factura(
     data: FacturaForm,
     foto_file: Optional[UploadFile],
     modified_by: str,
+    gestor_carga_id: Optional[int] = None
 ) -> Factura:
     if repositories.get_factura_by(
         db, data.liquidacion_id, data.numero_factura, data.moneda_id, data.iva_id
@@ -22,8 +23,12 @@ async def create_factura(
         raise HTTPException(
             status_code=409, detail=f"La Factura Nº {data.numero_factura} ya existe"
         )
-    foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
-    return repositories.create_factura(db, data, foto_url, modified_by)
+    # foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
+    foto_url = 'url'
+    # creamos movimientos iva y retencion
+    factura = repositories.create_factura(db, data, foto_url, modified_by)
+    service.create_movimiento_by_factura(db, data, gestor_carga_id, modified_by)
+    return factura
 
 
 def get_factura_by_id(db: Session, id: int) -> Factura:

@@ -41,9 +41,16 @@ class Factura(AuditMixin, Base):
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
     moneda = relationship(Moneda, uselist=False)
     iva_id = Column(Integer, ForeignKey("tipo_iva.id"))
-    iva = relationship(TipoIva, uselist=False)
+    tipo_iva = relationship(TipoIva, uselist=False)
     fecha_vencimiento = Column(DateTime)
     foto = Column(String(255))
+
+    timbrado = Column(String(255))
+    contribuyente = Column(String(255))
+    ruc = Column(String(255))
+    fecha_factura = Column(DateTime)
+    iva = Column(Numeric(38,10))
+    retencion = Column(Numeric(38,10))
 
     @hybrid_property
     def contraparte(self):
@@ -55,7 +62,7 @@ class Factura(AuditMixin, Base):
 
     @hybrid_property
     def iva_descripcion(self):
-        return self.iva.descripcion
+        return self.tipo_iva.descripcion
 
     @hybrid_property
     def moneda_nombre(self):
@@ -72,3 +79,11 @@ class Factura(AuditMixin, Base):
     @hybrid_property
     def tipo_operacion_descripcion(self):
         return self.liquidacion.tipo_operacion_descripcion
+
+    @hybrid_property
+    def tipo_contraparte_id(self):
+        return self.liquidacion.tipo_contraparte_id
+
+    @hybrid_property
+    def contraparte_id(self):
+        return self.liquidacion.contraparte_id

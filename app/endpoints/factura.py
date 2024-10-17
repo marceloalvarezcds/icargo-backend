@@ -39,7 +39,7 @@ async def add_new_factura(
     _: bool = Depends(Permiso(a.CREAR, m.FACTURA)),  # noqa: B008
 ):
     return await services.create_factura(
-        db, data, foto_file, current_user.username  # type: ignore
+        db, data, foto_file, current_user.username, current_user.gestor_carga_id  # type: ignore
     )
 
 
