@@ -59,4 +59,7 @@ async def edit_factura(
 
 def delete_factura(db: Session, id: int, modified_by: str) -> Factura:
     co = get_factura_by_id(db, id)
-    return repositories.delete_factura(co, db, modified_by)
+    liquidacion = co.liquidacion
+    factura = repositories.delete_factura(co, db, modified_by)
+    service.delete_movimiento_by_factura(db, liquidacion, modified_by)
+    return factura

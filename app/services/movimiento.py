@@ -27,7 +27,11 @@ from app.models import (
     OrdenCargaDescuento,
     TipoCuenta,
     TipoMovimiento,
-    Propietario
+    Propietario,
+    Chofer,
+    Proveedor,
+    Remitente,
+    Liquidacion,
 )
 from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm, FacturaForm
 from app.schemas.date_model import Date
@@ -36,6 +40,7 @@ from app.schemas.rounded_decimal_model import RoundedDecimal
 from app.services import seleccionable_service as service
 from app.utils import get_flete_detalle, get_merma_detalle
 
+from app.logger import logger
 
 def get_orden_carga_by_movimiento(movimiento: Movimiento):
     oc = movimiento.orden_carga
@@ -1143,7 +1148,31 @@ def create_movimiento_by_factura(
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
 
-    contraparte = service.get_by_id(Propietario, db, factura.contraparte_id)
+    chofer_id = None
+    proveedor_id = None
+    propietario_id = None
+    remitente_id = None
+    punto_venta_id = None
+
+    if tipo_contraparte.descripcion == TipoContraparteEnum.CHOFER.value:
+        contraparte = service.get_by_id(Chofer, db, factura.contraparte_id)
+        chofer_id = contraparte.id
+
+    if tipo_contraparte.descripcion == TipoContraparteEnum.PROVEEDOR.value:
+        contraparte = service.get_by_id(Proveedor, db, factura.contraparte_id)
+        proveedor_id = contraparte.id
+        # enviar del fron indicador de pdv
+
+    if tipo_contraparte.descripcion == TipoContraparteEnum.PROPIETARIO.value:
+        contraparte = service.get_by_id(Propietario, db, factura.contraparte_id)
+        propietario_id = contraparte.id
+
+    if tipo_contraparte.descripcion == TipoContraparteEnum.REMITENTE.value:
+        contraparte = service.get_by_id(Remitente, db, factura.contraparte_id)
+        remitente_id = contraparte.id
+
+    # TODO: ver caso mov factura contraparte otros
+    # TODO: ver caso PDV
 
     create_movimiento(
         db,
@@ -1151,7 +1180,13 @@ def create_movimiento_by_factura(
             liquidacion_id=factura.liquidacion_id,
             tipo_contraparte_id=tipo_contraparte.id,
             contraparte_id=contraparte.id,
-            propietario_id=contraparte.id,
+
+            chofer_id=chofer_id,
+            proveedor_id=proveedor_id,
+            propietario_id=propietario_id,
+            remitente_id=remitente_id,
+            punto_venta_id=punto_venta_id,
+
             contraparte=factura.contribuyente,
             contraparte_numero_documento=factura.ruc,
             tipo_documento_relacionado_id=tipo_documento_relacionado.id,
@@ -1195,3 +1230,28 @@ def create_movimiento_by_factura(
         gestor_carga_id,
         modified_by,
     )
+
+
+def delete_movimiento_by_factura(db: Session,
+    liquidacion: Liquidacion,
+    modified_by: str,
+    gestor_carga_id: Optional[int] = None,
+) :
+
+    movimientos = get_movimiento_list_by_liquidacion(db,
+                            liquidacion.id, liquidacion.estado, gestor_carga_id)
+
+    tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
+        db, TipoMovimientoEnum.FISCAL.value
+    )
+
+    for c in movimientos:
+        logger.info(f"delete mov => {c.id} - {c.tipo_movimiento_descripcion} - {c.tipo_movimiento_info}")
+        if ( c.tipo_movimiento_descripcion == tipo_movimiento.descripcion
+                and ( c.tipo_movimiento_info == 'IVA' or c.tipo_movimiento_info == 'RETENCION')):
+            mov = get_movimiento_by_id(db, c.id)
+            db.delete(mov)
+            db.commit()
+
+    db.commit()
+
