@@ -17,17 +17,20 @@ async def create_factura(
     modified_by: str,
     gestor_carga_id: Optional[int] = None
 ) -> Factura:
+    
     if repositories.get_factura_by(
         db, data.liquidacion_id, data.numero_factura, data.moneda_id, data.iva_id
     ):
         raise HTTPException(
             status_code=409, detail=f"La Factura Nº {data.numero_factura} ya existe"
         )
-    # foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
-    foto_url = 'url'
-    # creamos movimientos iva y retencion
+    
+    foto_url = 'foto' # await upload_and_get_image_url(foto_file) if foto_file else None    
     factura = repositories.create_factura(db, data, foto_url, modified_by)
-    service.create_movimiento_by_factura(db, data, gestor_carga_id, modified_by)
+    
+    if data.es_cobro or data.es_pago:
+        service.create_movimiento_by_factura(db, data, gestor_carga_id, modified_by)
+
     return factura
 
 

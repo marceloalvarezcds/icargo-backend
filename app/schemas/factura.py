@@ -23,9 +23,31 @@ class FacturaForm(BaseModel):
     fecha_factura: Date
     tipo_contraparte_id: int
     contraparte_id: int
+    iva_incl: Optional[bool] = None
+    es_pago: Optional[bool] = None
+    es_cobro: Optional[bool] = None
+
+class FacturaResponse(BaseModel):
+    liquidacion_id: int
+    moneda_id: int
+    iva_id: int
+    numero_factura: str
+    timbrado: Optional[str]
+    contribuyente: Optional[str]
+    ruc: Optional[str]
+    monto: RoundedDecimal
+    iva: Optional[RoundedDecimal]
+    retencion: Optional[RoundedDecimal]
+    fecha_vencimiento: Date
+    fecha_factura: Optional[Date]
+    tipo_contraparte_id: int
+    contraparte_id: int
+    iva_incl: Optional[bool] = None
+    es_pago: Optional[bool] = None
+    es_cobro: Optional[bool] = None
 
 
-class Factura(FacturaForm):
+class Factura(FacturaResponse):
     id: int
     liquidacion_id: int
     estado: EstadoEnum

@@ -1195,7 +1195,7 @@ def create_movimiento_by_factura(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.EN_PROCESO,
             detalle=tipo_movimiento.descripcion,
-            monto=-factura.iva,
+            monto = factura.iva *-1 if factura.es_cobro else  factura.iva,
             moneda_id=factura.moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
             fecha= datetime.now(),
@@ -1220,7 +1220,7 @@ def create_movimiento_by_factura(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.EN_PROCESO,
             detalle=tipo_movimiento.descripcion,
-            monto=-factura.retencion,
+            monto= factura.retencion *-1 if factura.es_cobro else factura.retencion,
             moneda_id=factura.moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
             fecha= datetime.now(),
@@ -1238,20 +1238,13 @@ def delete_movimiento_by_factura(db: Session,
     gestor_carga_id: Optional[int] = None,
 ) :
 
-    movimientos = get_movimiento_list_by_liquidacion(db,
-                            liquidacion.id, liquidacion.estado, gestor_carga_id)
-
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.FISCAL.value
     )
 
-    for c in movimientos:
+    for c in liquidacion.movimientos:
         logger.info(f"delete mov => {c.id} - {c.tipo_movimiento_descripcion} - {c.tipo_movimiento_info}")
         if ( c.tipo_movimiento_descripcion == tipo_movimiento.descripcion
                 and ( c.tipo_movimiento_info == 'IVA' or c.tipo_movimiento_info == 'RETENCION')):
-            mov = get_movimiento_by_id(db, c.id)
-            db.delete(mov)
-            db.commit()
-
-    db.commit()
+            delete_movimiento(db, c.id, modified_by)
 

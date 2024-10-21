@@ -67,7 +67,10 @@ def create_factura(
         fecha_factura=data.fecha_factura,
         iva=data.iva,
         retencion=data.retencion,
-        contribuyente=data.contribuyente
+        contribuyente=data.contribuyente,
+        iva_incl=data.iva_incl,
+        es_pago=data.es_pago,
+        es_cobro=data.es_cobro,
     )
     db.add(obj)
     db.commit()

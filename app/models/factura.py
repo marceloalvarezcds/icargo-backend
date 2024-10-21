@@ -8,7 +8,8 @@ from sqlalchemy import (  # type: ignore
     UniqueConstraint,
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
-from sqlalchemy.orm import relationship  # type: ignore
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql.sqltypes import Boolean  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
@@ -51,6 +52,10 @@ class Factura(AuditMixin, Base):
     fecha_factura = Column(DateTime)
     iva = Column(Numeric(38,10))
     retencion = Column(Numeric(38,10))
+    
+    iva_incl = Column(Boolean, unique=False, default=False)
+    es_pago = Column(Boolean, unique=False, default=False)
+    es_cobro = Column(Boolean, unique=False, default=False, nullable=True)
 
     @hybrid_property
     def contraparte(self):

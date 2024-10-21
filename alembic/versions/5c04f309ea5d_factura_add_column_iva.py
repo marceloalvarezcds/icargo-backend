@@ -35,6 +35,15 @@ def upgrade():
     op.add_column(
         "factura", sa.Column("fecha_factura", sa.DateTime(), nullable=True)
     )
+    op.add_column(
+        "factura", sa.Column('iva_incl', sa.Boolean(), nullable=True, default=False)
+    )
+    op.add_column(
+        "factura", sa.Column('es_pago', sa.Boolean(), nullable=True, default=False)
+    )
+    op.add_column(
+        "factura", sa.Column('es_cobro', sa.Boolean(), nullable=True, default=False)
+    )
 
 
 def downgrade():
@@ -44,5 +53,7 @@ def downgrade():
     op.drop_column("factura", "contribuyente")
     op.drop_column("factura", "ruc")
     op.drop_column("factura", "fecha_factura")
-
+    op.drop_column("factura", "iva_incl")
+    op.drop_column("factura", "es_pago")
+    op.drop_column("factura", "es_cobro")
 
