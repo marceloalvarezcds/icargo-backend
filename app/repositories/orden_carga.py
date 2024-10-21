@@ -284,6 +284,18 @@ def edit_orden_carga(
         obj.destino_id = data.destino_id
     if data.comentarios:
         obj.comentarios = data.comentarios
+    if data.condicion_gestor_carga_tarifa:
+        obj.condicion_gestor_carga_tarifa = data.condicion_gestor_carga_tarifa
+    if data.condicion_propietario_tarifa:
+        obj.condicion_propietario_tarifa = data.condicion_propietario_tarifa
+    if data.merma_gestor_carga_tolerancia:
+        obj.merma_gestor_carga_tolerancia = data.merma_gestor_carga_tolerancia
+    if data.merma_propietario_tolerancia:
+        obj.merma_propietario_tolerancia = data.merma_propietario_tolerancia
+    if data.merma_gestor_carga_valor:
+        obj.merma_gestor_carga_valor = data.merma_gestor_carga_valor
+    if data.merma_propietario_valor:
+        obj.merma_propietario_valor = data.merma_propietario_valor
     obj.anticipos_liberados = data.anticipos_liberados
     obj.gestor_carga_id = gestor_carga_id
     obj.modified_by = modified_by
