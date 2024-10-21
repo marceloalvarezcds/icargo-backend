@@ -30,6 +30,7 @@ class EstadoCuenta(BaseModel):
     pendiente: RoundedDecimal
     en_proceso: RoundedDecimal
     confirmado: RoundedDecimal
+    saldo_pendiente: RoundedDecimal
     finalizado: RoundedDecimal
     cantidad_pendiente: int
     cantidad_en_proceso: int
@@ -63,3 +64,17 @@ class EstadoCuenta(BaseModel):
         for row in results:
             list_to_return.append(cls.from_orm_row(row))
         return list_to_return
+
+
+class ContraparteEstadoCuenta(BaseModel):
+    confirmado: RoundedDecimal
+    finalizado: RoundedDecimal
+
+    @classmethod
+    def from_dict(cls, dic: Dict) -> "ContraparteEstadoCuenta":
+        return ContraparteEstadoCuenta(**dic)
+
+    @classmethod
+    def from_orm_row(cls, row: Row) -> "ContraparteEstadoCuenta":
+        dic = row._asdict()
+        return cls.from_dict(dic)

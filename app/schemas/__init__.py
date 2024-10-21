@@ -22,7 +22,10 @@ from .contacto import Contacto, ContactoForm  # noqa
 from .contraparte import Contraparte  # noqa
 from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa
 from .ente_emisor_transporte import EnteEmisorTransporte  # noqa
-from .estado_cuenta import EstadoCuenta  # noqa
+from .estado_cuenta import ( # noqa
+    EstadoCuenta,
+    ContraparteEstadoCuenta
+)
 from .factura import Factura, FacturaForm  # noqa
 from .flete import Flete, FleteForm, FleteList  # noqa
 from .flete_anticipo import FleteAnticipo, FleteAnticipoForm  # noqa
@@ -62,8 +65,9 @@ from .movimiento import (  # noqa
     MovimientoFleteEditForm,
     MovimientoForm,
     MovimientoMermaEditForm,
-    MovimientoEstadoCuenta,
+    EstadoCuentaMovimiento,
 )
+from .movimiento_estado_cuenta import MovimientoEstadoCuenta
 from .orden_carga import (  # noqa
     OrdenCarga,
     OrdenCargaEditForm,
@@ -90,7 +94,7 @@ from .orden_carga_complemento import (  # noqa
     OrdenCargaComplementoForm,
 )
 
-from .orden_carga_comentarios_historial import OrdenCargaComentariosHistorial  
+from .orden_carga_comentarios_historial import OrdenCargaComentariosHistorial
 from .orden_carga_descuento import OrdenCargaDescuento, OrdenCargaDescuentoForm  # noqa
 from .orden_carga_estado_historial import OrdenCargaEstadoHistorial  # noqa
 

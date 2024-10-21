@@ -34,7 +34,7 @@ class Banco(AuditMixin, Base):
     saldo_confirmado = Column(Numeric(38, 10))
     saldo_provisional = Column(Numeric(38, 10))
     instrumentos = relationship(
-        "Instrumento", back_populates="banco", order_by="Instrumento.modified_by"
+        "Instrumento", back_populates="banco", order_by="Instrumento.modified_at.desc()"
     )
 
     @hybrid_property
@@ -48,15 +48,19 @@ class Banco(AuditMixin, Base):
     @hybrid_property
     def info(self):
         return f"{self.nombre}: ({self.titular} - {self.numero_cuenta})"
-    
+
     @hybrid_property
     def credito(self):
         if self.instrumentos:
-            return self.instrumentos[0].credito
+            return sum(
+                x.credito for x in self.instrumentos if x.estado != EstadoEnum.ELIMINADO.value
+            )
         return None
-    
+
     @hybrid_property
     def debito(self):
         if self.instrumentos:
-            return self.instrumentos[0].debito
-        return None    
+             return sum(
+                x.debito for x in self.instrumentos if x.estado != EstadoEnum.ELIMINADO.value
+             )
+        return None

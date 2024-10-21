@@ -88,6 +88,7 @@ def get_liquidacion_list_by_contraparte_and_gestor_carga_id(
                         or_(
                             Liquidacion.etapa == LiquidacionEtapaEnum.EN_PROCESO.value,
                             Liquidacion.etapa == LiquidacionEtapaEnum.CONFIRMADO.value,
+                            Liquidacion.etapa == LiquidacionEtapaEnum.FINALIZADO.value,
                         )
                      ),
                     else_=Liquidacion.etapa == etapa,
@@ -144,7 +145,7 @@ def create_liquidacion(
         created_by=modified_by,
         modified_by=modified_by,
         pago_cobro=data.monto,
-        #es_pago_cobro=data.es_pago_cobro
+        es_pago_cobro=data.es_pago_cobro
     )
     db.add(obj)
     db.commit()
