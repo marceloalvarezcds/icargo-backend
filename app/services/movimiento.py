@@ -32,6 +32,7 @@ from app.models import (
     Proveedor,
     Remitente,
     Liquidacion,
+    Factura,
 )
 from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm, FacturaForm
 from app.schemas.date_model import Date
@@ -1123,6 +1124,7 @@ def create_movimiento_by_factura(
     factura: FacturaForm,
     gestor_carga_id: Optional[int],
     modified_by: str,
+    facturaModel: Factura,
 ) -> Optional[Movimiento]:
 
     tipo_contraparte = repositories.get_tipo_comprobante_by_id(
@@ -1174,7 +1176,7 @@ def create_movimiento_by_factura(
     # TODO: ver caso mov factura contraparte otros
     # TODO: ver caso PDV
 
-    create_movimiento(
+    mov_iva = create_movimiento(
         db,
         MovimientoForm(
             liquidacion_id=factura.liquidacion_id,
@@ -1195,7 +1197,7 @@ def create_movimiento_by_factura(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.EN_PROCESO,
             detalle=tipo_movimiento.descripcion,
-            monto = factura.iva *-1 if factura.es_cobro else  factura.iva,
+            monto = factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else  factura.iva,
             moneda_id=factura.moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
             fecha= datetime.now(),
@@ -1205,7 +1207,8 @@ def create_movimiento_by_factura(
         gestor_carga_id,
         modified_by,
     )
-    return create_movimiento(
+
+    mov_reten = create_movimiento(
         db,
         MovimientoForm(
             liquidacion_id=factura.liquidacion_id,
@@ -1220,7 +1223,7 @@ def create_movimiento_by_factura(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.EN_PROCESO,
             detalle=tipo_movimiento.descripcion,
-            monto= factura.retencion *-1 if factura.es_cobro else factura.retencion,
+            monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
             moneda_id=factura.moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
             fecha= datetime.now(),
@@ -1231,20 +1234,44 @@ def create_movimiento_by_factura(
         modified_by,
     )
 
+    facturaModel.iva_movimiento_id = mov_iva.id
+    facturaModel.retencion_movimiento_id = mov_reten.id
+
+    db.commit()
+    db.refresh(facturaModel)
+
+    return facturaModel
 
 def delete_movimiento_by_factura(db: Session,
-    liquidacion: Liquidacion,
+    factura: Factura,
     modified_by: str,
     gestor_carga_id: Optional[int] = None,
 ) :
 
-    tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
-        db, TipoMovimientoEnum.FISCAL.value
-    )
+    if factura.retencion_movimiento_id:
+        delete_movimiento(db, factura.retencion_movimiento_id, modified_by)
 
-    for c in liquidacion.movimientos:
-        logger.info(f"delete mov => {c.id} - {c.tipo_movimiento_descripcion} - {c.tipo_movimiento_info}")
-        if ( c.tipo_movimiento_descripcion == tipo_movimiento.descripcion
-                and ( c.tipo_movimiento_info == 'IVA' or c.tipo_movimiento_info == 'RETENCION')):
-            delete_movimiento(db, c.id, modified_by)
+    if factura.iva_movimiento_id:
+        delete_movimiento(db, factura.iva_movimiento_id, modified_by)
 
+
+def edit_movimiento_by_factura(
+    db: Session,
+    facturaModel: Factura,
+    factura: FacturaForm,
+    modified_by: str,
+) :
+
+    mov_iva = get_movimiento_by_id(db, facturaModel.iva_movimiento_id)
+    mov_iva.monto= factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else factura.iva,
+    mov_iva.moneda_id= factura.moneda_id
+
+    mov_retencion = get_movimiento_by_id(db, facturaModel.retencion_movimiento_id)
+    mov_retencion.monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
+    mov_retencion.moneda_id= factura.moneda_id
+
+    db.commit()
+    db.refresh(mov_iva)
+    db.refresh(mov_retencion)
+
+    return facturaModel

@@ -36,13 +36,19 @@ def upgrade():
         "factura", sa.Column("fecha_factura", sa.DateTime(), nullable=True)
     )
     op.add_column(
-        "factura", sa.Column('iva_incl', sa.Boolean(), nullable=True, default=False)
+        "factura", sa.Column('iva_incluido', sa.Boolean(), nullable=True, default=False)
     )
     op.add_column(
-        "factura", sa.Column('es_pago', sa.Boolean(), nullable=True, default=False)
+        "factura", sa.Column('sentido_mov_iva', sa.String(length=10), nullable=True)
     )
     op.add_column(
-        "factura", sa.Column('es_cobro', sa.Boolean(), nullable=True, default=False)
+        "factura", sa.Column('sentido_mov_retencion', sa.String(length=10), nullable=True)
+    )
+    op.add_column(
+        "factura", sa.Column('iva_movimiento_id', sa.Integer(), nullable=True)
+    )
+    op.add_column(
+        "factura", sa.Column('retencion_movimiento_id', sa.Integer(), nullable=True)
     )
 
 
@@ -53,7 +59,9 @@ def downgrade():
     op.drop_column("factura", "contribuyente")
     op.drop_column("factura", "ruc")
     op.drop_column("factura", "fecha_factura")
-    op.drop_column("factura", "iva_incl")
-    op.drop_column("factura", "es_pago")
-    op.drop_column("factura", "es_cobro")
+    op.drop_column("factura", "iva_incluido")
+    op.drop_column("factura", "sentido_mov_iva")
+    op.drop_column("factura", "sentido_mov_retencion")
+    op.drop_column("factura", "iva_movimiento_id")
+    op.drop_column("factura", "retencion_movimiento_id")
 

@@ -12,6 +12,7 @@ from app.schemas import MovimientoEstadoCuenta
 from app.schemas import Movimiento as MovimientoSchema
 
 
+
 def get_movimiento_list(db: Session) -> List[Movimiento]:
     return (
         db.query(Movimiento)

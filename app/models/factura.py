@@ -36,7 +36,10 @@ class Factura(AuditMixin, Base):
     id = Column(Integer, primary_key=True)
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     liquidacion_id = Column(Integer, ForeignKey("liquidacion.id"))
-    liquidacion = relationship(Liquidacion, uselist=False, back_populates="facturas")
+    liquidacion = relationship(Liquidacion,
+                uselist=False,
+                primaryjoin="Liquidacion.id == Factura.liquidacion_id and Factura.estado=='Activo'",
+                back_populates="facturas")
     numero_factura = Column(String(255))
     monto = Column(Numeric(38, 10))
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
@@ -52,10 +55,12 @@ class Factura(AuditMixin, Base):
     fecha_factura = Column(DateTime)
     iva = Column(Numeric(38,10))
     retencion = Column(Numeric(38,10))
-    
-    iva_incl = Column(Boolean, unique=False, default=False)
-    es_pago = Column(Boolean, unique=False, default=False)
-    es_cobro = Column(Boolean, unique=False, default=False, nullable=True)
+    iva_incluido = Column(Boolean, unique=False, default=False)
+    sentido_mov_iva = Column( String(10) )
+    sentido_mov_retencion = Column( String(10) )
+
+    iva_movimiento_id = Column( Integer )
+    retencion_movimiento_id = Column( Integer)
 
     @hybrid_property
     def contraparte(self):

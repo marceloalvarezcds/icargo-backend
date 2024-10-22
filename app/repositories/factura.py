@@ -68,9 +68,9 @@ def create_factura(
         iva=data.iva,
         retencion=data.retencion,
         contribuyente=data.contribuyente,
-        iva_incl=data.iva_incl,
-        es_pago=data.es_pago,
-        es_cobro=data.es_cobro,
+        iva_incluido=data.iva_incluido,
+        sentido_mov_iva=data.sentido_mov_iva,
+        sentido_mov_retencion=data.sentido_mov_retencion,
     )
     db.add(obj)
     db.commit()
@@ -91,16 +91,21 @@ def edit_factura(
     obj.monto = data.monto
     obj.iva_id = data.iva_id
     obj.fecha_vencimiento = data.fecha_vencimiento
-    obj.timbrado=data.timbrado,
-    obj.ruc=data.ruc,
+    obj.timbrado=data.timbrado
+    obj.ruc=data.ruc
     obj.fecha_factura=data.fecha_factura,
-    obj.iva=data.iva,
+    obj.iva=data.iva
     obj.retencion=data.retencion,
     obj.contribuyente=data.contribuyente
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
+    obj.iva_incluido=data.iva_incluido
+    obj.sentido_mov_iva = data.sentido_mov_iva
+    obj.sentido_mov_retencion = data.sentido_mov_retencion,
+
     if foto_url:
         obj.foto = foto_url
+
     db.commit()
     db.refresh(obj)
     return obj

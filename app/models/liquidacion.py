@@ -6,6 +6,7 @@ from sqlalchemy import (  # type: ignore
     String,
     Text,
 )
+from sqlalchemy.sql.elements import and_ # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import Numeric  # type: ignore
@@ -71,7 +72,10 @@ class Liquidacion(AuditMixin, Base):
         "Instrumento", back_populates="liquidacion", order_by="Instrumento.modified_at"
     )
     facturas = relationship(
-        "Factura", back_populates="liquidacion", order_by="Factura.modified_at"
+        "Factura",
+        back_populates="liquidacion",
+        order_by="Factura.modified_at",
+        primaryjoin="and_(Liquidacion.id == Factura.liquidacion_id, Factura.estado=='Activo')",
     )
 
     @hybrid_property

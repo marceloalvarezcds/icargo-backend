@@ -23,9 +23,11 @@ class FacturaForm(BaseModel):
     fecha_factura: Date
     tipo_contraparte_id: int
     contraparte_id: int
-    iva_incl: Optional[bool] = None
-    es_pago: Optional[bool] = None
-    es_cobro: Optional[bool] = None
+    iva_incluido: bool
+    sentido_mov_iva: Optional[str]
+    sentido_mov_retencion: Optional[str]
+    iva_movimiento_id: Optional[int]
+    retencion_movimiento_id: Optional[int]
 
 class FacturaResponse(BaseModel):
     liquidacion_id: int
@@ -42,9 +44,11 @@ class FacturaResponse(BaseModel):
     fecha_factura: Optional[Date]
     tipo_contraparte_id: int
     contraparte_id: int
-    iva_incl: Optional[bool] = None
-    es_pago: Optional[bool] = None
-    es_cobro: Optional[bool] = None
+    iva_incluido: Optional[bool]
+    sentido_mov_iva: Optional[str]
+    sentido_mov_retencion: Optional[str]
+    iva_movimiento_id: Optional[int]
+    retencion_movimiento_id: Optional[int]
 
 
 class Factura(FacturaResponse):
