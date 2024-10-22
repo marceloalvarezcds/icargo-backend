@@ -42,6 +42,7 @@ class LiquidacionForm(BaseModel):
     punto_venta_id: Optional[int]
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
+    saldo_cc: Optional[RoundedDecimal]
 
 
 class Liquidacion(LiquidacionForm):

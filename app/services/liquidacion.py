@@ -99,7 +99,7 @@ def create_liquidacion_pendiente(
     nombre_contraparte = None
     contraparte_documento = None
     moneda = None
-# camino con movimientos    
+# camino con movimientos
     if len(data.movimientos) > 0:
         movimientos = get_movimiento_list_by_liquidacion_create_form(db, data)
         movimiento = movimientos[0]
@@ -118,7 +118,7 @@ def create_liquidacion_pendiente(
         elif movimiento.es_gestor:
             remitente_id = movimiento.remitente_id
         else:
-            propietario_id = movimiento.propietario_id    
+            propietario_id = movimiento.propietario_id
     else:
         moneda = data.cabecera.moneda_id
         nombre_contraparte = data.cabecera.contraparte
@@ -316,8 +316,11 @@ def add_instrumentos(
     if int(saldo_residual) == 0:
         obj = get_liquidacion_by_id(db, id)
         get_instrumento_list_by_liquidacion_create_form(db, id, data, modified_by)
+        saldo_cc = data.instrumentos[0].saldo_cc
         obj.modified_by = modified_by
         obj.modified_at = datetime.now()
+        obj.saldo_cc = saldo_cc
+        # actualizar saldo cc liquidacion
         db.commit()
         db.refresh(obj)
         obj = repositories.change_liquidacion_status(

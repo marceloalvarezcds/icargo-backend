@@ -13,11 +13,45 @@ class FacturaForm(BaseModel):
     moneda_id: int
     iva_id: int
     numero_factura: str
+    timbrado: str
+    contribuyente: str
+    ruc: str
     monto: RoundedDecimal
+    iva: RoundedDecimal
+    retencion: RoundedDecimal
     fecha_vencimiento: Date
+    fecha_factura: Date
+    tipo_contraparte_id: int
+    contraparte_id: int
+    iva_incluido: bool
+    sentido_mov_iva: Optional[str]
+    sentido_mov_retencion: Optional[str]
+    iva_movimiento_id: Optional[int]
+    retencion_movimiento_id: Optional[int]
+
+class FacturaResponse(BaseModel):
+    liquidacion_id: int
+    moneda_id: int
+    iva_id: int
+    numero_factura: str
+    timbrado: Optional[str]
+    contribuyente: Optional[str]
+    ruc: Optional[str]
+    monto: RoundedDecimal
+    iva: Optional[RoundedDecimal]
+    retencion: Optional[RoundedDecimal]
+    fecha_vencimiento: Date
+    fecha_factura: Optional[Date]
+    tipo_contraparte_id: int
+    contraparte_id: int
+    iva_incluido: Optional[bool]
+    sentido_mov_iva: Optional[str]
+    sentido_mov_retencion: Optional[str]
+    iva_movimiento_id: Optional[int]
+    retencion_movimiento_id: Optional[int]
 
 
-class Factura(FacturaForm):
+class Factura(FacturaResponse):
     id: int
     liquidacion_id: int
     estado: EstadoEnum

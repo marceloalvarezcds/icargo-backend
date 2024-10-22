@@ -8,3 +8,4 @@ class TipoMovimientoEnum(Enum):
     DESCUENTO = "Descuento"
     MERMA = "Merma"
     OTRO = "Otro"
+    FISCAL = "Fiscal"

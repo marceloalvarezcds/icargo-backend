@@ -34,12 +34,12 @@ async def read_factura_by_id(
 async def add_new_factura(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.FacturaForm] = Form(...),  # type: ignore  # noqa: B008
-    foto_file: UploadFile = File(...),  # noqa: B008
+    foto_file: Optional[UploadFile] = File(None) ,  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.FACTURA)),  # noqa: B008
 ):
     return await services.create_factura(
-        db, data, foto_file, current_user.username  # type: ignore
+        db, data, foto_file, current_user.username, current_user.gestor_carga_id  # type: ignore
     )
 
 
