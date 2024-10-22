@@ -134,7 +134,6 @@ class OrdenCarga(OrdenCargaBaseModel):
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
-    condicion_gestor_cuenta_tarifa: Optional[int] = None
     resultado_gestor_carga_saldo_total: Optional[int] = None
     resultado_propietario_total_anticipos_retirados: Optional[int] = None
 
@@ -158,20 +157,26 @@ class OrdenCarga(OrdenCargaBaseModel):
     # FIN Tramo de OC
     # INICIO Cantidad y Flete
     # inicio - Condiciones para el Gestor de Carga
+    condicion_gestor_cuenta_tarifa: Optional[int] = None
     condicion_gestor_carga_moneda: Optional[Moneda] = None
     # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda: Optional[Moneda] = None
+    condicion_propietario_tarifa: Optional[int] = None
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
     # inicio - Mermas para el Gestor de Carga
     merma_gestor_carga_moneda: Optional[Moneda] = None
     merma_gestor_carga_es_porcentual_descripcion: str
+    merma_gestor_carga_tolerancia: Optional[int] = None
+    merma_gestor_carga_valor: Optional[int] = None
     # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
     merma_propietario_moneda: Optional[Moneda] = None
     merma_propietario_es_porcentual_descripcion: str
+    merma_propietario_tolerancia: Optional[int] = None
+    merma_propietario_valor: Optional[int] = None
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
     # Relaciones Listas
