@@ -131,7 +131,7 @@ class OrdenCarga(AuditMixin, Base):
     
     @hybrid_property
     def combinacion_chofer_doc(self):
-        return self.combinacion.chofer.ruc
+        return self.combinacion.chofer_numero_documento
     
     @hybrid_property
     def camion_marca(self):

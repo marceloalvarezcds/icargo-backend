@@ -138,6 +138,7 @@ from .insumo_punto_venta import (  # noqa
 from .insumo_punto_venta_precio import (  # noqa
     create_insumo_punto_venta_precio,
     get_insumo_punto_venta_precio_by_insumo_id_and_moneda_id_and_punto_venta_id,
+    get_insumo_venta_precio_list,
 )
 from .liquidacion import (  # noqa
     aceptar_liquidacion,
