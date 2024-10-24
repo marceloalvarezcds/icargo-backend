@@ -206,6 +206,11 @@ class OrdenCarga(AuditMixin, Base):
         return self.combinacion.combinacion_chofer_id
     
     @hybrid_property
+    def combinacion_chofer_nombre(self):
+        return self.combinacion.chofer_nombre
+    
+    
+    @hybrid_property
     def neto(self):
       return self.combinacion.neto
     

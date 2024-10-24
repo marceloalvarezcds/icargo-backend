@@ -234,6 +234,8 @@ class OrdenCargaList(OrdenCargaForm):
     semi_placa: str
     beneficiario_descripcion: Optional[str] = None
     combinacion_id: Optional[int] = None
+    combinacion_chofer_nombre: Optional[str] = None
+    combinacion_chofer_doc: Optional[str] = None
     # Datos de fletes
     flete_destino_nombre: Optional[str] = None
     flete_gestor_carga_id: int
