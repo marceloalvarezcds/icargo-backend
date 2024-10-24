@@ -33,6 +33,7 @@ from app.models import (
     Remitente,
     Liquidacion,
     Factura,
+    PuntoVenta
 )
 from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm, FacturaForm
 from app.schemas.date_model import Date
@@ -1163,7 +1164,10 @@ def create_movimiento_by_factura(
     if tipo_contraparte.descripcion == TipoContraparteEnum.PROVEEDOR.value:
         contraparte = service.get_by_id(Proveedor, db, factura.contraparte_id)
         proveedor_id = contraparte.id
-        # enviar del fron indicador de pdv
+
+        if factura.punto_venta_id:
+            contraparte = service.get_by_id(PuntoVenta, db, factura.punto_venta_id)
+            punto_venta_id = contraparte.id
 
     if tipo_contraparte.descripcion == TipoContraparteEnum.PROPIETARIO.value:
         contraparte = service.get_by_id(Propietario, db, factura.contraparte_id)
@@ -1181,14 +1185,11 @@ def create_movimiento_by_factura(
         MovimientoForm(
             liquidacion_id=factura.liquidacion_id,
             tipo_contraparte_id=tipo_contraparte.id,
-            contraparte_id=contraparte.id,
-
             chofer_id=chofer_id,
             proveedor_id=proveedor_id,
             propietario_id=propietario_id,
             remitente_id=remitente_id,
             punto_venta_id=punto_venta_id,
-
             contraparte=factura.contribuyente,
             contraparte_numero_documento=factura.ruc,
             tipo_documento_relacionado_id=tipo_documento_relacionado.id,
@@ -1213,8 +1214,11 @@ def create_movimiento_by_factura(
         MovimientoForm(
             liquidacion_id=factura.liquidacion_id,
             tipo_contraparte_id=tipo_contraparte.id,
-            contraparte_id=contraparte.id,
-            propietario_id=contraparte.id,
+            chofer_id=chofer_id,
+            proveedor_id=proveedor_id,
+            propietario_id=propietario_id,
+            remitente_id=remitente_id,
+            punto_venta_id=punto_venta_id,
             contraparte=factura.contribuyente,
             contraparte_numero_documento=factura.ruc,
             tipo_documento_relacionado_id=tipo_documento_relacionado.id,
