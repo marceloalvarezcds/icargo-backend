@@ -27,14 +27,21 @@ from app.models import (
     OrdenCargaDescuento,
     TipoCuenta,
     TipoMovimiento,
+    Propietario,
+    Chofer,
+    Proveedor,
+    Remitente,
+    Liquidacion,
+    Factura,
 )
-from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm
+from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm, FacturaForm
 from app.schemas.date_model import Date
 from app.schemas.orden_carga import OrdenCargaEditForm
 from app.schemas.rounded_decimal_model import RoundedDecimal
 from app.services import seleccionable_service as service
 from app.utils import get_flete_detalle, get_merma_detalle
 
+from app.logger import logger
 
 def get_orden_carga_by_movimiento(movimiento: Movimiento):
     oc = movimiento.orden_carga
@@ -1109,3 +1116,162 @@ def get_movimiento_estado_cuenta_reports_by_contraparte(
         punto_venta_id
     )
     return generate_movimiento_reports(datalist, True, True)
+
+
+
+def create_movimiento_by_factura(
+    db: Session,
+    factura: FacturaForm,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+    facturaModel: Factura,
+) -> Optional[Movimiento]:
+
+    tipo_contraparte = repositories.get_tipo_comprobante_by_id(
+        db, factura.tipo_contraparte_id
+    )
+    tipo_documento_relacionado = (
+        repositories.get_tipo_documento_relacionado_by_descripcion(db, "OC")
+    )
+    tipo_cuenta = repositories.get_tipo_cuenta_by_descripcion(
+        db, TipoCuentaEnum.VIAJES.value
+    )
+    tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
+        db, TipoMovimientoEnum.FISCAL.value
+    )
+    if (
+        not tipo_contraparte
+        or not tipo_documento_relacionado
+        or not tipo_cuenta
+        or not tipo_movimiento
+    ):
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
+        )
+
+    chofer_id = None
+    proveedor_id = None
+    propietario_id = None
+    remitente_id = None
+    punto_venta_id = None
+
+    if tipo_contraparte.descripcion == TipoContraparteEnum.CHOFER.value:
+        contraparte = service.get_by_id(Chofer, db, factura.contraparte_id)
+        chofer_id = contraparte.id
+
+    if tipo_contraparte.descripcion == TipoContraparteEnum.PROVEEDOR.value:
+        contraparte = service.get_by_id(Proveedor, db, factura.contraparte_id)
+        proveedor_id = contraparte.id
+        # enviar del fron indicador de pdv
+
+    if tipo_contraparte.descripcion == TipoContraparteEnum.PROPIETARIO.value:
+        contraparte = service.get_by_id(Propietario, db, factura.contraparte_id)
+        propietario_id = contraparte.id
+
+    if tipo_contraparte.descripcion == TipoContraparteEnum.REMITENTE.value:
+        contraparte = service.get_by_id(Remitente, db, factura.contraparte_id)
+        remitente_id = contraparte.id
+
+    # TODO: ver caso mov factura contraparte otros
+    # TODO: ver caso PDV
+
+    mov_iva = create_movimiento(
+        db,
+        MovimientoForm(
+            liquidacion_id=factura.liquidacion_id,
+            tipo_contraparte_id=tipo_contraparte.id,
+            contraparte_id=contraparte.id,
+
+            chofer_id=chofer_id,
+            proveedor_id=proveedor_id,
+            propietario_id=propietario_id,
+            remitente_id=remitente_id,
+            punto_venta_id=punto_venta_id,
+
+            contraparte=factura.contribuyente,
+            contraparte_numero_documento=factura.ruc,
+            tipo_documento_relacionado_id=tipo_documento_relacionado.id,
+            #numero_documento_relacionado=anticipo.orden_carga_id,
+            cuenta_id=tipo_cuenta.id,
+            tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.EN_PROCESO,
+            detalle=tipo_movimiento.descripcion,
+            monto = factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else  factura.iva,
+            moneda_id=factura.moneda_id,
+            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+            fecha= datetime.now(),
+            fecha_cambio_moneda=datetime.now(),
+            tipo_movimiento_info='IVA'
+        ),
+        gestor_carga_id,
+        modified_by,
+    )
+
+    mov_reten = create_movimiento(
+        db,
+        MovimientoForm(
+            liquidacion_id=factura.liquidacion_id,
+            tipo_contraparte_id=tipo_contraparte.id,
+            contraparte_id=contraparte.id,
+            propietario_id=contraparte.id,
+            contraparte=factura.contribuyente,
+            contraparte_numero_documento=factura.ruc,
+            tipo_documento_relacionado_id=tipo_documento_relacionado.id,
+            #numero_documento_relacionado=anticipo.orden_carga_id,
+            cuenta_id=tipo_cuenta.id,
+            tipo_movimiento_id=tipo_movimiento.id,
+            estado=MovimientoEstadoEnum.EN_PROCESO,
+            detalle=tipo_movimiento.descripcion,
+            monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
+            moneda_id=factura.moneda_id,
+            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+            fecha= datetime.now(),
+            fecha_cambio_moneda=datetime.now(),
+            tipo_movimiento_info='RETENCION'
+        ),
+        gestor_carga_id,
+        modified_by,
+    )
+
+    facturaModel.iva_movimiento_id = mov_iva.id
+    facturaModel.retencion_movimiento_id = mov_reten.id
+
+    db.commit()
+    db.refresh(facturaModel)
+
+    return facturaModel
+
+def delete_movimiento_by_factura(db: Session,
+    factura: Factura,
+    modified_by: str,
+    gestor_carga_id: Optional[int] = None,
+) :
+
+    if factura.retencion_movimiento_id:
+        delete_movimiento(db, factura.retencion_movimiento_id, modified_by)
+
+    if factura.iva_movimiento_id:
+        delete_movimiento(db, factura.iva_movimiento_id, modified_by)
+
+
+def edit_movimiento_by_factura(
+    db: Session,
+    facturaModel: Factura,
+    factura: FacturaForm,
+    modified_by: str,
+) :
+
+    mov_iva = get_movimiento_by_id(db, facturaModel.iva_movimiento_id)
+    mov_iva.monto= factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else factura.iva,
+    mov_iva.moneda_id= factura.moneda_id
+
+    mov_retencion = get_movimiento_by_id(db, facturaModel.retencion_movimiento_id)
+    mov_retencion.monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
+    mov_retencion.moneda_id= factura.moneda_id
+
+    db.commit()
+    db.refresh(mov_iva)
+    db.refresh(mov_retencion)
+
+    return facturaModel

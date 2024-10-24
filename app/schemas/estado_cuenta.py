@@ -28,12 +28,12 @@ class EstadoCuenta(BaseModel):
     tipo_contraparte_id: int
     tipo_contraparte_descripcion: str
     pendiente: RoundedDecimal
-    en_proceso: RoundedDecimal
+    en_proceso: Optional[RoundedDecimal]
     confirmado: RoundedDecimal
-    saldo_pendiente: RoundedDecimal
+    saldo_pendiente: Optional[RoundedDecimal]
     finalizado: RoundedDecimal
     cantidad_pendiente: int
-    cantidad_en_proceso: int
+    cantidad_en_proceso: Optional[int]
     cantidad_confirmado: int
     cantidad_finalizado: int
     q: str

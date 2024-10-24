@@ -12,6 +12,7 @@ from app.schemas import MovimientoEstadoCuenta
 from app.schemas import Movimiento as MovimientoSchema
 
 
+
 def get_movimiento_list(db: Session) -> List[Movimiento]:
     return (
         db.query(Movimiento)
@@ -485,7 +486,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
     gestor_carga_id: int,
     punto_venta_id: Optional[int]
     ) -> Query:
-    
+
     # columnas especificas
     query = db.query(
                 Movimiento.id.label("movimiento_id"),
@@ -498,6 +499,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                 Movimiento.detalle.label("info"),
                 Movimiento.estado.label("estado"),
                 Liquidacion.estado.label("estado_liquidacion"),
+                Movimiento.es_editable.label("es_editable"),
                 *get_cols_estado_cuenta_case_statement(),
                 )\
                 .join(Movimiento.tipo_movimiento)\

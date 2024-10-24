@@ -3,7 +3,6 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
-
 from app.enums import EstadoEnum
 from app.models import Factura
 from app.schemas import FacturaForm
@@ -51,7 +50,7 @@ def create_factura(
     db: Session,
     data: FacturaForm,
     foto_url: Optional[str],
-    modified_by: str,
+    modified_by: str
 ) -> Factura:
     obj = Factura(
         liquidacion_id=data.liquidacion_id,
@@ -63,6 +62,15 @@ def create_factura(
         foto=foto_url,
         created_by=modified_by,
         modified_by=modified_by,
+        timbrado=data.timbrado,
+        ruc=data.ruc,
+        fecha_factura=data.fecha_factura,
+        iva=data.iva,
+        retencion=data.retencion,
+        contribuyente=data.contribuyente,
+        iva_incluido=data.iva_incluido,
+        sentido_mov_iva=data.sentido_mov_iva,
+        sentido_mov_retencion=data.sentido_mov_retencion,
     )
     db.add(obj)
     db.commit()
@@ -83,10 +91,21 @@ def edit_factura(
     obj.monto = data.monto
     obj.iva_id = data.iva_id
     obj.fecha_vencimiento = data.fecha_vencimiento
+    obj.timbrado=data.timbrado
+    obj.ruc=data.ruc
+    obj.fecha_factura=data.fecha_factura,
+    obj.iva=data.iva
+    obj.retencion=data.retencion,
+    obj.contribuyente=data.contribuyente
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
+    obj.iva_incluido=data.iva_incluido
+    obj.sentido_mov_iva = data.sentido_mov_iva
+    obj.sentido_mov_retencion = data.sentido_mov_retencion,
+
     if foto_url:
         obj.foto = foto_url
+
     db.commit()
     db.refresh(obj)
     return obj
