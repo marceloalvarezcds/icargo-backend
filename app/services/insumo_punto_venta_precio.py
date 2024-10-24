@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 
+from app import repositories
 from app.models import InsumoPuntoVentaPrecio
 from app.repositories import (
     create_insumo_punto_venta,
@@ -11,6 +12,11 @@ from app.repositories import (
 )
 from app.schemas import InsumoPuntoVentaPrecioForm
 from app.utils.gestor_carga import get_gestor_carga_by_params
+
+def get_insumo_venta_precio_list(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[InsumoPuntoVentaPrecio]:
+    return repositories.get_insumo_punto_venta_precio_list(db, gestor_carga_id)
 
 
 def get_insumo_punto_venta_precio_by_insumo_id_and_moneda_id_and_punto_venta_id(

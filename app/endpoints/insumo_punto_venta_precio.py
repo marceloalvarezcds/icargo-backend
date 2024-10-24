@@ -11,6 +11,14 @@ from app.enums import PermisoModeloEnum as m
 
 api = APIRouter()
 
+@api.get("/", response_model=List[schemas.InsumoPuntoVentaPrecioList])
+async def read_insumo_punto_venta_precio_list(
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.LISTAR, m.INSUMO_PUNTO_VENTA_PRECIO)),
+):
+    return services.get_insumo_venta_precio_list(db, current_user.gestor_carga_id)
+
 
 @api.get("/flete/{fleteId}", response_model=List[schemas.InsumoPuntoVentaPrecioList])
 async def read_insumo_punto_venta_precio_list(

@@ -232,11 +232,13 @@ from .insumo_punto_venta import (  # noqa
     get_insumo_punto_venta_list_by_insumo_id,
     get_insumo_punto_venta_list_by_insumo_id_and_punto_venta_id,
     get_insumo_punto_venta_list_by_tipo_insumo_id,
+    
 )
 from .insumo_punto_venta_precio import (  # noqa
     create_insumo_punto_venta_precio_by_insumo_punto_venta,
     get_insumo_punto_venta_precio_list_by_gestor_carga_id,
     get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id,
+    get_insumo_punto_venta_precio_list,
 )
 from .liquidacion import (  # noqa
     change_liquidacion_status,

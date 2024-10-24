@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from app.schemas.rounded_decimal_model import RoundedDecimal
 from pydantic import BaseModel
 
 from app.enums.estado import EstadoEnum
@@ -22,7 +23,7 @@ class InsumoPuntoVenta(BaseModel):
     moneda_nombre: str
     punto_venta_nombre: str
     precios: List[InsumoPuntoVentaPrecio] = []
-
+    precio: Optional[RoundedDecimal]
     class Config:
         orm_mode = True
         use_enum_values = True

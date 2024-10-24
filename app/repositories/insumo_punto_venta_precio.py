@@ -16,6 +16,23 @@ from app.models import (
 )
 from app.schemas import InsumoPuntoVentaPrecioForm
 
+def get_insumo_punto_venta_precio_list(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[InsumoPuntoVentaPrecio]:
+    return (
+        db.query(InsumoPuntoVentaPrecio)
+        .filter(
+            and_(
+                InsumoPuntoVentaPrecio.gestor_carga_id == gestor_carga_id,
+                InsumoPuntoVentaPrecio.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .all()
+    )
+
+# def get_insumo_punto_venta_precio_list(db: Session) -> List[InsumoPuntoVentaPrecio]:
+#     return db.query(InsumoPuntoVentaPrecio).all()
+
 
 def get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id(
     db: Session,

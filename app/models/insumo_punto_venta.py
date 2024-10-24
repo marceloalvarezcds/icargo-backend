@@ -115,3 +115,7 @@ class InsumoPuntoVenta(AuditMixin, Base):
     @hybrid_property
     def punto_venta_longitud(self):
         return self.punto_venta.longitud
+
+    @hybrid_property
+    def precio(self):
+        return self.precios.precio
