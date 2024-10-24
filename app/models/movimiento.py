@@ -94,6 +94,7 @@ class Movimiento(AuditMixin, Base):
     proveedor = relationship(Proveedor, uselist=False)
     remitente_id = Column(Integer, ForeignKey("remitente.id"))
     remitente = relationship(Remitente, uselist=False)
+    punto_venta_id = Column(Integer)
 
     @hybrid_property
     def es_cobro(self):
@@ -134,7 +135,7 @@ class Movimiento(AuditMixin, Base):
     @hybrid_property
     def cuenta_codigo_descripcion(self):
         return self.cuenta.codigo_descripcion
-  
+
     @hybrid_property
     def destino_nombre(self):
         return self.orden_carga.destino_nombre
@@ -199,7 +200,7 @@ class Movimiento(AuditMixin, Base):
     def remitente_numero_documento(self):
         return self.orden_carga.flete_remitente_numero_documento
 
-    
+
 
     @hybrid_property
     def semi_placa(self):
@@ -245,7 +246,10 @@ class Movimiento(AuditMixin, Base):
         )
 
     @hybrid_property
-    def punto_venta_id(self):
+    def punto_venta_identificador(self):
+        if self.punto_venta_id:
+            return self.punto_venta_id
+
         return self.anticipo.punto_venta_id if self.anticipo else None
 
     @hybrid_property
@@ -278,7 +282,7 @@ class Movimiento(AuditMixin, Base):
             self.tipo_movimiento_descripcion == TipoMovimientoEnum.COMPLEMENTO.value
             and self.complemento is not None
         )
-    
+
     @hybrid_property
     def complemento_concepto(self):
         return self.complemento.concepto_descripcion

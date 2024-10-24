@@ -386,6 +386,7 @@ def create_movimiento(
         created_by=modified_by,
         modified_by=modified_by,
         tipo_movimiento_info=data.tipo_movimiento_info,
+        punto_venta_id=data.punto_venta_id,
     )
     db.add(obj)
     db.commit()
@@ -524,6 +525,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                 ),
                 or_(
                     OrdenCargaAnticipoRetirado.punto_venta_id == punto_venta_id,
+                    Movimiento.punto_venta_id == punto_venta_id,
                     punto_venta_id == None
                 ),
                 Movimiento.gestor_carga_id == gestor_carga_id,

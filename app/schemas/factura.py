@@ -22,12 +22,13 @@ class FacturaForm(BaseModel):
     fecha_vencimiento: Date
     fecha_factura: Date
     tipo_contraparte_id: int
-    contraparte_id: int
+    contraparte_id: Optional[int]
     iva_incluido: bool
     sentido_mov_iva: Optional[str]
     sentido_mov_retencion: Optional[str]
     iva_movimiento_id: Optional[int]
     retencion_movimiento_id: Optional[int]
+    punto_venta_id: Optional[int]
 
 class FacturaResponse(BaseModel):
     liquidacion_id: int

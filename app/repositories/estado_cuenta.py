@@ -290,9 +290,26 @@ def get_estado_cuenta_proveedor_pdv(db: Session) -> Query:
             *get_cols_estado_cuenta_case_statement(),
         )
         .join(Movimiento.proveedor)
-        .join(Movimiento.anticipo)
-        .join(OrdenCargaAnticipoRetirado.punto_venta)
         .join(Movimiento.tipo_contraparte)
+        .outerjoin(Movimiento.anticipo)
+        .outerjoin(PuntoVenta, or_(
+            OrdenCargaAnticipoRetirado.punto_venta_id == PuntoVenta.id,
+            PuntoVenta.id == case(
+                (
+
+                    Movimiento.punto_venta_id == null(),
+                    OrdenCargaAnticipoRetirado.punto_venta_id,
+                ),
+                    else_=Movimiento.punto_venta_id,
+            )
+            )
+        )
+        .filter(
+            or_(
+                Movimiento.anticipo_id != None,
+                Movimiento.punto_venta_id != None
+            )
+        )
     )
 
 
@@ -333,7 +350,7 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
     return chofer.union_all(choferLiquidacion, propietario, propietarioLiquidacion,
             proveedor, proveedorLiquidacion, proveedorPdv, proveedorPdvLiquidacion,
             remitente, remitenteLiquidacion, otro, otroLiquidacion)
-    # return proveedorPdv.union_all( chofer, proveedor, remitente)
+    # return proveedor.union_all( proveedorPdv, proveedorPdvLiquidacion)
     # return chofer.union_all(proveedor, proveedorPdv)
 
 
@@ -629,7 +646,7 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             Liquidacion.es_pago_cobro.label("detalle"),
             Liquidacion.id.label("nro_documento_relacionado"),
             Factura.numero_factura,
-            Instrumento.estado,
+            Instrumento.operacion_estado,
             literal_column("''").label("estado_liquidacion"),
             literal_column("false").label("es_editable"),
             literal_column("0"),
