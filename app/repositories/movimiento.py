@@ -235,7 +235,7 @@ def get_movimiento_list_by_contraparte_and_gestor_carga_id(
                 Movimiento.gestor_carga_id == gestor_carga_id,
             )
         )
-        .order_by(Movimiento.contraparte, Movimiento.liquidacion_id)
+        .order_by(Movimiento.contraparte, Movimiento.id.desc())
         .all()
     )
 
