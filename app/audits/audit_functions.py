@@ -81,5 +81,6 @@ def create_audit_database_for_update(db_conn, target):
         target.__tablename__,
         "update",
         target.modified_by,
-        dumps(changes, skipkeys=True, iterable_as_array=True, for_json=True),
+		# TODO: revisar este item si guarda correctamente 
+        dumps(changes, skipkeys=True, iterable_as_array=True, for_json=True, default=str),
     )
