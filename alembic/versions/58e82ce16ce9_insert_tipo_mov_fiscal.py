@@ -19,7 +19,7 @@ depends_on = None
 def upgrade():
     op.execute('insert into tipo_movimiento '\
         ' (created_by, created_at, modified_by, modified_at, id, descripcion, estado, cuenta_id, codigo ) '\
-        ' values (\'system\', now(), \'system\', now(), 7, \'Fiscal\', \'Activo\', 1, \'07\' )' )
+        ' values (\'system\', now(), \'system\', now(), 15, \'Fiscal\', \'Activo\', 4, \'8\' )' )
 
 
 def downgrade():
