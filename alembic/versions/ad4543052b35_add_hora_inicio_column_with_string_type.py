@@ -17,11 +17,13 @@ depends_on = None
 
 
 def upgrade():
-    # Agregar las columnas 'hora_inicio' y 'observacion' a la tabla 'insumo_punto_venta_precio'
-    op.add_column('insumo_punto_venta_precio', sa.Column('hora_inicio', sa.String(length=5), nullable=True))
-    op.add_column('insumo_punto_venta_precio', sa.Column('observacion', sa.String(length=255), nullable=True))
+    pass
+    # # Agregar las columnas 'hora_inicio' y 'observacion' a la tabla 'insumo_punto_venta_precio'
+    # op.add_column('insumo_punto_venta_precio', sa.Column('hora_inicio', sa.String(length=5), nullable=True))
+    # op.add_column('insumo_punto_venta_precio', sa.Column('observacion', sa.String(length=255), nullable=True))
 
 def downgrade():
+    pass
     # Eliminar las columnas 'hora_inicio' y 'observacion' en caso de rollback
-    op.drop_column('insumo_punto_venta_precio', 'hora_inicio')
-    op.drop_column('insumo_punto_venta_precio', 'observacion')
+    # op.drop_column('insumo_punto_venta_precio', 'hora_inicio')
+    # op.drop_column('insumo_punto_venta_precio', 'observacion')
