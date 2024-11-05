@@ -9,6 +9,20 @@ from app.enums import EstadoEnum
 from app.models import Insumo, InsumoPuntoVenta, InsumoPuntoVentaPrecio
 from app.schemas import InsumoPuntoVentaPrecioForm
 
+def get_insumo_punto_venta_precio_list(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[InsumoPuntoVenta]:
+    return (
+        db.query(InsumoPuntoVenta)
+        .filter(
+            and_(
+                InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
+                InsumoPuntoVenta.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .all()
+    )
+
 
 def get_insumo_punto_venta_by_id(db: Session, id: int) -> Optional[InsumoPuntoVenta]:
     return db.query(InsumoPuntoVenta).get(id)
@@ -65,6 +79,15 @@ def get_insumo_punto_venta_list_by_tipo_insumo_id(
             )
         )
         .order_by(InsumoPuntoVenta.created_at)
+        .all()
+    )
+
+
+def get_insumos_by_punto_venta_id(db: Session, punto_venta_id: int, gestor_carga_id: int):
+    return (
+        db.query(InsumoPuntoVenta)
+        .filter(InsumoPuntoVenta.punto_venta_id == punto_venta_id)
+        .filter(InsumoPuntoVenta.gestor_carga_id == gestor_carga_id)  # Si necesitas filtrar por gestor
         .all()
     )
 

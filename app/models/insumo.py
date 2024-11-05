@@ -1,4 +1,5 @@
-from sqlalchemy import Column, ForeignKey, Integer  # type: ignore
+
+from sqlalchemy import Column, ForeignKey, Integer, DateTime, String  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 
@@ -19,6 +20,8 @@ class Insumo(SeleccionableMixin, Base):
     unidad_id = Column(Integer, ForeignKey("unidad.id"))
     unidad = relationship(Unidad, uselist=False)
     punto_ventas = relationship("InsumoPuntoVenta", back_populates="insumo")
+    fecha_creacion = Column(DateTime)
+    marca = Column(String(100))
 
     @hybrid_property
     def tipo_descripcion(self):

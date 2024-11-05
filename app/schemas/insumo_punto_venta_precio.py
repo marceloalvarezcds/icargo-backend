@@ -7,6 +7,7 @@ from app.enums.estado import EstadoEnum
 
 from .date_model import Date
 from .rounded_decimal_model import RoundedDecimal
+from datetime import datetime, time
 
 
 class InsumoPuntoVentaPrecioForm(BaseModel):
@@ -14,18 +15,27 @@ class InsumoPuntoVentaPrecioForm(BaseModel):
     insumo_id: int
     proveedor_id: Optional[int] = None
     punto_venta_id: int
-    moneda_id: int
+    moneda_id: Optional[int] = None
     precio: RoundedDecimal
-    fecha_inicio: Date
-    fecha_fin: Optional[Date] = None
-
-
+    fecha_inicio: datetime
+    fecha_fin: Optional[datetime] = None
+    hora_inicio: Optional[str] = None
+    marca_insumo: Optional[str] = None
+    observacion: Optional[str] = None
 class InsumoPuntoVentaPrecio(BaseModel):
     id: int
     precio: RoundedDecimal
-    fecha_inicio: Date
-    fecha_fin: Optional[Date] = None
-
+    fecha_inicio: datetime
+    fecha_fin: Optional[datetime] = None
+    insumo_unidad_descripcion: Optional[str] = None
+    insumo_moneda_nombre: str
+    insumo_descripcion: Optional[str] = None
+    punto_venta_id: Optional[int] = None
+    punto_venta_nombre: Optional[str] = None
+    created_at_insumo: Optional[datetime] = None
+    hora_inicio: Optional[str] = None
+    marca_insumo: Optional[str] = None
+    observacion: Optional[str] = None
     class Config:
         orm_mode = True
         use_enum_values = True
@@ -57,3 +67,24 @@ class InsumoPuntoVentaPrecioList(InsumoPuntoVentaPrecio):
     punto_venta_logo: Optional[str] = None
     punto_venta_latitud: Optional[Decimal] = None
     punto_venta_longitud: Optional[Decimal] = None
+    proveedor_documento: Optional[str]
+    created_at_insumo: Optional[datetime] = None
+    hora_inicio: Optional[str] = None
+    marca_insumo: Optional[str] = None
+    observacion: Optional[str] = None
+           # Auditoría
+    created_by: str
+    created_at: Date
+    modified_by: str
+    modified_at: Date
+
+class InsumoPuntoVentaPrecioUpdate(BaseModel):
+    precio: RoundedDecimal
+    fecha_inicio: datetime
+    fecha_fin: Optional[datetime] = None
+    hora_inicio: Optional[str] = None
+    observacion: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True

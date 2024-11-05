@@ -134,11 +134,22 @@ from .insumo_punto_venta import (  # noqa
     get_proveedor_list_by_insumo_id,
     get_punto_venta_list_by_insumo_id_and_proveedor_id,
     get_tipo_insumo_list_by_flete_id_and_gestor_carga_id,
+    get_insumo_venta_precio_list,
+    get_all_insumo_punto_venta_list,
 )
 from .insumo_punto_venta_precio import (  # noqa
     create_insumo_punto_venta_precio,
     get_insumo_punto_venta_precio_by_insumo_id_and_moneda_id_and_punto_venta_id,
-    get_insumo_venta_precio_list,
+    edit_insumo_punto_venta_precio,
+    get_insumo_punto_venta_precio_list,
+    get_insumo_punto_venta_precio_reports,
+    get_insumo_punto_venta_precio_by_id,
+    get_all_insumo_punto_venta_precio_list,
+    get_insumos_by_punto_venta_id_and_gestor_carga,
+    update_insumo_punto_venta_precio,
+    edit_and_create_insumo_punto_venta_precio,
+    update_insumo_punto_venta_precio_by_insumo_punto_venta,
+    get_insumo_punto_venta_precio_list_by_estado_activo,
 )
 from .liquidacion import (  # noqa
     aceptar_liquidacion,

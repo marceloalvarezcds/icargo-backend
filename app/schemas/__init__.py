@@ -47,6 +47,7 @@ from .insumo_punto_venta_precio import (  # noqa
     InsumoPuntoVentaPrecio,
     InsumoPuntoVentaPrecioForm,
     InsumoPuntoVentaPrecioList,
+    InsumoPuntoVentaPrecioUpdate,
 )
 from .liquidacion import (  # noqa
     Liquidacion,

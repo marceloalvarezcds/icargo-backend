@@ -82,6 +82,10 @@ class PuntoVenta(AuditMixin, Base):
     @hybrid_property
     def proveedor_nombre(self):
         return self.proveedor.nombre
+    
+    @hybrid_property
+    def proveedor_documento(self):
+        return self.proveedor.numero_documento
 
     @hybrid_property
     def tipo_documento_descripcion(self):

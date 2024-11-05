@@ -271,3 +271,5 @@ def permiso_combinacion_seeds(db: Session) -> List[Permiso]:
     permisos.append(permiso_seeds(db, a.REPORTE, m.COMBINACION, u.FLOTA, "Reporte de Combinacion")
     )
     return permisos
+
+

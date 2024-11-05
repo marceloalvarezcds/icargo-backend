@@ -2,7 +2,9 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
 
+from app import repositories
 from app.models import Insumo, Moneda, Proveedor, PuntoVenta
+from app.models.insumo_punto_venta import InsumoPuntoVenta
 from app.models.tipo_insumo import TipoInsumo
 from app.repositories import (
     get_insumo_punto_venta_list_by_gestor_carga_id,
@@ -11,6 +13,16 @@ from app.repositories import (
     get_insumo_punto_venta_list_by_tipo_insumo_id,
 )
 from app.services import get_tipo_insumo_list_by_flete_id
+
+
+def get_insumo_venta_precio_list(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[InsumoPuntoVenta]:
+    return repositories.get_insumo_punto_venta_precio_list(db, gestor_carga_id)
+
+
+def get_all_insumo_punto_venta_list(db: Session) -> List[InsumoPuntoVenta]:
+    return db.query(InsumoPuntoVenta).order_by(InsumoPuntoVenta.id.desc()).all()
 
 
 def get_moneda_list_by_insumo_id_and_punto_venta_id(

@@ -1,7 +1,7 @@
 from typing import Optional
 
 from .estado_base_model import EstadoBaseModel
-
+from datetime import datetime
 
 class InsumoForm(EstadoBaseModel):
     descripcion: str
@@ -14,6 +14,7 @@ class Insumo(InsumoForm):
     tipo_descripcion: str
     unidad_descripcion: Optional[str]
     unidad_abreviatura: Optional[str]
+    fecha_creacion: Optional[datetime] = None
 
     class Config:
         orm_mode = True

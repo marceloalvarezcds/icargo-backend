@@ -37,6 +37,8 @@ class InsumoPuntoVentaPrecio(AuditMixin, Base):
     fecha_inicio = Column(DateTime)
     fecha_fin = Column(DateTime)
     estado = Column(String(15), server_default=EstadoEnum.ACTIVO.value)
+    hora_inicio = Column(String(5))
+    observacion = Column(String(255))
 
     @hybrid_property
     def ciudad_nombre(self):
@@ -105,6 +107,18 @@ class InsumoPuntoVentaPrecio(AuditMixin, Base):
     @hybrid_property
     def proveedor_nombre(self):
         return self.insumo_punto_venta.proveedor_nombre
+    
+    @hybrid_property
+    def proveedor_documento(self):
+        return self.insumo_punto_venta.proveedor_documento
+    
+    @hybrid_property
+    def created_at_insumo(self):
+        return self.insumo_punto_venta.created_insumo
+    
+    @hybrid_property
+    def marca_insumo(self):
+        return self.insumo_punto_venta.marca_insumo
 
     @hybrid_property
     def punto_venta_id(self):
