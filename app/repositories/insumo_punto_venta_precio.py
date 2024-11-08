@@ -1,10 +1,11 @@
-from datetime import datetime, timezone
+from datetime import datetime,  time
 from typing import List, Optional
 
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql import func  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from sqlalchemy.sql.expression import null  # type: ignore
+from sqlalchemy.exc import IntegrityError
 
 from app.enums import EstadoEnum
 from app.models import (
@@ -178,21 +179,44 @@ def create_insumo_punto_venta_precio_by_insumo_punto_venta(
     data: InsumoPuntoVentaPrecioForm,
     modified_by: str,
 ) -> InsumoPuntoVentaPrecio:
-    obj = InsumoPuntoVentaPrecio(
-        insumo_punto_venta_id=obj.id,
-        precio=data.precio,
-        fecha_inicio=data.fecha_inicio,
-        hora_inicio = data.hora_inicio,
-        observacion = data.observacion,
-        fecha_fin=data.fecha_fin,
-        estado=EstadoEnum.ACTIVO.value,
-        created_by=modified_by,
-        modified_by=modified_by,
-    )
-    db.add(obj)
-    db.commit()
-    db.refresh(obj)
-    return obj
+    try:
+        # Inhabilitar precios activos previos
+        db.query(InsumoPuntoVentaPrecio).filter(
+            InsumoPuntoVentaPrecio.insumo_punto_venta_id == data.insumo_punto_venta_id,
+            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
+        ).update({"estado": EstadoEnum.INACTIVO.value}, synchronize_session=False)
+
+        # Convertir hora_inicio a string en el formato 'HH:MM:SS' si es un objeto time
+        if isinstance(data.hora_inicio, time):
+            hora_inicio_str = data.hora_inicio.strftime("%H:%M:%S")
+        else:
+            hora_inicio_str = data.hora_inicio  # Mantener el valor tal cual si no es tipo time
+
+        # Crear el nuevo precio
+        new_price = InsumoPuntoVentaPrecio(
+            insumo_punto_venta_id=data.insumo_punto_venta_id,
+            precio=data.precio,
+            fecha_inicio=data.fecha_inicio,
+            fecha_fin=data.fecha_fin,
+            hora_inicio=hora_inicio_str,  # Guardamos la hora como string
+            observacion=data.observacion,
+            estado=EstadoEnum.ACTIVO.value,  # El nuevo precio es activo
+            created_by=modified_by,
+            modified_by=modified_by,
+        )
+        db.add(new_price)
+        db.commit()
+        db.refresh(new_price)
+        return new_price
+
+    except IntegrityError as e:
+        # Verificar si el error es por duplicado de clave
+        if "Key (insumo_punto_venta_id, precio)" in str(e.orig):
+            raise ValueError(f"Ya existe un precio activo para el insumo {data.insumo_id} en el punto de venta {data.punto_venta_id} con el precio {data.precio}. No se puede insertar un precio duplicado.")
+        else:
+            # Re-lanzar el error si no es por clave duplicada
+            raise e
+
 
 
 def edit_insumo_punto_venta_precio(

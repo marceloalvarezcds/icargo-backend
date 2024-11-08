@@ -3,8 +3,8 @@ import os
 from datetime import datetime
 from http.client import HTTPException
 from typing import List, Optional
-from sqlalchemy import desc
-
+from sqlalchemy import desc, func
+from sqlalchemy.orm import aliased
 
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -38,18 +38,36 @@ def get_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int) -> Lis
 
 def get_insumo_punto_venta_precio_list_by_estado_activo(
     db: Session, gestor_carga_id: int
-) -> List[models.InsumoPuntoVentaPrecio]:
-    return (
-        db.query(models.InsumoPuntoVentaPrecio)
-        .join(models.InsumoPuntoVenta) 
-        .filter(
-            models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id, 
-            models.InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value  
+) -> List[InsumoPuntoVentaPrecio]:
+    # Subquery para obtener el precio activo más reciente de cada punto de venta
+    subquery = (
+        db.query(
+            InsumoPuntoVenta.punto_venta_id,
+            func.max(InsumoPuntoVentaPrecio.fecha_inicio).label("max_fecha_inicio")
         )
-        .order_by(desc(models.InsumoPuntoVentaPrecio.id))  
-        .all()
+        .join(InsumoPuntoVentaPrecio, InsumoPuntoVenta.id == InsumoPuntoVentaPrecio.insumo_punto_venta_id)
+        .filter(
+            InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
+            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
+        )
+        .group_by(InsumoPuntoVenta.punto_venta_id)
+        .subquery()
     )
 
+    # Consulta principal para unir la subconsulta con el precio más reciente y otros detalles
+    return (
+        db.query(InsumoPuntoVentaPrecio)
+        .join(InsumoPuntoVenta, InsumoPuntoVentaPrecio.insumo_punto_venta_id == InsumoPuntoVenta.id)
+        .join(subquery, 
+              (InsumoPuntoVenta.punto_venta_id == subquery.c.punto_venta_id) &
+              (InsumoPuntoVentaPrecio.fecha_inicio == subquery.c.max_fecha_inicio))
+        .filter(
+            InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
+            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value  # Aseguramos que solo se traigan los precios activos
+        )
+        .order_by(desc(InsumoPuntoVentaPrecio.id))
+        .all()
+    )
 
 def get_all_insumo_punto_venta_precio_list(db: Session) -> List[InsumoPuntoVentaPrecio]:
     return (
@@ -124,11 +142,14 @@ def create_insumo_punto_venta_precio(
         .first()
     )
 
+    # Verificar si existe el insumo
     if existing_insumo:
+        # Llamar a la función de actualización, verificando si el precio cambió
         return update_insumo_punto_venta_precio_by_insumo_punto_venta(
             db, existing_insumo, data, modified_by
         )
     else:
+        # Crear un nuevo registro si no existe
         return create_insumo_punto_venta_precio_by_insumo_punto_venta(
             db, data, modified_by
         )
@@ -140,41 +161,67 @@ def update_insumo_punto_venta_precio_by_insumo_punto_venta(
     data: InsumoPuntoVentaPrecioForm,
     modified_by: str,
 ) -> InsumoPuntoVentaPrecio:
-    insumo_punto_venta_id = existing_insumo.id 
-    existing_price = (
-        db.query(InsumoPuntoVentaPrecio)
-        .filter(
-            InsumoPuntoVentaPrecio.insumo_punto_venta_id == insumo_punto_venta_id,  
-            InsumoPuntoVentaPrecio.precio == data.precio, 
-            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value,
-        )
-        .first()
-    )
+    # Obtener el ID del insumo punto de venta
+    insumo_punto_venta_id = existing_insumo.id
 
-    if existing_price:
-        existing_price.precio = data.precio
-        existing_price.fecha_inicio = data.fecha_inicio
-        existing_price.fecha_fin = data.fecha_fin
-        existing_price.observacion = data.observacion
-        existing_price.modified_by = modified_by
-        existing_price.modified_at = datetime.now()
-    else:
-        
+    # Obtener el precio activo actual para este insumo_punto_venta_id
+    current_price = db.query(InsumoPuntoVentaPrecio).filter(
+        InsumoPuntoVentaPrecio.insumo_punto_venta_id == insumo_punto_venta_id,
+        InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
+    ).first()
+
+    # Verificar si el precio ha cambiado
+    if current_price and current_price.precio != data.precio:
+        # Si el precio cambia, inactivar el precio anterior
+        db.query(InsumoPuntoVentaPrecio).filter(
+            InsumoPuntoVentaPrecio.insumo_punto_venta_id == insumo_punto_venta_id,
+            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
+        ).update({"estado": EstadoEnum.INACTIVO.value}, synchronize_session=False)
+
+        # Crear un nuevo precio con el nuevo valor
         new_price = InsumoPuntoVentaPrecio(
             insumo_punto_venta_id=insumo_punto_venta_id,
             precio=data.precio,
             fecha_inicio=data.fecha_inicio,
             fecha_fin=data.fecha_fin,
-            hora_inicio = data.hora_inicio,
-            observacion = data.observacion,
-            estado=EstadoEnum.ACTIVO.value,
+            hora_inicio=data.hora_inicio,
+            observacion=data.observacion,
+            estado=EstadoEnum.ACTIVO.value,  # El nuevo precio es activo
             created_by=modified_by,
             modified_by=modified_by,
         )
         db.add(new_price)
-
-    db.commit() 
-    return existing_price if existing_price else new_price 
+        db.commit()
+        db.refresh(new_price)
+        return new_price
+    else:
+        # Si solo las fechas o la hora cambiaron, actualizamos el registro sin crear uno nuevo
+        if current_price:
+            current_price.fecha_inicio = data.fecha_inicio
+            current_price.fecha_fin = data.fecha_fin
+            current_price.hora_inicio = data.hora_inicio
+            current_price.observacion = data.observacion
+            current_price.modified_by = modified_by
+            db.commit()
+            db.refresh(current_price)
+            return current_price
+        else:
+            # Si no existe un precio, crear un nuevo registro (esto puede no ser necesario según tu lógica)
+            new_price = InsumoPuntoVentaPrecio(
+                insumo_punto_venta_id=insumo_punto_venta_id,
+                precio=data.precio,
+                fecha_inicio=data.fecha_inicio,
+                fecha_fin=data.fecha_fin,
+                hora_inicio=data.hora_inicio,
+                observacion=data.observacion,
+                estado=EstadoEnum.ACTIVO.value,
+                created_by=modified_by,
+                modified_by=modified_by,
+            )
+            db.add(new_price)
+            db.commit()
+            db.refresh(new_price)
+            return new_price
 
 
 

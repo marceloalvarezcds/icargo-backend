@@ -5,6 +5,7 @@ from sqlalchemy import (  # type: ignore
     Integer,
     Numeric,
     String,
+    Time
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
@@ -37,7 +38,7 @@ class InsumoPuntoVentaPrecio(AuditMixin, Base):
     fecha_inicio = Column(DateTime)
     fecha_fin = Column(DateTime)
     estado = Column(String(15), server_default=EstadoEnum.ACTIVO.value)
-    hora_inicio = Column(String(5))
+    hora_inicio = Column(Time) 
     observacion = Column(String(255))
 
     @hybrid_property
