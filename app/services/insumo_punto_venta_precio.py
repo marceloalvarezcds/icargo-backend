@@ -27,11 +27,11 @@ from app.config import REPORTS_FOLDER
 
 
 def get_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int) -> List[models.InsumoPuntoVentaPrecio]:
-    resultados = (
+    return (
         db.query(models.InsumoPuntoVentaPrecio)
-        .join(models.InsumoPuntoVenta)
-        .filter(models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id)
-        .order_by(desc(models.InsumoPuntoVentaPrecio.id))
+        .join(models.InsumoPuntoVenta)  # Unir con InsumoPuntoVenta
+        .filter(models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id)  # Filtrar por gestor_carga_id
+        .order_by(desc(models.InsumoPuntoVentaPrecio.id))  # Ordenar por id en orden descendente
         .all()
     )
     
