@@ -27,47 +27,53 @@ from app.config import REPORTS_FOLDER
 
 
 def get_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int) -> List[models.InsumoPuntoVentaPrecio]:
-    return (
+    resultados = (
         db.query(models.InsumoPuntoVentaPrecio)
-        .join(models.InsumoPuntoVenta)  # Unir con InsumoPuntoVenta
-        .filter(models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id)  # Filtrar por gestor_carga_id
-        .order_by(desc(models.InsumoPuntoVentaPrecio.id))  # Ordenar por id en orden descendente
+        .join(models.InsumoPuntoVenta)
+        .filter(models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id)
+        .order_by(desc(models.InsumoPuntoVentaPrecio.id))
         .all()
     )
-
+    
 
 def get_insumo_punto_venta_precio_list_by_estado_activo(
     db: Session, gestor_carga_id: int
 ) -> List[InsumoPuntoVentaPrecio]:
-    # Subquery para obtener el precio activo más reciente de cada punto de venta
+    # Subquery para obtener el precio activo más reciente de cada insumo en cada punto de venta
     subquery = (
         db.query(
             InsumoPuntoVenta.punto_venta_id,
-            func.max(InsumoPuntoVentaPrecio.fecha_inicio).label("max_fecha_inicio")
+            func.max(InsumoPuntoVentaPrecio.fecha_inicio).label("max_fecha_inicio"),
+            InsumoPuntoVentaPrecio.insumo_punto_venta_id
         )
         .join(InsumoPuntoVentaPrecio, InsumoPuntoVenta.id == InsumoPuntoVentaPrecio.insumo_punto_venta_id)
         .filter(
             InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
             InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
         )
-        .group_by(InsumoPuntoVenta.punto_venta_id)
+        .group_by(InsumoPuntoVenta.punto_venta_id, InsumoPuntoVentaPrecio.insumo_punto_venta_id)
         .subquery()
     )
 
-    # Consulta principal para unir la subconsulta con el precio más reciente y otros detalles
+    # Consulta principal con DISTINCT ON y ORDER BY correctamente alineado
     return (
         db.query(InsumoPuntoVentaPrecio)
         .join(InsumoPuntoVenta, InsumoPuntoVentaPrecio.insumo_punto_venta_id == InsumoPuntoVenta.id)
         .join(subquery, 
               (InsumoPuntoVenta.punto_venta_id == subquery.c.punto_venta_id) &
-              (InsumoPuntoVentaPrecio.fecha_inicio == subquery.c.max_fecha_inicio))
+              (InsumoPuntoVentaPrecio.fecha_inicio == subquery.c.max_fecha_inicio) &
+              (InsumoPuntoVentaPrecio.insumo_punto_venta_id == subquery.c.insumo_punto_venta_id))
         .filter(
             InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
-            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value  # Aseguramos que solo se traigan los precios activos
+            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
         )
-        .order_by(desc(InsumoPuntoVentaPrecio.id))
+        .distinct(InsumoPuntoVenta.punto_venta_id)
+        .order_by(InsumoPuntoVenta.punto_venta_id, desc(InsumoPuntoVentaPrecio.id))  # Asegurar el ORDER BY coincide con DISTINCT ON
         .all()
     )
+
+
+
 
 def get_all_insumo_punto_venta_precio_list(db: Session) -> List[InsumoPuntoVentaPrecio]:
     return (
