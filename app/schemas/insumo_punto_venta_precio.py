@@ -1,5 +1,6 @@
 from decimal import Decimal
 from typing import Optional
+from wsgiref.validate import validator
 
 from pydantic import BaseModel
 
@@ -19,9 +20,8 @@ class InsumoPuntoVentaPrecioForm(BaseModel):
     precio: RoundedDecimal
     fecha_inicio: datetime
     fecha_fin: Optional[datetime] = None
-    hora_inicio: Optional[time] = None
-    marca_insumo: Optional[str] = None
     observacion: Optional[str] = None
+
 class InsumoPuntoVentaPrecio(BaseModel):
     id: int
     precio: RoundedDecimal

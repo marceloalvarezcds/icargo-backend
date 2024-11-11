@@ -186,19 +186,26 @@ def create_insumo_punto_venta_precio_by_insumo_punto_venta(
             InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
         ).update({"estado": EstadoEnum.INACTIVO.value}, synchronize_session=False)
 
-        # Convertir hora_inicio a string en el formato 'HH:MM:SS' si es un objeto time
+        # Verificar si hora_inicio es de tipo time (sin fecha)
         if isinstance(data.hora_inicio, time):
-            hora_inicio_str = data.hora_inicio.strftime("%H:%M:%S")
+            # Convertir hora_inicio a un objeto datetime usando una fecha ficticia
+            hora_inicio_obj = datetime.combine(datetime.today(), data.hora_inicio)
+            # Reemplazar solo la hora de fecha_inicio
+            fecha_inicio_obj = data.fecha_inicio.replace(
+                hour=hora_inicio_obj.hour,
+                minute=hora_inicio_obj.minute,
+                second=hora_inicio_obj.second
+            )
         else:
-            hora_inicio_str = data.hora_inicio  # Mantener el valor tal cual si no es tipo time
+            # Si no se pasa hora_inicio, mantener la fecha de inicio sin cambios
+            fecha_inicio_obj = data.fecha_inicio
 
-        # Crear el nuevo precio
+        # Crear el nuevo precio con la fecha modificada
         new_price = InsumoPuntoVentaPrecio(
             insumo_punto_venta_id=data.insumo_punto_venta_id,
             precio=data.precio,
-            fecha_inicio=data.fecha_inicio,
+            fecha_inicio=fecha_inicio_obj,  # Usar la fecha con la hora modificada
             fecha_fin=data.fecha_fin,
-            hora_inicio=hora_inicio_str,  # Guardamos la hora como string
             observacion=data.observacion,
             estado=EstadoEnum.ACTIVO.value,  # El nuevo precio es activo
             created_by=modified_by,

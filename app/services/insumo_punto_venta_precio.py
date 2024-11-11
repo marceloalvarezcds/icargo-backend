@@ -190,7 +190,7 @@ def update_insumo_punto_venta_precio_by_insumo_punto_venta(
             precio=data.precio,
             fecha_inicio=data.fecha_inicio,
             fecha_fin=data.fecha_fin,
-            hora_inicio=data.hora_inicio,
+           
             observacion=data.observacion,
             estado=EstadoEnum.ACTIVO.value,  # El nuevo precio es activo
             created_by=modified_by,
