@@ -285,7 +285,8 @@ def get_estado_cuenta_proveedor_pdv(db: Session) -> Query:
             PuntoVenta.nombre.label("contraparte_pdv"),
             PuntoVenta.numero_documento.label("contraparte_numero_documento_pdv"),
             Movimiento.tipo_contraparte_id.label("tipo_contraparte_id"),
-            TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",
+            #TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",
+            literal_column("'PUNTO DE VENTA'").label("tipo_contraparte_descripcion"),
             Movimiento.gestor_carga_id.label("gestor_carga_id"),
             *get_cols_estado_cuenta_case_statement(),
         )
@@ -323,7 +324,8 @@ def get_estado_cuenta_proveedor_pdv_liquidacion(db: Session) -> Query:
             Liquidacion.contraparte.label("contraparte_pdv"),
             Liquidacion.contraparte_numero_documento.label("contraparte_numero_documento_pdv"),
             Liquidacion.tipo_contraparte_id.label("tipo_contraparte_id"),
-            TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",
+            #TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",
+            literal_column("'PUNTO DE VENTA'").label("tipo_contraparte_descripcion"),
             Liquidacion.gestor_carga_id.label("gestor_carga_id"),
             *get_cols_estado_cuenta_liquidacion_case_statement(),
         )
