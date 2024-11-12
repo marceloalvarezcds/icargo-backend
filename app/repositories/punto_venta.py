@@ -1,4 +1,5 @@
 from datetime import datetime
+from operator import or_
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
@@ -6,6 +7,8 @@ from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import GestorCargaProveedor, Proveedor, PuntoVenta
+from app.models.insumo_punto_venta import InsumoPuntoVenta
+from app.models.insumo_punto_venta_precio import InsumoPuntoVentaPrecio
 from app.schemas import PuntoVentaForm
 
 
@@ -34,6 +37,31 @@ def get_punto_venta_list_by_gestor_carga_id(
             and_(
                 GestorCargaProveedor.gestor_carga_id == gestor_carga_id,
                 PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
+            )
+        )
+        .order_by(PuntoVenta.nombre)
+        .all()
+    )
+
+
+def get_punto_venta_list_with_active_prices_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[PuntoVenta]:
+    return (
+        db.query(PuntoVenta)
+        .join(Proveedor)
+        .join(GestorCargaProveedor)
+        .join(InsumoPuntoVenta, PuntoVenta.id == InsumoPuntoVenta.punto_venta_id)
+        .join(InsumoPuntoVentaPrecio, InsumoPuntoVenta.id == InsumoPuntoVentaPrecio.insumo_punto_venta_id)
+        .filter(
+            and_(
+                GestorCargaProveedor.gestor_carga_id == gestor_carga_id,
+                PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
+                InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value,
+                or_(
+                    InsumoPuntoVentaPrecio.fecha_fin.is_(None),
+                    InsumoPuntoVentaPrecio.fecha_fin > datetime.now()
+                )
             )
         )
         .order_by(PuntoVenta.nombre)

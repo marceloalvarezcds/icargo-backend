@@ -431,6 +431,7 @@ from .punto_venta import (  # noqa
     get_punto_venta_by_id,
     get_punto_venta_list,
     get_punto_venta_list_by_gestor_carga_id,
+    get_punto_venta_list_with_active_prices_by_gestor_carga_id,
 )
 from .punto_venta_contacto_gestor_carga import (  # noqa
     create_punto_venta_contacto_gestor_carga,

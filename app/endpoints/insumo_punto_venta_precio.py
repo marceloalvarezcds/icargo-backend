@@ -39,7 +39,6 @@ async def read_all_insumo_punto_venta_precio_list(
     return services.get_all_insumo_punto_venta_precio_list(db)
 
 
-
 @api.get("/flete/{fleteId}", response_model=List[schemas.InsumoPuntoVentaPrecioList])
 async def read_insumo_punto_venta_precio_list(
     fleteId: int,
