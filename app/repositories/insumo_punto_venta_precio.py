@@ -105,7 +105,7 @@ def get_insumo_punto_venta_precio_list_by_id(
 def get_insumo_punto_venta_precio_list_by_gestor_carga_id(
     db: Session, flete_id: int, gestor_carga_id: Optional[int]
 ) -> List[InsumoPuntoVentaPrecio]:
-    # Subconsulta para obtener el máximo de fecha de inicio
+    # Subconsulta para obtener el máximo de fecha de inicio por gestor de carga específico
     sub_query = (
         db.query(
             InsumoPuntoVenta.punto_venta_id,
@@ -119,7 +119,7 @@ def get_insumo_punto_venta_precio_list_by_gestor_carga_id(
         .filter(
             and_(
                 FleteAnticipo.flete_id == flete_id,
-                InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
+                InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,  # Filtrar por gestor de carga específico
                 InsumoPuntoVenta.estado != EstadoEnum.ELIMINADO.value,
                 InsumoPuntoVentaPrecio.estado != EstadoEnum.ELIMINADO.value,
                 PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
@@ -139,7 +139,10 @@ def get_insumo_punto_venta_precio_list_by_gestor_carga_id(
                 sub_query.c.max_fecha_inicio == InsumoPuntoVentaPrecio.fecha_inicio,
             ),
         )
-        .filter(InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value)  # Filtro para precios activos
+        .filter(
+            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value,
+            InsumoPuntoVenta.gestor_carga_id == gestor_carga_id  # Filtrar para evitar duplicados
+        )
         .order_by(
             InsumoPuntoVentaPrecio.fecha_inicio,
             InsumoPuntoVentaPrecio.fecha_fin,

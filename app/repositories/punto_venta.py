@@ -55,7 +55,7 @@ def get_punto_venta_list_with_active_prices_by_gestor_carga_id(
         .join(InsumoPuntoVentaPrecio, InsumoPuntoVenta.id == InsumoPuntoVentaPrecio.insumo_punto_venta_id)
         .filter(
             and_(
-                GestorCargaProveedor.gestor_carga_id == gestor_carga_id,
+                InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
                 PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
                 InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value,
                 or_(

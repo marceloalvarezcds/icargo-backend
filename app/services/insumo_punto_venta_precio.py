@@ -14,7 +14,6 @@ from app import models
 from app.enums.estado import EstadoEnum
 from app.models import InsumoPuntoVentaPrecio, InsumoPuntoVenta
 from app.repositories import (
-    create_insumo_punto_venta,
     create_insumo_punto_venta_precio_by_insumo_punto_venta,
     get_insumo_punto_venta_by_insumo_id_and_moneda_id_and_punto_venta_id,
     get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id,
@@ -71,8 +70,6 @@ def get_insumo_punto_venta_precio_list_by_estado_activo(
         .order_by(InsumoPuntoVenta.punto_venta_id, desc(InsumoPuntoVentaPrecio.id))  # Asegurar el ORDER BY coincide con DISTINCT ON
         .all()
     )
-
-
 
 
 def get_all_insumo_punto_venta_precio_list(db: Session) -> List[InsumoPuntoVentaPrecio]:
