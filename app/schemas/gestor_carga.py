@@ -30,6 +30,7 @@ class GestorCargaForm(BaseModel):
     # INICIO Limitaciones de la Gestora
     limite_cantidad_oc_activas: int
     # FIN Limitaciones de la Gestora
+    estado: Optional[str] = None
 
 
 class GestorCarga(GestorCargaForm):

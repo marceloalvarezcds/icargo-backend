@@ -30,6 +30,7 @@ class PuntoVentaBaseModel(BaseModel):
     longitud: Optional[Decimal] = None
     direccion: Optional[str] = None
     ciudad_id: Optional[int] = None
+    estado: Optional[str] = None
 
 
 class PuntoVentaForm(PuntoVentaBaseModel):

@@ -109,7 +109,7 @@ def edit_remitente(
     obj.latitud = data.latitud
     obj.longitud = data.longitud
     obj.ciudad_id = data.ciudad_id
-    obj.estado = EstadoEnum.ACTIVO.value
+    obj.estado = data.estado
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     if logo_url:

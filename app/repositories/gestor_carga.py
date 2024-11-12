@@ -95,7 +95,7 @@ def edit_gestor_carga(
     obj.longitud = data.longitud
     obj.ciudad_id = data.ciudad_id
     obj.limite_cantidad_oc_activas = data.limite_cantidad_oc_activas
-    obj.estado = EstadoEnum.ACTIVO.value
+    obj.estado = data.estado
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     if logo_url:

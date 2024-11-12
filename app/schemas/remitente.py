@@ -29,6 +29,7 @@ class RemitenteBaseModel(BaseModel):
     longitud: Optional[Decimal] = None
     direccion: Optional[str] = None
     ciudad_id: Optional[int] = None
+    estado: Optional[str] = None
 
 
 class RemitenteForm(RemitenteBaseModel):
@@ -43,7 +44,7 @@ class RemitenteBase(RemitenteBaseModel):
     logo: Optional[str] = None
     estado: EstadoEnum
     ciudad: Optional[Ciudad] = None
-    
+
 
 
 class RemitenteList(RemitenteBase):
