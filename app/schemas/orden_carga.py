@@ -91,6 +91,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     camion_chofer_numero_documento: Optional[str] = None
     camion_chofer_puede_recibir_anticipos: bool
     camion_limite_cantidad_oc_activas: int
+    camion_estado: Optional[str] = None
     camion_limite_monto_anticipos: Optional[RoundedDecimal] = None
     camion_monto_anticipo_disponible: Optional[RoundedDecimal] = None
     camion_total_anticipos_retirados_en_estado_pendiente_o_en_proceso: Optional[
@@ -111,6 +112,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     semi_placa: str
     semi_marca: Optional[str] = None
     semi_color: Optional[str] = None
+    semi_estado: Optional[str] = None
     # Datos de fletes
     flete_producto_id: Optional[int] = None
     flete_anticipo_maximo: RoundedDecimal
