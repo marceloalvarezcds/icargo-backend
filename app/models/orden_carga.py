@@ -301,6 +301,32 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_limite_credito(self):  # total anticipo
         return (self.flete_anticipo_maximo / Decimal(100)) * self.flete_proyectado
+    
+    #flete_limite_credito 
+    #camion_monto_anticipo_disponible
+    #total_anticipo_complemento
+
+    @hybrid_property
+    def linea_disponible(self):
+        # Verificar si flete_limite_credito o camion_monto_anticipo_disponible son None
+        flete_limite_credito = self.flete_limite_credito
+        camion_monto_anticipo_disponible = self.camion_monto_anticipo_disponible
+        
+        # Si ambos son None, devuelve None
+        if flete_limite_credito is None and camion_monto_anticipo_disponible is None:
+            return None
+        
+        # Si uno de ellos es None, asigna 0 al que sea None para evitar el error
+        if flete_limite_credito is None:
+            flete_limite_credito = Decimal(0)
+        if camion_monto_anticipo_disponible is None:
+            camion_monto_anticipo_disponible = Decimal(0)
+        
+        # Calcular el menor valor entre los dos
+        menor_valor = min(flete_limite_credito, camion_monto_anticipo_disponible)
+        
+        # Sumar el valor calculado al total_anticipo_complemento
+        return self.total_anticipo_complemento + menor_valor
 
     @hybrid_property
     def flete_numero_lote(self):

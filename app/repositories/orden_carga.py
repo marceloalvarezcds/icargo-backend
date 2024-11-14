@@ -192,15 +192,8 @@ def create_orden_carga(
     flete: Flete,
     gestor_carga_id: Optional[int],
     modified_by: str,
+    estado_inicial: EstadoEnum,
 ) -> OrdenCarga:
-    rol_id = get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
-
-    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 1 - orden de carga", db)
-
-    if roles_permisos:
-        estado_inicial = EstadoEnum.ACEPTADO
-    else:
-        estado_inicial = EstadoEnum.NUEVO
 
     obj = OrdenCarga(
         camion_id=data.camion_id,
