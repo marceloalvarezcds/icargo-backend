@@ -139,7 +139,8 @@ class OrdenCarga(OrdenCargaBaseModel):
     gestor_carga_moneda_nombre: str
     resultado_gestor_carga_saldo_total: Optional[int] = None
     resultado_propietario_total_anticipos_retirados: Optional[int] = None
-
+    saldo_efectivo: Optional[int] = None
+    saldo_combustible: Optional[int] = None
     # Historial de Estados
     is_aceptado: bool
     is_cancelado: bool
@@ -264,6 +265,12 @@ class OrdenCargaList(OrdenCargaForm):
     estado_valor: Union[EstadoEnum, OrdenCargaEstadoEnum]
     anticipos_liberados: bool
     anticipos_liberados_descripcion: str
+    resultado_propietario_total_anticipos_retirados: Optional[int] = None
+    resultado_propietario_total_anticipos_retirados_efectivo: Optional[int] = None
+    resultado_propietario_total_anticipos_retirados_combustible: Optional[int] = None
+    resultado_saldo_combustible: Optional[int] = None
+    saldo_efectivo: Optional[int] = None
+    saldo_combustible: Optional[int] = None
     # INICIO Tramo de OC
     origen_id: Optional[int] = None
     origen_nombre: Optional[str] = None

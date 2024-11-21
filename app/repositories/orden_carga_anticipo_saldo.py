@@ -33,9 +33,26 @@ def get_orden_carga_anticipo_saldo_by_id(
     )
 
 
+def get_orden_carga_anticipo_saldo_by_orden_carga_id(db: Session, orden_carga_id: int):
+    return db.query(OrdenCargaAnticipoSaldo).filter(
+        OrdenCargaAnticipoSaldo.orden_carga_id == orden_carga_id
+    ).all()
+
+
+def get_orden_carga_anticipo_saldo_by_orden_carga_and_tipo_insumo_id(
+    db: Session, orden_carga_id: int, tipo_insumo_id: int
+) -> Optional[OrdenCargaAnticipoSaldo]:
+    return db.query(OrdenCargaAnticipoSaldo).filter(
+        OrdenCargaAnticipoSaldo.orden_carga_id == orden_carga_id,
+        OrdenCargaAnticipoSaldo.tipo_insumo_id == tipo_insumo_id
+    ).first()
+
+
+
 def create_orden_carga_anticipo_saldo(
     db: Session,
     data: OrdenCargaAnticipoSaldoForm,
+    saldo_actualizado: float,
     modified_by: str,
 ) -> OrdenCargaAnticipoSaldo:
     obj = OrdenCargaAnticipoSaldo(
@@ -44,8 +61,8 @@ def create_orden_carga_anticipo_saldo(
         orden_carga_anticipo_porcentaje_id=data.orden_carga_anticipo_porcentaje_id,
         total_anticipo=data.total_anticipo,
         total_complemento=data.total_complemento,
-        total_retirado=data.total_retirado,
-        saldo=data.saldo,
+        total_retirado=data.total_retirado,  # Esto sigue siendo como antes
+        saldo=saldo_actualizado,  # Usamos el saldo actualizado calculado en el servicio
         created_by=modified_by,
         modified_by=modified_by,
     )

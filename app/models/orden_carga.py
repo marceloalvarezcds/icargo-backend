@@ -18,6 +18,8 @@ from sqlalchemy.orm import relationship  # type: ignore
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums import EstadoEnum
+
+from app.models.flete_anticipo import FleteAnticipo
 from app.schemas import (
     OrdenCargaAnticipoRetirado,
     OrdenCargaComplemento,
@@ -25,6 +27,7 @@ from app.schemas import (
     OrdenCargaEstadoHistorial,
     OrdenCargaRemisionDestino,
     OrdenCargaRemisionOrigen,
+    OrdenCargaAnticipoSaldo,
 )
 from app.utils import get_flete_detalle, get_merma_detalle
 
@@ -36,6 +39,8 @@ from .flete import Flete
 from .gestor_carga import GestorCarga
 from .moneda import Moneda
 from .semi import Semi
+from sqlalchemy.orm import aliased
+
 
 
 class OrdenCarga(AuditMixin, Base):
@@ -302,30 +307,20 @@ class OrdenCarga(AuditMixin, Base):
     def flete_limite_credito(self):  # total anticipo
         return (self.flete_anticipo_maximo / Decimal(100)) * self.flete_proyectado
     
-    #flete_limite_credito 
-    #camion_monto_anticipo_disponible
-    #total_anticipo_complemento
-
     @hybrid_property
     def linea_disponible(self):
-        # Verificar si flete_limite_credito o camion_monto_anticipo_disponible son None
         flete_limite_credito = self.flete_limite_credito
         camion_monto_anticipo_disponible = self.camion_monto_anticipo_disponible
-        
-        # Si ambos son None, devuelve None
         if flete_limite_credito is None and camion_monto_anticipo_disponible is None:
             return None
-        
-        # Si uno de ellos es None, asigna 0 al que sea None para evitar el error
+ 
         if flete_limite_credito is None:
             flete_limite_credito = Decimal(0)
         if camion_monto_anticipo_disponible is None:
             camion_monto_anticipo_disponible = Decimal(0)
-        
-        # Calcular el menor valor entre los dos
+    
         menor_valor = min(flete_limite_credito, camion_monto_anticipo_disponible)
-        
-        # Sumar el valor calculado al total_anticipo_complemento
+      
         return self.total_anticipo_complemento + menor_valor
 
     @hybrid_property
@@ -657,6 +652,48 @@ class OrdenCarga(AuditMixin, Base):
     def resultado_propietario_total_complemento(self):
         lista: List[OrdenCargaComplemento] = self.complementos
         return sum(x.propietario_monto for x in lista)
+    
+    @hybrid_property
+    def resultado_saldo_combustible(self):
+        total_anticipo_combustible = sum(
+            saldo.flete_anticipo.total_anticipo or 0 for saldo in self.saldos
+            if saldo.flete_anticipo and saldo.flete_anticipo.tipo_insumo_id == 1
+        )
+        total_retirado_combustible = sum(
+            saldo.total_retirado or 0 for saldo in self.saldos
+            if saldo.flete_anticipo and saldo.flete_anticipo.tipo_insumo_id == 1
+        )
+        sobrante_combustible = total_anticipo_combustible - total_retirado_combustible
+
+        print(f"Total Anticipo Combustible: {total_anticipo_combustible}")
+        print(f"Total Retirado Combustible: {total_retirado_combustible}")
+        print(f"Sobrante Combustible: {sobrante_combustible}")
+
+        return sobrante_combustible
+    
+    @hybrid_property
+    def saldo_efectivo(self):
+        fa = aliased(FleteAnticipo)
+        total_saldo = sum(
+            saldo.saldo or 0 
+            for saldo in self.saldos 
+            if saldo.flete_anticipo and saldo.flete_anticipo.tipo_insumo_id is None
+        )
+        
+        return total_saldo
+
+    @hybrid_property
+    def saldo_combustible(self):
+        fa = aliased(FleteAnticipo)
+        total_combustible = sum(
+            saldo.saldo or 0 
+            for saldo in self.saldos 
+            if saldo.flete_anticipo and saldo.flete_anticipo.tipo_insumo_id == 1
+        )
+        
+        return total_combustible       
+
+
 
     @hybrid_property
     def resultado_propietario_total_complemento_a_cobrar(self):
