@@ -27,10 +27,64 @@ def create_orden_carga_anticipo_saldo(
     data: schemas.OrdenCargaAnticipoSaldoForm,
     modified_by: str,
 ) -> OrdenCargaAnticipoSaldo:
+    # print(f"Buscando anticipos existentes para orden_carga_id={data.orden_carga_id}")
+
+    # Recuperar y ordenar anticipos por flete_anticipo_id de forma ascendente
+    existing_anticipos = repositories.get_orden_carga_anticipo_saldo_by_orden_carga_id(
+        db, data.orden_carga_id
+    )
+    sorted_anticipos = sorted(existing_anticipos, key=lambda a: a.flete_anticipo_id)
+
+    # Recuperar tipo_insumo_id del FleteAnticipo actual
+    flete_anticipo_actual = (
+        db.query(FleteAnticipo)
+        .filter(FleteAnticipo.id == data.flete_anticipo_id)
+        .first()
+    )
+    if not flete_anticipo_actual:
+        raise ValueError(f"No se encontró un FleteAnticipo con ID {data.flete_anticipo_id}")
+    
+    tipo_insumo_actual = flete_anticipo_actual.tipo_insumo_id
+    # print(f"Tipo de insumo actual: {tipo_insumo_actual}")
+
+    saldo_actualizado = data.saldo
+    for anticipo in sorted_anticipos:
+        # print(f"Procesando anticipo con ID {anticipo.id}, flete_anticipo_id={anticipo.flete_anticipo_id}, monto retirado {anticipo.total_retirado}")
+
+        # Procesar solo si el flete_anticipo_id es diferente al actual
+        if anticipo.flete_anticipo_id != data.flete_anticipo_id:
+            # Recuperar tipo_insumo_id del FleteAnticipo relacionado al anticipo
+            tipo_insumo_id = (
+                anticipo.flete_anticipo.tipo_insumo_id
+                if anticipo.flete_anticipo
+                else None
+            )
+            # print(f"Tipo de insumo del anticipo: {tipo_insumo_id}")
+
+            # Restar según el tipo de insumo
+            if tipo_insumo_id is None and tipo_insumo_actual is None:  # Efectivo
+                # print("Restando monto de efectivo.")
+                saldo_actualizado -= anticipo.total_retirado
+            elif tipo_insumo_id == 1 and tipo_insumo_actual == 1:  # Combustible
+                # print("Restando monto de combustible.")
+                saldo_actualizado -= anticipo.total_retirado
+            elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:  # Lubricantes
+                # print("Restando monto de lubricantes.")
+                saldo_actualizado -= anticipo.total_retirado
+            else:
+                print("El tipo de insumo no coincide. No se resta nada.")
+
+            # # Asegurarse de que el saldo no sea negativo
+            # if saldo_actualizado < 0:
+            #     print("Saldo calculado es negativo. Ajustando saldo a 0.")
+            #     saldo_actualizado = 0
+
+    # print(f"Creando nuevo anticipo con saldo actualizado: {saldo_actualizado}")
     return repositories.create_orden_carga_anticipo_saldo(
         db,
         data,
-        modified_by,
+        saldo_actualizado,
+        modified_by
     )
 
 

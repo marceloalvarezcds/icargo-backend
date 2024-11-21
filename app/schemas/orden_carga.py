@@ -133,12 +133,14 @@ class OrdenCarga(OrdenCargaBaseModel):
     flete_tarifa: RoundedDecimal
     flete_tipo: Optional[TipoFleteEnum] = None
     flete_saldo: Optional[int] = None
+    linea_disponible: Optional[int] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
     resultado_gestor_carga_saldo_total: Optional[int] = None
     resultado_propietario_total_anticipos_retirados: Optional[int] = None
-
+    saldo_efectivo: Optional[int] = None
+    saldo_combustible: Optional[int] = None
     # Historial de Estados
     is_aceptado: bool
     is_cancelado: bool
@@ -256,12 +258,19 @@ class OrdenCargaList(OrdenCargaForm):
     gestor_carga_moneda_nombre: str
     condicion_propietario_tarifa: int #Agregar para vista OC
     condicion_gestor_cuenta_tarifa: Optional[int] = None
+    linea_disponible: Optional[int] = None
     # Campos para la edición
     estado: EstadoEnum
     orden_carga_estado: OrdenCargaEstadoEnum
     estado_valor: Union[EstadoEnum, OrdenCargaEstadoEnum]
     anticipos_liberados: bool
     anticipos_liberados_descripcion: str
+    resultado_propietario_total_anticipos_retirados: Optional[int] = None
+    resultado_propietario_total_anticipos_retirados_efectivo: Optional[int] = None
+    resultado_propietario_total_anticipos_retirados_combustible: Optional[int] = None
+    resultado_saldo_combustible: Optional[int] = None
+    saldo_efectivo: Optional[int] = None
+    saldo_combustible: Optional[int] = None
     # INICIO Tramo de OC
     origen_id: Optional[int] = None
     origen_nombre: Optional[str] = None
