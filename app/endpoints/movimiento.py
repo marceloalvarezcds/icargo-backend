@@ -306,6 +306,10 @@ async def read_movimiento_list_by_estado_cuenta_det(
     "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}/punto_venta_id/{punto_venta_id}",  # noqa
     response_model=List[schemas.Movimiento],
 )
+@api.get(
+    "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}/punto_venta_id/{punto_venta_id}/tipo_liquidacion/{tipo_liquidacion}",  # noqa
+    response_model=List[schemas.Movimiento],
+)
 async def read_movimiento_list_by_estado_cuenta(
     tipo_contraparte_id: int,
     contraparte_id: int,
@@ -313,6 +317,7 @@ async def read_movimiento_list_by_estado_cuenta(
     contraparte_numero_documento: str,
     etapa: str,
     punto_venta_id: int,
+    tipo_liquidacion: str,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
@@ -325,5 +330,6 @@ async def read_movimiento_list_by_estado_cuenta(
         contraparte_numero_documento,
         etapa,
         current_user.gestor_carga_id,
-        punto_venta_id
+        punto_venta_id,
+        tipo_liquidacion
     )

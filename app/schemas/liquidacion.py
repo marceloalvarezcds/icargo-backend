@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator
 
-from app.schemas.estado_cuenta import EstadoCuenta, EstadoCuentaForm
+from app.schemas.estado_cuenta import EstadoCuentaForm
 from decimal import Decimal
 from typing import List, Optional
 from app.enums import LiquidacionEstadoEnum, LiquidacionEtapaEnum
@@ -11,17 +11,20 @@ from .moneda import Moneda
 from .movimiento import Movimiento
 from .rounded_decimal_model import RoundedDecimal
 from .tipo_contraparte import TipoContraparte
+from app.enums.tipo_liquidacion import TipoLiquidacion
 
 class LiquidacionNewMovimientosForm(BaseModel):
     movimientos: List[Movimiento]
     cabecera: EstadoCuentaForm
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
+    tipo_mov_liquidacion: TipoLiquidacion = TipoLiquidacion.EFECTIVO
 
 class LiquidacionAddMovimientosForm(BaseModel):
     movimientos: List[Movimiento]
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
+    tipo_mov_liquidacion: Optional[TipoLiquidacion]
 
 
 class LiquidacionAddInstrumentosForm(BaseModel):
@@ -43,6 +46,7 @@ class LiquidacionForm(BaseModel):
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
     saldo_cc: Optional[RoundedDecimal]
+    tipo_mov_liquidacion: TipoLiquidacion
 
 
 class Liquidacion(LiquidacionForm):
@@ -70,6 +74,7 @@ class Liquidacion(LiquidacionForm):
     tipo_contraparte_descripcion: str
     tipo_operacion_descripcion: str
     url: str
+    tipo_mov_liquidacion: Optional[TipoLiquidacion] = None
     # Auditoría
     created_by: str
     created_at: Date

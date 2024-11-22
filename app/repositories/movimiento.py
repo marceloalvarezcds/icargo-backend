@@ -10,7 +10,7 @@ from app.models import Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, Tipo
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
 from app.schemas import Movimiento as MovimientoSchema
-
+from app.enums.tipo_liquidacion import TipoLiquidacion
 
 
 def get_movimiento_list(db: Session) -> List[Movimiento]:
@@ -208,9 +208,10 @@ def get_movimiento_list_by_contraparte_and_gestor_carga_id(
     contraparte_numero_documento: str,
     estado: str,
     gestor_carga_id: int,
-    punto_venta_id: Optional[int]
+    punto_venta_id: Optional[int],
+    listar_efectivo: Optional[str]
 ) -> List[Movimiento]:
-    return (
+    query = (
         db.query(Movimiento)
         .outerjoin(Movimiento.anticipo)
         .filter(
@@ -233,11 +234,17 @@ def get_movimiento_list_by_contraparte_and_gestor_carga_id(
                 ),
                 Movimiento.estado == estado,
                 Movimiento.gestor_carga_id == gestor_carga_id,
+
             )
-        )
-        .order_by(Movimiento.contraparte, Movimiento.id.desc())
-        .all()
+        ).order_by(Movimiento.contraparte, Movimiento.id.desc())
     )
+
+    if listar_efectivo == TipoLiquidacion.INSUMO.value:
+        query = query.filter(OrdenCargaAnticipoRetirado.insumo_punto_venta_precio_id != null())
+    elif listar_efectivo == TipoLiquidacion.EFECTIVO.value:
+        query = query.filter(OrdenCargaAnticipoRetirado.insumo_punto_venta_precio_id == null())
+
+    return query.all()
 
 
 def get_movimiento_list_by_liquidacion(
@@ -501,6 +508,20 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                 Movimiento.estado.label("estado"),
                 Liquidacion.estado.label("estado_liquidacion"),
                 Movimiento.es_editable.label("es_editable"),
+                case(
+                    (
+                        and_(
+                            Movimiento.estado != MovimientoEstadoEnum.FINALIZADO.value,
+                            Movimiento.orden_carga_id != null(),
+                            or_(
+                                TipoMovimiento.descripcion == TipoMovimientoEnum.FLETE.value,
+                                TipoMovimiento.descripcion == TipoMovimientoEnum.MERMA.value,
+                            )
+                        ),
+                        True,
+                    ),
+                    else_=literal_column("false"),
+                ).label("can_edit_oc"),
                 *get_cols_estado_cuenta_case_statement(),
                 )\
                 .join(Movimiento.tipo_movimiento)\
