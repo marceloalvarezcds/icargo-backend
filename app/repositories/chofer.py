@@ -6,6 +6,7 @@ from sqlalchemy.sql.elements import and_, not_  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Camion, Chofer
+from app.models.combinacion import Combinacion
 from app.schemas import ChoferEditForm, ChoferForm
 
 
@@ -84,6 +85,10 @@ def get_chofer_by(
 
 def get_chofer_by_id(db: Session, id: int) -> Optional[Chofer]:
     return db.query(Chofer).filter(Chofer.id == id).first()
+
+
+def get_combinaciones_by_chofer_id(db: Session, chofer_id: int) -> List[Combinacion]:
+    return db.query(Combinacion).filter(Combinacion.chofer_id == chofer_id).all()
 
 
 def create_chofer(

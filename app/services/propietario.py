@@ -208,11 +208,36 @@ def delete_propietario(
     return get_propietario_detail(db, obj, gestor_cuenta_id)
 
 
+
 def change_propietario_status(
     db: Session, id: int, status: EstadoEnum, modified_by: str
-) -> schemas.Camion:
-    co = get_propietario_by_id(db, id)
-    return repositories.change_propietario_status(co, db, status, modified_by)
+) -> schemas.Propietario:
+    propietario = get_propietario_by_id(db, id)
+    if not propietario:
+        raise HTTPException(status_code=404, detail="Propietario no encontrado.")
+
+    repositories.change_propietario_status(propietario, db, status, modified_by)
+
+    if status == EstadoEnum.INACTIVO:
+        combinaciones_relacionadas = repositories.get_combinaciones_by_propietario_id(db, propietario.id)
+
+        # Inactivar cada combinación asociada
+        for combinacion in combinaciones_relacionadas:
+            repositories.change_combinacion_status(combinacion, db, EstadoEnum.INACTIVO, modified_by)
+
+    elif status == EstadoEnum.ACTIVO:
+        # Obtener todas las combinaciones relacionadas con este propietario
+        combinaciones_relacionadas = repositories.get_combinaciones_by_propietario_id(db, propietario.id)
+
+        # Activar cada combinación asociada
+        for combinacion in combinaciones_relacionadas:
+            repositories.change_combinacion_status(combinacion, db, EstadoEnum.ACTIVO, modified_by)
+
+    # Confirmar los cambios en la base de datos
+    db.commit()
+
+    return schemas.Propietario.from_orm(propietario)
+
 
 
 def get_propietario_reports(db: Session) -> str:

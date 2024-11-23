@@ -129,9 +129,28 @@ def delete_semi(db: Session, id: int, modified_by: str) -> schemas.Semi:
 
 def change_semi_status(
     db: Session, id: int, status: EstadoEnum, modified_by: str
-) -> schemas.Camion:
-    co = get_semi_by_id(db, id)
-    return repositories.change_semi_status(co, db, status, modified_by)
+) -> schemas.Semi:
+    semi = get_semi_by_id(db, id)
+    if not semi:
+        raise HTTPException(status_code=404, detail="Semi no encontrado.")
+    repositories.change_semi_status(semi, db, status, modified_by)
+    if status == EstadoEnum.INACTIVO:
+        combinaciones_relacionadas = repositories.get_combinaciones_by_semi_id(db, semi.id)
+        for combinacion in combinaciones_relacionadas:
+            repositories.change_combinacion_status(combinacion, db, EstadoEnum.INACTIVO, modified_by)
+
+    # Si el semi es activado, activar las combinaciones relacionadas
+    elif status == EstadoEnum.ACTIVO:
+        # Obtener todas las combinaciones relacionadas con este semi
+        combinaciones_relacionadas = repositories.get_combinaciones_by_semi_id(db, semi.id)
+
+        # Activar cada combinación asociada
+        for combinacion in combinaciones_relacionadas:
+            repositories.change_combinacion_status(combinacion, db, EstadoEnum.ACTIVO, modified_by)
+    db.commit()
+
+    return schemas.Semi.from_orm(semi)
+
 
 
 def get_semi_reports(db: Session) -> str:

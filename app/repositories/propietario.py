@@ -6,6 +6,7 @@ from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Propietario
+from app.models.combinacion import Combinacion
 from app.schemas import Chofer, PropietarioEditForm, PropietarioForm
 
 
@@ -47,6 +48,9 @@ def get_propietario_list_by_tipo_persona_id(
         .all()
     )
 
+
+def get_combinaciones_by_propietario_id(db: Session, propietario_id: int) -> List[Combinacion]:
+    return db.query(Combinacion).filter(Combinacion.propietario_id == propietario_id).all()
 
 
 def get_propietario_by(
