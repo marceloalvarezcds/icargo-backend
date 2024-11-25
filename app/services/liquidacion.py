@@ -112,7 +112,7 @@ def create_liquidacion_pendiente(
         elif movimiento.es_proveedor:
             proveedor_id = movimiento.proveedor_id
             if movimiento.es_punto_venta:
-                punto_venta = movimiento.punto_venta_id
+                punto_venta = movimiento.punto_venta_id if movimiento.punto_venta_id is not None else movimiento.anticipo.punto_venta_id
                 nombre_contraparte = movimiento.punto_venta_nombre
                 contraparte_documento = movimiento.punto_venta_documento
         elif movimiento.es_gestor:
@@ -154,7 +154,8 @@ def create_liquidacion_pendiente(
             remitente_id=remitente_id,
             punto_venta_id=punto_venta,
             es_pago_cobro=data.es_pago_cobro,
-            monto=data.monto
+            monto=data.monto,
+            tipo_mov_liquidacion=data.tipo_mov_liquidacion
         ),
         gestor_id,
         modified_by,

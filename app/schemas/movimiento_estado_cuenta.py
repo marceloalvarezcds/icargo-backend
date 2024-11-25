@@ -31,6 +31,7 @@ class MovimientoEstadoCuenta(BaseModel):
     estado: str
     estado_liquidacion: Optional[str]
     es_editable: bool
+    can_edit_oc: bool
     pendiente: RoundedDecimal
     en_proceso: RoundedDecimal
     confirmado: RoundedDecimal

@@ -86,6 +86,7 @@ def get_movimiento_list_by_estado_cuenta(
     estado: str,
     gestor_carga_id: Optional[int],
     punto_venta_id: Optional[int] = None,
+    listar_efectivo: Optional[str] = 'Efectivo',
 ) -> List[Movimiento]:
     if gestor_carga_id:
         return repositories.get_movimiento_list_by_contraparte_and_gestor_carga_id(
@@ -96,7 +97,8 @@ def get_movimiento_list_by_estado_cuenta(
             contraparte_numero_documento,
             estado,
             gestor_carga_id,
-            punto_venta_id
+            punto_venta_id,
+            listar_efectivo
         )
     return repositories.get_movimiento_list_by_contraparte(
         db,

@@ -242,7 +242,8 @@ class Movimiento(AuditMixin, Base):
     def es_punto_venta(self):
         return (
             self.tipo_movimiento_descripcion == TipoMovimientoEnum.ANTICIPO.value
-            and self.anticipo is not None and self.anticipo.es_punto_venta
+            and self.anticipo is not None
+            and self.anticipo.es_punto_venta
         )
 
     @hybrid_property
