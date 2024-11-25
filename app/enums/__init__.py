@@ -23,3 +23,4 @@ from .tipo_documento_relacionado import TipoDocumentoRelacionadoEnum  # noqa
 from .tipo_flete import TipoFleteEnum  # noqa
 from .tipo_insumo import TipoInsumoEnum  # noqa
 from .tipo_movimiento import TipoMovimientoEnum  # noqa
+from .tipo_liquidacion import TipoLiquidacion  # noqa
