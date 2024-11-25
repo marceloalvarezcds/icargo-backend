@@ -203,37 +203,35 @@ async def create_combinacion(
     combinacion_semi = repositories.get_combinacion_semi_ids(
         db, data.semi_id, gestor_carga_id
         )
+ #Tracto solo puede tener un solo Propietario/Beneficiario
+
     if combinacion_exists and combinacion_exists.estado != EstadoEnum.INACTIVO.value:
         raise HTTPException(
             status_code=409,
             detail="La combinación de beneficiario, tracto y chofer ya existe para este gestor de carga."
-        )
-    # if combinacion_tracto_chofer and combinacion_tracto_chofer.estado != EstadoEnum.INACTIVO.value:
-    #     raise HTTPException(
-    #         status_code=409,
-    #         detail="La combinación de tracto y chofer ya existe para este gestor de carga."
-    #     )
-    if combinacion_tracto_semi_chofer_propietario and combinacion_tracto_semi_chofer_propietario.estado != EstadoEnum.INACTIVO.value:
-        raise HTTPException(
-            status_code=409,
-            detail="La combinación de tracto, semi y chofer ya existe para este gestor de carga."
         )
     if combinacion_tracto_propietario and combinacion_tracto_propietario.estado != EstadoEnum.INACTIVO.value:
         raise HTTPException(
             status_code=409,
             detail="La combinación de tracto y beneficiario ya existe para este gestor de carga."
         )
-    if combinacion_semi and combinacion_semi.estado != EstadoEnum.INACTIVO.value:
-        raise HTTPException(
-            status_code=409,
-            detail="La combinación de semi ya existe para este gestor de carga."
-        )
+    # if combinacion_tracto_semi_chofer_propietario and combinacion_tracto_semi_chofer_propietario.estado != EstadoEnum.INACTIVO.value:
+    #     raise HTTPException(
+    #         status_code=409,
+    #         detail="La combinación de tracto, semi y chofer ya existe para este gestor de carga."
+    #     )
+ 
+    # if combinacion_semi and combinacion_semi.estado != EstadoEnum.INACTIVO.value:
+    #     raise HTTPException(
+    #         status_code=409,
+    #         detail="La combinación de semi ya existe para este gestor de carga."
+    #     )
     
-    if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
-        raise HTTPException(
-            status_code=409,
-            detail="La combinación de tracto ya existe para este gestor de carga."
-        )
+    # if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
+    #     raise HTTPException(
+    #         status_code=409,
+    #         detail="La combinación de tracto ya existe para este gestor de carga."
+    #     )
     combinacion = repositories.create_combinacion(
         db,
         data,
