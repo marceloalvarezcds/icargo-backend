@@ -31,6 +31,7 @@ from .camion import (  # noqa
     get_camion_list,
     get_camion_list_by_gestor_cuenta_id,
     get_camion_list_by_propietario_id,
+    get_combinaciones_by_camion_id,
 )
 from .camion_semi_neto import (  # noqa
     create_camion_semi_neto,
@@ -79,6 +80,7 @@ from .chofer import (  # noqa
     get_chofer_list,
     get_chofer_list_by_gestor_cuenta_id,
     get_chofer_list_without_camion,
+    get_combinaciones_by_chofer_id,
 )
 from .chofer_propietario import (  # noqa
     create_propietario_by_chofer,
@@ -398,6 +400,7 @@ from .propietario import (  # noqa
     get_propietario_list,
     get_propietario_list_by_gestor_cuenta_id,
     get_propietario_list_by_tipo_persona_id,
+    get_combinaciones_by_propietario_id,
 )
 from .propietario_chofer import (  # noqa
     create_chofer_by_propietario,
@@ -473,6 +476,7 @@ from .semi import (  # noqa
     get_semi_by_id,
     get_semi_list,
     get_semi_list_by_propietario_id,
+    get_combinaciones_by_semi_id,
 )
 from .semi_clasificacion import (  # noqa
     get_semi_clasificacion_by_descripcion,
@@ -568,4 +572,5 @@ from .combinacion import(
     get_combinacion_tracto_semi_chofer_propietario_ids,
     get_combinacion_tracto_ids,
     get_combinacion_list_by_camion_id,
+    get_combinaciones_relacionadas,
 )

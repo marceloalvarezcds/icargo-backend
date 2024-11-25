@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Semi
+from app.models.combinacion import Combinacion
 from app.schemas import SemiForm
 
 
@@ -32,6 +33,10 @@ def get_semi_list_by_propietario_id(db: Session, propietario_id: int) -> List[Se
         .order_by(Semi.placa)
         .all()
     )
+
+
+def get_combinaciones_by_semi_id(db: Session, semi_id: int) -> List[Combinacion]:
+    return db.query(Combinacion).filter(Combinacion.semi_id == semi_id).all()
 
 
 def create_semi(

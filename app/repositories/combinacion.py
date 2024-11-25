@@ -65,6 +65,28 @@ def get_combinacion_list_by_camion_id(
 
 
 
+def get_combinaciones_relacionadas(
+    db: Session,
+    camion_id: Optional[int] = None,
+    chofer_id: Optional[int] = None,
+    propietario_id: Optional[int] = None,
+    semi_id: Optional[int] = None
+) -> List[Combinacion]:
+    query = db.query(Combinacion)
+
+    if camion_id:
+        query = query.filter(Combinacion.camion_id == camion_id)
+    if chofer_id:
+        query = query.filter(Combinacion.chofer_id == chofer_id)
+    if propietario_id:
+        query = query.filter(Combinacion.propietario_id == propietario_id)
+    if semi_id:
+        query = query.filter(Combinacion.semi_id == semi_id)
+
+    return query.all()
+
+
+
 ####################################################################################
 
 def get_camion_list_by_combinacion_id(

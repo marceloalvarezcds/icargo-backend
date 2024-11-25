@@ -6,6 +6,7 @@ from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Camion
+from app.models.combinacion import Combinacion
 from app.models.propietario import Propietario
 from app.schemas import CamionForm
 
@@ -52,6 +53,9 @@ def get_camion_list_by_propietario_id(db: Session, propietario_id: int) -> List[
         .order_by(Camion.placa)
         .all()
     )
+
+def get_combinaciones_by_camion_id(db: Session, camion_id: int) -> List[Combinacion]:
+    return db.query(Combinacion).filter(Combinacion.camion_id == camion_id).all()
 
 
 def create_camion(

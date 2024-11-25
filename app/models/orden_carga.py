@@ -693,8 +693,6 @@ class OrdenCarga(AuditMixin, Base):
         
         return total_combustible       
 
-
-
     @hybrid_property
     def resultado_propietario_total_complemento_a_cobrar(self):
         lista: List[OrdenCargaComplemento] = self.complementos

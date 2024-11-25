@@ -138,8 +138,25 @@ def delete_camion(db: Session, id: int, modified_by: str) -> schemas.Camion:
 def change_camion_status(
     db: Session, id: int, status: EstadoEnum, modified_by: str
 ) -> schemas.Camion:
-    co = get_camion_by_id(db, id)
-    return repositories.change_camion_status(co, db, status, modified_by)
+    camion = get_camion_by_id(db, id)
+    if not camion:
+        raise HTTPException(status_code=404, detail="Camión no encontrado.")
+    repositories.change_camion_status(camion, db, status, modified_by)
+    if status == EstadoEnum.INACTIVO:
+        combinaciones_relacionadas = repositories.get_combinaciones_by_camion_id(db, camion.id)
+        # Inactivar cada combinación asociada
+        for combinacion in combinaciones_relacionadas:
+            repositories.change_combinacion_status(combinacion, db, EstadoEnum.INACTIVO, modified_by)
+    # Si el camión es activado, activar las combinaciones relacionadas
+    elif status == EstadoEnum.ACTIVO:
+        # Obtener todas las combinaciones relacionadas con este camión
+        combinaciones_relacionadas = repositories.get_combinaciones_by_camion_id(db, camion.id)
+        # Activar cada combinación asociada
+        for combinacion in combinaciones_relacionadas:
+            repositories.change_combinacion_status(combinacion, db, EstadoEnum.ACTIVO, modified_by)
+    db.commit()
+
+    return schemas.Camion.from_orm(camion)
 
 
 def update_camion_anticipo_retirado(db: Session, camion: Camion):

@@ -193,9 +193,39 @@ def delete_chofer(
 
 def change_chofer_status(
     db: Session, id: int, status: EstadoEnum, modified_by: str
-) -> schemas.Camion:
-    co = get_chofer_by_id(db, id)
-    return repositories.change_chofer_status(co, db, status, modified_by)
+) -> schemas.Chofer:
+    # Obtener el chofer
+    chofer = get_chofer_by_id(db, id)
+    if not chofer:
+        raise HTTPException(status_code=404, detail="Chofer no encontrado.")
+
+    # Cambiar el estado del chofer
+    repositories.change_chofer_status(chofer, db, status, modified_by)
+
+    # Si el chofer es inactivado, inactivar las combinaciones relacionadas
+    if status == EstadoEnum.INACTIVO:
+        # Obtener todas las combinaciones relacionadas con este chofer
+        combinaciones_relacionadas = repositories.get_combinaciones_by_chofer_id(db, chofer.id)
+        
+        # Inactivar cada combinación asociada
+        for combinacion in combinaciones_relacionadas:
+            repositories.change_combinacion_status(combinacion, db, EstadoEnum.INACTIVO, modified_by)
+
+    # Si el chofer es activado, activar las combinaciones relacionadas
+    elif status == EstadoEnum.ACTIVO:
+        # Obtener todas las combinaciones relacionadas con este chofer
+        combinaciones_relacionadas = repositories.get_combinaciones_by_chofer_id(db, chofer.id)
+        
+        # Activar cada combinación asociada
+        for combinacion in combinaciones_relacionadas:
+            repositories.change_combinacion_status(combinacion, db, EstadoEnum.ACTIVO, modified_by)
+
+    # Confirmar los cambios en la base de datos
+    db.commit()
+
+    return schemas.Chofer.from_orm(chofer)
+
+
 
 
 def get_chofer_reports(db: Session) -> str:
