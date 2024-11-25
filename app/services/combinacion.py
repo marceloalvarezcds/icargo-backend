@@ -46,40 +46,8 @@ def get_combinacion_by_gestor_cuenta_and_combinacion_id(
 def change_combinacion_status(
     db: Session, id: int, status: EstadoEnum, modified_by: str
 ) -> schemas.CombinacionesBD:
-    # Obtener la combinación
-    combinacion = get_combinacion_by_id(db, id)
-    if not combinacion:
-        raise HTTPException(status_code=404, detail="Combinación no encontrada.")
-
-    # Cambiar el estado de la combinación
-    repositories.change_combinacion_status(combinacion, db, status, modified_by)
-
-    # Si la combinación es inactivada, inactivar todos los elementos relacionados
-    if status == EstadoEnum.INACTIVO:
-        if combinacion.camion_id:
-            camion = repositories.get_camion_by_id(db, combinacion.camion_id)
-            if camion:
-                repositories.change_camion_status(camion, db, EstadoEnum.INACTIVO, modified_by)
-
-        if combinacion.chofer_id:
-            chofer = repositories.get_chofer_by_id(db, combinacion.chofer_id)
-            if chofer:
-                repositories.change_chofer_status(chofer, db, EstadoEnum.INACTIVO, modified_by)
-
-        if combinacion.semi_id:
-            semi = get_semi_by_id(db, combinacion.semi_id)
-            if semi:
-                repositories.change_semi_status(semi, db, EstadoEnum.INACTIVO, modified_by)
-
-        if combinacion.propietario_id:
-            propietario = repositories.get_propietario_by_id(db, combinacion.propietario_id)
-            if propietario:
-                repositories.change_propietario_status(propietario, db, EstadoEnum.INACTIVO, modified_by)
-
-    # Confirmar los cambios en la base de datos
-    db.commit()
-
-    return schemas.CombinacionesBD.from_orm(combinacion)
+    co = get_combinacion_by_id(db, id)
+    return repositories.change_combinacion_status(co, db, status, modified_by)
 
 
 
