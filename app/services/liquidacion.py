@@ -279,8 +279,8 @@ def aceptar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
 
 def cancelar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
     obj = get_liquidacion_by_id(db, id)
-    movimientos = repositories.get_movimiento_list_by_liquidacion(
-        db, id, MovimientoEstadoEnum.EN_PROCESO.value
+    movimientos = repositories.get_movimiento_list_by_liquidacion_id(
+        db, id
     )
     change_movimiento_list_status(
         db, movimientos, LiquidacionEstadoEnum.PENDIENTE, modified_by

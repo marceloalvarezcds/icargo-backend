@@ -239,10 +239,11 @@ def get_movimiento_list_by_contraparte_and_gestor_carga_id(
         ).order_by(Movimiento.contraparte, Movimiento.id.desc())
     )
 
-    if listar_efectivo == TipoLiquidacion.INSUMO.value:
-        query = query.filter(OrdenCargaAnticipoRetirado.insumo_punto_venta_precio_id != null())
-    elif listar_efectivo == TipoLiquidacion.EFECTIVO.value:
-        query = query.filter(OrdenCargaAnticipoRetirado.insumo_punto_venta_precio_id == null())
+    if listar_efectivo:
+        if listar_efectivo == TipoLiquidacion.INSUMO.value:
+            query = query.filter(OrdenCargaAnticipoRetirado.insumo_punto_venta_precio_id != null())
+        elif listar_efectivo == TipoLiquidacion.EFECTIVO.value:
+            query = query.filter(OrdenCargaAnticipoRetirado.insumo_punto_venta_precio_id == null())
 
     return query.all()
 

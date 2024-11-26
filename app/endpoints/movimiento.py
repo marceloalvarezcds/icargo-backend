@@ -310,7 +310,7 @@ async def read_movimiento_list_by_estado_cuenta_det(
     "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}/punto_venta_id/{punto_venta_id}/tipo_liquidacion/{tipo_liquidacion}",  # noqa
     response_model=List[schemas.Movimiento],
 )
-async def read_movimiento_list_by_estado_cuenta(
+async def read_movimiento_list_by_estado_cuenta_pdv(
     tipo_contraparte_id: int,
     contraparte_id: int,
     contraparte: str,
