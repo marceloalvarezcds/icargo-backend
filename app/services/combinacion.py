@@ -210,11 +210,14 @@ async def create_combinacion(
             status_code=409,
             detail="La combinación de beneficiario, tracto y chofer ya existe para este gestor de carga."
         )
-    if combinacion_tracto_propietario and combinacion_tracto_propietario.estado != EstadoEnum.INACTIVO.value:
+# Verificamos si la combinación existe y si el propietario es distinto
+    if combinacion_tracto_propietario is  None :
+    # Lanza la excepción HTTP con el mensaje adecuado
         raise HTTPException(
-            status_code=409,
-            detail="La combinación de tracto y beneficiario ya existe para este gestor de carga."
-        )
+        status_code=409,
+        detail="El tracto puede tener un solo beneficiario."
+    )
+
     # if combinacion_tracto_semi_chofer_propietario and combinacion_tracto_semi_chofer_propietario.estado != EstadoEnum.INACTIVO.value:
     #     raise HTTPException(
     #         status_code=409,
