@@ -31,9 +31,8 @@ from app.models import (
     Chofer,
     Proveedor,
     Remitente,
-    Liquidacion,
     Factura,
-    PuntoVenta
+    PuntoVenta,
 )
 from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm, FacturaForm
 from app.schemas.date_model import Date
@@ -86,7 +85,7 @@ def get_movimiento_list_by_estado_cuenta(
     estado: str,
     gestor_carga_id: Optional[int],
     punto_venta_id: Optional[int] = None,
-    listar_efectivo: Optional[str] = 'Efectivo',
+    listar_efectivo: Optional[str] = None
 ) -> List[Movimiento]:
     if gestor_carga_id:
         return repositories.get_movimiento_list_by_contraparte_and_gestor_carga_id(
