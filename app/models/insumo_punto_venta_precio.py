@@ -35,10 +35,9 @@ class InsumoPuntoVentaPrecio(AuditMixin, Base):
         InsumoPuntoVenta, uselist=False, back_populates="precios"
     )
     precio = Column(Numeric(38, 10))
-    fecha_inicio = Column(DateTime)
-    fecha_fin = Column(DateTime)
+    fecha_inicio = Column(DateTime) 
     estado = Column(String(15), server_default=EstadoEnum.ACTIVO.value)
-    hora_inicio = Column(Time) 
+    hora_inicio = Column(String(8))
     observacion = Column(String(255))
 
     @hybrid_property
