@@ -665,10 +665,6 @@ class OrdenCarga(AuditMixin, Base):
         )
         sobrante_combustible = total_anticipo_combustible - total_retirado_combustible
 
-        print(f"Total Anticipo Combustible: {total_anticipo_combustible}")
-        print(f"Total Retirado Combustible: {total_retirado_combustible}")
-        print(f"Sobrante Combustible: {sobrante_combustible}")
-
         return sobrante_combustible
     
     @hybrid_property

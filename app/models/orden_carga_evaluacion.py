@@ -34,10 +34,33 @@ class OrdenCargaEvaluacionesHistorial(AuditMixin, Base):
     origen_id = Column(Integer)
     destino_id = Column(Integer)
     producto_id = Column(Integer)
+    tracto_rating = Column(Integer, nullable=True)
+    semi_rating = Column(Integer, nullable=True)
+    chofer_rating = Column(Integer, nullable=True)
+    propietario_rating = Column(Integer, nullable=True)
+    carga_rating = Column(Integer, nullable=True)
+    descarga_rating = Column(Integer, nullable=True)
 
     # Hybrid properties for accessing related data
     @hybrid_property
     def tipo_incidente_nombre(self):
         return self.tipo_incidente.descripcion
+    
+    @hybrid_property
+    def oc_camion_placa(self):
+        return self.orden_carga.camion_placa
+
+    @hybrid_property
+    def oc_semi_placa(self):
+        return self.orden_carga.semi_placa
+    
+    @hybrid_property
+    def oc_chofer_nombre(self):
+        return self.orden_carga.combinacion_chofer_nombre
+    
+    @hybrid_property
+    def oc_beneficiario_nombre(self):
+        return self.orden_carga.camion_beneficiario_nombre
+
 
    
