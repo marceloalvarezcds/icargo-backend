@@ -35,7 +35,10 @@ from .orden_carga_remision_resultado import (
     get_orden_carga_remision_resultado_list_by_flete,
     get_orden_carga_remision_resultado_list_by_orden_carga,
 )
-
+from .provision import (
+    create_provision_by_finalizar_oc,
+    borrar_provisiones_by_conciliacion_oc
+)
 
 def get_orden_carga_list(
     db: Session, gestor_carga_id: Optional[int]
@@ -73,7 +76,7 @@ def create_complementos_and_descuentos(
         create_orden_carga_complemento_by_flete(db, obj, c, modified_by)
     for d in flete.descuentos:
         create_orden_carga_descuento_by_flete(db, obj, d, modified_by)
-        
+
 
 def create_orden_carga(
     db: Session,
@@ -84,7 +87,7 @@ def create_orden_carga(
     flete = repositories.get_flete_by_id(db, data.flete_id)
     if not flete:
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
-    
+
     # Obtener el gestor de carga y el usuario modificado
     gestor_carga_id = current_user.gestor_carga_id
     modified_by = current_user.username
@@ -92,13 +95,13 @@ def create_orden_carga(
     # Obtener el rol del gestor de carga y verificar los permisos
     rol_id = repositories.get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
     roles_permisos = repositories.rol_tiene_permiso(rol_id, "Cambiar_estado 1 - orden de carga", db)
- 
+
     # Determinar el estado inicial (ACEPTADO o NUEVO) dependiendo de los permisos
     if roles_permisos:
         estado_inicial = EstadoEnum.ACEPTADO
     else:
         estado_inicial = EstadoEnum.NUEVO
-   
+
     # Verificar la existencia del camión
     camion = db.query(Camion).filter(Camion.id == data.camion_id).first()
     if not camion:
@@ -119,7 +122,7 @@ def create_orden_carga(
         db, data.camion_id, data.semi_id, flete.producto_id, gestor_carga_id
     )
     data.camion_semi_neto_id = camion_semi_neto.id if camion_semi_neto else None
-    
+
     # Crear la orden de carga con el estado determinado
     obj = repositories.create_orden_carga(
         db,
@@ -127,15 +130,15 @@ def create_orden_carga(
         flete,
         gestor_carga_id,
         modified_by,
-        estado_inicial, 
+        estado_inicial,
     )
-    
+
     # Crear anticipos, complementos y descuentos
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list(
         db, obj.id, obj.flete_anticipos, modified_by
     )
     create_complementos_and_descuentos(db, obj, flete, modified_by)
-    
+
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
@@ -236,39 +239,39 @@ def get_ordenes_carga_by_combinacion_id(db: Session, combinacion_id: int) -> Lis
 def get_ordenes_carga_by_combinacion_id_and_nuevo(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-    
+
     # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
         OrdenCarga.estado == "Nuevo"  # Ajusta este valor si el estado se almacena de manera diferente
     ).all()
-    
+
     return ordenes_carga
 
 
 def get_ordenes_carga_by_combinacion_id_and_finalizar(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-    
+
     # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
         OrdenCarga.estado == "Finalizado"  # Ajusta este valor si el estado se almacena de manera diferente
     ).all()
-    
+
     return ordenes_carga
 
 
 def get_ordenes_carga_by_combinacion_id_and_aceptado(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-    
+
     # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
         OrdenCarga.estado == "Aceptado"  # Ajusta este valor si el estado se almacena de manera diferente
     ).all()
-    
+
     return ordenes_carga
 
 
@@ -477,6 +480,9 @@ def conciliar_orden_carga(
     create_movimiento_by_conciliacion_oc(
         db, obj, current_user.gestor_carga_id, current_user.username
     )
+    borrar_provisiones_by_conciliacion_oc(
+        db, obj, current_user.gestor_carga_id, current_user.username
+    )
     return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
@@ -527,6 +533,9 @@ def finalizar_orden_carga(
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.finalizar_orden_carga(obj, db, current_user.username)
+    create_provision_by_finalizar_oc(
+        db, obj, current_user.gestor_carga_id, current_user.username
+    )
     return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
