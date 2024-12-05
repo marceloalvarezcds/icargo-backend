@@ -59,6 +59,7 @@ class OrdenCarga(AuditMixin, Base):
     comentarios = Column(Text)
     gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
     gestor_carga = relationship(GestorCarga, uselist=False)
+    documento_fisico = Column(Boolean, server_default=text("false"))
     # Campos para la edición
     estado = Column(String(15), server_default=EstadoEnum.NUEVO.value)
     orden_carga_estado = Column(String(25), server_default=EstadoEnum.PENDIENTE.value)
@@ -133,15 +134,15 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def camion_chofer_nombre(self):
         return self.camion.chofer_nombre
-    
+
     @hybrid_property
     def combinacion_chofer_doc(self):
         return self.combinacion.chofer_numero_documento
-    
+
     @hybrid_property
     def camion_marca(self):
         return self.camion.marca.descripcion
-    
+
     @hybrid_property
     def camion_color(self):
         return self.camion.color.descripcion
@@ -153,7 +154,7 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def camion_chofer_puede_recibir_anticipos(self):
         return self.camion.chofer_puede_recibir_anticipos
-    
+
     @hybrid_property
     def camion_estado(self):
         return self.camion.estado
@@ -189,7 +190,7 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def camion_propietario_nombre(self):
         return self.camion.propietario_nombre
-    
+
     @hybrid_property
     def camion_propietario_documento(self):
         return self.camion.propietario.ruc
@@ -197,27 +198,27 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def camion_propietario_puede_recibir_anticipos(self):
         return self.camion.propietario_puede_recibir_anticipos
-    
+
     @hybrid_property
     def camion_beneficiario_nombre(self):
         return self.combinacion.propietario.nombre
-    
+
     @hybrid_property
     def camion_beneficiario_documento(self):
         return self.combinacion.propietario.ruc
-    
+
     @hybrid_property
     def semi_estado(self):
         return self.semi.estado
-    
+
     @hybrid_property
     def combinacion_propietario_id(self):
         return self.combinacion.propietario_id
-    
+
     @hybrid_property
     def combinacion_chofer_id(self):
         return self.combinacion.combinacion_chofer_id
-    
+
     @hybrid_property
     def combinacion_chofer_nombre(self):
         return self.combinacion.chofer_nombre
@@ -225,11 +226,11 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def neto(self):
       return self.combinacion.neto
-    
+
     @hybrid_property
     def condicion_gestor_cuenta_tarifa(self):
         return self.flete.condicion_gestor_cuenta_tarifa
-    
+
     @hybrid_property
     def cantidad_destino(self):
         return self.get_remision_cantidad_total_kg(self.remisiones_destino)
@@ -265,7 +266,7 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def total_anticipo_complemento(self):
         return sum(x.propietario_monto for x in self.complementos if x.anticipado)
-    
+
     @hybrid_property
     def flete_saldo(self):
       return self.flete.condicion_cantidad
@@ -306,21 +307,21 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_limite_credito(self):  # total anticipo
         return (self.flete_anticipo_maximo / Decimal(100)) * self.flete_proyectado
-    
+
     @hybrid_property
     def linea_disponible(self):
         flete_limite_credito = self.flete_limite_credito
         camion_monto_anticipo_disponible = self.camion_monto_anticipo_disponible
         if flete_limite_credito is None and camion_monto_anticipo_disponible is None:
             return None
- 
+
         if flete_limite_credito is None:
             flete_limite_credito = Decimal(0)
         if camion_monto_anticipo_disponible is None:
             camion_monto_anticipo_disponible = Decimal(0)
-    
+
         menor_valor = min(flete_limite_credito, camion_monto_anticipo_disponible)
-      
+
         return self.total_anticipo_complemento + menor_valor
 
     @hybrid_property
@@ -342,7 +343,7 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_origen_nombre(self):
         return self.flete.origen_nombre
-    
+
     @hybrid_property
     def flete_producto_id(self):
         return self.flete.producto_id
@@ -495,11 +496,11 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def semi_placa(self):
         return self.semi.placa
-    
+
     @hybrid_property
     def marca_semi(self):
         return self.semi.marca.descripcion
-    
+
     @hybrid_property
     def semi_color(self):
         return self.semi.color.descripcion
@@ -594,7 +595,7 @@ class OrdenCarga(AuditMixin, Base):
             )
             - self.resultado_propietario_total_anticipos_retirados
         )
-    
+
     @hybrid_property
     def resultado_propietario_saldo_bruto(self):
         return (
@@ -642,7 +643,7 @@ class OrdenCarga(AuditMixin, Base):
     def resultado_propietario_total_anticipos_retirados(self):
         lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
         return sum(x.monto_retirado for x in lista)
-    
+
     @hybrid_property
     def monto_anticipo_retirado(self):
         lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
@@ -652,7 +653,7 @@ class OrdenCarga(AuditMixin, Base):
     def resultado_propietario_total_complemento(self):
         lista: List[OrdenCargaComplemento] = self.complementos
         return sum(x.propietario_monto for x in lista)
-    
+
     @hybrid_property
     def resultado_saldo_combustible(self):
         total_anticipo_combustible = sum(
@@ -670,28 +671,28 @@ class OrdenCarga(AuditMixin, Base):
         print(f"Sobrante Combustible: {sobrante_combustible}")
 
         return sobrante_combustible
-    
+
     @hybrid_property
     def saldo_efectivo(self):
         fa = aliased(FleteAnticipo)
         total_saldo = sum(
-            saldo.saldo or 0 
-            for saldo in self.saldos 
+            saldo.saldo or 0
+            for saldo in self.saldos
             if saldo.flete_anticipo and saldo.flete_anticipo.tipo_insumo_id is None
         )
-        
+
         return total_saldo
 
     @hybrid_property
     def saldo_combustible(self):
         fa = aliased(FleteAnticipo)
         total_combustible = sum(
-            saldo.saldo or 0 
-            for saldo in self.saldos 
+            saldo.saldo or 0
+            for saldo in self.saldos
             if saldo.flete_anticipo and saldo.flete_anticipo.tipo_insumo_id == 1
         )
-        
-        return total_combustible       
+
+        return total_combustible
 
     @hybrid_property
     def resultado_propietario_total_complemento_a_cobrar(self):
