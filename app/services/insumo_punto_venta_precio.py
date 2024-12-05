@@ -78,7 +78,7 @@ def get_all_insumo_punto_venta_precio_list(db: Session) -> List[InsumoPuntoVenta
         .join(InsumoPuntoVentaPrecio.insumo_punto_venta)
         .order_by(
             InsumoPuntoVentaPrecio.fecha_inicio,
-            InsumoPuntoVentaPrecio.fecha_fin,
+            # InsumoPuntoVentaPrecio.fecha_fin,
             InsumoPuntoVentaPrecio.modified_by,
         )
         .all()
@@ -186,8 +186,8 @@ def update_insumo_punto_venta_precio_by_insumo_punto_venta(
             insumo_punto_venta_id=insumo_punto_venta_id,
             precio=data.precio,
             fecha_inicio=data.fecha_inicio,
-            fecha_fin=data.fecha_fin,
-           
+            # fecha_fin=data.fecha_fin,
+            hora_inicio= data.hora_inicio,
             observacion=data.observacion,
             estado=EstadoEnum.ACTIVO.value,  # El nuevo precio es activo
             created_by=modified_by,
@@ -201,8 +201,9 @@ def update_insumo_punto_venta_precio_by_insumo_punto_venta(
         # Si solo las fechas o la hora cambiaron, actualizamos el registro sin crear uno nuevo
         if current_price:
             current_price.fecha_inicio = data.fecha_inicio
-            current_price.fecha_fin = data.fecha_fin
-            current_price.hora_inicio = data.hora_inicio
+            # current_price.fecha_fin = data.fecha_fin
+            current_price.fecha_fin = data.hora_inicio
+            current_price.precio = data.precio
             current_price.observacion = data.observacion
             current_price.modified_by = modified_by
             db.commit()
@@ -214,8 +215,8 @@ def update_insumo_punto_venta_precio_by_insumo_punto_venta(
                 insumo_punto_venta_id=insumo_punto_venta_id,
                 precio=data.precio,
                 fecha_inicio=data.fecha_inicio,
-                fecha_fin=data.fecha_fin,
-                hora_inicio=data.hora_inicio,
+                # fecha_fin=data.fecha_fin,
+                hora_inicio= data.hora_inicio,
                 observacion=data.observacion,
                 estado=EstadoEnum.ACTIVO.value,
                 created_by=modified_by,
@@ -240,7 +241,7 @@ def update_insumo_punto_venta_precio(
     if existing_record:
         existing_record.precio = data.precio
         existing_record.fecha_inicio = data.fecha_inicio
-        existing_record.fecha_fin = data.fecha_fin
+        # existing_record.fecha_fin = data.fecha_fin
         existing_record.modified_by = modified_by
         db.commit()
         db.refresh(existing_record)

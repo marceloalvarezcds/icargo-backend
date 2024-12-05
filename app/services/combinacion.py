@@ -186,7 +186,7 @@ async def create_combinacion(
             detail="El chofer especificado no existe."
         )
     combinacion_exists = repositories.get_combinacion_by_ids(
-        db, data.propietario_id, data.camion_id, data.semi_id, data.chofer_id, gestor_carga_id
+        db, data.propietario_id, data.camion_id, data.chofer_id, gestor_carga_id
         )
     combinacion_tracto_chofer = repositories.get_combinacion_tracto_chofer_by_ids(
         db, data.chofer_id, gestor_carga_id
@@ -211,7 +211,7 @@ async def create_combinacion(
             detail="La combinación de beneficiario, tracto y chofer ya existe para este gestor de carga."
         )
 # Verificamos si la combinación existe y si el propietario es distinto
-    if combinacion_tracto_propietario is  None :
+    if combinacion_tracto_propietario:
     # Lanza la excepción HTTP con el mensaje adecuado
         raise HTTPException(
         status_code=409,

@@ -21,9 +21,19 @@ class OrdenCargaEvaluacionesHistorialForm(BaseModel):
     destino_id: Optional[int] = None
     producto_id: Optional[int] = None
     comentarios: Optional[str] = None
+    tracto_rating: Optional[int] = None
+    semi_rating: Optional[int] = None
+    chofer_rating: Optional[int] = None
+    propietario_rating: Optional[int] = None
+    carga_rating: Optional[int] = None
+    descarga_rating: Optional[int] = None
 
 class OrdenCargaEvaluacionesHistorial(OrdenCargaEvaluacionesHistorialForm):
     id: int
+    oc_camion_placa: Optional[str] = None
+    oc_semi_placa: Optional[str] = None
+    oc_chofer_nombre: Optional[str] = None
+    oc_beneficiario_nombre: Optional[str] = None
     created_by: str
     created_at: Date
     modified_by: str

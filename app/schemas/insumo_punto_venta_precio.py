@@ -19,21 +19,22 @@ class InsumoPuntoVentaPrecioForm(BaseModel):
     moneda_id: Optional[int] = None
     precio: RoundedDecimal
     fecha_inicio: datetime
-    fecha_fin: Optional[datetime] = None
+  
     observacion: Optional[str] = None
+    hora_inicio: Optional[str] = None
 
 class InsumoPuntoVentaPrecio(BaseModel):
     id: int
     precio: RoundedDecimal
     fecha_inicio: datetime
-    fecha_fin: Optional[datetime] = None
+    # fecha_fin: Optional[datetime] = None
     insumo_unidad_descripcion: Optional[str] = None
     insumo_moneda_nombre: str
     insumo_descripcion: Optional[str] = None
     punto_venta_id: Optional[int] = None
     punto_venta_nombre: Optional[str] = None
     created_at_insumo: Optional[datetime] = None
-    hora_inicio: Optional[time] = None
+    hora_inicio: Optional[str] = None
     marca_insumo: Optional[str] = None
     observacion: Optional[str] = None
 
@@ -70,7 +71,7 @@ class InsumoPuntoVentaPrecioList(InsumoPuntoVentaPrecio):
     punto_venta_longitud: Optional[Decimal] = None
     proveedor_documento: Optional[str]
     created_at_insumo: Optional[datetime] = None
-    hora_inicio: Optional[time] = None
+    hora_inicio: Optional[str] = None
     marca_insumo: Optional[str] = None
     observacion: Optional[str] = None
            # Auditoría
@@ -82,8 +83,8 @@ class InsumoPuntoVentaPrecioList(InsumoPuntoVentaPrecio):
 class InsumoPuntoVentaPrecioUpdate(BaseModel):
     precio: RoundedDecimal
     fecha_inicio: datetime
-    fecha_fin: Optional[datetime] = None
-    hora_inicio: Optional[time] = None
+    
+    hora_inicio: Optional[str] = None
     observacion: Optional[str] = None
 
     class Config:

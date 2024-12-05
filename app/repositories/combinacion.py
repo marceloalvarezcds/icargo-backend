@@ -237,14 +237,12 @@ def get_combinacion_by_ids(
     db: Session,
     propietario_id: int,
     camion_id: int,
-    semi_id: int,
     chofer_id: int,
     gestor_carga_id: int,
 ) -> Combinacion:
     return db.query(Combinacion).filter(
         Combinacion.propietario_id == propietario_id,
         Combinacion.camion_id == camion_id,
-        Combinacion.semi_id == semi_id,
         Combinacion.chofer_id == chofer_id,
         Combinacion.gestor_carga_id == gestor_carga_id
     ).first()
@@ -261,6 +259,7 @@ def get_combinacion_tracto_chofer_by_ids(
         Combinacion.gestor_carga_id == gestor_carga_id
     ).first()
 
+
 def get_combinacion_tracto_propietario_ids(
     db: Session,
     camion_id: int,
@@ -274,9 +273,7 @@ def get_combinacion_tracto_propietario_ids(
     
     # Verificamos si la combinación existe y si el propietario es diferente.
     if combinacion and combinacion.propietario_id != propietario_id:
-        return None  # Retornamos None en lugar de lanzar una excepción.
-    
-    return combinacion
+        return combinacion
 
 
 

@@ -29,6 +29,12 @@ def create_orden_carga_evaluacion(
         origen_id=data.origen_id,
         destino_id=data.destino_id,
         producto_id=data.producto_id,
+        tracto_rating= data.tracto_rating,
+        semi_rating= data.semi_rating,
+        chofer_rating=data.chofer_rating,
+        propietario_rating=data.propietario_rating,
+        carga_rating=data.carga_rating,
+        descarga_rating=data.descarga_rating, 
         created_by=modified_by,
         modified_by=modified_by,
     )

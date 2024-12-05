@@ -42,10 +42,10 @@ def get_insumo_punto_venta_list_by_gestor_carga_id(
                     and_(
                         InsumoPuntoVentaPrecio.estado != EstadoEnum.ELIMINADO.value,
                         InsumoPuntoVentaPrecio.fecha_inicio <= now,
-                        or_(
-                            InsumoPuntoVentaPrecio.fecha_fin == null(),
-                            InsumoPuntoVentaPrecio.fecha_fin >= now,
-                        ),
+                        # or_(
+                        #     InsumoPuntoVentaPrecio.fecha_fin == null(),
+                        #     InsumoPuntoVentaPrecio.fecha_fin >= now,
+                        # ),
                     ),
                 ),
             )
@@ -70,10 +70,10 @@ def get_insumo_punto_venta_list_by_tipo_insumo_id(
                     and_(
                         InsumoPuntoVentaPrecio.estado != EstadoEnum.ELIMINADO.value,
                         InsumoPuntoVentaPrecio.fecha_inicio <= now,
-                        or_(
-                            InsumoPuntoVentaPrecio.fecha_fin == null(),
-                            InsumoPuntoVentaPrecio.fecha_fin >= now,
-                        ),
+                        # or_(
+                        #     InsumoPuntoVentaPrecio.fecha_fin == null(),
+                        #     InsumoPuntoVentaPrecio.fecha_fin >= now,
+                        # ),
                     ),
                 ),
             )
@@ -107,10 +107,10 @@ def get_insumo_punto_venta_list_by_insumo_id(
                     and_(
                         InsumoPuntoVentaPrecio.estado != EstadoEnum.ELIMINADO.value,
                         InsumoPuntoVentaPrecio.fecha_inicio <= now,
-                        or_(
-                            InsumoPuntoVentaPrecio.fecha_fin == null(),
-                            InsumoPuntoVentaPrecio.fecha_fin >= now,
-                        ),
+                        # or_(
+                        #     InsumoPuntoVentaPrecio.fecha_fin == null(),
+                        #     InsumoPuntoVentaPrecio.fecha_fin >= now,
+                        # ),
                     ),
                 ),
             )
