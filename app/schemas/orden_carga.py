@@ -30,6 +30,8 @@ from .rounded_decimal_model import RoundedDecimal
 
 class OrdenCargaForm(BaseModel):
     camion_id: int
+    chofer_id: int
+    propietario_id: int
     semi_id: int
     flete_id: int
     camion_semi_neto_id: Optional[int] = None
@@ -88,6 +90,10 @@ class OrdenCarga(OrdenCargaBaseModel):
     combinacion_id: Optional[int] = None
     camion_color: Optional[str] = None
     camion_chofer_nombre: Optional[str] = None
+    chofer_nombre: Optional[str] = None
+    chofer_documento: Optional[str] = None
+    propietario_nombre: Optional[str] = None
+    propietario_documento: Optional[str] = None
     camion_chofer_numero_documento: Optional[str] = None
     camion_chofer_puede_recibir_anticipos: bool
     camion_limite_cantidad_oc_activas: int
@@ -231,6 +237,10 @@ class OrdenCargaList(OrdenCargaForm):
     id: int
     # Datos de camion
     camion_chofer_nombre: Optional[str] = None
+    chofer_nombre: Optional[str] = None
+    propietario_nombre: Optional[str] = None
+    propietario_documento: Optional[str] = None
+    chofer_documento: Optional[str] = None
     camion_chofer_numero_documento: Optional[str] = None
     camion_placa: str
     camion_propietario_nombre: str

@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 import os
 from typing import List, Optional
 
@@ -6,6 +7,8 @@ from app.config import REPORTS_FOLDER
 from app.enums.estado import EstadoEnum
 from app.models.camion import Camion
 from app.models.chofer import Chofer
+from app.models.combinacion_historial import CombinacionHistorial
+from app.models.orden_carga import OrdenCarga
 from app.models.semi import Semi
 from app.utils.gestor_carga import get_gestor_carga_by_params
 from fastapi import HTTPException # type: ignore
@@ -23,6 +26,14 @@ def get_combinacion_list(
     if gestor_carga_id:
         return repositories.get_combinacion_list_by_gestor_carga_id(db, gestor_carga_id)
     return repositories.get_combinacion_list(db)
+
+
+def get_combinacion_activa_list(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[Combinacion]:
+    if gestor_carga_id:
+        return repositories.get_combinacion_activa_list_by_gestor_carga_id(db, gestor_carga_id)
+    return repositories.get_combinacion_list_combinacion_activa(db)
 
 
 def get_combinacion_by_id(db: Session, id: int) -> Combinacion:
@@ -203,38 +214,13 @@ async def create_combinacion(
     combinacion_semi = repositories.get_combinacion_semi_ids(
         db, data.semi_id, gestor_carga_id
         )
- #Tracto solo puede tener un solo Propietario/Beneficiario
-
-    if combinacion_exists and combinacion_exists.estado != EstadoEnum.INACTIVO.value:
-        raise HTTPException(
-            status_code=409,
-            detail="La combinación de beneficiario, tracto y chofer ya existe para este gestor de carga."
-        )
-# Verificamos si la combinación existe y si el propietario es distinto
+    
     if combinacion_tracto_propietario:
-    # Lanza la excepción HTTP con el mensaje adecuado
         raise HTTPException(
         status_code=409,
         detail="El tracto puede tener un solo beneficiario."
     )
 
-    # if combinacion_tracto_semi_chofer_propietario and combinacion_tracto_semi_chofer_propietario.estado != EstadoEnum.INACTIVO.value:
-    #     raise HTTPException(
-    #         status_code=409,
-    #         detail="La combinación de tracto, semi y chofer ya existe para este gestor de carga."
-    #     )
- 
-    # if combinacion_semi and combinacion_semi.estado != EstadoEnum.INACTIVO.value:
-    #     raise HTTPException(
-    #         status_code=409,
-    #         detail="La combinación de semi ya existe para este gestor de carga."
-    #     )
-    
-    # if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
-    #     raise HTTPException(
-    #         status_code=409,
-    #         detail="La combinación de tracto ya existe para este gestor de carga."
-    #     )
     combinacion = repositories.create_combinacion(
         db,
         data,
@@ -244,53 +230,57 @@ async def create_combinacion(
     return combinacion
 
 
-async def edit_combinacion(
+def edit_combinacion(
     id: int,
     db: Session,
-    data: schemas.CombinacionCreateModel,
+    data: schemas.CombinacionUpdate,
+    gestor_carga_id: Optional[int],
     modified_by: str,
-) -> schemas.Combinacion:
-    combinacion = repositories.get_combinacion_by_id(db, id)
-    if not combinacion:
+) -> Combinacion:
+    # Verificar si la combinación existe
+    combinacion_to_edit = db.query(Combinacion).filter(Combinacion.id == id).first()
+    if not combinacion_to_edit:
         raise HTTPException(status_code=404, detail="Combinación no encontrada")
 
-    if data.propietario_id is not None:
-        propietario = repositories.get_propietario_by_id(db, data.propietario_id)
-        if not propietario:
-            raise HTTPException(status_code=404, detail="Propietario no encontrado")
-
-    if data.chofer_id is not None:
-        chofer = repositories.get_chofer_by_id(db, data.chofer_id)
-        if not chofer:
-            raise HTTPException(status_code=404, detail="Chofer no encontrado")
+    combinacion_exists = repositories.get_combinacion_by_ids(
+        db, data.propietario_id, data.camion_id, data.chofer_id, gestor_carga_id
+        )
+    combinacion_tracto = repositories.get_combinacion_tracto_ids(
+        db, data.camion_id, gestor_carga_id
+        )
+    if combinacion_exists and combinacion_exists.estado != EstadoEnum.INACTIVO.value:
+        raise HTTPException(
+            status_code=409,
+            detail="Ya existe una combinación activa con el mismo chofer, semi y propietario."
+        )
+  
+    if (data.propietario_id != combinacion_to_edit.propietario_id or
+        data.camion_id != combinacion_to_edit.camion_id):
         
-    if data.camion_id is not None:
-        camion = repositories.get_camion_by_id(db, data.camion_id)
-        if not camion:
-            raise HTTPException(status_code=404, detail="Camión no encontrado")
+        # Verificar si ya existe otra combinación con el mismo camión y propietario
+        combinacion_tracto_propietario = db.query(Combinacion).filter(
+            Combinacion.camion_id == data.camion_id,
+            Combinacion.propietario_id == data.propietario_id,
+            Combinacion.estado != EstadoEnum.INACTIVO.value
+        ).first()
 
-    if data.semi_id is not None:
-        semi = repositories.get_semi_by_id(db, data.semi_id)
-        if not semi:
-            raise HTTPException(status_code=404, detail="Semi no encontrado")
+        if combinacion_tracto_propietario:
+            raise HTTPException(
+                status_code=409,
+                detail="El camión ya tiene un beneficiario asociado."
+            )
 
-    if data.propietario_id is not None:
-        combinacion.propietario_id = data.propietario_id
-    if data.camion_id is not None:
-        combinacion.camion_id = data.camion_id
-    if data.chofer_id is not None:
-        combinacion.chofer_id = data.chofer_id
-    if data.semi_id is not None:
-        combinacion.semi_id = data.semi_id
-    if data.comentario is not None:
-        combinacion.comentario = data.comentario
-    if data.neto is not None:
-        combinacion.neto = data.neto
-    db.add(combinacion)
-    db.commit()
-    db.refresh(combinacion)
-
-    return combinacion
+    if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
+         raise HTTPException(
+             status_code=409,
+             detail="La combinación de tracto ya existe para este gestor de carga."
+         )
+    # if combinacion_tracto_propietario:
+    #     raise HTTPException(
+    #     status_code=409,
+    #     detail="El tracto puede tener un solo beneficiario."
+    # )
+    return repositories.edit_combinacion(combinacion_to_edit, db, data, gestor_carga_id, modified_by)
 
 
 def get_combinacion_reports(db: Session) -> str:

@@ -25,6 +25,7 @@ async def read_combinacion_by_camion_id(
     return repositories.get_combinacion_list_by_camion_id(db, camion_id)
 
 
+
 @api.get("/", response_model=List[schemas.CombinacionesBD])
 async def read_combinacion_list(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -90,14 +91,15 @@ async def add_new_combinacion(
 async def edit_combinacion(
     id: int,
     db: Session = Depends(get_db_session),
-    data: Json[schemas.CombinacionCreateModel] = Form(...),
+    data: Json[schemas.CombinacionUpdate] = Form(...),
     current_user: schemas.AuthUser = Depends(get_current_user),
     _: bool = Depends(Permiso(a.EDITAR, m.COMBINACION)),
 ):
-    return await services.edit_combinacion(
+    return services.edit_combinacion(
         id,
         db,
         data,
+        current_user.gestor_carga_id,
         current_user.username,
     )
 

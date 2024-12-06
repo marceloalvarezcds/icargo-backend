@@ -1,7 +1,8 @@
 import os
-from typing import Optional
+from typing import List, Optional
 
-from fastapi import HTTPException, UploadFile  # type: ignore
+from app.models.combinacion import Combinacion
+from fastapi import HTTPException, UploadFile, status  # type: ignore
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
@@ -13,6 +14,21 @@ from app.models import Camion
 from app.utils import get_gestor_carga_by_params
 
 from .camion_check_files import check_files
+
+
+def check_combinaciones_activas(db: Session) -> List[Camion]:
+    camiones = repositories.get_camion_list(db)
+    
+    for camion in camiones:
+        combinacion_tracto = db.query(Combinacion).filter(Combinacion.camion_id == camion.id).first()
+        
+        if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"La combinación de tracto para el camión {camion.placa} ya está activa."
+            )
+    
+    return camiones
 
 
 async def create_camion(

@@ -19,7 +19,9 @@ from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums import EstadoEnum
 
+from app.models.chofer import Chofer
 from app.models.flete_anticipo import FleteAnticipo
+from app.models.propietario import Propietario
 from app.schemas import (
     OrdenCargaAnticipoRetirado,
     OrdenCargaComplemento,
@@ -124,6 +126,13 @@ class OrdenCarga(AuditMixin, Base):
     remisiones_destino = relationship(
         "OrdenCargaRemisionDestino", back_populates="orden_carga"
     )
+    # Nuevas relaciones para chofer y propietario
+    chofer_id = Column(Integer, ForeignKey("chofer.id"))
+    chofer = relationship(Chofer, uselist=False)
+    
+    propietario_id = Column(Integer, ForeignKey("propietario.id"))
+    propietario = relationship(Propietario, uselist=False)
+
 
 
     @hybrid_property
@@ -133,6 +142,22 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def camion_chofer_nombre(self):
         return self.camion.chofer_nombre
+    
+    @hybrid_property
+    def chofer_nombre(self):
+        return self.chofer.nombre
+    
+    @hybrid_property
+    def chofer_documento(self):
+        return self.chofer.ruc
+    
+    @hybrid_property
+    def propietario_nombre(self):
+        return self.propietario.nombre
+
+    @hybrid_property
+    def propietario_documento(self):
+        return self.propietario.ruc
     
     @hybrid_property
     def combinacion_chofer_doc(self):

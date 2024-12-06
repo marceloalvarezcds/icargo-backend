@@ -9,6 +9,7 @@ from sqlalchemy import (  # type: ignore
     Numeric,
     String,
     text,
+    Boolean
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
@@ -86,6 +87,7 @@ class Camion(AuditMixin, Base):
     # INICIO Capacidad del Camión
     bruto = Column(Numeric(38, 10))
     tara = Column(Numeric(38, 10))
+    is_in_combinacion = Column(Boolean, default=False)
     # FIN Capacidad del Camión
     combinaciones = relationship("CamionSemiNeto", back_populates="camion")
 

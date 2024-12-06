@@ -343,9 +343,25 @@ def change_combinacion_status(
     obj.estado = status.value
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
+
+    if status == EstadoEnum.ACTIVO:
+
+        db.execute(
+            update(Camion)
+            .where(Camion.id == obj.camion_id)
+            .values(is_in_combinacion=True)
+        )
+    elif status == EstadoEnum.INACTIVO:
+        db.execute(
+            update(Camion)
+            .where(Camion.id == obj.camion_id)
+            .values(is_in_combinacion=False)
+        )
+    
     db.commit()
     db.refresh(obj)
     return obj
+
 
 
 def get_combinacion_by(
@@ -364,25 +380,20 @@ def get_combinacion_by(
 
 
 def edit_combinacion(
-    obj: CombinacionForm,
+    combinacion: Combinacion,
     db: Session,
+    data,
+    gestor_carga_id: Optional[int],
     modified_by: str,
-) ->Combinacion:
-
-    if obj.propietario_id:
-        obj.propietario_id = obj.propietario_id
-    if obj.camion_id:
-        obj.camion_id = obj.camion_id
-    if obj.semi_id:
-        obj.semi_id = obj.semi_id
-    if obj.chofer_id:
-        obj.chofer_id = obj.chofer_id
-    if obj.comentario:
-        obj.comentario = obj.comentario
-    obj.modified_by = modified_by
-    obj.modified_at = datetime.now()
-
-    return obj
+) -> Combinacion:
+    combinacion.chofer_id = data.chofer_id
+    combinacion.semi_id = data.semi_id
+    combinacion.propietario_id = data.propietario_id
+    combinacion.gestor_carga_id = gestor_carga_id
+    combinacion.modified_by = modified_by
+    db.commit()
+    db.refresh(combinacion)
+    return combinacion
 
 
 def gestor_carga_tiene_permiso(gestor_carga_id: int, permiso_descripcion: str, db: Session) -> bool:
@@ -430,11 +441,13 @@ def create_combinacion(
 
     roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 6 - combinaciones", db)
 
+    # Determinar el estado inicial según el permiso
     if roles_permisos:
         estado_inicial = EstadoEnum.ACTIVO.value
     else:
         estado_inicial = EstadoEnum.NUEVO.value
-  
+
+    # Crear la combinación
     combinacion = Combinacion(
         estado=estado_inicial,
         propietario_id=data.propietario_id,
@@ -451,26 +464,37 @@ def create_combinacion(
     db.add(combinacion)
     db.commit()
     db.refresh(combinacion)
-    db.execute(
-        update(Camion)
-        .where(Camion.id == data.camion_id)
-        .values(limite_cantidad_oc_activas= data.oc_activa, 
-                limite_monto_anticipos=data.limite_anticipos)
-    )
+
+    # Actualizar el estado del camión: Marcarlo como en combinación si está activo
+    if estado_inicial == EstadoEnum.ACTIVO.value:
+        db.execute(
+            update(Camion)
+            .where(Camion.id == data.camion_id)
+            .values(is_in_combinacion=True)  # Establecer como en combinación si es activo
+        )
+    else:
+        db.execute(
+            update(Camion)
+            .where(Camion.id == data.camion_id)
+            .values(is_in_combinacion=False)  # Marcar como no en combinación si no es activo
+        )
+
     db.commit()
     
+    # Actualizar datos de otros relacionados
     db.execute(
         update(Propietario)
         .where(Propietario.id == data.propietario_id)
-        .values(puede_recibir_anticipos= data.anticipo_propietario)
+        .values(puede_recibir_anticipos=data.anticipo_propietario)
     )
     db.commit()
 
     db.execute(
         update(Chofer)
         .where(Chofer.id == data.chofer_id)
-        .values(puede_recibir_anticipos= data.puede_recibir_anticipos)
+        .values(puede_recibir_anticipos=data.puede_recibir_anticipos)
     )
     db.commit()
     
     return combinacion
+

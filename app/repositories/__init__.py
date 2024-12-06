@@ -32,6 +32,7 @@ from .camion import (  # noqa
     get_camion_list_by_gestor_cuenta_id,
     get_camion_list_by_propietario_id,
     get_combinaciones_by_camion_id,
+    is_camion_in_combinacion,
 )
 from .camion_semi_neto import (  # noqa
     create_camion_semi_neto,
@@ -573,4 +574,5 @@ from .combinacion import(
     get_combinacion_tracto_ids,
     get_combinacion_list_by_camion_id,
     get_combinaciones_relacionadas,
+    
 )

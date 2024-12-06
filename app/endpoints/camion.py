@@ -1,3 +1,4 @@
+from http.client import HTTPException
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
@@ -19,6 +20,36 @@ async def read_camion_list(
     _: bool = Depends(Permiso(a.LISTAR, m.CAMION)),  # noqa: B008
 ):
     return repositories.get_camion_list(db)
+
+
+@api.get("/camion/combinacion", response_model=List[schemas.CamionList])
+async def read_camion_list(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.CAMION)),  # noqa: B008
+):
+   return services.check_combinaciones_activas(db)
+
+
+@api.get("/combinacion_por_camion/{camion_id}", response_model=schemas.Combinacion)
+async def read_combinacion_by_camion_and_gestor(
+    camion_id: int,  # ID del camión a buscar
+    db: Session = Depends(get_db_session),  # Dependencia para obtener la sesión de la base de datos
+    current_user: schemas.AuthUser = Depends(get_current_user),  # Dependencia para obtener el usuario actual
+    _: bool = Depends(Permiso(a.LISTAR, m.COMBINACION)),  # Verificación de permisos
+):
+    # Obtener las combinaciones asociadas al camión y al gestor actual
+    combinacion = repositories.get_combinacion_tracto_ids(
+        db, camion_id, current_user.gestor_carga_id
+    )
+    
+    if not combinacion:
+        # Si no se encuentra ninguna combinación, retornar un mensaje indicando que no está en una combinación
+        raise HTTPException(
+            status_code=404,
+            detail=f"El camión con ID {camion_id} no está asociado a ninguna combinación."
+        )
+
+    return combinacion
 
 
 @api.get("/gestor_carga", response_model=List[schemas.CamionList])

@@ -199,6 +199,8 @@ def create_orden_carga(
         camion_id=data.camion_id,
         camion_semi_neto_id=data.camion_semi_neto_id,
         semi_id=data.semi_id,
+        chofer_id = data.chofer_id,
+        propietario_id=data.propietario_id,
         flete_id=data.flete_id,
         combinacion_id=data.combinacion_id,
         cantidad_nominada=data.cantidad_nominada,

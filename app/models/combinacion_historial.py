@@ -1,52 +1,32 @@
-from app.models.gestor_carga import GestorCarga
-from app.models.producto import Producto
+from sqlalchemy import Column, Integer, String, ForeignKey, Numeric
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
-from sqlalchemy import (  # type: ignore
-    Column,
-    ForeignKey,
-    Integer,
-    String,
-    text,
-    Numeric,
-)
-from .propietario import Propietario
-from .chofer import Chofer
-from .camion import Camion
-from .semi import Semi
-from sqlalchemy.orm import relationship  # type: ignore
-
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
-from app.enums.estado import EstadoEnum
 
-class Combinacion(AuditMixin, Base):
-
-    __tablename__= "combinacion"
-    id = Column(Integer, primary_key=True)
-
+class CombinacionHistorial(AuditMixin, Base):
+    __tablename__ = "combinacion_historial"
+    
+    id = Column(Integer, primary_key=True)  # ID único para cada registro en el historial
+    combinacion_id = Column(Integer, ForeignKey('combinacion.id'), nullable=False)  # Relación con la Combinación original
     chofer_id = Column(Integer, ForeignKey('chofer.id'))
-    chofer: Chofer = relationship(Chofer, uselist=False)
-
+    chofer = relationship('Chofer', uselist=False)
     propietario_id = Column(Integer, ForeignKey('propietario.id'))
-    propietario: Propietario = relationship(Propietario, uselist=False)
-
+    propietario = relationship('Propietario', uselist=False)
     camion_id = Column(Integer, ForeignKey('camion.id'))
-    camion: Camion = relationship(Camion, uselist=False)
-
+    camion = relationship('Camion', uselist=False)
     semi_id = Column(Integer, ForeignKey('semi.id'))
-    semi: Semi = relationship(Semi, uselist=False)
-    estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
+    semi = relationship('Semi', uselist=False)
+    estado = Column(String(255))
     comentario = Column(String(255))
     gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
-    gestor_carga = relationship(GestorCarga, uselist=False)
+    gestor_carga = relationship('GestorCarga', uselist=False)
     neto = Column(Numeric(38, 10))
 
-    historial = relationship(
-        "CombinacionHistorial",
-        back_populates="combinacion",
-        cascade="all, delete-orphan",
-    )
-    
+
+    # Relación inversa con Combinacion
+    combinacion = relationship("Combinacion", back_populates="historial")
+
     @hybrid_property
     def camion_placa(self):
         return self.camion.placa 
@@ -61,7 +41,7 @@ class Combinacion(AuditMixin, Base):
     
     @hybrid_property
     def marca_descripcion(self):
-        return self.camion.marca_descripcion if self.camion else None
+        return self.camion.marca.descripcion if self.camion else None
     
     @hybrid_property
     def foto_camion(self):
@@ -127,7 +107,3 @@ class Combinacion(AuditMixin, Base):
     def semi_placa(self):
         return self.semi.placa 
     
-
-
-    
-   
