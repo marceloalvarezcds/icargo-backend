@@ -2,7 +2,6 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session  # type: ignore
-
 from app import schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
@@ -27,6 +26,44 @@ async def read_estado_cuenta_list_by_gestor_carga_id(
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_estado_cuenta_list(db, current_user.gestor_carga_id)
+
+
+@api.get(
+    "/flujo",  # noqa
+    response_model=List[schemas.EstadoCuenta]
+)
+async def read_estado_cuenta_pdv(
+    tipo_flujo: Optional[str]= None,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ESTADO_CUENTA)),  # noqa: B008
+):
+    return services.get_estado_cuenta_pdv_list(
+        db,
+        tipo_flujo,
+    )
+
+# usar id pdv en el detallado saldo cuenta y movimientos
+@api.get(
+    "/flujo/{flujo}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/punto_venta/{punto_venta_id}",  # noqa
+    response_model=Optional[schemas.EstadoCuenta],
+)
+async def read_estado_cuenta_pdv(
+    flujo: Optional[str],
+    contraparte_id: Optional[int],
+    contraparte: Optional[str],
+    contraparte_numero_documento: Optional[str],
+    punto_venta_id: Optional[int],
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ESTADO_CUENTA)),  # noqa: B008
+):
+    return services.get_estado_cuenta_pdv(
+        db,
+        flujo,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        punto_venta_id,
+    )
 
 
 @api.get(
@@ -73,16 +110,6 @@ async def read_estado_cuenta_by_contraparte(
     )
 
 
-@api.get("/reports")
-async def estado_cuenta_reports(
-    db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.REPORTE, m.ESTADO_CUENTA)),  # noqa: B008
-):
-    return services.get_estado_cuenta_reports(db)
-
-
-
-# add nuevo servicio de estado de cuenta detallado aqui
 @api.get(
     "/movimiento/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}",  # noqa",  # noqa
     response_model=List[schemas.MovimientoEstadoCuenta],
@@ -112,12 +139,17 @@ async def read_movimiento_list_by_estado_cuenta_det(
     "/movimiento/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/punto_venta_id/{punto_venta_id}",  # noqa",  # noqa
     response_model=List[schemas.MovimientoEstadoCuenta],
 )
+@api.get(
+    "/movimiento/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/punto_venta_id/{punto_venta_id}/tipo_movimiento/{tipo_movimiento}",  # noqa",  # noqa
+    response_model=List[schemas.MovimientoEstadoCuenta],
+)
 async def read_movimiento_list_by_estado_cuenta_det(
     tipo_contraparte_id: int,
     contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
     punto_venta_id: Optional[int] = None,
+    tipo_movimiento: Optional[str] = None,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
@@ -129,11 +161,49 @@ async def read_movimiento_list_by_estado_cuenta_det(
         contraparte,
         contraparte_numero_documento,
         current_user.gestor_carga_id,
-        punto_venta_id
+        punto_venta_id,
+        tipo_movimiento
+    )
+
+
+@api.get("/reports")
+async def estado_cuenta_reports(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.REPORTE, m.ESTADO_CUENTA)),  # noqa: B008
+):
+    return services.get_estado_cuenta_reports(db)
+
+
+# add nuevo servicio de estado de cuenta detallado aqui
+@api.get(
+    "/report/movimiento/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}",  # noqa",  # noqa
+)
+# add nuevo servicio de estado de cuenta detallado aqui
+@api.get(
+    "/report/movimiento/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/punto_venta_id/{punto_venta_id}",  # noqa",  # noqa
+)
+async def read_report_movimiento_list_by_estado_cuenta_det(
+    tipo_contraparte_id: int,
+    contraparte_id: int,
+    contraparte: str,
+    contraparte_numero_documento: str,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+):
+    return services.get_report_nuevo_servicio(
+        db,
+        tipo_contraparte_id,
+        contraparte_id,
+        contraparte,
+        contraparte_numero_documento,
+        current_user.gestor_carga_id,
+        None
     )
 
 
 
+#Deprecar
 @api.get(
     "/saldo/{tipo_contraparte_id}/id/{contraparte_id}",  # noqa",  # noqa
     response_model=schemas.ContraparteEstadoCuenta,
@@ -172,32 +242,4 @@ async def get_saldo_cuenta_contraparte(
         tipo_contraparte_id,
         contraparte_id,
         punto_venta_id,
-    )
-
-
-# add nuevo servicio de estado de cuenta detallado aqui
-@api.get(
-    "/report/movimiento/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}",  # noqa",  # noqa
-)
-# add nuevo servicio de estado de cuenta detallado aqui
-@api.get(
-    "/report/movimiento/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/punto_venta_id/{punto_venta_id}",  # noqa",  # noqa
-)
-async def read_report_movimiento_list_by_estado_cuenta_det(
-    tipo_contraparte_id: int,
-    contraparte_id: int,
-    contraparte: str,
-    contraparte_numero_documento: str,
-    db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
-    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-):
-    return services.get_report_nuevo_servicio(
-        db,
-        tipo_contraparte_id,
-        contraparte_id,
-        contraparte,
-        contraparte_numero_documento,
-        current_user.gestor_carga_id,
-        None
     )

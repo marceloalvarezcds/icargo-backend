@@ -7,6 +7,7 @@ from app import repositories
 from app.models import Factura
 from app.schemas import FacturaForm
 from . import movimiento as service
+from . import liquidacion as liquidacionService
 from .pictshare import upload_and_get_image_url
 
 
@@ -30,6 +31,7 @@ async def create_factura(
 
     if data.sentido_mov_iva or data.sentido_mov_retencion:
         service.create_movimiento_by_factura(db, data, gestor_carga_id, modified_by, factura)
+        liquidacionService.refresh_pago_cobro(db, data.liquidacion_id, modified_by)
 
     return factura
 
@@ -63,6 +65,7 @@ async def edit_factura(
 
     if to_edit_obj.iva_movimiento_id or to_edit_obj.retencion_movimiento_id:
         service.edit_movimiento_by_factura(db, to_edit_obj, data, modified_by)
+        liquidacionService.refresh_pago_cobro(db, data.liquidacion_id, modified_by)
 
     return repositories.edit_factura(to_edit_obj, db, data, foto_url, modified_by)
 
@@ -72,6 +75,7 @@ def delete_factura(db: Session, id: int, modified_by: str) -> Factura:
 
     if co.iva_movimiento_id or co.retencion_movimiento_id:
         service.delete_movimiento_by_factura(db, co, modified_by)
+        liquidacionService.refresh_pago_cobro(db, co.liquidacion_id, modified_by)
 
     factura = repositories.delete_factura(co, db, modified_by)
 

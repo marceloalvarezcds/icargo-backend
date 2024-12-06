@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 from sqlalchemy.orm import Query, Session # type: ignore
-from sqlalchemy import case, null
+from sqlalchemy import case, null, desc
 from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
 from app.enums import MovimientoEstadoEnum, EstadoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
@@ -240,10 +240,10 @@ def get_movimiento_list_by_contraparte_and_gestor_carga_id(
     )
 
     if listar_efectivo:
-        if listar_efectivo == TipoLiquidacion.INSUMO.value:
-            query = query.filter(OrdenCargaAnticipoRetirado.insumo_punto_venta_precio_id != null())
-        elif listar_efectivo == TipoLiquidacion.EFECTIVO.value:
-            query = query.filter(OrdenCargaAnticipoRetirado.insumo_punto_venta_precio_id == null())
+        #if listar_efectivo == TipoLiquidacion.INSUMO.value:
+        query = query.filter(Movimiento.tipo_movimiento_info == listar_efectivo)
+        #elif listar_efectivo == TipoLiquidacion.EFECTIVO.value:
+        #    query = query.filter(OrdenCargaAnticipoRetirado.insumo_punto_venta_precio_id == null())
 
     return query.all()
 
@@ -298,7 +298,7 @@ def get_movimiento_list_by_liquidacion_and_gestor_carga_id(
                 Movimiento.gestor_carga_id == gestor_carga_id,
             )
         )
-        .order_by(Movimiento.contraparte, Movimiento.liquidacion_id)
+        .order_by(Movimiento.contraparte, desc(Movimiento.id))
         .all()
     )
 
@@ -395,6 +395,7 @@ def create_movimiento(
         modified_by=modified_by,
         tipo_movimiento_info=data.tipo_movimiento_info,
         punto_venta_id=data.punto_venta_id,
+        linea_movimiento=data.linea_movimiento
     )
     db.add(obj)
     db.commit()
@@ -493,7 +494,8 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
     contraparte: str,
     contraparte_numero_documento: str,
     gestor_carga_id: int,
-    punto_venta_id: Optional[int]
+    punto_venta_id: Optional[int],
+    tipo_movimiento: Optional[str],
     ) -> Query:
 
     # columnas especificas
@@ -549,6 +551,10 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                     OrdenCargaAnticipoRetirado.punto_venta_id == punto_venta_id,
                     Movimiento.punto_venta_id == punto_venta_id,
                     punto_venta_id == None
+                ),
+                or_(
+                    Movimiento.linea_movimiento == tipo_movimiento,
+                    tipo_movimiento == None
                 ),
                 Movimiento.gestor_carga_id == gestor_carga_id,
                 Movimiento.estado != MovimientoEstadoEnum.ELIMINADO.value

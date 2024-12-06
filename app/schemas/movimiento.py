@@ -47,6 +47,8 @@ class MovimientoBaseModel(BaseModel):
     punto_venta_id: Optional[int]
     es_punto_venta: Optional[bool]
     tipo_movimiento_info: Optional[str]
+    documento_fisico_oc:Optional[bool] = False
+    linea_movimiento: Optional[str]
 
 
 class MovimientoForm(MovimientoBaseModel):

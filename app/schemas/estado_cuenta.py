@@ -27,6 +27,7 @@ class EstadoCuenta(BaseModel):
     contraparte_numero_documento_pdv: Optional[str]
     tipo_contraparte_id: int
     tipo_contraparte_descripcion: str
+    tipo_flujo: Optional[str]
     pendiente: RoundedDecimal
     en_proceso: Optional[RoundedDecimal]
     confirmado: RoundedDecimal

@@ -62,7 +62,7 @@ class Liquidacion(AuditMixin, Base):
     user_aprueba = Column(String(100))
     punto_venta_id = Column(Integer, ForeignKey("punto_venta.id"))
     saldo_cc = Column(Numeric(38, 10))
-    tipo_mov_liquidacion = Column(Integer)
+    tipo_mov_liquidacion = Column(String(20))
 
     # Listas
     movimientos = relationship(

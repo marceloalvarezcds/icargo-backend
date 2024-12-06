@@ -11,6 +11,7 @@ from app.config import REPORTS_FOLDER
 from app.enums import TipoContraparteEnum
 from app.schemas import EstadoCuenta, MovimientoEstadoCuenta, ContraparteEstadoCuenta
 from app.schemas.rounded_decimal_model import RoundedDecimal
+from app.logger import logger
 
 
 def get_estado_cuenta_list(
@@ -23,6 +24,70 @@ def get_estado_cuenta_list(
     else:
         results = repositories.get_estado_cuenta_list(db)
     return EstadoCuenta.result_of_query_to_list(results)
+
+
+def get_estado_cuenta_pdv_list(
+    db: Session,
+    tipo_flujo: Optional[str] = None,
+    contraparte_id: Optional[int] = None,
+    contraparte: Optional[str] = None,
+    contraparte_numero_documento: Optional[str] = None,
+    punto_venta_id: Optional[int] = None,
+) -> List[EstadoCuenta]:
+
+    # return error message
+    #if contraparte and tipo_flujo is None:
+    #    return None
+
+    results = repositories.get_estado_cuenta_pdv_list(
+        db, tipo_flujo, contraparte_id, contraparte, contraparte_numero_documento, punto_venta_id
+    )
+
+    if results:
+        return EstadoCuenta.result_of_query_to_list(results)
+
+    return None
+
+
+def get_estado_cuenta_pdv(
+    db: Session,
+    tipo_flujo: Optional[str] = None,
+    contraparte_id: Optional[int] = None,
+    contraparte: Optional[str] = None,
+    contraparte_numero_documento: Optional[str] = None,
+    punto_venta_id: Optional[int] = None,
+) -> Optional[EstadoCuenta]:
+
+    # return error message
+    #if contraparte and tipo_flujo is None:
+    #    return None
+
+    result = repositories.get_estado_cuenta_pdv(
+        db, tipo_flujo, contraparte_id, contraparte, contraparte_numero_documento, punto_venta_id
+    )
+
+    logger.info("result")
+    logger.info(result)
+
+    if result:
+        retorno = EstadoCuenta.from_orm_row(result)
+    else:
+        # obtener info contraparte
+        result = repositories.get_estado_cuenta_by_contraparte_and_tipo(
+            db, contraparte_id, None, punto_venta_id
+        )
+        retorno = EstadoCuenta.from_orm_row(result)
+        retorno.pendiente= 0
+        retorno.en_proceso= 0
+        retorno.confirmado= 0
+        retorno.saldo_pendiente= 0
+        retorno.finalizado= 0
+        retorno.cantidad_pendiente= 0
+        retorno.cantidad_en_proceso= 0
+        retorno.cantidad_confirmado= 0
+        retorno.cantidad_finalizado= 0
+
+    return retorno
 
 
 def get_estado_cuenta_by_contraparte(
@@ -119,13 +184,14 @@ def get_nuevo_servicio(
     contraparte_numero_documento: str,
     gestor_carga_id: Optional[int],
     punto_venta_id: Optional[int] = None,
+    linea_movimiento: Optional[str] = None,
 ) -> List[MovimientoEstadoCuenta]:
-    results = []
-    if gestor_carga_id:
-        results = repositories.nuevo_endpint(
-            db, tipo_contraparte_id, contraparte_id, contraparte,
-            contraparte_numero_documento, gestor_carga_id, punto_venta_id
-        )
+
+    results = repositories.nuevo_endpint(
+        db, tipo_contraparte_id, contraparte_id, contraparte,
+        contraparte_numero_documento, gestor_carga_id, punto_venta_id,
+        linea_movimiento
+    )
 
     return MovimientoEstadoCuenta.result_of_query_to_list(results)
 

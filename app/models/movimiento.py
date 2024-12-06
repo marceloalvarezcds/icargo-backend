@@ -95,6 +95,7 @@ class Movimiento(AuditMixin, Base):
     remitente_id = Column(Integer, ForeignKey("remitente.id"))
     remitente = relationship(Remitente, uselist=False)
     punto_venta_id = Column(Integer)
+    linea_movimiento = Column(String(20))
 
     @hybrid_property
     def es_cobro(self):
@@ -199,8 +200,6 @@ class Movimiento(AuditMixin, Base):
     @hybrid_property
     def remitente_numero_documento(self):
         return self.orden_carga.flete_remitente_numero_documento
-
-
 
     @hybrid_property
     def semi_placa(self):
@@ -439,5 +438,9 @@ class Movimiento(AuditMixin, Base):
         return (
             self.orden_carga.merma_propietario_tolerancia if self.orden_carga else None
         )
+
+    @hybrid_property
+    def documento_fisico_oc(self):
+        return self.orden_carga.documento_fisico
 
     # TERMINA Campos editables de la OC desde el movimiento

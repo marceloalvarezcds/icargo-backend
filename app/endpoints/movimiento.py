@@ -307,7 +307,7 @@ async def read_movimiento_list_by_estado_cuenta_det(
     response_model=List[schemas.Movimiento],
 )
 @api.get(
-    "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}/punto_venta_id/{punto_venta_id}/tipo_liquidacion/{tipo_liquidacion}",  # noqa
+    "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/etapa/{etapa}/punto_venta_id/{punto_venta_id}/tipo_movimiento/{tipo_liquidacion}",  # noqa
     response_model=List[schemas.Movimiento],
 )
 async def read_movimiento_list_by_estado_cuenta_pdv(
