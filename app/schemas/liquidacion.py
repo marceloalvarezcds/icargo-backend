@@ -18,13 +18,13 @@ class LiquidacionNewMovimientosForm(BaseModel):
     cabecera: EstadoCuentaForm
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
-    tipo_mov_liquidacion: TipoLiquidacion = TipoLiquidacion.EFECTIVO
+    tipo_mov_liquidacion: Optional[str] = "EFECTIVO"
 
 class LiquidacionAddMovimientosForm(BaseModel):
     movimientos: List[Movimiento]
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
-    tipo_mov_liquidacion: Optional[TipoLiquidacion]
+    tipo_mov_liquidacion: Optional[str]
 
 
 class LiquidacionAddInstrumentosForm(BaseModel):
@@ -46,7 +46,7 @@ class LiquidacionForm(BaseModel):
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
     saldo_cc: Optional[RoundedDecimal]
-    tipo_mov_liquidacion: TipoLiquidacion
+    tipo_mov_liquidacion: str
 
 
 class Liquidacion(LiquidacionForm):
@@ -74,7 +74,6 @@ class Liquidacion(LiquidacionForm):
     tipo_contraparte_descripcion: str
     tipo_operacion_descripcion: str
     url: str
-    tipo_mov_liquidacion: Optional[TipoLiquidacion] = None
     # Auditoría
     created_by: str
     created_at: Date

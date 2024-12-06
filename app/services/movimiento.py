@@ -17,6 +17,8 @@ from app.enums import (
     TipoContraparteEnum,
     TipoCuentaEnum,
     TipoMovimientoEnum,
+    TipoAnticipoEnum,
+    TipoInsumoEnum,
 )
 from app.models import (
     Moneda,
@@ -163,6 +165,12 @@ def create_movimiento_by_anticipo(
     tipo_movimiento = repositories.get_tipo_movimiento_by_descripcion(
         db, TipoMovimientoEnum.ANTICIPO.value
     )
+    # obtenemos linea
+    if anticipo.flete_anticipo.tipo.descripcion == TipoAnticipoEnum.EFECTIVO.value:
+        linea_movimiento = TipoAnticipoEnum.EFECTIVO.value
+    else:
+        linea_movimiento = anticipo.flete_anticipo.tipo_insumo.descripcion
+
     if (
         not propietario_contraparte
         or not proveedor_contraparte
@@ -193,7 +201,8 @@ def create_movimiento_by_anticipo(
             fecha_cambio_moneda=datetime.now(),
             anticipo_id=anticipo.id,
             proveedor_id=anticipo.punto_venta.proveedor_id,
-            tipo_movimiento_info=anticipo.concepto
+            tipo_movimiento_info=anticipo.concepto,
+            linea_movimiento=linea_movimiento,
         ),
         gestor_carga_id,
         modified_by,
@@ -217,7 +226,8 @@ def create_movimiento_by_anticipo(
             fecha_cambio_moneda=datetime.now(),
             anticipo_id=anticipo.id,
             propietario_id=anticipo.orden_carga.camion.propietario_id,
-            tipo_movimiento_info=anticipo.concepto
+            tipo_movimiento_info=anticipo.concepto,
+            linea_movimiento=linea_movimiento,
         ),
         gestor_carga_id,
         modified_by,
@@ -275,6 +285,7 @@ def create_movimiento_by_flete(
             fecha_cambio_moneda=datetime.now(),
             remitente_id=orden_carga.flete.remitente_id,
             tipo_movimiento_info=tipo_movimiento.descripcion,
+            linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
         ),
         gestor_carga_id,
         modified_by,
@@ -297,7 +308,8 @@ def create_movimiento_by_flete(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             propietario_id=orden_carga.camion.propietario_id,
-            tipo_movimiento_info=tipo_movimiento.descripcion
+            tipo_movimiento_info=tipo_movimiento.descripcion,
+            linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
         ),
         gestor_carga_id,
         modified_by,
@@ -357,6 +369,7 @@ def create_movimiento_by_complemento(
                 complemento_id=complemento.id,
                 remitente_id=complemento.orden_carga.flete.remitente_id,
                 tipo_movimiento_info=complemento.concepto_descripcion,
+                linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
             ),
             gestor_carga_id,
             modified_by,
@@ -381,6 +394,7 @@ def create_movimiento_by_complemento(
             complemento_id=complemento.id,
             propietario_id=complemento.orden_carga.camion.propietario_id,
             tipo_movimiento_info=complemento.concepto_descripcion,
+            linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
         ),
         gestor_carga_id,
         modified_by,
@@ -440,6 +454,7 @@ def create_movimiento_by_descuento(
                 descuento_id=descuento.id,
                 proveedor_id=descuento.proveedor_id,
                 tipo_movimiento_info=descuento.concepto_descripcion,
+                linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
             ),
             gestor_carga_id,
             modified_by,
@@ -464,6 +479,7 @@ def create_movimiento_by_descuento(
             descuento_id=descuento.id,
             propietario_id=descuento.orden_carga.camion.propietario_id,
             tipo_movimiento_info=descuento.concepto_descripcion,
+            linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
         ),
         gestor_carga_id,
         modified_by,
@@ -521,6 +537,7 @@ def create_movimiento_by_merma(
             fecha_cambio_moneda=datetime.now(),
             remitente_id=orden_carga.flete.remitente_id,
             tipo_movimiento_info=tipo_movimiento.descripcion,
+            linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
         ),
         gestor_carga_id,
         modified_by,
@@ -544,6 +561,7 @@ def create_movimiento_by_merma(
             fecha_cambio_moneda=datetime.now(),
             propietario_id=orden_carga.camion.propietario_id,
             tipo_movimiento_info=tipo_movimiento.descripcion,
+            linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
         ),
         gestor_carga_id,
         modified_by,
@@ -1129,6 +1147,7 @@ def create_movimiento_by_factura(
     facturaModel: Factura,
 ) -> Optional[Movimiento]:
 
+    liquidacion = facturaModel.liquidacion
     tipo_contraparte = repositories.get_tipo_comprobante_by_id(
         db, factura.tipo_contraparte_id
     )
@@ -1204,7 +1223,8 @@ def create_movimiento_by_factura(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
             fecha= datetime.now(),
             fecha_cambio_moneda=datetime.now(),
-            tipo_movimiento_info='IVA'
+            tipo_movimiento_info='IVA',
+            linea_movimiento=liquidacion.tipo_mov_liquidacion,
         ),
         gestor_carga_id,
         modified_by,
@@ -1233,7 +1253,8 @@ def create_movimiento_by_factura(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
             fecha= datetime.now(),
             fecha_cambio_moneda=datetime.now(),
-            tipo_movimiento_info='RETENCION'
+            tipo_movimiento_info='RETENCION',
+            linea_movimiento=liquidacion.tipo_mov_liquidacion,
         ),
         gestor_carga_id,
         modified_by,

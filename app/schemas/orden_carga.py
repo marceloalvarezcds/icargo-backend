@@ -36,10 +36,10 @@ class OrdenCargaForm(BaseModel):
     combinacion_id: Optional[int] = None
     cantidad_nominada: RoundedDecimal
     comentarios: Optional[str] = None
-   
+
     class Config:
         orm_mode = True
-        use_enum_values = True    
+        use_enum_values = True
 
 class OrdenCargaBaseModel(BaseModel):
     camion_id: Optional[int] = None
@@ -50,6 +50,7 @@ class OrdenCargaBaseModel(BaseModel):
     origen_id: Optional[int] = None
     destino_id: Optional[int] = None
     anticipos_liberados: Optional[bool] = True
+    documento_fisico: Optional[bool] = False
     # INICIO Cantidad y Flete
     modify_by_movimiento: Optional[bool] = False
     # inicio - Condiciones para el Gestor de Carga
@@ -186,8 +187,8 @@ class OrdenCarga(OrdenCargaBaseModel):
     # Relaciones Listas
     auditorias: List[AuditDatabase]
     historial: List[OrdenCargaEstadoHistorial]
-    comentario: List[OrdenCargaComentariosHistorial] = [] 
-    evaluaciones_historial: List[OrdenCargaEvaluacionesHistorial] = [] 
+    comentario: List[OrdenCargaComentariosHistorial] = []
+    evaluaciones_historial: List[OrdenCargaEvaluacionesHistorial] = []
     saldos: List[OrdenCargaAnticipoSaldo]
     anticipos: List[OrdenCargaAnticipoRetirado]
     porcentaje_anticipos: List[OrdenCargaAnticipoPorcentaje]
@@ -238,7 +239,7 @@ class OrdenCargaList(OrdenCargaForm):
     semi_placa: str
     beneficiario_descripcion: Optional[str] = None
     combinacion_id: Optional[int] = None
-    combinacion_chofer_nombre: Optional[str] = None 
+    combinacion_chofer_nombre: Optional[str] = None
     combinacion_chofer_doc: Optional[str] = None
     # Datos de fletes
     flete_destino_nombre: Optional[str] = None

@@ -4,7 +4,6 @@ from sqlalchemy import case, exists, func, literal_column, null, desc, nullsfirs
 from sqlalchemy.engine.row import Row  # type: ignore
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
-
 from app.enums import EstadoEnum, TipoContraparteEnum
 from app.models import (
     Chofer,
@@ -20,8 +19,8 @@ from app.models import (
     TipoInstrumento,
     Factura
 )
-from app.schemas import MovimientoEstadoCuenta
 from app.repositories.movimiento import get_query_movimientos_by_contraparte_and_gestor_carga_id
+from app.logger import logger
 
 def get_estado_cuenta_case_statement() -> Tuple:
     return (
@@ -119,6 +118,7 @@ def get_estado_cuenta_case_statement_new() -> Tuple:
         Movimiento.tipo_contraparte_id.label("tipo_contraparte_id"),
         TipoContraparte.descripcion.label("tipo_contraparte_descripcion"),
         Movimiento.gestor_carga_id.label("gestor_carga_id"),
+        Movimiento.linea_movimiento.label("tipo_flujo"),
         *get_cols_estado_cuenta_case_statement(),
     )
 
@@ -131,6 +131,7 @@ def get_estado_cuenta_liquidacion_case_statement_new() -> Tuple:
         Liquidacion.tipo_contraparte_id.label("tipo_contraparte_id"),
         TipoContraparte.descripcion.label("tipo_contraparte_descripcion"),
         Liquidacion.gestor_carga_id.label("gestor_carga_id"),
+        Liquidacion.tipo_mov_liquidacion.label("tipo_flujo"),
         *get_cols_estado_cuenta_liquidacion_case_statement(),
     )
 
@@ -288,6 +289,7 @@ def get_estado_cuenta_proveedor_pdv(db: Session) -> Query:
             #TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",
             literal_column("'PUNTO DE VENTA'").label("tipo_contraparte_descripcion"),
             Movimiento.gestor_carga_id.label("gestor_carga_id"),
+            Movimiento.linea_movimiento.label("tipo_flujo"),
             *get_cols_estado_cuenta_case_statement(),
         )
         .join(Movimiento.proveedor)
@@ -327,6 +329,7 @@ def get_estado_cuenta_proveedor_pdv_liquidacion(db: Session) -> Query:
             #TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",
             literal_column("'PUNTO DE VENTA'").label("tipo_contraparte_descripcion"),
             Liquidacion.gestor_carga_id.label("gestor_carga_id"),
+            Liquidacion.tipo_mov_liquidacion.label("tipo_flujo"),
             *get_cols_estado_cuenta_liquidacion_case_statement(),
         )
         .join(Liquidacion.proveedor)
@@ -337,23 +340,24 @@ def get_estado_cuenta_proveedor_pdv_liquidacion(db: Session) -> Query:
 
 
 def get_estado_cuenta_subquery(db: Session) -> Query:
+
     chofer = get_estado_cuenta_chofer(db)
-    choferLiquidacion = get_estado_cuenta_chofer_liquidacion(db)
     propietario = get_estado_cuenta_propietario(db)
-    propietarioLiquidacion = get_estado_cuenta_propietario_liquidacion(db)
     proveedor = get_estado_cuenta_proveedor(db)
-    proveedorLiquidacion = get_estado_cuenta_proveedor_liquidacion(db)
     proveedorPdv = get_estado_cuenta_proveedor_pdv(db)
-    proveedorPdvLiquidacion = get_estado_cuenta_proveedor_pdv_liquidacion(db)
     remitente = get_estado_cuenta_remitente(db)
-    remitenteLiquidacion = get_estado_cuenta_remitente_liquidacion(db)
     otro = get_estado_cuenta_otro(db)
+
+    choferLiquidacion = get_estado_cuenta_chofer_liquidacion(db)
+    propietarioLiquidacion = get_estado_cuenta_propietario_liquidacion(db)
+    proveedorLiquidacion = get_estado_cuenta_proveedor_liquidacion(db)
+    proveedorPdvLiquidacion = get_estado_cuenta_proveedor_pdv_liquidacion(db)
+    remitenteLiquidacion = get_estado_cuenta_remitente_liquidacion(db)
     otroLiquidacion = get_estado_cuenta_otro_liquidacion(db)
+
     return chofer.union_all(choferLiquidacion, propietario, propietarioLiquidacion,
-            proveedor, proveedorLiquidacion, proveedorPdv, proveedorPdvLiquidacion,
-            remitente, remitenteLiquidacion, otro, otroLiquidacion)
-    # return proveedor.union_all( proveedorPdv, proveedorPdvLiquidacion)
-    # return chofer.union_all(proveedor, proveedorPdv)
+        proveedor, proveedorLiquidacion, proveedorPdv, proveedorPdvLiquidacion,
+        remitente, remitenteLiquidacion, otro, otroLiquidacion)
 
 
 def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
@@ -369,12 +373,9 @@ def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
             table.c.tipo_contraparte_descripcion.label("tipo_contraparte_descripcion"),
             table.c.gestor_carga_id.label("gestor_carga_id"),
             func.sum(table.c.pendiente).label("pendiente"),
-            #func.sum(table.c.en_proceso).label("en_proceso"),
             func.sum(table.c.confirmado).label("confirmado"),
-            #func.sum(table.c.saldo_pendiente).label("saldo_pendiente"),
             func.sum(table.c.finalizado).label("finalizado"),
             func.sum(table.c.cantidad_pendiente).label("cantidad_pendiente"),
-            #func.sum(table.c.cantidad_en_proceso).label("cantidad_en_proceso"),
             func.sum(table.c.cantidad_confirmado).label("cantidad_confirmado"),
             func.sum(table.c.cantidad_finalizado).label("cantidad_finalizado"),
         )
@@ -388,6 +389,46 @@ def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
             table.c.tipo_contraparte_id,
             table.c.tipo_contraparte_descripcion,
             table.c.gestor_carga_id,
+        )
+        .order_by(
+            table.c.tipo_contraparte_descripcion,
+            table.c.contraparte
+        )
+    )
+
+
+def get_estado_cuenta_pdv_group_by_query(db: Session, table: Query) -> Query:
+    return (
+        db.query(
+            table.c.contraparte_id.label("contraparte_id"),
+            table.c.contraparte.label("contraparte"),
+            table.c.contraparte_numero_documento.label("contraparte_numero_documento"),
+            table.c.punto_venta_id.label("punto_venta_id"),
+            table.c.contraparte_pdv.label("contraparte_pdv"),
+            table.c.contraparte_numero_documento_pdv.label("contraparte_numero_documento_pdv"),
+            table.c.tipo_contraparte_id.label("tipo_contraparte_id"),
+            table.c.tipo_contraparte_descripcion.label("tipo_contraparte_descripcion"),
+            table.c.gestor_carga_id.label("gestor_carga_id"),
+            table.c.tipo_flujo.label("tipo_flujo"),
+            func.sum(table.c.pendiente).label("pendiente"),
+            func.sum(table.c.confirmado).label("confirmado"),
+            func.sum(table.c.finalizado).label("finalizado"),
+            func.sum(table.c.cantidad_pendiente).label("cantidad_pendiente"),
+            func.sum(table.c.cantidad_confirmado).label("cantidad_confirmado"),
+            func.sum(table.c.cantidad_finalizado).label("cantidad_finalizado"),
+        )
+        .group_by(
+            table.c.contraparte_id,
+            table.c.contraparte,
+            table.c.contraparte_numero_documento,
+            table.c.punto_venta_id,
+            table.c.contraparte_pdv,
+            table.c.contraparte_numero_documento_pdv,
+            table.c.tipo_contraparte_id,
+            table.c.tipo_contraparte_descripcion,
+            table.c.gestor_carga_id,
+            table.c.gestor_carga_id,
+            table.c.tipo_flujo,
         )
         .order_by(
             table.c.tipo_contraparte_descripcion,
@@ -419,7 +460,7 @@ def get_estado_cuenta_list_by_gestor_carga_id(
 def get_estado_cuenta_by_contraparte_and_tipo(
     db: Session,
     contraparte_id: int,
-    tipo_contraparte_id: int,
+    tipo_contraparte_id: Optional[int],
     punto_venta_id: int = None
 ) -> Optional[Row]:
     subquery = get_estado_cuenta_subquery(db).subquery()
@@ -427,7 +468,11 @@ def get_estado_cuenta_by_contraparte_and_tipo(
         db.query(subquery)
         .filter(
             subquery.c.contraparte_id == contraparte_id,
-            subquery.c.tipo_contraparte_id == tipo_contraparte_id,
+            #subquery.c.tipo_contraparte_id == tipo_contraparte_id,
+            or_(
+                subquery.c.tipo_contraparte_id == tipo_contraparte_id,
+                tipo_contraparte_id == None
+            ),
             or_(
                 subquery.c.punto_venta_id == punto_venta_id,
                 punto_venta_id == None
@@ -457,6 +502,77 @@ def get_estado_cuenta_by_contraparte_tipo_otro(
     return get_estado_cuenta_group_by_query(db, table).first()
 
 
+def get_estado_cuenta_pdv_list(
+    db: Session,
+    tipo_flujo: Optional[str],
+    contraparte_id: Optional[int],
+    contraparte: Optional[str],
+    contraparte_numero_documento: Optional[str],
+    punto_venta_id: Optional[int],
+) -> List[Row]:
+    subquery = get_estado_cuenta_subquery(db)\
+        .filter(PuntoVenta.id > 0).subquery()
+    table = (
+        db.query(subquery)
+        .filter(
+            or_(
+                subquery.c.tipo_flujo == tipo_flujo,
+                tipo_flujo == None
+            ),
+            or_(
+                subquery.c.contraparte == contraparte,
+                contraparte == None
+            ),
+            or_(
+                subquery.c.contraparte_numero_documento == contraparte_numero_documento,
+                contraparte_numero_documento == None
+            )
+            # add filtro solo pdv
+        )
+        .subquery()
+    )
+    return get_estado_cuenta_pdv_group_by_query(db, table).all()
+
+
+def get_estado_cuenta_pdv(
+    db: Session,
+    tipo_flujo: Optional[str],
+    contraparte_id: Optional[int],
+    contraparte: Optional[str],
+    contraparte_numero_documento: Optional[str],
+    punto_venta_id: Optional[int],
+) -> Optional[Row]:
+    logger.info(tipo_flujo)
+    logger.info(contraparte)
+    logger.info(contraparte_numero_documento)
+    logger.info(punto_venta_id)
+
+    subquery = get_estado_cuenta_subquery(db).subquery()
+        #.filter(PuntoVenta.id > 0).subquery()
+    table = (
+        db.query(subquery)
+        .filter(
+            subquery.c.punto_venta_id == punto_venta_id,
+            or_(
+                subquery.c.tipo_flujo == tipo_flujo,
+                tipo_flujo == None
+            ),
+            or_(
+                subquery.c.contraparte == contraparte,
+                contraparte == None
+            ),
+            or_(
+                subquery.c.contraparte_numero_documento == contraparte_numero_documento,
+                contraparte_numero_documento == None
+            )
+            # add filtro solo pdv
+        )
+        .subquery()
+    )
+    return get_estado_cuenta_pdv_group_by_query(db, table).first()
+
+
+
 def get_cols_estado_cuenta_case_statement() -> Tuple:
     return (
         case(
@@ -469,32 +585,12 @@ def get_cols_estado_cuenta_case_statement() -> Tuple:
             ),
             else_=literal_column("0"),
         ).label("pendiente"),
-        #case(
-        #    (
-                #and_(
-                    # Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
-        #            Movimiento.estado == EstadoEnum.EN_PROCESO.value,
-                #),
-        #        Movimiento.monto,
-        #    ),
-        #    else_=literal_column("0"),
-        #).label("en_proceso"),
         case(
             (
                 or_(
-                    #and_(
-                        #Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
-                        Movimiento.estado == EstadoEnum.EN_PROCESO.value,
-                    #),
-                    #and_(
-                        #Liquidacion.etapa == EstadoEnum.PENDIENTE.value,
-                    #    Movimiento.estado == EstadoEnum.EN_PROCESO.value,
-                    #),
-                    #and_(
-                        #Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
-                        Movimiento.estado == EstadoEnum.CONFIRMADO.value,
-                        Movimiento.estado == EstadoEnum.FINALIZADO.value,
-                    #)
+                    Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                    Movimiento.estado == EstadoEnum.CONFIRMADO.value,
+                    Movimiento.estado == EstadoEnum.FINALIZADO.value,
                 ),
                 Movimiento.monto,
             ),
@@ -511,31 +607,12 @@ def get_cols_estado_cuenta_case_statement() -> Tuple:
             ),
             else_=literal_column("0"),
         ).label("cantidad_pendiente"),
-        # case(
-        #     (
-        #         #and_(
-        #         #    Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
-        #             Movimiento.estado == EstadoEnum.EN_PROCESO.value,
-        #         #),
-        #         literal_column("1"),
-        #     ),
-        #     else_=literal_column("0"),
-        # ).label("cantidad_en_proceso"),
         case(
             (
                 or_(
-                    #and_(
-                    #    Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
-                        Movimiento.estado == EstadoEnum.EN_PROCESO.value,
-                    #),
-                    #and_(
-                    #    Liquidacion.etapa == EstadoEnum.PENDIENTE.value,
-                        Movimiento.estado == EstadoEnum.EN_PROCESO.value,
-                    #),
-                    #and_(
-                    #    Liquidacion.etapa == EstadoEnum.CONFIRMADO.value,
-                        Movimiento.estado == EstadoEnum.FINALIZADO.value,
-                    #)
+                   Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                   Movimiento.estado == EstadoEnum.EN_PROCESO.value,
+                   Movimiento.estado == EstadoEnum.FINALIZADO.value,
                 ),
                 literal_column("1"),
             ),
@@ -548,7 +625,6 @@ def get_cols_estado_cuenta_case_statement() -> Tuple:
 def get_cols_estado_cuenta_liquidacion_case_statement() -> Tuple:
     return (
         literal_column("0").label("pendiente"),
-        #literal_column("0").label("en_proceso"),
         literal_column("0").label("confirmado"),
         case(
             (
@@ -560,7 +636,6 @@ def get_cols_estado_cuenta_liquidacion_case_statement() -> Tuple:
             else_=literal_column("0"),
         ).label("finalizado"),
         literal_column("0").label("cantidad_pendiente"),
-        #literal_column("0").label("cantidad_en_proceso"),
         literal_column("0").label("cantidad_confirmado"),
         case(
             (
@@ -636,7 +711,8 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
     contraparte: str,
     contraparte_numero_documento: str,
     gestor_carga_id: int,
-    punto_venta_id: Optional[int]
+    punto_venta_id: Optional[int],
+    tipo_movimiento: Optional[str],
 ) -> Query:
 
     query = db.query(
@@ -684,6 +760,10 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
                     Liquidacion.punto_venta_id == punto_venta_id,
                     punto_venta_id == None
                 ),
+                or_(
+                    Liquidacion.tipo_mov_liquidacion == tipo_movimiento,
+                    tipo_movimiento == None
+                ),
                 Liquidacion.gestor_carga_id == gestor_carga_id,
             )
         )
@@ -698,16 +778,17 @@ def nuevo_endpint(
     contraparte: str,
     contraparte_numero_documento: str,
     gestor_carga_id: int,
-    punto_venta_id: Optional[int]
+    punto_venta_id: Optional[int],
+    linea_movimiento: Optional[str],
     ) -> List[Row]:
 
     query_movimientos = get_query_movimientos_by_contraparte_and_gestor_carga_id(
         db, tipo_contraparte_id, contraparte_id, contraparte, contraparte_numero_documento,
-        gestor_carga_id, punto_venta_id
+        gestor_carga_id, punto_venta_id, linea_movimiento
     )
     query_instrumentos = get_query_instrumentos_by_contraparte_and_gestor_carga_id(
         db, tipo_contraparte_id, contraparte_id, contraparte, contraparte_numero_documento,
-        gestor_carga_id, punto_venta_id
+        gestor_carga_id, punto_venta_id, linea_movimiento
     )
 
     table = query_movimientos.union_all(query_instrumentos).subquery()

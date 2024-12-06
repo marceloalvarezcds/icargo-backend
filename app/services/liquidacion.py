@@ -17,6 +17,7 @@ from app.enums import (
     LiquidacionEtapaEnum,
     MovimientoEstadoEnum,
     TipoContraparteEnum,
+    EstadoEnum
 )
 from app.models import (
     Camion,
@@ -210,6 +211,9 @@ def add_movimientos(
     to_edit_obj.movimientos = [*old_movimientos, *new_movimientos]
     to_edit_obj.modified_by = modified_by
     to_edit_obj.modified_at = datetime.now()
+    to_edit_obj.pago_cobro =  sum(
+            x.saldo for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+        )
     db.commit()
     return to_edit_obj
 
@@ -232,6 +236,23 @@ def remove_movimiento(
     to_edit_obj.movimientos = new_movimientos
     to_edit_obj.modified_by = modified_by
     to_edit_obj.modified_at = datetime.now()
+    to_edit_obj.pago_cobro =  sum(
+        x.saldo for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+    )
+    db.commit()
+    return to_edit_obj
+
+
+def refresh_pago_cobro(
+    db: Session,
+    id: int,
+    modified_by: str,
+) -> Liquidacion:
+    to_edit_obj = get_liquidacion_by_id(db, id)
+    movimientos = to_edit_obj.movimientos
+    to_edit_obj.pago_cobro =  sum(
+        x.saldo for x in movimientos if x.estado != EstadoEnum.ELIMINADO.value
+    )
     db.commit()
     return to_edit_obj
 
@@ -258,6 +279,9 @@ def remove_movimientos(
     to_edit_obj.movimientos = result
     to_edit_obj.modified_by = modified_by
     to_edit_obj.modified_at = datetime.now()
+    to_edit_obj.pago_cobro =  sum(
+        x.saldo for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+    )
     db.commit()
 
     return to_edit_obj
@@ -316,6 +340,9 @@ def add_instrumentos(
     saldo_residual = 0  # TODO: obtener de lo que viene del front
     if int(saldo_residual) == 0:
         obj = get_liquidacion_by_id(db, id)
+        obj = repositories.change_liquidacion_status(
+            obj, db, LiquidacionEstadoEnum.SALDO_CERRADO, modified_by
+        )
         get_instrumento_list_by_liquidacion_create_form(db, id, data, modified_by)
         saldo_cc = data.instrumentos[0].saldo_cc
         obj.modified_by = modified_by
@@ -324,9 +351,9 @@ def add_instrumentos(
         # actualizar saldo cc liquidacion
         db.commit()
         db.refresh(obj)
-        obj = repositories.change_liquidacion_status(
-            obj, db, LiquidacionEstadoEnum.SALDO_CERRADO, modified_by
-        )
+        #obj = repositories.change_liquidacion_status(
+        #    obj, db, LiquidacionEstadoEnum.SALDO_CERRADO, modified_by
+        #)
     else:
         raise HTTPException(
             status_code=404,
