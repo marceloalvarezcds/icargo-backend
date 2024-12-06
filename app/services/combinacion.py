@@ -7,7 +7,6 @@ from app.config import REPORTS_FOLDER
 from app.enums.estado import EstadoEnum
 from app.models.camion import Camion
 from app.models.chofer import Chofer
-from app.models.combinacion_historial import CombinacionHistorial
 from app.models.orden_carga import OrdenCarga
 from app.models.semi import Semi
 from app.utils.gestor_carga import get_gestor_carga_by_params

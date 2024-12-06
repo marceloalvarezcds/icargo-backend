@@ -41,11 +41,6 @@ class Combinacion(AuditMixin, Base):
     gestor_carga = relationship(GestorCarga, uselist=False)
     neto = Column(Numeric(38, 10))
 
-    historial = relationship(
-        "CombinacionHistorial",
-        back_populates="combinacion",
-        cascade="all, delete-orphan",
-    )
     
     @hybrid_property
     def camion_placa(self):
