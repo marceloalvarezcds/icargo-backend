@@ -212,8 +212,8 @@ def create_movimiento_by_anticipo(
         MovimientoForm(
             orden_carga_id=anticipo.orden_carga_id,
             tipo_contraparte_id=propietario_contraparte.id,
-            contraparte=anticipo.orden_carga.camion_beneficiario_nombre,
-            contraparte_numero_documento=anticipo.orden_carga.camion_beneficiario_documento,
+            contraparte=anticipo.orden_carga.propietario.nombre,
+            contraparte_numero_documento=anticipo.orden_carga.propietario.ruc,
             tipo_documento_relacionado_id=tipo_documento_relacionado.id,
             numero_documento_relacionado=anticipo.orden_carga_id,
             cuenta_id=tipo_cuenta.id,
@@ -225,7 +225,7 @@ def create_movimiento_by_anticipo(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en anticipos  # noqa
             fecha_cambio_moneda=datetime.now(),
             anticipo_id=anticipo.id,
-            propietario_id=anticipo.orden_carga.combinacion_propietario_id,
+            propietario_id=anticipo.orden_carga.propietario_id,
             tipo_movimiento_info=anticipo.concepto,
             linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
         ),
@@ -295,8 +295,8 @@ def create_movimiento_by_flete(
         MovimientoForm(
             orden_carga_id=orden_carga.id,
             tipo_contraparte_id=propietario_contraparte.id,
-            contraparte=orden_carga.camion_beneficiario_nombre,
-            contraparte_numero_documento=orden_carga.camion_beneficiario_documento,
+            contraparte=orden_carga.propietario.nombre,
+            contraparte_numero_documento=orden_carga.propietario.ruc,
             tipo_documento_relacionado_id=tipo_documento_relacionado.id,
             numero_documento_relacionado=orden_carga.id,
             cuenta_id=tipo_cuenta.id,
@@ -307,7 +307,7 @@ def create_movimiento_by_flete(
             moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
-            propietario_id=orden_carga.combinacion_propietario_id,
+            propietario_id=orden_carga.propietario_id,
             tipo_movimiento_info=tipo_movimiento.descripcion,
             linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
         ),
@@ -379,8 +379,8 @@ def create_movimiento_by_complemento(
         MovimientoForm(
             orden_carga_id=complemento.orden_carga_id,
             tipo_contraparte_id=propietario_contraparte.id,
-            contraparte=complemento.orden_carga.camion_beneficiario_nombre,
-            contraparte_numero_documento=complemento.orden_carga.camion_beneficiario_documento,
+            contraparte=complemento.orden_carga.propietario.nombre,
+            contraparte_numero_documento=complemento.orden_carga.propietario.ruc,
             tipo_documento_relacionado_id=tipo_documento_relacionado.id,
             numero_documento_relacionado=complemento.orden_carga_id,
             cuenta_id=tipo_cuenta.id,
@@ -392,7 +392,7 @@ def create_movimiento_by_complemento(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Complemento  # noqa
             fecha_cambio_moneda=datetime.now(),
             complemento_id=complemento.id,
-            propietario_id=complemento.orden_carga.combinacion_propietario_id,
+            propietario_id=complemento.orden_carga.propietario_id,
             tipo_movimiento_info=complemento.concepto_descripcion,
             linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
         ),
@@ -464,8 +464,8 @@ def create_movimiento_by_descuento(
         MovimientoForm(
             orden_carga_id=descuento.orden_carga_id,
             tipo_contraparte_id=propietario_contraparte.id,
-            contraparte=descuento.orden_carga.camion_beneficiario_nombre,
-            contraparte_numero_documento=descuento.orden_carga.camion_beneficiario_documento,
+            contraparte=descuento.orden_carga.propietario.nombre,
+            contraparte_numero_documento=descuento.orden_carga.propietario.ruc,
             tipo_documento_relacionado_id=tipo_documento_relacionado.id,
             numero_documento_relacionado=descuento.orden_carga_id,
             cuenta_id=tipo_cuenta.id,
@@ -477,7 +477,7 @@ def create_movimiento_by_descuento(
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
             fecha_cambio_moneda=datetime.now(),
             descuento_id=descuento.id,
-            propietario_id=descuento.orden_carga.combinacion_propietario_id,
+            propietario_id=descuento.orden_carga.propietario_id,
             tipo_movimiento_info=descuento.concepto_descripcion,
             linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
         ),
@@ -547,8 +547,8 @@ def create_movimiento_by_merma(
         MovimientoForm(
             orden_carga_id=orden_carga.id,
             tipo_contraparte_id=propietario_contraparte.id,
-            contraparte=orden_carga.camion_beneficiario_nombre,
-            contraparte_numero_documento=orden_carga.camion_beneficiario_documento,
+            contraparte=orden_carga.propietario.nombre,
+            contraparte_numero_documento=orden_carga.propietario.ruc,
             tipo_documento_relacionado_id=tipo_documento_relacionado.id,
             numero_documento_relacionado=orden_carga.id,
             cuenta_id=tipo_cuenta.id,
@@ -559,7 +559,7 @@ def create_movimiento_by_merma(
             moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
             tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
-            propietario_id=orden_carga.combinacion_propietario_id,
+            propietario_id=orden_carga.propietario_id,
             tipo_movimiento_info=tipo_movimiento.descripcion,
             linea_movimiento=TipoAnticipoEnum.EFECTIVO.value,
         ),
