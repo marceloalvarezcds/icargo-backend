@@ -15,10 +15,12 @@ down_revision = 'b3cbe3bf846f'
 branch_labels = None
 depends_on = None
 
-
+# se comenta debido a que migracion se duplica en revision da60a4ecebd4
 def upgrade():
-    op.add_column('insumo_punto_venta_precio', sa.Column('hora_inicio', sa.String(length=8), nullable=True))
+    pass
+    #op.add_column('insumo_punto_venta_precio', sa.Column('hora_inicio', sa.String(length=8), nullable=True))
 
 
 def downgrade():
-    op.drop_column('insumo_punto_venta_precio', 'hora_inicio')
+    pass
+    #op.drop_column('insumo_punto_venta_precio', 'hora_inicio')

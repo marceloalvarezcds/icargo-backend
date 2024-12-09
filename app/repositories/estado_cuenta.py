@@ -1,6 +1,7 @@
 from typing import List, Optional, Tuple
 
-from sqlalchemy import case, exists, func, literal_column, null, desc, nullsfirst  # type: ignore
+from sqlalchemy import case, exists, func, literal_column, null, desc, nullsfirst
+from sqlalchemy.sql.functions import concat  # type: ignore
 from sqlalchemy.engine.row import Row  # type: ignore
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
@@ -194,7 +195,7 @@ def get_estado_cuenta_proveedor(db: Session) -> Query:
     return (
         db.query(
             Movimiento.proveedor_id.label("contraparte_id"),
-            Proveedor.nombre.label("contraparte"),
+            concat(Proveedor.nombre, '-', Proveedor.nombre_corto).label("contraparte"),
             Proveedor.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_case_statement_new(),
         )
@@ -208,7 +209,7 @@ def get_estado_cuenta_proveedor_liquidacion(db: Session) -> Query:
     return (
         db.query(
             Liquidacion.proveedor_id.label("contraparte_id"),
-            Proveedor.nombre.label("contraparte"),
+            concat(Proveedor.nombre, '-', Proveedor.nombre_corto).label("contraparte"),
             Proveedor.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_liquidacion_case_statement_new(),
         )
@@ -223,7 +224,7 @@ def get_estado_cuenta_remitente(db: Session) -> Query:
     return (
         db.query(
             Movimiento.remitente_id.label("contraparte_id"),
-            Remitente.nombre.label("contraparte"),
+            concat(Remitente.nombre, '-', Remitente.nombre_corto).label("contraparte"),
             Remitente.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_case_statement_new(),
         )
@@ -236,7 +237,7 @@ def get_estado_cuenta_remitente_liquidacion(db: Session) -> Query:
     return (
         db.query(
             Liquidacion.remitente_id.label("contraparte_id"),
-            Remitente.nombre.label("contraparte"),
+            concat(Remitente.nombre, '-', Remitente.nombre_corto).label("contraparte"),
             Remitente.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_liquidacion_case_statement_new(),
         )
@@ -283,7 +284,7 @@ def get_estado_cuenta_proveedor_pdv(db: Session) -> Query:
             Proveedor.nombre.label("contraparte"),
             Proveedor.numero_documento.label("contraparte_numero_documento"),
             PuntoVenta.id.label("punto_venta_id"),
-            PuntoVenta.nombre.label("contraparte_pdv"),
+            concat(PuntoVenta.nombre, '-', PuntoVenta.nombre_corto).label("contraparte_pdv"),
             PuntoVenta.numero_documento.label("contraparte_numero_documento_pdv"),
             Movimiento.tipo_contraparte_id.label("tipo_contraparte_id"),
             #TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",
@@ -323,7 +324,7 @@ def get_estado_cuenta_proveedor_pdv_liquidacion(db: Session) -> Query:
             Proveedor.nombre.label("contraparte"),
             Proveedor.numero_documento.label("contraparte_numero_documento"),
             Liquidacion.punto_venta_id.label("punto_venta_id"),
-            Liquidacion.contraparte.label("contraparte_pdv"),
+            concat(PuntoVenta.nombre, '-', PuntoVenta.nombre_corto).label("contraparte_pdv"),
             Liquidacion.contraparte_numero_documento.label("contraparte_numero_documento_pdv"),
             Liquidacion.tipo_contraparte_id.label("tipo_contraparte_id"),
             #TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",
