@@ -500,6 +500,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
 
     # columnas especificas
     query = db.query(
+                literal_column("2").label("orden"),
                 Movimiento.id.label("movimiento_id"),
                 Movimiento.liquidacion_id.label("liquidacion_id"),
                 Movimiento.created_at.label("fecha"),
@@ -653,6 +654,7 @@ def get_all_movimiento_instrumento_estado_cuenta_list(
 
 def get_cols_estado_cuenta_case_statement() -> tuple:
     return (
+        literal_column("0").label("provision"),
         case(
             (
                 and_(

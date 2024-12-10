@@ -577,5 +577,10 @@ from .combinacion import(
     get_combinacion_tracto_ids,
     get_combinacion_list_by_camion_id,
     get_combinaciones_relacionadas,
-    
 )
+
+from .provision import ( # noqa
+    get_provision_list,
+    create_provision,
+    get_query_provisiones_by_contraparte_and_gestor_carga_id,
+) # noqa

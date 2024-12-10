@@ -43,10 +43,7 @@ def get_estado_cuenta_pdv_list(
         db, tipo_flujo, contraparte_id, contraparte, contraparte_numero_documento, punto_venta_id
     )
 
-    if results:
-        return EstadoCuenta.result_of_query_to_list(results)
-
-    return None
+    return EstadoCuenta.result_of_query_to_list(results)
 
 
 def get_estado_cuenta_pdv(
