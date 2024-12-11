@@ -466,7 +466,7 @@ def create_combinacion(
     db.refresh(combinacion)
 
     # Actualizar el estado del camión: Marcarlo como en combinación si está activo
-    if estado_inicial == EstadoEnum.ACTIVO.value:
+    if estado_inicial in [EstadoEnum.ACTIVO.value, EstadoEnum.NUEVO.value]:
         db.execute(
             update(Camion)
             .where(Camion.id == data.camion_id)
