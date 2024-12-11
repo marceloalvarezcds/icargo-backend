@@ -22,6 +22,7 @@ class LiquidacionNewMovimientosForm(BaseModel):
 
 class LiquidacionAddMovimientosForm(BaseModel):
     movimientos: List[Movimiento]
+    cabecera: EstadoCuentaForm
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
     tipo_mov_liquidacion: Optional[str]

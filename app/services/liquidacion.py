@@ -112,10 +112,10 @@ def create_liquidacion_pendiente(
             chofer_id = movimiento.chofer_id
         elif movimiento.es_proveedor:
             proveedor_id = movimiento.proveedor_id
-            if movimiento.es_punto_venta:
-                punto_venta = movimiento.punto_venta_id if movimiento.punto_venta_id is not None else movimiento.anticipo.punto_venta_id
-                nombre_contraparte = movimiento.punto_venta_nombre
-                contraparte_documento = movimiento.punto_venta_documento
+            if data.cabecera.punto_venta_id:
+                punto_venta = data.cabecera.punto_venta_id
+                nombre_contraparte = data.cabecera.contraparte_pdv
+                contraparte_documento = data.cabecera.contraparte_numero_documento_pdv
         elif movimiento.es_gestor:
             remitente_id = movimiento.remitente_id
         else:
