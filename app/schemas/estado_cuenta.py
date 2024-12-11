@@ -28,7 +28,7 @@ class EstadoCuenta(BaseModel):
     tipo_contraparte_id: int
     tipo_contraparte_descripcion: str
     tipo_flujo: Optional[str]
-    provision: Optional[RoundedDecimal]
+    provision: RoundedDecimal
     pendiente: RoundedDecimal
     en_proceso: Optional[RoundedDecimal]
     confirmado: RoundedDecimal
