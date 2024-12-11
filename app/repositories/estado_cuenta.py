@@ -782,7 +782,6 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
                 Liquidacion.gestor_carga_id == gestor_carga_id,
             )
         )
-
     return query
 
 
