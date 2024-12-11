@@ -337,6 +337,9 @@ def get_estado_cuenta_proveedor_pdv_liquidacion(db: Session) -> Query:
         )
         .join(Liquidacion.proveedor)
         .join(Liquidacion.tipo_contraparte)
+        .join(PuntoVenta,
+            PuntoVenta.id == Liquidacion.punto_venta_id
+        )
         .filter(Liquidacion.punto_venta_id != null())
         .filter(Liquidacion.estado != 'Cancelado')
     )
@@ -368,6 +371,8 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
     return chofer.union_all(choferLiquidacion, choferProvision, propietario, propietarioLiquidacion,
         propietarioProvision, proveedor, proveedorLiquidacion, proveedorProvision, proveedorPdv, proveedorPdvLiquidacion,
         proveedorPdvProvision, remitente, remitenteLiquidacion, remitenteProvision, otro, otroLiquidacion)
+
+    #return chofer.union_all(proveedorPdv, proveedorPdvLiquidacion)
 
 
 def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
@@ -421,6 +426,7 @@ def get_estado_cuenta_pdv_group_by_query(db: Session, table: Query) -> Query:
             table.c.tipo_contraparte_descripcion.label("tipo_contraparte_descripcion"),
             table.c.gestor_carga_id.label("gestor_carga_id"),
             table.c.tipo_flujo.label("tipo_flujo"),
+            func.sum(table.c.provision).label("provision"),
             func.sum(table.c.pendiente).label("pendiente"),
             func.sum(table.c.confirmado).label("confirmado"),
             func.sum(table.c.finalizado).label("finalizado"),

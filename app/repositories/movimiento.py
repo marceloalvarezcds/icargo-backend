@@ -4,7 +4,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Query, Session # type: ignore
 from sqlalchemy import case, null, desc
 from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
-from app.enums import MovimientoEstadoEnum, EstadoEnum
+from app.enums import MovimientoEstadoEnum, EstadoEnum, TipoAnticipoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
 from app.models import Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta, TipoMovimiento, OrdenCargaAnticipoRetirado, TipoAnticipo
 from app.schemas import MovimientoForm
@@ -230,6 +230,7 @@ def get_movimiento_list_by_contraparte_and_gestor_carga_id(
                 ),
                 or_(
                     OrdenCargaAnticipoRetirado.punto_venta_id == punto_venta_id,
+                    Movimiento.punto_venta_id == punto_venta_id,
                     punto_venta_id == None
                 ),
                 Movimiento.estado == estado,
@@ -241,7 +242,7 @@ def get_movimiento_list_by_contraparte_and_gestor_carga_id(
 
     if listar_efectivo:
         #if listar_efectivo == TipoLiquidacion.INSUMO.value:
-        query = query.filter(Movimiento.tipo_movimiento_info == listar_efectivo)
+        query = query.filter(Movimiento.linea_movimiento == listar_efectivo)
         #elif listar_efectivo == TipoLiquidacion.EFECTIVO.value:
         #    query = query.filter(OrdenCargaAnticipoRetirado.insumo_punto_venta_precio_id == null())
 
@@ -362,6 +363,7 @@ def create_movimiento(
     gestor_carga_id: int,
     modified_by: str,
 ) -> Movimiento:
+
     obj = Movimiento(
         gestor_carga_id=gestor_carga_id,
         liquidacion_id=data.liquidacion_id,
@@ -395,7 +397,7 @@ def create_movimiento(
         modified_by=modified_by,
         tipo_movimiento_info=data.tipo_movimiento_info,
         punto_venta_id=data.punto_venta_id,
-        linea_movimiento=data.linea_movimiento
+        linea_movimiento= data.linea_movimiento if data.linea_movimiento else TipoAnticipoEnum.EFECTIVO.value
     )
     db.add(obj)
     db.commit()
