@@ -70,10 +70,7 @@ def create_orden_carga_anticipo_saldo(
                 saldo_actualizado -= anticipo.total_retirado
             elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:  # Lubricantes
                 # print("Restando monto de lubricantes.")
-                saldo_actualizado -= anticipo.total_retirado
-            else:
-                print("El tipo de insumo no coincide. No se resta nada.")
-
+                saldo_actualizado -= anticipo.total_retirado         
             # # Asegurarse de que el saldo no sea negativo
             # if saldo_actualizado < 0:
             #     print("Saldo calculado es negativo. Ajustando saldo a 0.")

@@ -34,6 +34,18 @@ def get_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int) -> Lis
         .all()
     )
     
+def get_inactive_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int) -> List[models.InsumoPuntoVentaPrecio]:
+    return (
+        db.query(models.InsumoPuntoVentaPrecio)
+        .join(models.InsumoPuntoVenta)  # Unir con InsumoPuntoVenta
+        .filter(
+            models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
+            models.InsumoPuntoVentaPrecio.estado == EstadoEnum.INACTIVO.value,  # Filtrar por estado inactivo
+        )
+        .order_by(desc(models.InsumoPuntoVentaPrecio.id))  # Ordenar por id en orden descendente
+        .all()
+    )
+
 
 def get_insumo_punto_venta_precio_list_by_estado_activo(
     db: Session, gestor_carga_id: int

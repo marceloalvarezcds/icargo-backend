@@ -152,6 +152,7 @@ from .insumo_punto_venta_precio import (  # noqa
     edit_and_create_insumo_punto_venta_precio,
     update_insumo_punto_venta_precio_by_insumo_punto_venta,
     get_insumo_punto_venta_precio_list_by_estado_activo,
+    get_inactive_insumo_punto_venta_precio_list,
 )
 from .liquidacion import (  # noqa
     aceptar_liquidacion,
