@@ -30,6 +30,7 @@ from app.schemas import (
     LiquidacionAddInstrumentosForm,
     LiquidacionAddMovimientosForm,
     LiquidacionForm,
+    LiquidacionCabeceraMovimientosForm
 )
 from app.utils import get_gestor_carga_by_params, number_format
 
@@ -87,7 +88,7 @@ def create_liquidacion(
 
 def create_liquidacion_pendiente(
     db: Session,
-    data: LiquidacionAddMovimientosForm,
+    data: LiquidacionCabeceraMovimientosForm,
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Movimiento:
