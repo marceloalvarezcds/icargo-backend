@@ -19,7 +19,8 @@ from app.models import (
     OrdenCargaAnticipoRetirado,
     TipoInstrumento,
     Factura,
-    Provision
+    Provision,
+    InstrumentoVia
 )
 from app.repositories.movimiento import get_query_movimientos_by_contraparte_and_gestor_carga_id
 from app.repositories.provision import get_query_provisiones_by_contraparte_and_gestor_carga_id
@@ -736,10 +737,16 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
 
     query = db.query(
             literal_column("3").label("orden"),
-            null().label('movimiento_id'),
+            case(
+                (
+                    InstrumentoVia.descripcion == 'Caja',
+                    Instrumento.caja_id,
+                ),
+                else_= Instrumento.banco_id
+            ).label("movimiento_id"),
             Liquidacion.id,
             Liquidacion.created_at,
-            TipoInstrumento.descripcion,
+            concat(InstrumentoVia.descripcion, ' | ', TipoInstrumento.descripcion).label("tipo_cuenta_descripcion"),
             literal_column("'Pago/Cobro'").label("tipo_movimiento_concepto"),
             Liquidacion.es_pago_cobro.label("detalle"),
             Liquidacion.id.label("nro_documento_relacionado"),
@@ -761,6 +768,7 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             ).label("finalizado"),
         )\
         .join(Liquidacion.instrumentos)\
+        .join(Instrumento.via)\
         .join(Instrumento.tipo_instrumento)\
         .outerjoin(Liquidacion.facturas)\
         .filter(
@@ -811,6 +819,7 @@ def nuevo_endpint(
         db, tipo_contraparte_id, contraparte_id, contraparte, contraparte_numero_documento,
         gestor_carga_id, punto_venta_id, linea_movimiento
     )
+
     query_instrumentos = get_query_instrumentos_by_contraparte_and_gestor_carga_id(
         db, tipo_contraparte_id, contraparte_id, contraparte, contraparte_numero_documento,
         gestor_carga_id, punto_venta_id, linea_movimiento
