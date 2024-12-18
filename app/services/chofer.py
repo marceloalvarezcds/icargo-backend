@@ -142,15 +142,15 @@ async def edit_chofer(
     (
         foto_documento_frente_url,
         foto_documento_reverso_url,
-        foto_perfil_url,
         foto_registro_reverso_url,
         foto_registro_frente_url,
+        foto_perfil_url,
     ) = await check_files(
         foto_documento_frente_file,
         foto_documento_reverso_file,
-        foto_perfil_file,
         foto_registro_frente_file,
         foto_registro_reverso_file,
+        foto_perfil_file,
     )
     to_edit_obj = get_chofer_by_id(db, id)
     obj = repositories.edit_chofer(
@@ -206,7 +206,7 @@ def change_chofer_status(
     if status == EstadoEnum.INACTIVO:
         # Obtener todas las combinaciones relacionadas con este chofer
         combinaciones_relacionadas = repositories.get_combinaciones_by_chofer_id(db, chofer.id)
-        
+
         # Inactivar cada combinación asociada
         for combinacion in combinaciones_relacionadas:
             repositories.change_combinacion_status(combinacion, db, EstadoEnum.INACTIVO, modified_by)
@@ -215,7 +215,7 @@ def change_chofer_status(
     elif status == EstadoEnum.ACTIVO:
         # Obtener todas las combinaciones relacionadas con este chofer
         combinaciones_relacionadas = repositories.get_combinaciones_by_chofer_id(db, chofer.id)
-        
+
         # Activar cada combinación asociada
         for combinacion in combinaciones_relacionadas:
             repositories.change_combinacion_status(combinacion, db, EstadoEnum.ACTIVO, modified_by)

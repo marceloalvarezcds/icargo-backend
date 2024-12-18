@@ -26,7 +26,8 @@ async def create_factura(
             status_code=409, detail=f"La Factura Nº {data.numero_factura} ya existe"
         )
 
-    foto_url = 'foto' # await upload_and_get_image_url(foto_file) if foto_file else None
+    # foto_url = 'foto' # await upload_and_get_image_url(foto_file) if foto_file else None
+    foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
     factura = repositories.create_factura(db, data, foto_url, modified_by)
 
     if data.sentido_mov_iva or data.sentido_mov_retencion:
@@ -60,8 +61,8 @@ async def edit_factura(
 
     to_edit_obj = get_factura_by_id(db, id)
 
-    #foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
-    foto_url = 'foto url' if foto_file else None
+    foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
+    # foto_url = 'foto url' if foto_file else None
 
     if to_edit_obj.iva_movimiento_id or to_edit_obj.retencion_movimiento_id:
         service.edit_movimiento_by_factura(db, to_edit_obj, data, modified_by)

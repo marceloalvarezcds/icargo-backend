@@ -55,7 +55,8 @@ from .liquidacion import (  # noqa
     LiquidacionNewMovimientosForm,
     LiquidacionAddMovimientosForm,
     LiquidacionForm,
-    LiquidacionSometer
+    LiquidacionSometer,
+    LiquidacionCabeceraMovimientosForm
 )
 from .localidad import Localidad  # noqa
 from .marca_camion import MarcaCamion  # noqa

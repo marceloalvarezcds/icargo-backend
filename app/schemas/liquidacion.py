@@ -20,9 +20,18 @@ class LiquidacionNewMovimientosForm(BaseModel):
     es_pago_cobro: Optional[str]
     tipo_mov_liquidacion: Optional[str] = "EFECTIVO"
 
-class LiquidacionAddMovimientosForm(BaseModel):
+
+class LiquidacionCabeceraMovimientosForm(BaseModel):
     movimientos: List[Movimiento]
     cabecera: EstadoCuentaForm
+    monto: Optional[RoundedDecimal]
+    es_pago_cobro: Optional[str]
+    tipo_mov_liquidacion: Optional[str]
+
+
+class LiquidacionAddMovimientosForm(BaseModel):
+    movimientos: List[Movimiento]
+    cabecera: Optional[EstadoCuentaForm]
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
     tipo_mov_liquidacion: Optional[str]
