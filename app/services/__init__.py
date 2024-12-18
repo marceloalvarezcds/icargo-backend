@@ -153,6 +153,7 @@ from .insumo_punto_venta_precio import (  # noqa
     update_insumo_punto_venta_precio_by_insumo_punto_venta,
     get_insumo_punto_venta_precio_list_by_estado_activo,
     get_inactive_insumo_punto_venta_precio_list,
+    get_active_insumo_punto_venta_precio_list,
 )
 from .liquidacion import (  # noqa
     aceptar_liquidacion,
@@ -239,7 +240,6 @@ from .orden_carga_anticipo_retirado import (  # noqa
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id,
-
 )
 from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,

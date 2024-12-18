@@ -27,7 +27,7 @@ async def read_insumo_punto_venta_precio_list(
     current_user: schemas.AuthUser = Depends(get_current_user),
     _: bool = Depends(Permiso(a.LISTAR, m.INSUMO_PUNTO_VENTA_PRECIO)),
 ):
-    return services.get_insumo_punto_venta_precio_list_by_estado_activo(db, current_user.gestor_carga_id)
+    return services.get_active_insumo_punto_venta_precio_list(db, current_user.gestor_carga_id)
 
 
 @api.get("/inactivos", response_model=List[schemas.InsumoPuntoVentaPrecioList])
