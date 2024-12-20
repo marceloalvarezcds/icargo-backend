@@ -379,6 +379,7 @@ from .orden_carga_remision_origen import (  # noqa
     get_orden_carga_remision_origen_by,
     get_orden_carga_remision_origen_by_id,
     get_orden_carga_remision_origen_list_by_orden_carga_id,
+    get_remision_origen_list_by_nro_remito
 )
 
 from .orden_carga_evaluacion import (  # noqa

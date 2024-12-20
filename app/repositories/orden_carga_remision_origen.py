@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app.models import OrdenCargaRemisionOrigen
 from app.schemas import OrdenCargaRemisionOrigenForm
-
+from app.logger import logger
 
 def get_orden_carga_remision_origen_list_by_orden_carga_id(
     db: Session, orden_carga_id: int
@@ -87,3 +87,22 @@ def delete_orden_carga_remision_origen(db: Session, id: int, modified_by: str):
         db.commit()
         db.delete(obj)
         db.commit()
+
+
+def get_remision_origen_list_by_nro_remito(
+    db: Session, nro_remito: Optional[str] = None
+) -> List[OrdenCargaRemisionOrigen]:
+    
+    if nro_remito:
+        return (
+            db.query(OrdenCargaRemisionOrigen)
+            .filter(OrdenCargaRemisionOrigen.numero_documento.like(('%'+nro_remito+'%')))
+            .order_by(OrdenCargaRemisionOrigen.created_by)
+            .all()
+        )
+    else:
+        return (
+            db.query(OrdenCargaRemisionOrigen)
+            .order_by(OrdenCargaRemisionOrigen.created_by)
+            .all()
+        )

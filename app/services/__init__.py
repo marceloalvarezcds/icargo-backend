@@ -230,6 +230,7 @@ from .orden_carga import (  # noqa
     get_ordenes_carga_by_combinacion_id_and_nuevo,
     update_comentarios,
     create_orden_carga_comentarios_historial,
+    edit_documento_fisico_orden_carga,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
@@ -374,5 +375,5 @@ from .combinacion import (
     get_camion_list_combinacion,
     get_semi_list_by_camion_id,
     get_combinacion_by_camion_id_and_semi_id_,
-    
+
 )
