@@ -374,5 +374,8 @@ from .combinacion import (
     get_camion_list_combinacion,
     get_semi_list_by_camion_id,
     get_combinacion_by_camion_id_and_semi_id_,
-
+)
+from .contribuyente import (
+    get_list,
+    #get_by_id,
 )

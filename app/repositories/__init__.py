@@ -138,6 +138,7 @@ from .factura import (  # noqa
     get_factura_by,
     get_factura_by_id,
     get_factura_list_by_liquidacion_id,
+    get_all_contribuyente
 )
 from .flete import (  # noqa
     change_flete_public_status,

@@ -191,3 +191,4 @@ from .combinacion import (
 from .provision import (
     ProvisionForm
 )
+from .contribuyente import ( Contribuyente )
