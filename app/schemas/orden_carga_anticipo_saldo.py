@@ -20,6 +20,7 @@ class OrdenCargaAnticipoSaldo(OrdenCargaAnticipoSaldoForm):
     concepto: str
     porcentaje: RoundedDecimal
     total_disponible: RoundedDecimal
+    flete_anticipo_id_property: int
     # Auditoría
     created_by: str
     created_at: Date

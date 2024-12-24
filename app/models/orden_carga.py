@@ -587,7 +587,18 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_gestor_carga_total_flete_saldo_bruto(self):
         return self.resultado_gestor_carga_tarifa_flete * self.cantidad_destino
+    
+    @hybrid_property
+    def saldos_flete_id(self):
+    # Primero, obtenemos todos los saldos relacionados
+        saldos: List[OrdenCargaAnticipoSaldo] = self.saldos
 
+        # Verificar si existe un flete_id y si ha cambiado
+        if self.flete_id:
+            # Filtrar los saldos por el flete_id actual
+           saldos = [saldo for saldo in saldos if saldo.flete_anticipo and saldo.flete_anticipo.flete_id == self.flete_id]
+        
+        return saldos
     # fin - gestor carga
 
     # inicio - propietario
@@ -641,7 +652,6 @@ class OrdenCarga(AuditMixin, Base):
             + self.resultado_propietario_total_anticipos_retirados
         )
 
-    # Define una propiedad que devuelva el monto retirado específico para cada tipo
     @hybrid_property
     def resultado_propietario_total_anticipos_retirados_efectivo(self):
         lista: List[OrdenCargaAnticipoRetirado] = self.anticipos

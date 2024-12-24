@@ -340,6 +340,8 @@ from .orden_carga_anticipo_saldo import (  # noqa
     get_orden_carga_anticipo_saldo_by_id,
     get_orden_carga_anticipo_saldo_by_orden_carga_id,
     get_orden_carga_anticipo_saldo_by_orden_carga_and_tipo_insumo_id,
+    create_flete_anticipo,
+    get_orden_carga_anticipo_saldo_insumo_by,
 )
 from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,

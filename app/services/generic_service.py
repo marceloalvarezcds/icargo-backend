@@ -84,6 +84,18 @@ def create(
     return repository.create(ModelType, db, data, modified_by)
 
 
+def create_oc(
+    ModelType: type,
+    db: Session,
+    data: Schema,
+    modified_by: str,
+    unique_message_error: str,
+    **unique_columns,
+) -> Model:
+    check_unique_oc(ModelType, db, None, unique_message_error, **unique_columns)
+    return repository.create(ModelType, db, data, modified_by)
+
+
 def create_with_gestor_carga_id(
     ModelType: type,
     db: Session,
@@ -163,6 +175,31 @@ def check_unique(
         if exists and exists.id != id:  # type: ignore
             raise HTTPException(
                 status_code=409,
+                 detail=unique_message_error,
+            )
+    elif exists:
+        raise HTTPException(
+            status_code=409,
+             detail=unique_message_error,
+        )
+
+
+def check_unique_oc(
+    ModelType: type,
+    db: Session,
+    id: Optional[int],
+    unique_message_error: str,
+    skip_unique_check: bool = False,  # Nuevo parámetro para omitir la verificación de unicidad
+    **unique_columns,
+):
+    if skip_unique_check:
+        return True  # Si se debe omitir la verificación, simplemente retorna True
+    
+    exists: Optional[Model] = get_by_unique_columns_or_none(ModelType, db, **unique_columns)  # type: ignore  # noqa: B950
+    if id:
+        if exists and exists.id != id:  # type: ignore
+            raise HTTPException(
+                status_code=409,
                 detail=unique_message_error,
             )
     elif exists:
@@ -170,3 +207,4 @@ def check_unique(
             status_code=409,
             detail=unique_message_error,
         )
+    return True

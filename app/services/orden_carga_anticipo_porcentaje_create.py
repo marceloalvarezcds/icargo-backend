@@ -35,13 +35,18 @@ def create_orden_carga_anticipo_porcentaje(
         porcentaje=porcentaje,
         porcentaje_minimo=Decimal(0),
     )
-    obj: OrdenCargaAnticipoPorcentaje = service.create(
-        OrdenCargaAnticipoPorcentaje,
-        db,
-        data,
-        modified_by,
-        "El Porcentaje de Anticipo",
-        flete_anticipo_id=flete_anticipo.id,
-        orden_carga_id=orden_carga_id,
-    )
-    return obj
+    try:
+        obj: OrdenCargaAnticipoPorcentaje = service.create_oc(
+            OrdenCargaAnticipoPorcentaje,
+            db,
+            data,
+            modified_by,
+            None,
+            flete_anticipo_id=flete_anticipo.id,
+            orden_carga_id=orden_carga_id,
+        )
+        return obj
+    except Exception as e:
+        # Manejo silencioso del error
+        print(f"Conflicto detectado: {str(e)}")  # Solo para depuración
+        return None  # O maneja el retorno según tu lógica

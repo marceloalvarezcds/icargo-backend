@@ -3,7 +3,9 @@ from datetime import datetime
 from http import HTTPStatus
 from typing import List, Optional, cast
 
+from app.enums.tipo_anticipo import TipoAnticipoEnum
 from app.models.combinacion import Combinacion
+from app.models.flete_anticipo import FleteAnticipo
 from fastapi import HTTPException
 from jinja2 import Template
 from openpyxl import Workbook  # type: ignore
@@ -38,6 +40,9 @@ from .orden_carga_remision_resultado import (
 from .provision import (
     create_provision_by_finalizar_oc,
     borrar_provisiones_by_conciliacion_oc
+)
+from .orden_carga_anticipo_saldo import (
+    update_orden_carga_anticipo_saldo_by_orden_carga_id,
 )
 
 
@@ -84,31 +89,27 @@ def create_orden_carga(
     data: schemas.OrdenCargaForm,
     current_user: schemas.AuthUser,
 ) -> schemas.OrdenCarga:
-    # Obtener el flete
+
     flete = repositories.get_flete_by_id(db, data.flete_id)
     if not flete:
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
 
-    # Obtener el gestor de carga y el usuario modificado
     gestor_carga_id = current_user.gestor_carga_id
     modified_by = current_user.username
 
-    # Obtener el rol del gestor de carga y verificar los permisos
     rol_id = repositories.get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
     roles_permisos = repositories.rol_tiene_permiso(rol_id, "Cambiar_estado 1 - orden de carga", db)
 
-    # Determinar el estado inicial (ACEPTADO o NUEVO) dependiendo de los permisos
     if roles_permisos:
         estado_inicial = EstadoEnum.ACEPTADO
     else:
         estado_inicial = EstadoEnum.NUEVO
 
-    # Verificar la existencia del camión
     camion = db.query(Camion).filter(Camion.id == data.camion_id).first()
     if not camion:
         raise HTTPException(status_code=404, detail="Camión no encontrado")
 
-    # Verificar la cantidad de órdenes activas si el estado es NUEVO
+   
     if estado_inicial == EstadoEnum.ACEPTADO:
         cant_oc_aceptadas = repositories.get_orden_carga_aceptada_count_by_camion_id(db, data.camion_id)
         if cant_oc_aceptadas >= camion.limite_cantidad_oc_activas:
@@ -117,14 +118,11 @@ def create_orden_carga(
                 status_code=HTTPStatus.LOCKED,
                 detail=f"El camión con placa {camion.placa} ha alcanzado el límite de órdenes activas permitidas ({camion.limite_cantidad_oc_activas})."
             )
-
-    # Obtener la información del camion_semi_neto según las condiciones previas
     camion_semi_neto = get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
         db, data.camion_id, data.semi_id, flete.producto_id, gestor_carga_id
     )
     data.camion_semi_neto_id = camion_semi_neto.id if camion_semi_neto else None
 
-    # Crear la orden de carga con el estado determinado
     obj = repositories.create_orden_carga(
         db,
         data,
@@ -133,8 +131,7 @@ def create_orden_carga(
         modified_by,
         estado_inicial,
     )
-
-    # Crear anticipos, complementos y descuentos
+    update_orden_carga_anticipo_saldo_by_orden_carga_id(db, OrdenCarga.id, modified_by)
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list(
         db, obj.id, obj.flete_anticipos, modified_by
     )
@@ -150,7 +147,6 @@ def create_orden_carga_comentarios_historial(
     created_by: str,
     modified_by: str
 ) -> schemas.OrdenCargaComentariosHistorial:
-    # Lógica para crear el historial del comentario
     nuevo_comentario = OrdenCargaComentariosHistorial(
         orden_carga_id=orden_carga_id,
         comentario=comentario,

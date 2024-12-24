@@ -52,3 +52,7 @@ class OrdenCargaAnticipoSaldo(AuditMixin, Base):
     @hybrid_property
     def total_disponible(self):
         return self.total_anticipo + self.total_complemento
+    
+    @hybrid_property
+    def flete_anticipo_id_property(self):
+        return self.flete_anticipo.flete_id

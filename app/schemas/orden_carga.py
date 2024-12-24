@@ -196,6 +196,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     comentario: List[OrdenCargaComentariosHistorial] = []
     evaluaciones_historial: List[OrdenCargaEvaluacionesHistorial] = []
     saldos: List[OrdenCargaAnticipoSaldo]
+    saldos_flete_id: Optional[List[OrdenCargaAnticipoSaldo]] = None
     anticipos: List[OrdenCargaAnticipoRetirado]
     porcentaje_anticipos: List[OrdenCargaAnticipoPorcentaje]
     movimientos: List[Movimiento]
@@ -270,6 +271,8 @@ class OrdenCargaList(OrdenCargaForm):
     condicion_propietario_tarifa: int #Agregar para vista OC
     condicion_gestor_cuenta_tarifa: Optional[int] = None
     linea_disponible: Optional[int] = None
+    saldos_flete_id: Optional[List[OrdenCargaAnticipoSaldo]] = None
+    saldos: List[OrdenCargaAnticipoSaldo]
     # Campos para la edición
     estado: EstadoEnum
     orden_carga_estado: OrdenCargaEstadoEnum

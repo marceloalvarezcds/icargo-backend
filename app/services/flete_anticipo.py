@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
@@ -64,6 +64,14 @@ def get_tipo_insumo_list_by_flete_id(db: Session, flete_id: int) -> List[TipoIns
             id_list.append(item.id)
             filtered_list.append(item)
     return filtered_list
+
+def get_flete_anticipo_by_flete_and_tipo(db: Session, flete_id: int):
+    return db.query(FleteAnticipo).filter(
+        FleteAnticipo.flete_id == flete_id,
+        FleteAnticipo.tipo_insumo_id != None  # Asegura que tipo_insumo_id no sea NULL
+    ).all()
+
+
 
 
 def get_flete_anticipo_by_id(db: Session, id: int) -> FleteAnticipo:

@@ -68,7 +68,6 @@ async def read_orden_carga_list_conciliar(
     return services.get_orden_carga_list(db, current_user.gestor_carga_id)
 
 
-
 @api.get("/reports")
 async def orden_carga_reports(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -129,7 +128,6 @@ async def read_combinacion_by_orden_carga_id(
     return services.get_ordenes_carga_by_combinacion_id_and_aceptado(db, combinacion_id)
 
 
-
 @api.post("/", response_model=schemas.OrdenCarga)
 async def add_new_orden_carga(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -151,11 +149,11 @@ async def add_comentario_orden_carga(
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    # Llama a la función para crear el historial de comentarios
+
     comentario_historial = services.create_orden_carga_comentarios_historial(
         db=db,
-        orden_carga_id=data.orden_carga_id,  # Asegúrate de incluir este campo en el esquema
-        comentario=data.comentario,  # Asegúrate de incluir este campo en el esquema
+        orden_carga_id=data.orden_carga_id,  
+        comentario=data.comentario,  
         created_by=current_user.username,
         modified_by=current_user.username,
     )

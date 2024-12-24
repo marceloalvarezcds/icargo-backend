@@ -15,7 +15,7 @@ from app.models import (
 )
 from app.models.orden_carga_anticipo_porcentaje import OrdenCargaAnticipoPorcentaje
 
-from .flete_anticipo import get_flete_anticipo_by_id
+from .flete_anticipo import get_flete_anticipo_by_id, get_flete_anticipo_by_flete_and_tipo
 from .orden_carga_anticipo_porcentaje_create import (
     create_orden_carga_anticipo_porcentaje,
     get_orden_carga_anticipo_porcentaje_by,
@@ -27,9 +27,7 @@ def create_orden_carga_anticipo_saldo(
     data: schemas.OrdenCargaAnticipoSaldoForm,
     modified_by: str,
 ) -> OrdenCargaAnticipoSaldo:
-    # print(f"Buscando anticipos existentes para orden_carga_id={data.orden_carga_id}")
-
-    # Recuperar y ordenar anticipos por flete_anticipo_id de forma ascendente
+    
     existing_anticipos = repositories.get_orden_carga_anticipo_saldo_by_orden_carga_id(
         db, data.orden_carga_id
     )
@@ -45,13 +43,10 @@ def create_orden_carga_anticipo_saldo(
         raise ValueError(f"No se encontró un FleteAnticipo con ID {data.flete_anticipo_id}")
     
     tipo_insumo_actual = flete_anticipo_actual.tipo_insumo_id
-    # print(f"Tipo de insumo actual: {tipo_insumo_actual}")
 
     saldo_actualizado = data.saldo
     for anticipo in sorted_anticipos:
-        # print(f"Procesando anticipo con ID {anticipo.id}, flete_anticipo_id={anticipo.flete_anticipo_id}, monto retirado {anticipo.total_retirado}")
-
-        # Procesar solo si el flete_anticipo_id es diferente al actual
+  
         if anticipo.flete_anticipo_id != data.flete_anticipo_id:
             # Recuperar tipo_insumo_id del FleteAnticipo relacionado al anticipo
             tipo_insumo_id = (
@@ -59,24 +54,13 @@ def create_orden_carga_anticipo_saldo(
                 if anticipo.flete_anticipo
                 else None
             )
-            # print(f"Tipo de insumo del anticipo: {tipo_insumo_id}")
-
             # Restar según el tipo de insumo
             if tipo_insumo_id is None and tipo_insumo_actual is None:  # Efectivo
-                # print("Restando monto de efectivo.")
                 saldo_actualizado -= anticipo.total_retirado
             elif tipo_insumo_id == 1 and tipo_insumo_actual == 1:  # Combustible
-                # print("Restando monto de combustible.")
                 saldo_actualizado -= anticipo.total_retirado
             elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:  # Lubricantes
-                # print("Restando monto de lubricantes.")
                 saldo_actualizado -= anticipo.total_retirado         
-            # # Asegurarse de que el saldo no sea negativo
-            # if saldo_actualizado < 0:
-            #     print("Saldo calculado es negativo. Ajustando saldo a 0.")
-            #     saldo_actualizado = 0
-
-    # print(f"Creando nuevo anticipo con saldo actualizado: {saldo_actualizado}")
     return repositories.create_orden_carga_anticipo_saldo(
         db,
         data,
@@ -94,6 +78,15 @@ def get_flete_anticipo_by_orden_carga(
             return item
     return None
 
+
+def get_flete_anticipo_by_orden_carga_insumos(
+    orden_carga: OrdenCarga,
+) -> Optional[FleteAnticipo]:
+    complemento_list: List[FleteAnticipo] = orden_carga.flete_anticipos
+    for item in complemento_list:
+        if item.tipo_descripcion == enums.TipoAnticipoEnum.INSUMOS.value:
+            return item
+    return None
 
 # se agrega acá para evitar importación circular
 def get_orden_carga_by_id(db: Session, id: int) -> OrdenCarga:
@@ -118,6 +111,34 @@ def get_orden_carga_anticipo_saldo_by_id(
     if not obj:
         raise HTTPException(status_code=404, detail="Anticipo no encontrado")
     return obj
+
+
+def get_saldos_by_orden_carga(db, orden_carga_id):
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
+    
+    if not orden_carga:
+        raise Exception("Orden de carga no encontrada")
+    
+    flete_id = orden_carga.flete_id  
+    saldos = db.query(OrdenCargaAnticipoSaldo).join(FleteAnticipo).filter(
+        OrdenCargaAnticipoSaldo.orden_carga_id == orden_carga_id,
+        FleteAnticipo.flete_id == flete_id
+    ).all()
+
+    return saldos
+
+def get_flete_anticipo_id_by_flete_id_and_orden_carga_id(
+    db: Session,
+    flete_id: int,
+    orden_carga_id: int
+) -> int:
+    # Buscar el anticipo relacionado con flete_id y orden_carga_id
+    flete_anticipo = db.query(FleteAnticipo).filter(
+        FleteAnticipo.flete_id == flete_id,
+        FleteAnticipo.orden_carga_id == orden_carga_id
+    ).first()
+
+
 
 
 def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
@@ -214,9 +235,11 @@ def update_orden_carga_anticipo_saldo(
         if camion_limite
         else None
     )
+
     exists = repositories.get_orden_carga_anticipo_saldo_by(
         db, flete_anticipo_id, orden_carga_id
     )
+    flete_anticipo_results = get_flete_anticipo_by_flete_and_tipo(db, flete_anticipo.flete_id)
     porcentaje_anticipo: Optional[OrdenCargaAnticipoPorcentaje] = (
         exists.orden_carga_anticipo_porcentaje if exists else None
     )
@@ -242,46 +265,179 @@ def update_orden_carga_anticipo_saldo(
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, flete_anticipo_id, orden_carga_id
     )
+
     if not porcentaje_anticipo:
-        porcentaje_anticipo = create_orden_carga_anticipo_porcentaje(
-            db,
-            orden_carga_id,
-            flete_anticipo,
-            modified_by,
+        
+        try:
+            porcentaje_anticipo = create_orden_carga_anticipo_porcentaje(
+                db,
+                orden_carga_id,
+                flete_anticipo,  
+                modified_by,
+            )
+        except Exception as e:
+            print(f"Error al crear porcentaje de anticipo: {e}")
+ 
+    porcentaje_anticipo_insumo = get_orden_carga_anticipo_porcentaje_by(
+        db, flete_anticipo_results[0].id, orden_carga_id
+    )
+    if not porcentaje_anticipo_insumo:
+        try:
+            flete_anticipo_obj = flete_anticipo_results[0]
+            if not isinstance(flete_anticipo_obj, FleteAnticipo):
+                flete_anticipo_obj = get_flete_anticipo_by_id(db, flete_anticipo_results[0].id)
+                if not flete_anticipo_obj:
+                    return  
+
+            porcentaje_anticipo_insumo = create_orden_carga_anticipo_porcentaje(
+                db,
+                orden_carga_id,
+                flete_anticipo_obj,  
+                modified_by,
+            )
+
+        except Exception as e:
+            print(f"Error al crear porcentaje de anticipo: {e}")
+
+    porcentaje_anticipo_lubricante = get_orden_carga_anticipo_porcentaje_by(
+            db, flete_anticipo_results[1].id, orden_carga_id
         )
-    if exists:
-        schema = schemas.OrdenCargaAnticipoSaldoForm(
-            flete_anticipo_id=flete_anticipo_id,
-            orden_carga_id=orden_carga_id,
-            orden_carga_anticipo_porcentaje_id=porcentaje_anticipo.id,
-            total_anticipo=oc_limite,
-            total_complemento=total_complemento,
-            total_retirado=oc_monto_retirado,
-            saldo=saldo,
+
+    if not porcentaje_anticipo_lubricante:
+        try:
+            flete_anticipo_obj = flete_anticipo_results[1]
+            if not isinstance(flete_anticipo_obj, FleteAnticipo):
+                flete_anticipo_obj = get_flete_anticipo_by_id(db, flete_anticipo_results[1].id)
+                if not flete_anticipo_obj:
+                    return  
+
+            porcentaje_anticipo_lubricante = create_orden_carga_anticipo_porcentaje(
+                db,
+                orden_carga_id,
+                flete_anticipo_obj,  
+                modified_by,
+            )
+        except Exception as e:
+            print(f"Error al crear porcentaje de anticipo: {e}")
+
+
+    if flete_anticipo_results and len(flete_anticipo_results) > 0:
+        flete_anticipo_combustible = flete_anticipo_results[0]
+
+        if flete_anticipo_combustible and flete_anticipo_combustible.tipo_insumo_id:
+            oc_limite_combustible = (
+                orden_carga.flete_proyectado * (flete_anticipo_combustible.porcentaje / Decimal(100))
+                if flete_anticipo_combustible.porcentaje
+                else Decimal(0)
+            )
+            saldo_combustible = (
+                camion_monto_disponible
+                if camion_monto_disponible and camion_monto_disponible < oc_limite_combustible
+                else oc_limite_combustible
+            )
+
+            try:
+                if exists:  # Si el saldo ya existe, lo actualizamos
+                    exists.total_anticipo = oc_limite_combustible
+                    exists.total_complemento = total_complemento
+                    exists.total_retirado = oc_monto_retirado
+                    exists.saldo = saldo_combustible
+                    exists.modified_by = modified_by
+                    db.commit()  # Commit para guardar los cambios
+
+                else:  # Si el saldo no existe, lo creamos
+                    schema = schemas.OrdenCargaAnticipoSaldoForm(
+                        flete_anticipo_id=flete_anticipo_combustible.id,
+                        orden_carga_id=orden_carga_id,
+                        orden_carga_anticipo_porcentaje_id=porcentaje_anticipo_insumo.id,
+                        total_anticipo=oc_limite_combustible,
+                        total_complemento=total_complemento,
+                        total_retirado=oc_monto_retirado,
+                        saldo=saldo_combustible,
+                    )
+                    anticipo_saldo = create_orden_carga_anticipo_saldo(db, schema, modified_by)
+
+            except Exception as e:
+                print(f"Error al crear o actualizar el saldo para combustible: {e}")
+
+
+    if flete_anticipo_results and flete_anticipo_results[1].tipo_insumo_id is not None:
+        flete_anticipo_obj = get_flete_anticipo_by_id(db, flete_anticipo_results[1].id)
+        oc_limite_lubricante = (
+            orden_carga.flete_proyectado * (flete_anticipo_obj.porcentaje / Decimal(100))
+            if flete_anticipo_obj.porcentaje
+            else Decimal(0)
         )
-        anticipo_saldo = edit_orden_carga_anticipo_saldo(
-            exists.id,
-            db,
-            schema,
-            modified_by,
+        saldo_combustible_lubricante = (
+            camion_monto_disponible
+            if camion_monto_disponible and camion_monto_disponible < oc_limite_lubricante
+            else oc_limite_lubricante
         )
+
+    try:
+        if exists:  # Si el saldo ya existe, lo actualizamos
+            exists.total_anticipo = oc_limite_lubricante
+            exists.total_complemento = total_complemento
+            exists.total_retirado = oc_monto_retirado
+            exists.saldo = saldo_combustible_lubricante
+            exists.modified_by = modified_by
+            db.commit()  # Commit para guardar los cambios
+
+        else:  # Si el saldo no existe, lo creamos
+            schema = schemas.OrdenCargaAnticipoSaldoForm(
+                flete_anticipo_id=flete_anticipo_results[1].id,
+                orden_carga_id=orden_carga_id,
+                orden_carga_anticipo_porcentaje_id=porcentaje_anticipo_lubricante.id,
+                total_anticipo=oc_limite_lubricante,
+                total_complemento=total_complemento,
+                total_retirado=oc_monto_retirado,
+                saldo=saldo_combustible_lubricante,
+            )
+            anticipo_saldo = create_orden_carga_anticipo_saldo(
+                db,
+                schema,
+                modified_by,
+            )
+
+    except Exception as e:
+        print(f"Error al crear o actualizar el saldo para insumo: {e}")
+    
+
     else:
-        schema = schemas.OrdenCargaAnticipoSaldoForm(
-            flete_anticipo_id=flete_anticipo_id,
-            orden_carga_id=orden_carga_id,
-            orden_carga_anticipo_porcentaje_id=porcentaje_anticipo.id,
-            total_anticipo=oc_limite,
-            total_complemento=total_complemento,
-            total_retirado=oc_monto_retirado,
-            saldo=saldo,
-        )
-        anticipo_saldo = create_orden_carga_anticipo_saldo(
-            db,
-            schema,
-            modified_by,
-        )
+        if exists:
+            schema = schemas.OrdenCargaAnticipoSaldoForm(
+                flete_anticipo_id=flete_anticipo_id,
+                orden_carga_id=orden_carga_id,
+                orden_carga_anticipo_porcentaje_id=porcentaje_anticipo.id,
+                total_anticipo=oc_limite,
+                total_complemento=total_complemento,
+                total_retirado=oc_monto_retirado,
+                saldo=saldo,
+            )
+            anticipo_saldo = edit_orden_carga_anticipo_saldo(
+                exists.id,
+                db,
+                schema,
+                modified_by,
+            )
+
+        else:
+            schema = schemas.OrdenCargaAnticipoSaldoForm(
+                flete_anticipo_id=flete_anticipo_id,
+                orden_carga_id=orden_carga_id,
+                orden_carga_anticipo_porcentaje_id=porcentaje_anticipo.id,
+                total_anticipo=oc_limite,
+                total_complemento=total_complemento,
+                total_retirado=oc_monto_retirado,
+                saldo=saldo,
+            )
+            anticipo_saldo = create_orden_carga_anticipo_saldo(
+                db,
+                schema,
+                modified_by,
+            )
+
     if anticipo_saldo:
-        # Se actualiza el porcentaje mínimo de la tabla OC anticipo porcentaje
         flete_proyectado = (
             orden_carga.flete_proyectado if orden_carga.flete_proyectado > 0 else 1
         )
