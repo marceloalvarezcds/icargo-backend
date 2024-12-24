@@ -369,11 +369,11 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
     remitenteLiquidacion = get_estado_cuenta_remitente_liquidacion(db)
     otroLiquidacion = get_estado_cuenta_otro_liquidacion(db)
 
-    #return chofer.union_all(choferLiquidacion, choferProvision, propietario, propietarioLiquidacion,
-    #    propietarioProvision, proveedor, proveedorLiquidacion, proveedorProvision, proveedorPdv, proveedorPdvLiquidacion,
-    #    proveedorPdvProvision, remitente, remitenteLiquidacion, remitenteProvision, otro, otroLiquidacion)
+    return chofer.union_all(choferLiquidacion, choferProvision, propietario, propietarioLiquidacion,
+        propietarioProvision, proveedor, proveedorLiquidacion, proveedorProvision, proveedorPdv, proveedorPdvLiquidacion,
+        proveedorPdvProvision, remitente, remitenteLiquidacion, remitenteProvision, otro, otroLiquidacion)
 
-    return chofer.union_all(proveedor, proveedorProvision, proveedorLiquidacion)
+    #return chofer.union_all(proveedor, proveedorProvision, proveedorLiquidacion)
 
 
 def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
