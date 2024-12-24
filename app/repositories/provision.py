@@ -93,6 +93,7 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
                 null().label("estado_liquidacion"),
                 literal_column("false").label("es_editable"),
                 literal_column("false").label("can_edit_oc"),
+                literal_column("false").label("documento_fisico"),
                 Provision.monto.label("provision"),
                 literal_column("0").label("pendiente"),
                 literal_column("0").label("en_proceso"),

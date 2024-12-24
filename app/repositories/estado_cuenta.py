@@ -198,7 +198,7 @@ def get_estado_cuenta_proveedor(db: Session) -> Query:
     return (
         db.query(
             Movimiento.proveedor_id.label("contraparte_id"),
-            concat(Proveedor.nombre, '-', Proveedor.nombre_corto).label("contraparte"),
+            concat(Proveedor.nombre, ' | ', Proveedor.nombre_corto).label("contraparte"),
             Proveedor.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_case_statement_new(),
         )
@@ -212,7 +212,7 @@ def get_estado_cuenta_proveedor_liquidacion(db: Session) -> Query:
     return (
         db.query(
             Liquidacion.proveedor_id.label("contraparte_id"),
-            concat(Proveedor.nombre, '-', Proveedor.nombre_corto).label("contraparte"),
+            concat(Proveedor.nombre, ' | ', Proveedor.nombre_corto).label("contraparte"),
             Proveedor.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_liquidacion_case_statement_new(),
         )
@@ -227,7 +227,7 @@ def get_estado_cuenta_remitente(db: Session) -> Query:
     return (
         db.query(
             Movimiento.remitente_id.label("contraparte_id"),
-            concat(Remitente.nombre, '-', Remitente.nombre_corto).label("contraparte"),
+            concat(Remitente.nombre, ' | ', Remitente.nombre_corto).label("contraparte"),
             Remitente.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_case_statement_new(),
         )
@@ -240,7 +240,7 @@ def get_estado_cuenta_remitente_liquidacion(db: Session) -> Query:
     return (
         db.query(
             Liquidacion.remitente_id.label("contraparte_id"),
-            concat(Remitente.nombre, '-', Remitente.nombre_corto).label("contraparte"),
+            concat(Remitente.nombre, ' | ', Remitente.nombre_corto).label("contraparte"),
             Remitente.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_liquidacion_case_statement_new(),
         )
@@ -287,7 +287,7 @@ def get_estado_cuenta_proveedor_pdv(db: Session) -> Query:
             Proveedor.nombre.label("contraparte"),
             Proveedor.numero_documento.label("contraparte_numero_documento"),
             PuntoVenta.id.label("punto_venta_id"),
-            concat(PuntoVenta.nombre, '-', PuntoVenta.nombre_corto).label("contraparte_pdv"),
+            concat(PuntoVenta.nombre, ' | ', PuntoVenta.nombre_corto).label("contraparte_pdv"),
             PuntoVenta.numero_documento.label("contraparte_numero_documento_pdv"),
             Movimiento.tipo_contraparte_id.label("tipo_contraparte_id"),
             #TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",
@@ -327,7 +327,7 @@ def get_estado_cuenta_proveedor_pdv_liquidacion(db: Session) -> Query:
             Proveedor.nombre.label("contraparte"),
             Proveedor.numero_documento.label("contraparte_numero_documento"),
             Liquidacion.punto_venta_id.label("punto_venta_id"),
-            concat(PuntoVenta.nombre, '-', PuntoVenta.nombre_corto).label("contraparte_pdv"),
+            concat(PuntoVenta.nombre, ' | ', PuntoVenta.nombre_corto).label("contraparte_pdv"),
             Liquidacion.contraparte_numero_documento.label("contraparte_numero_documento_pdv"),
             Liquidacion.tipo_contraparte_id.label("tipo_contraparte_id"),
             #TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",
@@ -369,11 +369,11 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
     remitenteLiquidacion = get_estado_cuenta_remitente_liquidacion(db)
     otroLiquidacion = get_estado_cuenta_otro_liquidacion(db)
 
-    return chofer.union_all(choferLiquidacion, choferProvision, propietario, propietarioLiquidacion,
-        propietarioProvision, proveedor, proveedorLiquidacion, proveedorProvision, proveedorPdv, proveedorPdvLiquidacion,
-        proveedorPdvProvision, remitente, remitenteLiquidacion, remitenteProvision, otro, otroLiquidacion)
+    #return chofer.union_all(choferLiquidacion, choferProvision, propietario, propietarioLiquidacion,
+    #    propietarioProvision, proveedor, proveedorLiquidacion, proveedorProvision, proveedorPdv, proveedorPdvLiquidacion,
+    #    proveedorPdvProvision, remitente, remitenteLiquidacion, remitenteProvision, otro, otroLiquidacion)
 
-    #return chofer.union_all(proveedorPdv, proveedorPdvLiquidacion)
+    return chofer.union_all(proveedor, proveedorProvision, proveedorLiquidacion)
 
 
 def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
@@ -755,6 +755,7 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             literal_column("''").label("estado_liquidacion"),
             literal_column("false").label("es_editable"),
             literal_column("false").label("can_edit_oc"),
+            literal_column("false").label("documento_fisico"),
             literal_column("0"),
             literal_column("0"),
             literal_column("0"),
@@ -841,6 +842,7 @@ def nuevo_endpint(
         table.c.estado_liquidacion.label("estado_liquidacion"),
         table.c.es_editable.label("es_editable"),
         table.c.can_edit_oc.label("can_edit_oc"),
+        table.c.documento_fisico.label("documento_fisico"),
         table.c.provision.label("provision"),
         table.c.pendiente.label("pendiente"),
         table.c.en_proceso.label("en_proceso"),
@@ -921,7 +923,7 @@ def get_provision_remitente(db: Session) -> Query:
     return (
         db.query(
             Provision.remitente_id.label("contraparte_id"),
-            concat(Remitente.nombre, '-', Remitente.nombre_corto).label("contraparte"),
+            concat(Remitente.nombre, ' | ', Remitente.nombre_corto).label("contraparte"),
             Remitente.numero_documento.label("contraparte_numero_documento"),
             *get_estado_cuenta_provision(),
         )
@@ -937,7 +939,7 @@ def get_provision_proveedor_pdv(db: Session) -> Query:
             Proveedor.nombre.label("contraparte"),
             Proveedor.numero_documento.label("contraparte_numero_documento"),
             PuntoVenta.id.label("punto_venta_id"),
-            concat(PuntoVenta.nombre, '-', PuntoVenta.nombre_corto).label("contraparte_pdv"),
+            concat(PuntoVenta.nombre, ' | ', PuntoVenta.nombre_corto).label("contraparte_pdv"),
             PuntoVenta.numero_documento.label("contraparte_numero_documento_pdv"),
             Provision.tipo_contraparte_id.label("tipo_contraparte_id"),
             #TipoContraparte.descripcion.label("tipo_contraparte_descripcion") + " - PDV",

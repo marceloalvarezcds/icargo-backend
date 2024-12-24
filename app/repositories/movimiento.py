@@ -6,7 +6,9 @@ from sqlalchemy import case, null, desc
 from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
 from app.enums import MovimientoEstadoEnum, EstadoEnum, TipoAnticipoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
-from app.models import Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta, TipoMovimiento, OrdenCargaAnticipoRetirado, TipoAnticipo
+from app.models import (
+    Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta, TipoMovimiento, OrdenCargaAnticipoRetirado, TipoAnticipo, OrdenCarga
+)
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
 from app.schemas import Movimiento as MovimientoSchema
@@ -528,10 +530,12 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                     ),
                     else_=literal_column("false"),
                 ).label("can_edit_oc"),
+                OrdenCarga.documento_fisico.label("documento_fisico"),
                 *get_cols_estado_cuenta_case_statement(),
                 )\
                 .join(Movimiento.tipo_movimiento)\
                 .join(Movimiento.cuenta)\
+                .outerjoin(Movimiento.orden_carga)\
                 .outerjoin(Movimiento.liquidacion)\
                 .outerjoin(Movimiento.anticipo)\
                 .outerjoin(OrdenCargaAnticipoRetirado.flete_anticipo)
