@@ -372,7 +372,6 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
     return chofer.union_all(choferLiquidacion, choferProvision, propietario, propietarioLiquidacion,
         propietarioProvision, proveedor, proveedorLiquidacion, proveedorProvision, proveedorPdv, proveedorPdvLiquidacion,
         proveedorPdvProvision, remitente, remitenteLiquidacion, remitenteProvision, otro, otroLiquidacion)
-
     #return chofer.union_all(proveedor, proveedorProvision, proveedorLiquidacion)
 
 
