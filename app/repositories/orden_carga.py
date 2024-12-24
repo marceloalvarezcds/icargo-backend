@@ -21,7 +21,7 @@ def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
     return (
         db.query(OrdenCarga)
         .filter(OrdenCarga.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(desc(OrdenCarga.id)) 
+        .order_by(desc(OrdenCarga.id))
         .all()
     )
 
@@ -65,7 +65,7 @@ def get_orden_carga_list_by_gestor_carga_id(
                 OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
             )
         )
-        .order_by(desc(OrdenCarga.id)) 
+        .order_by(desc(OrdenCarga.id))
         .all()
     )
 
@@ -81,7 +81,7 @@ def get_orden_de_carga_by_combinacion_id(
             )
         )
         .order_by(
-            OrdenCarga.id  
+            OrdenCarga.id
         )
         .all()
     )
@@ -252,11 +252,20 @@ def create_orden_carga(
             created_by=modified_by,
             modified_by=modified_by,
         )
-        
+
     return change_orden_carga_status(obj, db, estado_inicial, modified_by)
 
-    
 
+def edit_model_orden_carga(
+    db: Session,
+    obj: OrdenCarga,
+    modified_by: str,
+) -> OrdenCarga:
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
 
 def edit_orden_carga(
     obj: OrdenCarga,
@@ -291,6 +300,7 @@ def edit_orden_carga(
         obj.merma_gestor_carga_valor = data.merma_gestor_carga_valor
     if data.merma_propietario_valor:
         obj.merma_propietario_valor = data.merma_propietario_valor
+    obj.documento_fisico = data.documento_fisico
     obj.anticipos_liberados = data.anticipos_liberados
     obj.gestor_carga_id = gestor_carga_id
     obj.modified_by = modified_by

@@ -138,6 +138,7 @@ from .factura import (  # noqa
     get_factura_by,
     get_factura_by_id,
     get_factura_list_by_liquidacion_id,
+    get_all_contribuyente
 )
 from .flete import (  # noqa
     change_flete_public_status,
@@ -381,6 +382,7 @@ from .orden_carga_remision_origen import (  # noqa
     get_orden_carga_remision_origen_by,
     get_orden_carga_remision_origen_by_id,
     get_orden_carga_remision_origen_list_by_orden_carga_id,
+    get_remision_origen_list_by_nro_remito
 )
 
 from .orden_carga_evaluacion import (  # noqa

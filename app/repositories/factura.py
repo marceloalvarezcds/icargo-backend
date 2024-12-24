@@ -131,3 +131,12 @@ def delete_factura(
     modified_by: str,
 ) -> Factura:
     return change_factura_status(obj, db, EstadoEnum.ELIMINADO, modified_by)
+
+
+def get_all_contribuyente(db: Session, gestor_carga_id: int) -> List[Factura]:
+    return (
+        db.query(Factura)
+        .distinct(Factura.ruc)
+        #.order_by(Factura.contribuyente)
+        .all()
+    )

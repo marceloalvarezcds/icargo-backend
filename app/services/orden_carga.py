@@ -160,7 +160,6 @@ def create_orden_carga_comentarios_historial(
     return nuevo_comentario
 
 
-
 def edit_orden_carga(
     id: int,
     db: Session,
