@@ -76,6 +76,7 @@ def create_flete(
         # FIN Tramo de Fletes
         # INICIO Cantidad y Flete
         condicion_cantidad=data.condicion_cantidad,
+        saldo=data.condicion_cantidad,
         # inicio - Condiciones para el Gestor de Carga
         condicion_gestor_cuenta_moneda_id=data.condicion_gestor_carga_moneda_id,
         condicion_gestor_cuenta_tarifa=data.condicion_gestor_carga_tarifa,

@@ -131,6 +131,18 @@ def create_orden_carga(
         modified_by,
         estado_inicial,
     )
+
+    if estado_inicial in [EstadoEnum.ACEPTADO, EstadoEnum.NUEVO]:
+        nueva_cantidad = flete.saldo - data.cantidad_nominada
+        if nueva_cantidad < 0:
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST,
+                detail="La cantidad nominada supera el saldo disponible del flete."
+            )
+        flete.saldo = nueva_cantidad
+        db.add(flete)
+        db.commit()
+
     update_orden_carga_anticipo_saldo_by_orden_carga_id(db, OrdenCarga.id, modified_by)
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list(
         db, obj.id, obj.flete_anticipos, modified_by

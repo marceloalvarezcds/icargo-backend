@@ -34,6 +34,7 @@ class FleteFormBaseModel(BaseModel):
     # FIN Tramo de Fletes
     # INICIO Cantidad y Flete
     condicion_cantidad: RoundedDecimal
+    saldo: Optional[RoundedDecimal]
     # inicio - Condiciones para el Gestor de Carga
     condicion_gestor_carga_moneda_id: int
     condicion_gestor_carga_tarifa: RoundedDecimal

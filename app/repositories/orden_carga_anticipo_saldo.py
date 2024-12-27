@@ -43,24 +43,6 @@ def get_orden_carga_anticipo_saldo_insumo_by(
 
 
 
-def create_flete_anticipo(
-    db: Session,
-    flete_anticipo_id: int,
-    tipo_descripcion: str,
-    created_by: str
-) -> FleteAnticipo:
-    nuevo_flete_anticipo = FleteAnticipo(
-        id=flete_anticipo_id,
-        tipo_descripcion=tipo_descripcion,
-        created_by=created_by,
-        created_at=datetime.utcnow()  
-    )
-    db.add(nuevo_flete_anticipo)
-    db.commit()  
-    db.refresh(nuevo_flete_anticipo) 
-    return nuevo_flete_anticipo
-
-
 def get_orden_carga_anticipo_saldo_by_id(
     db: Session,
     id: int,
