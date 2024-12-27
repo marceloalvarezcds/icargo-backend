@@ -735,14 +735,15 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
 ) -> Query:
 
     query = db.query(
-            literal_column("3").label("orden"),
+            literal_column("2").label("orden"),
+            null().label("movimiento_id"),
             case(
                 (
                     InstrumentoVia.descripcion == 'Caja',
                     Instrumento.caja_id,
                 ),
                 else_= Instrumento.banco_id
-            ).label("movimiento_id"),
+            ).label("instrumento_id"),
             Liquidacion.id,
             Liquidacion.created_at,
             concat(InstrumentoVia.descripcion, ' | ', TipoInstrumento.descripcion).label("tipo_cuenta_descripcion"),
@@ -831,6 +832,7 @@ def nuevo_endpint(
     query = db.query(
         table.c.movimiento_id.label("movimiento_id"),
         table.c.liquidacion_id.label("liquidacion_id"),
+        table.c.instrumento_id.label("instrumento_id"),
         table.c.fecha.label("fecha"),
         table.c.tipo_cuenta_descripcion.label("tipo_cuenta_descripcion"),
         table.c.tipo_movimiento_concepto.label("tipo_movimiento_concepto"),
@@ -847,7 +849,7 @@ def nuevo_endpint(
         table.c.en_proceso.label("en_proceso"),
         table.c.confirmado.label("confirmado"),
         table.c.finalizado.label("finalizado"),
-        ).order_by(nullsfirst(desc(table.c.liquidacion_id)), table.c.orden, desc(table.c.movimiento_id))
+        ).order_by(table.c.orden, nullsfirst(desc(table.c.liquidacion_id)), desc(table.c.movimiento_id))
 
     return query.all()
 

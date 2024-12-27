@@ -82,6 +82,7 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
     query = db.query(
                 literal_column("1").label("orden"),
                 Provision.id.label("movimiento_id"),
+                literal_column("0").label("instrumento_id"),
                 null().label("liquidacion_id"),
                 Provision.created_at.label("fecha"),
                 TipoCuenta.descripcion.label("tipo_cuenta_descripcion"),
