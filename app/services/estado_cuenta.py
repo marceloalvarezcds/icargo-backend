@@ -216,13 +216,14 @@ def get_report_nuevo_servicio(
     contraparte_numero_documento: str,
     gestor_carga_id: Optional[int],
     punto_venta_id: Optional[int] = None,
+    linea_movimiento: Optional[str] = None,
 ) -> str:
     results = []
 
     if gestor_carga_id:
         results = repositories.nuevo_endpint(
             db, tipo_contraparte_id, contraparte_id, contraparte,
-            contraparte_numero_documento, gestor_carga_id, punto_venta_id
+            contraparte_numero_documento, gestor_carga_id, punto_venta_id, linea_movimiento
         )
 
     return get_movimiento_estado_cuenta_reports(results)
