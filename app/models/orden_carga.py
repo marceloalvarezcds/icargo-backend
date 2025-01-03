@@ -590,10 +590,7 @@ class OrdenCarga(AuditMixin, Base):
     
     @hybrid_property
     def saldos_flete_id(self):
-    # Primero, obtenemos todos los saldos relacionados
         saldos: List[OrdenCargaAnticipoSaldo] = self.saldos
-
-        # Verificar si existe un flete_id y si ha cambiado
         if self.flete_id:
             # Filtrar los saldos por el flete_id actual
            saldos = [saldo for saldo in saldos if saldo.flete_anticipo and saldo.flete_anticipo.flete_id == self.flete_id]
@@ -661,7 +658,12 @@ class OrdenCarga(AuditMixin, Base):
     def resultado_propietario_total_anticipos_retirados_combustible(self):
         lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
         return sum(x.monto_retirado for x in lista if x.concepto == 'COMBUSTIBLE')
-
+    
+    @hybrid_property
+    def resultado_propietario_total_anticipos_retirados_lubricantes(self):
+        lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
+        return sum(x.monto_retirado for x in lista if x.concepto == 'LUBRICANTES')
+    
     @hybrid_property
     def resultado_propietario_tarifa_flete(self):
         return self.condicion_propietario_tarifa
@@ -940,3 +942,27 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def tipo_evaluacion_id(self):
       return self.evaluaciones_historial.tipo_incidente_id
+    
+    @hybrid_property
+    def total_anticipo_efectivo(self):
+        return sum(
+            saldo.total_anticipo
+            for saldo in self.saldos
+            if saldo.orden_carga_anticipo_porcentaje.concepto == 'EFECTIVO'
+        )
+    
+    @hybrid_property
+    def total_anticipo_combustible(self):
+        return sum(
+            saldo.total_anticipo
+            for saldo in self.saldos
+            if saldo.orden_carga_anticipo_porcentaje.concepto == 'COMBUSTIBLE'
+        )
+
+    @hybrid_property
+    def total_anticipo_lubricantes(self):
+        return sum(
+            saldo.total_anticipo
+            for saldo in self.saldos
+            if saldo.orden_carga_anticipo_porcentaje.concepto == 'LUBRICANTES'
+        )

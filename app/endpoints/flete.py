@@ -99,7 +99,7 @@ def cancel_flete_by_id(
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.FLETE)),  # noqa: B008
 ):
     return services.change_flete_status(
-        db, id, EstadoEnum.CANCELADO, current_user.username
+        db, id, EstadoEnum.INACTIVO, current_user.username
     )
 
 

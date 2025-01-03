@@ -88,7 +88,7 @@ def change_flete_status(
     db: Session, id: int, status: EstadoEnum, modified_by: str
 ) -> schemas.Flete:
     co = get_flete_by_id(db, id)
-    co.publicado = False
+    # co.publicado = False
     return get_flete_detail(
         repositories.change_flete_status(co, db, status, modified_by)
     )

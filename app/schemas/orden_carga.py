@@ -216,7 +216,11 @@ class OrdenCarga(OrdenCargaBaseModel):
     total_anticipo_disponible: RoundedDecimal
     resultado_propietario_total_anticipos_retirados_combustible:  Optional[RoundedDecimal] = None
     resultado_propietario_total_anticipos_retirados_efectivo:  Optional[RoundedDecimal] = None
+    resultado_propietario_total_anticipos_retirados_lubricantes:  Optional[RoundedDecimal] = None
     tipo_evaluacion_id: Optional[int] = None
+    total_anticipo_efectivo:  Optional[int] = None
+    total_anticipo_combustible:  Optional[int] = None
+    total_anticipo_lubricantes:  Optional[int] = None
     # Auditoría
     created_by: str
     created_at: Date
@@ -282,6 +286,7 @@ class OrdenCargaList(OrdenCargaForm):
     resultado_propietario_total_anticipos_retirados: Optional[int] = None
     resultado_propietario_total_anticipos_retirados_efectivo: Optional[int] = None
     resultado_propietario_total_anticipos_retirados_combustible: Optional[int] = None
+    resultado_propietario_total_anticipos_retirados_lubricantes: Optional[int] = None
     resultado_saldo_combustible: Optional[int] = None
     saldo_efectivo: Optional[int] = None
     saldo_combustible: Optional[int] = None
@@ -296,6 +301,9 @@ class OrdenCargaList(OrdenCargaForm):
     diferencia_origen_destino: RoundedDecimal
     remisiones: str
     nro_tickets: str
+    total_anticipo_efectivo:  Optional[int] = None
+    total_anticipo_combustible:  Optional[int] = None
+    total_anticipo_lubricantes:  Optional[int] = None
     # Auditoría
     created_by: str
     created_at: Date
