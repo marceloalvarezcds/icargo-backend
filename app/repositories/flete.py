@@ -44,7 +44,7 @@ def get_flete_list_by_gestor_carga_id(
                 Flete.es_subasta == false(),
             )
         )
-        .order_by(Flete.created_at)
+        .order_by(Flete.id.desc())
         .all()
     )
 
