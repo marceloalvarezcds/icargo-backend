@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from sqlalchemy.orm import Session  # type: ignore
-
+from app.enums import EstadoEnum
 from app.models import Unidad
 
 
@@ -11,5 +11,9 @@ def get_unidad_by_descripcion(db: Session, descripcion: str) -> Optional[Unidad]
 
 def get_unidad_list(db: Session) -> List[Unidad]:
     return (
-        db.query(Unidad).order_by(Unidad.descripcion).order_by(Unidad.descripcion).all()
+        db.query(Unidad)
+        .filter(
+            Unidad.estado == EstadoEnum.ACTIVO.value
+        )
+        .order_by(Unidad.descripcion).all()
     )

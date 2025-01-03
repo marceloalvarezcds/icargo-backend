@@ -506,6 +506,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
     query = db.query(
                 literal_column("2").label("orden"),
                 Movimiento.id.label("movimiento_id"),
+                literal_column("0").label("instrumento_id"),
                 Movimiento.liquidacion_id.label("liquidacion_id"),
                 Movimiento.created_at.label("fecha"),
                 TipoCuenta.descripcion.label("tipo_cuenta_descripcion"),

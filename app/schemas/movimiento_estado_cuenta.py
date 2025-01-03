@@ -22,6 +22,7 @@ class MovimientoEstadoCuentaForm(BaseModel):
 class MovimientoEstadoCuenta(BaseModel):
     movimiento_id: Optional[int]
     liquidacion_id: Optional[int]
+    instrumento_id: Optional[int]
     fecha: Optional[Date]
     tipo_cuenta_descripcion: str
     tipo_movimiento_concepto: str
