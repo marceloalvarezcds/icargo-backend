@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
-
+from sqlalchemy import null
 from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
 from app.enums import EstadoEnum
@@ -36,6 +36,7 @@ def get_factura_by(
                 Factura.numero_factura == numero_factura,
                 Factura.moneda_id == moneda_id,
                 Factura.iva_id == iva_id,
+                Factura.numero_factura != null(),
             )
         )
         .first()

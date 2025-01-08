@@ -12,13 +12,13 @@ class FacturaForm(BaseModel):
     liquidacion_id: int
     moneda_id: int
     iva_id: int
-    numero_factura: str
-    timbrado: str
+    numero_factura: Optional[str]
+    timbrado: Optional[str]
     contribuyente: str
     ruc: str
     monto: RoundedDecimal
     iva: RoundedDecimal
-    retencion: RoundedDecimal
+    retencion: Optional[RoundedDecimal]
     fecha_vencimiento: Date
     fecha_factura: Date
     tipo_contraparte_id: int
@@ -34,7 +34,7 @@ class FacturaResponse(BaseModel):
     liquidacion_id: int
     moneda_id: int
     iva_id: int
-    numero_factura: str
+    numero_factura: Optional[str]
     timbrado: Optional[str]
     contribuyente: Optional[str]
     ruc: Optional[str]
