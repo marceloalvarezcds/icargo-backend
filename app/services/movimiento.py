@@ -1200,68 +1200,69 @@ def create_movimiento_by_factura(
     # TODO: ver caso mov factura contraparte otros
     # TODO: ver caso PDV
 
-    mov_iva = create_movimiento(
-        db,
-        MovimientoForm(
-            liquidacion_id=factura.liquidacion_id,
-            tipo_contraparte_id=tipo_contraparte.id,
-            chofer_id=chofer_id,
-            proveedor_id=proveedor_id,
-            propietario_id=propietario_id,
-            remitente_id=remitente_id,
-            punto_venta_id=punto_venta_id,
-            contraparte=factura.contribuyente,
-            contraparte_numero_documento=factura.ruc,
-            tipo_documento_relacionado_id=tipo_documento_relacionado.id,
-            #numero_documento_relacionado=anticipo.orden_carga_id,
-            cuenta_id=tipo_cuenta.id,
-            tipo_movimiento_id=tipo_movimiento.id,
-            estado=MovimientoEstadoEnum.EN_PROCESO,
-            detalle=tipo_movimiento.descripcion,
-            monto = factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else  factura.iva,
-            moneda_id=factura.moneda_id,
-            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
-            fecha= datetime.now(),
-            fecha_cambio_moneda=datetime.now(),
-            tipo_movimiento_info='IVA',
-            linea_movimiento=liquidacion.tipo_mov_liquidacion,
-        ),
-        gestor_carga_id,
-        modified_by,
-    )
+    if factura.sentido_mov_iva and factura.iva:
+        mov_iva = create_movimiento(
+            db,
+            MovimientoForm(
+                liquidacion_id=factura.liquidacion_id,
+                tipo_contraparte_id=tipo_contraparte.id,
+                chofer_id=chofer_id,
+                proveedor_id=proveedor_id,
+                propietario_id=propietario_id,
+                remitente_id=remitente_id,
+                punto_venta_id=punto_venta_id,
+                contraparte=factura.contribuyente,
+                contraparte_numero_documento=factura.ruc,
+                tipo_documento_relacionado_id=tipo_documento_relacionado.id,
+                #numero_documento_relacionado=anticipo.orden_carga_id,
+                cuenta_id=tipo_cuenta.id,
+                tipo_movimiento_id=tipo_movimiento.id,
+                estado=MovimientoEstadoEnum.EN_PROCESO,
+                detalle=tipo_movimiento.descripcion,
+                monto = factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else  factura.iva,
+                moneda_id=factura.moneda_id,
+                tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+                fecha= datetime.now(),
+                fecha_cambio_moneda=datetime.now(),
+                tipo_movimiento_info='IVA',
+                linea_movimiento=liquidacion.tipo_mov_liquidacion,
+            ),
+            gestor_carga_id,
+            modified_by,
+        )
+        facturaModel.iva_movimiento_id = mov_iva.id
 
-    mov_reten = create_movimiento(
-        db,
-        MovimientoForm(
-            liquidacion_id=factura.liquidacion_id,
-            tipo_contraparte_id=tipo_contraparte.id,
-            chofer_id=chofer_id,
-            proveedor_id=proveedor_id,
-            propietario_id=propietario_id,
-            remitente_id=remitente_id,
-            punto_venta_id=punto_venta_id,
-            contraparte=factura.contribuyente,
-            contraparte_numero_documento=factura.ruc,
-            tipo_documento_relacionado_id=tipo_documento_relacionado.id,
-            #numero_documento_relacionado=anticipo.orden_carga_id,
-            cuenta_id=tipo_cuenta.id,
-            tipo_movimiento_id=tipo_movimiento.id,
-            estado=MovimientoEstadoEnum.EN_PROCESO,
-            detalle=tipo_movimiento.descripcion,
-            monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
-            moneda_id=factura.moneda_id,
-            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
-            fecha= datetime.now(),
-            fecha_cambio_moneda=datetime.now(),
-            tipo_movimiento_info='RETENCION',
-            linea_movimiento=liquidacion.tipo_mov_liquidacion,
-        ),
-        gestor_carga_id,
-        modified_by,
-    )
-
-    facturaModel.iva_movimiento_id = mov_iva.id
-    facturaModel.retencion_movimiento_id = mov_reten.id
+    if factura.sentido_mov_retencion and factura.retencion:
+        mov_reten = create_movimiento(
+            db,
+            MovimientoForm(
+                liquidacion_id=factura.liquidacion_id,
+                tipo_contraparte_id=tipo_contraparte.id,
+                chofer_id=chofer_id,
+                proveedor_id=proveedor_id,
+                propietario_id=propietario_id,
+                remitente_id=remitente_id,
+                punto_venta_id=punto_venta_id,
+                contraparte=factura.contribuyente,
+                contraparte_numero_documento=factura.ruc,
+                tipo_documento_relacionado_id=tipo_documento_relacionado.id,
+                #numero_documento_relacionado=anticipo.orden_carga_id,
+                cuenta_id=tipo_cuenta.id,
+                tipo_movimiento_id=tipo_movimiento.id,
+                estado=MovimientoEstadoEnum.EN_PROCESO,
+                detalle=tipo_movimiento.descripcion,
+                monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
+                moneda_id=factura.moneda_id,
+                tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+                fecha= datetime.now(),
+                fecha_cambio_moneda=datetime.now(),
+                tipo_movimiento_info='RETENCION',
+                linea_movimiento=liquidacion.tipo_mov_liquidacion,
+            ),
+            gestor_carga_id,
+            modified_by,
+        )
+        facturaModel.retencion_movimiento_id = mov_reten.id
 
     db.commit()
     db.refresh(facturaModel)
