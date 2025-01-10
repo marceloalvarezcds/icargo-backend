@@ -728,6 +728,17 @@ class OrdenCarga(AuditMixin, Base):
         return total_combustible
 
     @hybrid_property
+    def saldo_lubricantes(self):
+        fa = aliased(FleteAnticipo)
+        total_combustible = sum(
+            saldo.saldo or 0
+            for saldo in self.saldos
+            if saldo.flete_anticipo and saldo.flete_anticipo.tipo_insumo_id == 2
+        )
+
+        return total_combustible
+
+    @hybrid_property
     def resultado_propietario_total_complemento_a_cobrar(self):
         lista: List[OrdenCargaComplemento] = self.complementos
         return sum(x.remitente_monto for x in lista if x.remitente_monto)
