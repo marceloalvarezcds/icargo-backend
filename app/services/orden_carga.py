@@ -109,7 +109,7 @@ def create_orden_carga(
     if not camion:
         raise HTTPException(status_code=404, detail="Camión no encontrado")
 
-   
+
     if estado_inicial == EstadoEnum.ACEPTADO:
         cant_oc_aceptadas = repositories.get_orden_carga_aceptada_count_by_camion_id(db, data.camion_id)
         if cant_oc_aceptadas >= camion.limite_cantidad_oc_activas:
@@ -823,3 +823,11 @@ def get_orden_carga_reports(db: Session, gestor_carga_id: Optional[int]) -> str:
     # Save the file
     wb.save(os.path.join(REPORTS_FOLDER, filename))
     return filename
+
+
+def get_orden_carga_list_detail(
+    db: Session, id: int, current_user: schemas.AuthUser
+) -> OrdenCarga:
+    obj = get_orden_carga_by_id(db, id)
+    return obj
+

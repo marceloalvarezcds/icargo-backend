@@ -54,7 +54,7 @@ async def read_combinacion_by_camion_id_and_semi_id(
 @api.get("/reports")
 async def combinacion_reports(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.REPORTE, m.COMBINACION)), 
+    _: bool = Depends(Permiso(a.REPORTE, m.COMBINACION)),
      current_user: schemas.AuthUser = Depends(get_current_user), # noqa: B008
 ):
     return services.get_combinacion_reports(db)
@@ -66,7 +66,7 @@ async def read_combinacion_by_id(
      db: Session = Depends(get_db_session),  # noqa: B008
      current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
      _: bool = Depends(Permiso(a.VER, m.COMBINACION)),  # noqa: B008
- ):   
+ ):
      return services.get_combinacion_by_id(
          db, id
      )
@@ -125,3 +125,16 @@ def inactive_combinacion_by_id(
     return services.change_combinacion_status(
         db, id, EstadoEnum.INACTIVO, current_user.username
     )
+
+
+@api.get("/{id}/combinacion", response_model=schemas.CombinacionesBD)
+async def read_combinacion_by_id(
+     id: int,
+     db: Session = Depends(get_db_session),  # noqa: B008
+     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+     _: bool = Depends(Permiso(a.VER, m.COMBINACION)),  # noqa: B008
+ ):
+     return services.get_combinacion_by_id(
+         db, id
+     )
+
