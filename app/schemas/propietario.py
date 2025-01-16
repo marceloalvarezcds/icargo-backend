@@ -13,13 +13,14 @@ from .localidad import Localidad
 from .pais import Pais
 from .propietario_contacto_gestor_carga import PropietarioContactoGestorCargaList
 from .tipo_documento import TipoDocumento
-from .tipo_persona import TipoPersona
+# from .tipo_persona import TipoPersona
 from .tipo_registro import TipoRegistro
 
 
 class PropietarioBaseModel(BaseModel):
     nombre: str
-    tipo_persona_id: int
+    nombre_corto: Optional[str] = None
+    composicion_juridica_id: int
     ruc: str
     digito_verificador: Optional[str] = None
     pais_origen_id: Optional[int] = None
@@ -30,6 +31,7 @@ class PropietarioBaseModel(BaseModel):
     foto_perfil: Optional[str] = None
     es_chofer: Optional[bool] = False
     puede_recibir_anticipos: bool
+    tipo_documento_propietario_id: Optional[int] = None
     # INICIO Datos del Chofer
     tipo_documento_id: Optional[int] = None
     pais_emisor_documento_id: Optional[int] = None
@@ -62,7 +64,8 @@ class PropietarioForm(PropietarioBaseModel):
 
 class PropietarioEditForm(BaseModel):
     nombre: Optional[str] = None
-    tipo_persona_id: Optional[int] = None
+    nombre_corto: Optional[str] = None
+    composicion_juridica_id: Optional[int] = None
     ruc: Optional[str] = None
     digito_verificador: Optional[str] = None
     pais_origen_id: Optional[int] = None
@@ -74,6 +77,7 @@ class PropietarioEditForm(BaseModel):
     es_chofer: Optional[bool] = False
     puede_recibir_anticipos: bool
     anticipos_bloqueados: Optional[bool] = False
+    tipo_documento_propietario_id: Optional[int] = None
     # INICIO Datos del Chofer
     tipo_documento_id: Optional[int] = None
     pais_emisor_documento_id: Optional[int] = None
@@ -103,7 +107,7 @@ class PropietarioEditForm(BaseModel):
 
 class PropietarioBase(PropietarioBaseModel):
     id: int
-    tipo_persona: TipoPersona
+    # tipo_persona: TipoPersona
     pais_origen: Optional[Pais] = None
     gestor_cuenta_id: int
     gestor_cuenta_nombre: str
@@ -140,7 +144,7 @@ class PropietarioList(PropietarioBase):
     pais_nombre_corto: Optional[str] = None
     pais_origen_nombre: Optional[str] = None
     pais_origen_nombre_corto: Optional[str] = None
-    tipo_persona_descripcion: Optional[str] = None
+    # tipo_persona_descripcion: Optional[str] = None
 
 
 class Propietario(PropietarioBase):

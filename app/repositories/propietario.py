@@ -34,19 +34,19 @@ def get_propietario_list_by_gestor_cuenta_id(
         .all()
     )
 
-def get_propietario_list_by_tipo_persona_id(
-    db: Session, tipo_persona_id: int
-) -> List[Propietario]:
-    return (
-        db.query(Propietario)
-        .filter(
-            and_(
-                Propietario.tipo_persona_id == tipo_persona_id,
-            )
-        )
-        .order_by(Propietario.created_at.desc(), Propietario.nombre)
-        .all()
-    )
+# def get_propietario_list_by_tipo_persona_id(
+#     db: Session, tipo_persona_id: int
+# ) -> List[Propietario]:
+#     return (
+#         db.query(Propietario)
+#         .filter(
+#             and_(
+#                 Propietario.tipo_persona_id == tipo_persona_id,
+#             )
+#         )
+#         .order_by(Propietario.created_at.desc(), Propietario.nombre)
+#         .all()
+#     )
 
 
 def get_combinaciones_by_propietario_id(db: Session, propietario_id: int) -> List[Combinacion]:
@@ -55,7 +55,7 @@ def get_combinaciones_by_propietario_id(db: Session, propietario_id: int) -> Lis
 
 def get_propietario_by(
     db: Session,
-    tipo_persona_id: int,
+    composicion_juridica_id: int,
     ruc: str,
 ) -> Optional[Propietario]:
     return (
@@ -63,7 +63,7 @@ def get_propietario_by(
         .filter(
             and_(
                 Propietario.ruc == ruc,
-                Propietario.tipo_persona_id == tipo_persona_id,
+                Propietario.composicion_juridica_id == composicion_juridica_id,
             )
         )
         .first()
@@ -73,14 +73,14 @@ def get_propietario_by(
 def get_propietario_by_id(db: Session, id: int) -> Optional[Propietario]:
     return db.query(Propietario).filter(Propietario.id == id).first()
 
-def get_propietario_list_by_tipo_persona_id(
-    db: Session, tipo_persona_id: int
-) -> List[Propietario]:
-    return (
-        db.query(Propietario)
-        .filter_by(tipo_persona_id=tipo_persona_id)
-        .all()
-    )
+# def get_propietario_list_by_tipo_persona_id(
+#     db: Session, tipo_persona_id: int
+# ) -> List[Propietario]:
+#     return (
+#         db.query(Propietario)
+#         .filter_by(tipo_persona_id=tipo_persona_id)
+#         .all()
+#     )
 
 
 def create_propietario(
@@ -95,7 +95,9 @@ def create_propietario(
 ) -> Propietario:
     obj = Propietario(
         nombre=data.nombre,
-        tipo_persona_id=data.tipo_persona_id,
+        nombre_corto=data.nombre_corto,
+        composicion_juridica_id=data.composicion_juridica_id,
+        tipo_documento_propietario_id=data.tipo_documento_propietario_id,
         ruc=data.ruc,
         digito_verificador=data.digito_verificador,
         pais_origen_id=data.pais_origen_id,
@@ -132,9 +134,10 @@ def edit_propietario(
     chofer: Optional[Chofer],
     modified_by: str,
 ) -> Propietario:
-    if data.tipo_persona_id and data.ruc:
+    if data.composicion_juridica_id and data.ruc:
         obj.ruc = data.ruc
-        obj.tipo_persona_id = data.tipo_persona_id
+        obj.composicion_juridica_id = data.composicion_juridica_id
+        obj.tipo_documento_id = data.tipo_documento_id
         obj.digito_verificador = data.digito_verificador
         obj.fecha_nacimiento = data.fecha_nacimiento
         obj.es_chofer = data.es_chofer
@@ -144,6 +147,8 @@ def edit_propietario(
         obj.ciudad_id = data.ciudad_id
         if data.nombre:
             obj.nombre = data.nombre
+        if data.nombre_corto:
+            obj.nombre = data.nombre_corto
         if data.pais_origen_id:
             obj.pais_origen_id = data.pais_origen_id
         if data.oficial_cuenta_id:

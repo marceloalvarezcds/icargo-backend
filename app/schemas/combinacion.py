@@ -25,7 +25,7 @@ class CombinacionGet(BaseModel):
     chofer: Chofer
     neto: int
     comentario: Optional[str] = None
-    tipo_persona_id: Optional[int] = None
+    composicion_juridica_id: Optional[int] = None
     created_by: str
     created_at: datetime
     modified_by: str
@@ -91,7 +91,7 @@ class Combinaciones(CombinacionGet):
     chofer_numero_documento: Optional[str] = None
     puede_recibir_anticipos: bool
     anticipo_propietario: bool
-    tipo_persona_id: Optional[int] = None
+    composicion_juridica_id: Optional[int] = None
     class Config:
         orm_mode = True
 
@@ -139,4 +139,4 @@ class CombinacionUpdate(BaseModel):
     semi_id: Optional[int]
     chofer_id: Optional[int]
     propietario_id: Optional[int]
-    tipo_persona_id: Optional[int] = None
+    composicion_juridica_id: Optional[int] = None

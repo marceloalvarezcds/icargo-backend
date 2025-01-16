@@ -406,7 +406,7 @@ from .propietario import (  # noqa
     get_propietario_by_id,
     get_propietario_list,
     get_propietario_list_by_gestor_cuenta_id,
-    get_propietario_list_by_tipo_persona_id,
+    # get_propietario_list_by_tipo_persona_id,
     get_combinaciones_by_propietario_id,
 )
 from .propietario_chofer import (  # noqa

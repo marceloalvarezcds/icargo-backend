@@ -291,6 +291,7 @@ from .propietario import (  # noqa
     get_propietario_list_by_gestor_cuenta_and_semi_id,
     get_propietario_reports,
     get_propietario_list_by_tipo_persona_id,
+    get_propietario_list_by_id,
 )
 from .propietario_contacto import update_propietario_contacto_list  # noqa
 from .proveedor import (  # noqa

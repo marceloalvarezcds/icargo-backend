@@ -41,7 +41,7 @@ async def create_propietario(
     gestor_cuenta_id: Optional[int],
     modified_by: str,
 ) -> schemas.Propietario:
-    if repositories.get_propietario_by(db, data.tipo_persona_id, data.ruc):
+    if repositories.get_propietario_by(db, data.composicion_juridica_id, data.ruc):
         raise HTTPException(
             status_code=409,
             detail=f"El Propietario con documento {data.ruc} ya existe",
@@ -90,6 +90,11 @@ def get_propietario_by_id(db: Session, id: int) -> Propietario:
     if not obj:
         raise HTTPException(status_code=404, detail="Propietario no encontrado")
     return obj
+
+
+def get_propietario_list_by_id(db: Session, propietario_id: int):
+    return db.query(Propietario).filter(Propietario.id == propietario_id).all()
+
 
 
 def get_propietario_by_id_and_gestor_cuenta_id(
@@ -149,8 +154,8 @@ async def edit_propietario(
     modified_by: str,
 ) -> schemas.Propietario:
     gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
-    if data.tipo_persona_id and data.ruc:
-        exists = repositories.get_propietario_by(db, data.tipo_persona_id, data.ruc)
+    if data.composicion_juridica_id and data.ruc:
+        exists = repositories.get_propietario_by(db, data.composicion_juridica_id, data.ruc)
         if exists and exists.id != id:
             raise HTTPException(
                 status_code=409,

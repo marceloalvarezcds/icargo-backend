@@ -14,6 +14,8 @@ from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums.estado import EstadoEnum
+from app.models.composicion_juridica import ComposicionJuridica
+from app.models.tipo_documento import TipoDocumento
 
 from .chofer import Chofer
 from .ciudad import Ciudad
@@ -30,14 +32,19 @@ class Propietario(AuditMixin, Base):
 
     __table_args__ = (
         UniqueConstraint(
-            "tipo_persona_id",
+            "composicion_juridica_id",
             "ruc",
         ),
     )
     id = Column(Integer, primary_key=True)
     nombre = Column(String(255))
-    tipo_persona_id = Column(Integer, ForeignKey("tipo_persona.id"))
-    tipo_persona = relationship(TipoPersona, uselist=False)
+    composicion_juridica_id = Column(Integer, ForeignKey("composicion_juridica.id"))
+    composicion_juridica = relationship(ComposicionJuridica, uselist=False)
+
+    tipo_documento_propietario_id = Column(Integer, ForeignKey("tipo_documento.id"))
+    tipo_documento = relationship(TipoDocumento, uselist=False)
+
+    nombre_corto = Column(String(255))
     ruc = Column(String(255))
     digito_verificador = Column(String(2))
     pais_origen_id = Column(Integer, ForeignKey("pais.id"))

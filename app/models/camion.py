@@ -257,3 +257,11 @@ class Camion(AuditMixin, Base):
     @hybrid_property
     def tipo_descripcion(self):
         return self.tipo.descripcion if self.tipo else None
+
+    @hybrid_property
+    def propietario_foto(self):
+        return self.propietario.foto_perfil
+    
+    @hybrid_property
+    def propietario_camion_id(self):
+        return self.propietario.id

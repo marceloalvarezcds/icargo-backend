@@ -23,7 +23,7 @@ def create_propietario_by_chofer(
     fisica = get_tipo_persona_by_descripcion(db, "Física")
     obj = Propietario(
         nombre=data.nombre,
-        tipo_persona_id=cast(TipoPersona, fisica).id,
+        # tipo_persona_id=cast(TipoPersona, fisica).id,
         ruc=data.ruc,
         digito_verificador=data.digito_verificador,
         pais_origen_id=data.pais_origen_id,
@@ -60,7 +60,7 @@ def edit_propietario_by_chofer(
 ) -> Propietario:
     fisica = get_tipo_persona_by_descripcion(db, "Física")
     obj.ruc = data.ruc
-    obj.tipo_persona_id = cast(TipoPersona, fisica).id
+    # obj.composicion_juridica_id = cast(TipoPersona, fisica).id
     obj.digito_verificador = data.digito_verificador
     obj.fecha_nacimiento = data.fecha_nacimiento
     obj.es_chofer = True

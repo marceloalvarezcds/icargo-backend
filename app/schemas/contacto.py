@@ -14,7 +14,7 @@ class ContactoBaseModel(BaseModel):
 
 class ContactoForm(ContactoBaseModel):
     id: Optional[int] = None
-    cargo: Cargo
+    cargo: Optional[Cargo] = None
     alias: Optional[str] = None
 
 

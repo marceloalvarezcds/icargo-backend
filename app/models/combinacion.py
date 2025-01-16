@@ -110,9 +110,9 @@ class Combinacion(AuditMixin, Base):
     def propietario_telefono(self):
         return self.propietario.telefono
     
-    @hybrid_property
-    def tipo_persona_id(self):
-        return self.propietario.tipo_persona_id 
+    # @hybrid_property
+    # def tipo_persona_id(self):
+    #     return self.propietario.tipo_persona_id 
 
     @hybrid_property
     def tipo_descripcion(self):
