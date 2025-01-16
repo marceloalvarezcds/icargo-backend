@@ -152,8 +152,8 @@ async def add_comentario_orden_carga(
 
     comentario_historial = services.create_orden_carga_comentarios_historial(
         db=db,
-        orden_carga_id=data.orden_carga_id,  
-        comentario=data.comentario,  
+        orden_carga_id=data.orden_carga_id,
+        comentario=data.comentario,
         created_by=current_user.username,
         modified_by=current_user.username,
     )
@@ -360,3 +360,13 @@ def inactive_combinacion_by_id(
     return services.change_combinacion_status(
         db, id, EstadoEnum.INACTIVO, current_user.username
     )
+
+
+@api.get("/oc-list/{id}", response_model=schemas.OrdenCargaList)
+async def read_orden_carga_list_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_orden_carga_list_detail(db, id, current_user)

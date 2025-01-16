@@ -49,8 +49,8 @@ class Factura(AuditMixin, Base):
     fecha_vencimiento = Column(DateTime)
     foto = Column(String(255))
 
-    timbrado = Column(String(255))
-    contribuyente = Column(String(255))
+    timbrado = Column(String(30))
+    contribuyente = Column(String(50))
     ruc = Column(String(255))
     fecha_factura = Column(DateTime)
     iva = Column(Numeric(38,10))
