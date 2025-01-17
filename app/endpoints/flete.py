@@ -138,3 +138,12 @@ def read_flete_destinatario_list_by_id(
     return services.get_destinatario_list_by(
         db, remitente_id, origen_id, destino_id, current_user.gestor_carga_id
     )
+
+
+@api.get("/flete-list/{id}", response_model=schemas.FleteList)
+async def read_flete_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.FLETE)),  # noqa: B008
+):
+    return services.get_flete_detail_by_id(db, id)

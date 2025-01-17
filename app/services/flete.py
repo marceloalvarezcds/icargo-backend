@@ -52,8 +52,8 @@ def get_flete_by_id(db: Session, id: int) -> Flete:
     return obj
 
 
-def get_flete_detail_by_id(db: Session, id: int) -> schemas.Flete:
-    return get_flete_detail(get_flete_by_id(db, id))
+def get_flete_detail_by_id(db: Session, id: int) -> schemas.FleteList:
+    return get_flete_by_id(db, id)
 
 
 def edit_flete(
