@@ -137,7 +137,7 @@ def edit_propietario(
     if data.composicion_juridica_id and data.ruc:
         obj.ruc = data.ruc
         obj.composicion_juridica_id = data.composicion_juridica_id
-        obj.tipo_documento_id = data.tipo_documento_id
+        #obj.tipo_documento_id = data.tipo_documento_id
         obj.digito_verificador = data.digito_verificador
         obj.fecha_nacimiento = data.fecha_nacimiento
         obj.es_chofer = data.es_chofer
