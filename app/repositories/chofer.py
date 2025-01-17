@@ -14,7 +14,7 @@ def get_chofer_list(db: Session) -> List[Chofer]:
     return (
         db.query(Chofer)
         .filter(Chofer.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(Chofer.nombre)
+        .order_by(Chofer.id.desc())
         .all()
     )
 
@@ -30,7 +30,7 @@ def get_chofer_list_by_gestor_cuenta_id(
                 Chofer.estado == EstadoEnum.ACTIVO.value,
             )
         )
-        .order_by(Chofer.nombre)
+        .order_by(Chofer.id.desc())
         .all()
     )
 
@@ -59,7 +59,7 @@ def get_chofer_list_without_camion(
                 not_(Chofer.id.in_(sub_query)),
             )
         )
-        .order_by(Chofer.nombre)
+        .order_by(Chofer.id.desc())
         .all()
     )
 

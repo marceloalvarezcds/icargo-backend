@@ -14,7 +14,7 @@ def get_caja_list(db: Session) -> List[Caja]:
     return (
         db.query(Caja)
         .filter(Caja.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(Caja.nombre)
+        .order_by(Caja.id.desc())
         .all()
     )
 

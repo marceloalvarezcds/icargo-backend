@@ -15,7 +15,7 @@ def get_camion_list(db: Session) -> List[Camion]:
     return (
         db.query(Camion)
         .filter(Camion.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(Camion.placa)
+        .order_by(Camion.id.desc())
         .all()
     )
 
@@ -33,7 +33,7 @@ def get_camion_list_by_gestor_cuenta_id(
                 Camion.estado != EstadoEnum.ELIMINADO.value,
             )
         )
-        .order_by(Camion.placa)
+        .order_by(Camion.id.desc())
         .all()
     )
 
@@ -60,7 +60,7 @@ def get_camion_list_by_propietario_id(db: Session, propietario_id: int) -> List[
     return (
         db.query(Camion)
         .filter(Camion.propietario_id == propietario_id)
-        .order_by(Camion.placa)
+        .order_by(Camion.id.desc())
         .all()
     )
 

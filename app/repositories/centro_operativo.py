@@ -13,7 +13,7 @@ def get_centro_operativo_list(db: Session) -> List[CentroOperativo]:
     return (
         db.query(CentroOperativo)
         .filter(CentroOperativo.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(CentroOperativo.nombre)
+        .order_by(CentroOperativo.id.desc())
         .all()
     )
 
@@ -31,7 +31,7 @@ def get_centro_operativo_list_by_gestor_cuenta_id(
                 ),
             )
         )
-        .order_by(CentroOperativo.nombre)
+        .order_by(CentroOperativo.id.desc())
         .all()
     )
 

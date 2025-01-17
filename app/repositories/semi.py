@@ -13,7 +13,7 @@ def get_semi_list(db: Session) -> List[Semi]:
     return (
         db.query(Semi)
         .filter(Semi.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(Semi.placa)
+        .order_by(Semi.id.desc())
         .all()
     )
 
@@ -30,7 +30,7 @@ def get_semi_list_by_propietario_id(db: Session, propietario_id: int) -> List[Se
     return (
         db.query(Semi)
         .filter(Semi.propietario_id == propietario_id)
-        .order_by(Semi.placa)
+        .order_by(Semi.id.desc())
         .all()
     )
 

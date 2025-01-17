@@ -14,7 +14,7 @@ def get_banco_list(db: Session) -> List[Banco]:
     return (
         db.query(Banco)
         .filter(Banco.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(Banco.nombre, Banco.numero_cuenta, Banco.titular)
+        .order_by(Banco.id.desc())
         .all()
     )
 

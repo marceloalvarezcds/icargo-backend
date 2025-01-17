@@ -20,6 +20,6 @@ def get_centro_operativo_clasificacion_list(
 ) -> List[CentroOperativoClasificacion]:
     return (
         db.query(CentroOperativoClasificacion)
-        .order_by(CentroOperativoClasificacion.nombre)
+        .order_by(CentroOperativoClasificacion.id.desc())
         .all()
     )

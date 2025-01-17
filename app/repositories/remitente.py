@@ -13,7 +13,7 @@ def get_remitente_list(db: Session) -> List[Remitente]:
     return (
         db.query(Remitente)
         .filter(Remitente.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(Remitente.nombre)
+        .order_by(Remitente.id.desc())
         .all()
     )
 
@@ -31,7 +31,7 @@ def get_remitente_list_by_gestor_cuenta_id(
                 ),
             )
         )
-        .order_by(Remitente.nombre)
+        .order_by(Remitente.id.desc())
         .all()
     )
 

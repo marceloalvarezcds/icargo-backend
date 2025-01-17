@@ -13,7 +13,7 @@ def get_proveedor_list(db: Session) -> List[Proveedor]:
     return (
         db.query(Proveedor)
         .filter(Proveedor.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(Proveedor.nombre)
+        .order_by(Proveedor.id.desc())
         .all()
     )
 
@@ -31,7 +31,7 @@ def get_proveedor_list_by_gestor_cuenta_id(
                 ),
             )
         )
-        .order_by(Proveedor.nombre)
+        .order_by(Proveedor.id.desc())
         .all()
     )
 
