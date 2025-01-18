@@ -109,7 +109,7 @@ def create_propietario(
         foto_documento_frente=foto_documento_frente_url,
         foto_documento_reverso=foto_documento_reverso_url,
         foto_perfil=foto_perfil_url,
-        estado=EstadoEnum.PENDIENTE.value,
+        estado=EstadoEnum.ACTIVO.value,
         telefono=data.telefono,
         email=data.email,
         direccion=data.direccion,

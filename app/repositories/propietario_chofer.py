@@ -41,7 +41,7 @@ def create_chofer_by_propietario(
         foto_registro_frente=foto_registro_frente_url,
         foto_registro_reverso=foto_registro_reverso_url,
         # fin registro
-        estado=EstadoEnum.PENDIENTE.value,
+        estado=EstadoEnum.ACTIVO.value,
         telefono=data.telefono,
         email=data.email,
         direccion=data.direccion,
