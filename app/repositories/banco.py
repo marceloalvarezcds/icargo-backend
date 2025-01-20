@@ -28,7 +28,7 @@ def get_banco_list_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> List
                 Banco.estado != EstadoEnum.ELIMINADO.value,
             )
         )
-        .order_by(Banco.nombre, Banco.numero_cuenta, Banco.titular)
+        .order_by(Banco.id.desc())
         .all()
     )
 

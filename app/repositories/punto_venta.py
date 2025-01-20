@@ -21,7 +21,7 @@ def get_punto_venta_list(db: Session, proveedor_id: int) -> List[PuntoVenta]:
                 PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
             )
         )
-        .order_by(PuntoVenta.nombre)
+        .order_by(PuntoVenta.id.desc())
         .all()
     )
 
@@ -39,7 +39,7 @@ def get_punto_venta_list_by_gestor_carga_id(
                 PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
             )
         )
-        .order_by(PuntoVenta.nombre)
+        .order_by(PuntoVenta.id.desc())
         .all()
     )
 
@@ -64,7 +64,7 @@ def get_punto_venta_list_with_active_prices_by_gestor_carga_id(
                 )
             )
         )
-        .order_by(PuntoVenta.nombre)
+        .order_by(PuntoVenta.id.desc())
         .all()
     )
 
