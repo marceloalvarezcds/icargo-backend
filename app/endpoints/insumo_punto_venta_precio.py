@@ -22,7 +22,7 @@ async def read_insumo_punto_venta_precio_list(
 
 
 @api.get("/gestor-carga/activo", response_model=List[schemas.InsumoPuntoVentaPrecioList])
-async def read_insumo_punto_venta_precio_list(
+async def read_insumo_punto_venta_precio_activos_list(
     db: Session = Depends(get_db_session),
     current_user: schemas.AuthUser = Depends(get_current_user),
     _: bool = Depends(Permiso(a.LISTAR, m.INSUMO_PUNTO_VENTA_PRECIO)),

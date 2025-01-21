@@ -29,11 +29,15 @@ def get_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int) -> Lis
     return (
         db.query(models.InsumoPuntoVentaPrecio)
         .join(models.InsumoPuntoVenta)  # Unir con InsumoPuntoVenta
-        .filter(models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id)  # Filtrar por gestor_carga_id
+        .filter(
+            models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id, 
+            models.InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value  
+        )
         .order_by(desc(models.InsumoPuntoVentaPrecio.id))  # Ordenar por id en orden descendente
         .all()
     )
     
+
 def get_inactive_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int) -> List[models.InsumoPuntoVentaPrecio]:
     return (
         db.query(models.InsumoPuntoVentaPrecio)
@@ -46,17 +50,28 @@ def get_inactive_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: in
         .all()
     )
 
+
 def get_active_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int) -> List[models.InsumoPuntoVentaPrecio]:
-    return (
+    results = (
         db.query(models.InsumoPuntoVentaPrecio)
-        .join(models.InsumoPuntoVenta)  # Unir con InsumoPuntoVenta
+        .join(models.InsumoPuntoVenta)  
         .filter(
-            models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
-            models.InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value,  # Filtrar por estado inactivo
+            models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id, 
+            models.InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value  
         )
-        .order_by(desc(models.InsumoPuntoVentaPrecio.id))  # Ordenar por id en orden descendente
+        .order_by(desc(models.InsumoPuntoVentaPrecio.id))  
         .all()
     )
+    
+    seen = set()
+    unique_results = []
+    for item in results:
+        if item.punto_venta_id not in seen:
+            unique_results.append(item)
+            seen.add(item.punto_venta_id)
+
+    return unique_results
+
 
 
 def get_insumo_punto_venta_precio_list_by_estado_activo(
