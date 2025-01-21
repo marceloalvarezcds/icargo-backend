@@ -140,5 +140,5 @@ def get_all_contribuyente(db: Session, gestor_carga_id: int) -> List[Factura]:
         .distinct(Factura.ruc)
     ).subquery('sq')
 
-    return db.query(subquery).order_by(subquery.c.id).all()
+    return db.query(subquery).order_by(subquery.c.id.desc()).all()
 
