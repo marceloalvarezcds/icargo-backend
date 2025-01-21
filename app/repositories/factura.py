@@ -135,9 +135,10 @@ def delete_factura(
 
 
 def get_all_contribuyente(db: Session, gestor_carga_id: int) -> List[Factura]:
-    return (
+    subquery= (
         db.query(Factura)
         .distinct(Factura.ruc)
-        #.order_by(Factura.contribuyente)
-        .all()
-    )
+    ).subquery('sq')
+
+    return db.query(subquery).order_by(subquery.c.id).all()
+
