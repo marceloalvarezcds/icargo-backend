@@ -45,7 +45,7 @@ async def create_remitente(
     if repositories.get_remitente_by(db, data.tipo_documento_id, data.numero_documento):
         raise HTTPException(
             status_code=409,
-            detail=f"El Remitente con documento {data.numero_documento} ya existe",
+            detail=f"El Cliente con documento {data.numero_documento} ya existe",
         )
     logo_url = await upload_and_get_image_url(file)
     obj = repositories.create_remitente(db, data, logo_url, modified_by)
@@ -59,7 +59,7 @@ async def create_remitente(
 def get_remitente_by_id(db: Session, id: int) -> Remitente:
     obj = repositories.get_remitente_by_id(db, id)
     if not obj:
-        raise HTTPException(status_code=404, detail="Remitente no encontrado")
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
     return obj
 
 
@@ -68,7 +68,7 @@ def get_remitente_by_id_and_gestor_carga_id(
 ) -> schemas.Remitente:
     obj = repositories.get_remitente_by_id(db, id)
     if not obj:
-        raise HTTPException(status_code=404, detail="Remitente no encontrado")
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
     return get_remitente_detail(obj, gestor_carga_id)
 
 
@@ -86,7 +86,7 @@ async def edit_remitente(
     if exists and exists.id != id:
         raise HTTPException(
             status_code=409,
-            detail=f"El Remitente con documento {data.numero_documento} ya existe",
+            detail=f"El Cliente con documento {data.numero_documento} ya existe",
         )
     logo_url = await upload_and_get_image_url(file) if file else None
     to_edit_obj = get_remitente_by_id(db, id)
@@ -169,7 +169,7 @@ def get_remitente_reports(db: Session) -> str:
         )
 
     ws.auto_filter.ref = ws.dimensions
-    filename = "remitente_reports.xls"
+    filename = "cliente_reports.xls"
     # Save the file
     wb.save(os.path.join(REPORTS_FOLDER, filename))
     return filename
