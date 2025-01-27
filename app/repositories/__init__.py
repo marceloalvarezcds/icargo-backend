@@ -324,6 +324,8 @@ from .orden_carga import (  # noqa
     get_orden_carga_by_combinacion_id,
     get_rol_id_by_gestor_carga_id,
     rol_tiene_permiso,
+    get_orden_carga_aceptadas_list,
+    get_orden_carga_finalizadas_list,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,

@@ -25,6 +25,28 @@ def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
         .all()
     )
 
+def get_orden_carga_aceptadas_list(db: Session) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter(
+            OrdenCarga.estado == EstadoEnum.ACEPTADO.value  
+        )
+        .order_by(desc(OrdenCarga.id))
+        .all()
+    )
+
+
+def get_orden_carga_finalizadas_list(db: Session) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter(
+            OrdenCarga.estado == EstadoEnum.FINALIZADO.value  
+        )
+        .order_by(desc(OrdenCarga.id))
+        .all()
+    )
+
+
 def get_orden_carga_by_combinacion_id(
     db: Session, combinacion_id: int
 ) -> List[OrdenCarga]:
