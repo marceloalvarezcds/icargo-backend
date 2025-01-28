@@ -91,6 +91,39 @@ def get_orden_carga_list_by_gestor_carga_id(
         .all()
     )
 
+def get_orden_carga_aceptadas_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter(
+            and_(
+                OrdenCarga.gestor_carga_id == gestor_carga_id,
+                OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
+                OrdenCarga.estado == EstadoEnum.ACEPTADO.value,  # Filtro agregado
+            )
+        )
+        .order_by(desc(OrdenCarga.id))
+        .all()
+    )
+
+def get_orden_carga_finalizadas_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter(
+            and_(
+                OrdenCarga.gestor_carga_id == gestor_carga_id,
+                OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
+                OrdenCarga.estado == EstadoEnum.FINALIZADO.value,  # Filtro agregado
+            )
+        )
+        .order_by(desc(OrdenCarga.id))
+        .all()
+    )
+
+
 def get_orden_de_carga_by_combinacion_id(
     db: Session, combinacion_id: int, gestor_carga_id: Optional[int]
 ) -> List[OrdenCarga]:
