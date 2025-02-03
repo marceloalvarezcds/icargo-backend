@@ -330,3 +330,6 @@ class OrdenCargaGetList(OrdenCargaBase):
 
 class OrdenCargaUpdateForm(BaseModel):
     comentarios: Optional[str] = None
+
+class OrdenCargaUpdateFecha(BaseModel):
+    created_at: Optional[Date] = None

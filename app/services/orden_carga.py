@@ -213,6 +213,22 @@ def edit_orden_carga(
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
+
+def edit_remitir_fecha(
+    id: int,
+    db: Session,
+    data: schemas.OrdenCargaUpdateFecha,
+    current_user: schemas.AuthUser,
+) -> OrdenCarga:
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == id).first()
+
+    if not orden_carga:
+        raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
+
+    return repositories.edit_remitir_fecha(db, orden_carga, data, current_user.gestor_carga_id, current_user.username)
+
+
+
 def update_comentarios(
     id: int,
     db: Session,

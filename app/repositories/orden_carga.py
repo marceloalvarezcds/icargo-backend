@@ -12,6 +12,7 @@ from sqlalchemy import desc
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
 from app.models import Camion, Flete, OrdenCarga
 from app.schemas import OrdenCargaEditForm, OrdenCargaForm
+from app.schemas.orden_carga import OrdenCargaUpdateFecha
 
 from .orden_carga_estado_historial import create_orden_carga_estado_historial
 from .orden_carga_comentarios_historial import create_orden_carga_comentarios_historial
@@ -309,6 +310,23 @@ def create_orden_carga(
         )
 
     return change_orden_carga_status(obj, db, estado_inicial, modified_by)
+
+
+def edit_remitir_fecha(
+    db: Session,
+    obj: OrdenCarga,
+    data: OrdenCargaUpdateFecha,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+) -> OrdenCarga:
+    
+    obj.created_at = data.created_at
+    obj.gestor_carga_id = gestor_carga_id
+    obj.modified_by = modified_by
+    db.commit()
+    db.refresh(obj)
+    return obj
+
 
 
 def edit_model_orden_carga(

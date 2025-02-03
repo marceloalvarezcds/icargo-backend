@@ -195,6 +195,22 @@ async def edit_orden_carga(
     )
 
 
+@api.put("/{id}/remitir", response_model=schemas.OrdenCarga)
+async def edit_orden_carga(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.OrdenCargaUpdateFecha] = Form(...),  # type: ignore  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.edit_remitir_fecha(
+        id,
+        db,
+        data,  # type: ignore
+        current_user,
+    )
+
+
 @api.put("/{id}/comentarios", response_model=schemas.OrdenCarga)
 async def update_comentarios(
     id: int,

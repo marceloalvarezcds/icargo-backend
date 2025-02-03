@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
+import select
 from typing import List, Optional, Union
 
 from sqlalchemy import (  # type: ignore
@@ -18,6 +19,8 @@ from sqlalchemy.orm import relationship  # type: ignore
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums import EstadoEnum
+from sqlalchemy import func
+
 
 from app.models.chofer import Chofer
 from app.models.flete_anticipo import FleteAnticipo
@@ -587,6 +590,14 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_gestor_carga_total_flete_saldo_bruto(self):
         return self.resultado_gestor_carga_tarifa_flete * self.cantidad_destino
+
+    @hybrid_property
+    def resultado_gestor_carga_complemento_descuento(self):
+        total_descuento = sum(descuento.proveedor_monto or 0 for descuento in (self.descuentos or []))
+        total_complemento = sum(complemento.remitente_monto or 0 for complemento in (self.complementos or []))
+        
+        return total_descuento - total_complemento
+
     
     @hybrid_property
     def saldos_flete_id(self):
@@ -596,6 +607,7 @@ class OrdenCarga(AuditMixin, Base):
            saldos = [saldo for saldo in saldos if saldo.flete_anticipo and saldo.flete_anticipo.flete_id == self.flete_id]
         
         return saldos
+
     # fin - gestor carga
 
     # inicio - propietario
@@ -628,6 +640,14 @@ class OrdenCarga(AuditMixin, Base):
             )
             - self.resultado_propietario_total_anticipos_retirados
         )
+    
+    @hybrid_property
+    def resultado_propietario_complemento_descuento(self):
+        total_descuento = sum(descuento.propietario_monto or 0 for descuento in (self.descuentos or []))
+        total_complemento = sum(complemento.propietario_monto or 0 for complemento in (self.complementos or []))
+        
+        return total_descuento - total_complemento
+
 
     @hybrid_property
     def resultado_propietario_saldo_bruto(self):

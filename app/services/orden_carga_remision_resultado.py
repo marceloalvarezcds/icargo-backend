@@ -31,8 +31,10 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
                     merma_valor_total_moneda_local=(
                         orden_carga.resultado_gestor_carga_merma_valor_total_moneda_local
                     ),
+                   
                     saldo=orden_carga.resultado_gestor_carga_total_flete,
-                    saldo_bruto=orden_carga.resultado_gestor_carga_total_flete_saldo_bruto
+                    saldo_bruto=orden_carga.resultado_gestor_carga_total_flete_saldo_bruto,
+                    complemento_descuento = orden_carga.resultado_gestor_carga_complemento_descuento,
                     # resultado_gestor_carga_saldo (calculo anterior),
                 )
             )
@@ -55,7 +57,8 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
                 saldo=orden_carga.resultado_propietario_saldo,
                 total_efectivo=orden_carga.resultado_propietario_total_anticipos_retirados_efectivo,
                 total_combustible=orden_carga.resultado_propietario_total_anticipos_retirados_combustible,
-                saldo_bruto=orden_carga.resultado_propietario_saldo_bruto
+                saldo_bruto=orden_carga.resultado_propietario_saldo_bruto,
+                complemento_descuento = orden_carga.resultado_propietario_complemento_descuento,
             )
         )
     return lista
@@ -85,6 +88,8 @@ def get_orden_carga_remision_resultado_list_by_flete(
                         orden_carga.resultado_flete_gestor_carga_merma_valor_total_moneda_local
                     ),
                     saldo=orden_carga.resultado_flete_gestor_carga_total_flete,
+                    complemento_descuento = orden_carga.resultado_gestor_carga_complemento_descuento,
+                  
                     # resultado_flete_gestor_carga_saldo (calculo anterior),
                 )
             )
@@ -105,6 +110,7 @@ def get_orden_carga_remision_resultado_list_by_flete(
                 total_descuento=orden_carga.resultado_propietario_total_descuento,
                 total_anticipo=orden_carga.resultado_propietario_total_anticipos_retirados,
                 saldo=orden_carga.resultado_flete_propietario_saldo,
+                complemento_descuento = orden_carga.resultado_propietario_complemento_descuento,
             )
         )
     return lista
