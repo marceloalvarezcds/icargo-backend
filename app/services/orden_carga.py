@@ -369,7 +369,7 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "propietario_telefono": obj.camion.propietario.telefono,
         "chofer_nombre": obj.camion_chofer_nombre,
         "chofer_numero_documento": obj.camion_chofer_numero_documento,
-        "chofer_telefono": obj.camion.chofer.telefono,
+        
         "camion_foto": obj.camion.foto,
         "camion_placa": obj.camion_placa,
         "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",
@@ -414,7 +414,7 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
         "gestor_carga_numero_documento": gestor_carga.numero_documento,
         "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
         "propietario_nombre": obj.camion_propietario_nombre,
-        "chofer_nombre": obj.camion_chofer_nombre,
+        "chofer_nombre": obj.chofer_nombre,
         "camion_placa": obj.camion_placa,
         "semi_placa": obj.semi_placa,
         "origen": obj.origen_nombre,

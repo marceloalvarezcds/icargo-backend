@@ -574,6 +574,7 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_gestor_carga_tarifa_flete(self):
         return self.condicion_gestor_carga_tarifa
+    
 
     @hybrid_property
     def resultado_gestor_carga_tolerancia_kg(self):
