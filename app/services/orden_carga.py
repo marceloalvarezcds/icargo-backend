@@ -67,7 +67,7 @@ def get_orden_carga_finalizadas_list(
 ) -> List[OrdenCarga]:
     if gestor_carga_id:
         return repositories.get_orden_carga_finalizadas_list_by_gestor_carga_id(db, gestor_carga_id)
-    return repositories.get_orden_carga_aceptadas_list(db)
+    return repositories.get_orden_carga_finalizadas_list(db)
 
 
 def get_orden_carga_list_combinacion(
@@ -159,7 +159,7 @@ def create_orden_carga(
         flete.saldo = nueva_cantidad
         db.add(flete)
         db.commit()
-
+    send_emision_orden_carga_mail(obj)
     update_orden_carga_anticipo_saldo_by_orden_carga_id(db, OrdenCarga.id, modified_by)
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list(
         db, obj.id, obj.flete_anticipos, modified_by
@@ -632,8 +632,8 @@ def send_emision_orden_carga_mail(obj: OrdenCarga):
         "destino_direccion": obj.destino.direccion if obj.destino.direccion else "-",
         "propietario_nombre": obj.camion_propietario_nombre,
         "propietario_telefono": obj.camion.propietario.telefono,
-        "chofer_nombre": obj.camion_chofer_nombre,
-        "chofer_numero_documento": obj.camion_chofer_numero_documento,
+        "chofer_nombre": obj.chofer_nombre,
+        "chofer_numero_documento": obj.chofer_documento,
         "chofer_telefono": obj.camion.chofer.telefono if obj.camion.chofer else "",
         "camion_foto": obj.camion.foto,
         "camion_placa": obj.camion_placa,

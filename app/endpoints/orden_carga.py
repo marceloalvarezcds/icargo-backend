@@ -37,7 +37,7 @@ async def read_orden_carga_finalizadas(
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
-    return services.get_orden_carga_aceptadas_list(db, current_user.gestor_carga_id)
+    return services.get_orden_carga_finalizadas_list(db, current_user.gestor_carga_id)
 
 
 @api.post("/recepcion", response_model=List[schemas.OrdenCargaList])
