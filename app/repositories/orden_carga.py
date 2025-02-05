@@ -6,7 +6,7 @@ from app.models.permiso import Permiso
 from app.models.rol import Rol
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
-from sqlalchemy.sql.expressigit pon import true  # type: ignore
+from sqlalchemy.sql.expression import true  # type: ignore
 from sqlalchemy import desc
 
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
