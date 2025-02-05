@@ -6,7 +6,7 @@ from app.models.permiso import Permiso
 from app.models.rol import Rol
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
-from sqlalchemy.sql.expression import true  # type: ignore
+from sqlalchemy.sql.expressigit pon import true  # type: ignore
 from sqlalchemy import desc
 
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
@@ -16,6 +16,7 @@ from app.schemas.orden_carga import OrdenCargaUpdateFecha
 
 from .orden_carga_estado_historial import create_orden_carga_estado_historial
 from .orden_carga_comentarios_historial import create_orden_carga_comentarios_historial
+from sqlalchemy import func
 
 
 def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
@@ -58,22 +59,39 @@ def get_orden_carga_by_combinacion_id(
     )
 
 
-def get_orden_carga_aceptada_count_by_camion_id(
-    db: Session, camion_id: int
-) -> List[OrdenCarga]:
+# def get_orden_carga_aceptada_count_by_camion_id(
+#     db: Session, camion_id: int
+# ) -> List[OrdenCarga]:
+#     return (
+#         db.query(OrdenCarga)
+#         .filter(
+#             and_(
+#                 OrdenCarga.camion_id == camion_id,
+#                 or_(
+#                     OrdenCarga.estado == EstadoEnum.ACEPTADO.value,
+#                     # OrdenCarga.estado == EstadoEnum.EN_PROCESO.value,
+#                     # OrdenCarga.estado == EstadoEnum.FINALIZADO.value,
+#                 ),
+#             )
+#         )
+#         .count()
+#     )
+
+def get_orden_carga_aceptada_count_by_camion_id(db, camion_id):
+    return db.query(OrdenCarga).filter(
+        OrdenCarga.camion_id == camion_id,
+        OrdenCarga.estado == EstadoEnum.ACEPTADO.value,  # Convertimos el enum a su valor
+        OrdenCarga.estado != EstadoEnum.FINALIZADO.value  # Convertimos el enum a su valor
+    ).count()
+
+def get_orden_carga_finalizada_count_by_camion_id(db: Session, camion_id: int) -> int:
     return (
-        db.query(OrdenCarga)
+        db.query(func.count(OrdenCarga.id))
         .filter(
-            and_(
-                OrdenCarga.camion_id == camion_id,
-                or_(
-                    OrdenCarga.estado == EstadoEnum.ACEPTADO.value,
-                    OrdenCarga.estado == EstadoEnum.EN_PROCESO.value,
-                    OrdenCarga.estado == EstadoEnum.FINALIZADO.value,
-                ),
-            )
+            OrdenCarga.camion_id == camion_id,
+            OrdenCarga.estado == EstadoEnum.FINALIZADO.value   # Asegúrate de que este sea el estado correcto
         )
-        .count()
+        .scalar()
     )
 
 

@@ -328,7 +328,8 @@ from .orden_carga import (  # noqa
     get_orden_carga_finalizadas_list,
     get_orden_carga_aceptadas_list_by_gestor_carga_id,
     get_orden_carga_finalizadas_list_by_gestor_carga_id,
-    edit_remitir_fecha
+    edit_remitir_fecha,
+    get_orden_carga_finalizada_count_by_camion_id
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
