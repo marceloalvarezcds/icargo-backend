@@ -12,6 +12,7 @@ from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
 from pdfkit import from_string  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
+import logging
 
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, STATICS_URL, templateEnv
@@ -594,6 +595,7 @@ def send_oc_mail(db: Session, id: int):
 
 
 def send_emision_orden_carga_mail(obj: OrdenCarga):
+    
     gestor_carga: GestorCarga = obj.gestor_carga
     flete = get_flete_detail(obj.flete)
     destinatarios = ",".join([x.email for x in flete.destinatarios])
@@ -653,6 +655,12 @@ def send_emision_orden_carga_mail(obj: OrdenCarga):
         else "-",
         "usuario": obj.created_by,
     }
+
+    logging.debug(f"Destinatarios del correo: {destinatarios}")
+    logging.debug(f"LOGO_IMAGE_URL: {LOGO_IMAGE_URL}")
+    logging.debug(f"Datos del email a enviar: {data}")
+    for key, value in data.items():
+        logging.debug(f"{key}: {value}")
     send_email_with_template_by_thread(
         template_filename="mail_orden_carga.html",
         to=destinatarios,
