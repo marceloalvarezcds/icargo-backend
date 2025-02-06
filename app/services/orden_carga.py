@@ -13,6 +13,7 @@ from openpyxl.styles import Font  # type: ignore
 from pdfkit import from_string  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 import logging
+from app.logger import logger
 
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, STATICS_URL, templateEnv
@@ -595,6 +596,7 @@ def send_oc_mail(db: Session, id: int):
 
 
 def send_emision_orden_carga_mail(obj: OrdenCarga):
+
     gestor_carga: GestorCarga = obj.gestor_carga
     flete = get_flete_detail(obj.flete)
     destinatarios = ",".join([x.email for x in flete.destinatarios])
@@ -654,12 +656,45 @@ def send_emision_orden_carga_mail(obj: OrdenCarga):
         else "-",
         "usuario": obj.created_by,
     }
-
-    logging.debug(f"Destinatarios del correo: {destinatarios}")
-    logging.debug(f"LOGO_IMAGE_URL: {LOGO_IMAGE_URL}")
-    logging.debug(f"Datos del email a enviar: {data}")
-    for key, value in data.items():
-        logging.debug(f"{key}: {value}")
+    logger.info(f"gestor_carga: {gestor_carga}")
+    logger.info(f"id: {obj.id}")
+    logger.info(f"flete_id: {flete.id}")
+    logger.info(f"remitente: {flete.remitente.nombre}")
+    logger.info(f"remitente_numero_documento: {flete.remitente.numero_documento}")
+    logger.info(f"cantidad_nominada: {obj.cantidad_nominada}")
+    logger.info(f"gestor_carga.direccion: {gestor_carga.direccion}")
+    logger.info(f"gestor_carga.logo: {gestor_carga.logo}")
+    logger.info(f"gestor_carga.nombre: {gestor_carga.nombre}")
+    logger.info(f"gestor_carga_nombre_corto: {gestor_carga_nombre_corto}")
+    logger.info(f"gestor_carga.numero_documento: {gestor_carga.numero_documento}")
+    logger.info(f"fecha: {datetime.now().strftime(df)}")
+    logger.info(f"fecha_orden: {create_at.strftime(df)}")
+    logger.info(f"fecha_validez: {obj.fecha_validez.strftime(df)}")
+    logger.info(f"producto: {obj.flete_producto_descripcion}")
+    logger.info(f"origen: {obj.origen_nombre}")
+    logger.info(f"origen_direccion: {obj.origen.direccion if obj.origen.direccion else '-'}")
+    logger.info(f"destino: {obj.destino_nombre}")
+    logger.info(f"destino_direccion: {obj.destino.direccion if obj.destino.direccion else '-'}")
+    logger.info(f"propietario_nombre: {obj.camion_propietario_nombre}")
+    logger.info(f"propietario_telefono: {obj.camion.propietario.telefono}")
+    logger.info(f"chofer_nombre: {obj.chofer_nombre}")
+    logger.info(f"chofer_numero_documento: {obj.chofer_documento}")
+    logger.info(f"chofer_telefono: {obj.camion.chofer.telefono if obj.camion.chofer else ''}")
+    logger.info(f"camion_foto: {obj.camion.foto}")
+    logger.info(f"camion_placa: {obj.camion_placa}")
+    logger.info(f"camion_marca_tipo: {f'{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}'}")
+    logger.info(f"camion_color: {obj.camion.color_descripcion}")
+    logger.info(f"camion_tipo: {obj.camion.tipo_descripcion}")
+    logger.info(f"camion_fecha_vto: {fecha_vencimiento.strftime(df) if fecha_vencimiento else '-'}")
+    logger.info(f"semi_placa: {obj.semi_placa}")
+    logger.info(f"semi_marca_tipo: {f'{obj.semi.marca_descripcion}/{obj.semi.tipo_descripcion}'}")
+    logger.info(f"semi_color: {obj.semi.color_descripcion}")
+    logger.info(f"semi_tipo: {obj.semi.tipo_descripcion}")
+    logger.info(f"comentarios: {obj.comentarios if obj.comentarios else '-'}")
+    logger.info(f"texto_legal: {obj.flete.emision_orden_texto_legal if obj.flete.emision_orden_texto_legal else '-'}")
+    logger.info(f"usuario: {obj.created_by}")
+    logger.info(f"Destinatarios del correo: {destinatarios}")
+    logger.info(f"LOGO_IMAGE_URL: {LOGO_IMAGE_URL}")
     send_email_with_template_by_thread(
         template_filename="mail_orden_carga.html",
         to=destinatarios,
