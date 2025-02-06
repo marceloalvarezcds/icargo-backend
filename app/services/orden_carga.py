@@ -160,7 +160,7 @@ def create_orden_carga(
         flete.saldo = nueva_cantidad
         db.add(flete)
         db.commit()
-    send_emision_orden_carga_mail(obj)
+    send_oc_mail(db, obj.id)
     update_orden_carga_anticipo_saldo_by_orden_carga_id(db, OrdenCarga.id, modified_by)
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list(
         db, obj.id, obj.flete_anticipos, modified_by
@@ -595,7 +595,6 @@ def send_oc_mail(db: Session, id: int):
 
 
 def send_emision_orden_carga_mail(obj: OrdenCarga):
-    
     gestor_carga: GestorCarga = obj.gestor_carga
     flete = get_flete_detail(obj.flete)
     destinatarios = ",".join([x.email for x in flete.destinatarios])
