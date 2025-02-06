@@ -21,6 +21,7 @@ class EstadoCuentaForm(BaseModel):
 class EstadoCuenta(BaseModel):
     contraparte_id: Optional[int]
     contraparte: str
+    contraparte_alias: Optional[str]
     contraparte_numero_documento: str
     punto_venta_id: Optional[int]
     contraparte_pdv: Optional[str]
@@ -28,6 +29,7 @@ class EstadoCuenta(BaseModel):
     tipo_contraparte_id: int
     tipo_contraparte_descripcion: str
     tipo_flujo: Optional[str]
+    es_pdv: Optional[bool]
     provision: RoundedDecimal
     pendiente: RoundedDecimal
     en_proceso: Optional[RoundedDecimal]

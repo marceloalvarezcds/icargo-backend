@@ -41,11 +41,10 @@ def get_camion_list_by_gestor_cuenta_id(
 def is_camion_in_combinacion(db: Session, camion_id: int) -> bool:
     combinacion = db.query(Combinacion).filter(
         Combinacion.camion_id == camion_id,
-        Combinacion.estado == 'activo' 
+        Combinacion.estado == 'activo'
     ).first()
 
     return combinacion is not None
-
 
 
 def get_camion_by(db: Session, placa: str) -> Optional[Camion]:
