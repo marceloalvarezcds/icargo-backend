@@ -41,7 +41,7 @@ async def read_combinacion_by_camion_and_gestor(
     combinacion = repositories.get_combinacion_tracto_ids(
         db, camion_id, current_user.gestor_carga_id
     )
-    
+
     if not combinacion:
         # Si no se encuentra ninguna combinación, retornar un mensaje indicando que no está en una combinación
         raise HTTPException(
@@ -230,3 +230,13 @@ def inactive_camion_by_id(
     return services.change_camion_status(
         db, id, EstadoEnum.INACTIVO, current_user.username
     )
+
+
+@api.get("/combinacion/camion_list/{id}", response_model=schemas.CamionList)
+def inactive_camion_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.CAMION)),  # noqa: B008
+):
+    return services.get_camion_by_id(db, id)

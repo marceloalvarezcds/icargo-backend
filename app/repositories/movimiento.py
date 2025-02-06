@@ -7,7 +7,10 @@ from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
 from app.enums import MovimientoEstadoEnum, EstadoEnum, TipoAnticipoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
 from app.models import (
-    Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta, TipoMovimiento, OrdenCargaAnticipoRetirado, TipoAnticipo, OrdenCarga
+    Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta, TipoMovimiento,
+    OrdenCargaAnticipoRetirado, TipoAnticipo, OrdenCarga, Propietario, Remitente,
+    Proveedor, PuntoVenta
+
 )
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
@@ -503,11 +506,33 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
     ) -> Query:
 
     # columnas especificas
+    queryProveedor = db.query(Proveedor.nombre)\
+            .filter(Proveedor.id == Movimiento.proveedor_id)\
+            .label('contraparte_alias')
+
+    queryPDV = db.query(PuntoVenta.nombre_corto)\
+            .filter(PuntoVenta.id == Movimiento.punto_venta_id)\
+            .label('contraparte_alias')
+
+    # agregar case para contraparte nombre
+    # si es C buscar en tabla C y de ultima usar el nombre del movimiento - caso otros
+
     query = db.query(
                 literal_column("2").label("orden"),
                 Movimiento.id.label("movimiento_id"),
                 literal_column("0").label("instrumento_id"),
                 Movimiento.liquidacion_id.label("liquidacion_id"),
+                case(
+                    (
+                        Movimiento.punto_venta_id != null(),
+                        queryPDV,
+                    ),
+                    (
+                        Movimiento.proveedor_id != null(),
+                        queryProveedor
+                    ),
+                    else_=literal_column("'OTROS'"),
+                ).label("contraparte_alias"),
                 Movimiento.created_at.label("fecha"),
                 TipoCuenta.descripcion.label("tipo_cuenta_descripcion"),
                 TipoMovimiento.descripcion.label("tipo_movimiento_concepto"),
@@ -548,12 +573,12 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                     Movimiento.propietario_id == contraparte_id,
                     Movimiento.remitente_id == contraparte_id,
                     Movimiento.proveedor_id == contraparte_id,
+                    Movimiento.chofer_id == contraparte_id,
                     and_(
                         Movimiento.contraparte == contraparte,
                         Movimiento.contraparte_numero_documento
                         == contraparte_numero_documento,
                     ),
-                    Movimiento.chofer_id == contraparte_id,
                 ),
                 or_(
                     OrdenCargaAnticipoRetirado.punto_venta_id == punto_venta_id,

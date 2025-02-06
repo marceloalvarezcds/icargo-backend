@@ -20,6 +20,7 @@ class MovimientoEstadoCuentaForm(BaseModel):
 
 
 class MovimientoEstadoCuenta(BaseModel):
+    contraparte_alias: Optional[str]
     movimiento_id: Optional[int]
     liquidacion_id: Optional[int]
     instrumento_id: Optional[int]

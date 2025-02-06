@@ -201,8 +201,9 @@ def create_movimiento_by_anticipo(
             fecha_cambio_moneda=datetime.now(),
             anticipo_id=anticipo.id,
             proveedor_id=anticipo.punto_venta.proveedor_id,
+            punto_venta_id=anticipo.punto_venta.id,
             tipo_movimiento_info=anticipo.concepto,
-            linea_movimiento=linea_movimiento,
+            linea_movimiento=linea_movimiento
         ),
         gestor_carga_id,
         modified_by,

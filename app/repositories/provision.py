@@ -84,6 +84,7 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
                 Provision.id.label("movimiento_id"),
                 literal_column("0").label("instrumento_id"),
                 null().label("liquidacion_id"),
+                literal_column("' '").label("contraparte_alias"),
                 Provision.created_at.label("fecha"),
                 TipoCuenta.descripcion.label("tipo_cuenta_descripcion"),
                 literal_column("'Provision'").label("tipo_movimiento_concepto"),

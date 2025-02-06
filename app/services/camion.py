@@ -18,16 +18,16 @@ from .camion_check_files import check_files
 
 def check_combinaciones_activas(db: Session) -> List[Camion]:
     camiones = repositories.get_camion_list(db)
-    
+
     for camion in camiones:
         combinacion_tracto = db.query(Combinacion).filter(Combinacion.camion_id == camion.id).first()
-        
+
         if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"La combinación de tracto para el camión {camion.placa} ya está activa."
             )
-    
+
     return camiones
 
 
