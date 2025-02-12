@@ -11,6 +11,15 @@ from app.services import generic_service as service
 from app.services import seleccionable_service
 
 
+def get_tipo_cuenta_list(
+    db: Session,
+) -> List[TipoCuenta]:
+    return service.get_list(
+        TipoCuenta,
+        db
+    )
+
+
 def get_tipo_cuenta_list_by_tipo_documento_relacionado_otro(
     db: Session,
 ) -> List[TipoCuenta]:
@@ -24,6 +33,17 @@ def get_tipo_cuenta_list_by_tipo_documento_relacionado_otro(
             tipo_documento_relacionado_id=otro.id,
         )
     return []
+
+
+def get_tipo_cuenta_active_list(
+    db: Session,
+) -> List[TipoCuenta]:
+
+    return service.get_list_by_filter(
+        TipoCuenta,
+        db,
+        estado=EstadoEnum.ACTIVO.value,
+    )
 
 
 def get_tipo_cuenta_active_list_by_tipo_documento_relacionado_otro(

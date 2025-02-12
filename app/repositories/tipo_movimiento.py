@@ -29,7 +29,7 @@ def get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes(
         db.query(TipoMovimiento)
         .join(TipoMovimiento.cuenta)
         .filter(TipoCuenta.descripcion != TipoCuentaEnum.VIAJES.value)
-        .order_by(TipoMovimiento.descripcion)
+        .order_by(TipoMovimiento.id.desc())
         .all()
     )
 
@@ -46,6 +46,6 @@ def get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes(
                 TipoMovimiento.estado == EstadoEnum.ACTIVO.value,
             )
         )
-        .order_by(TipoMovimiento.descripcion)
+        .order_by(TipoMovimiento.id.desc())
         .all()
     )

@@ -20,7 +20,7 @@ async def read_tipo_cuenta_list(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.TIPO_CUENTA)),  # noqa: B008
 ):
-    return services.get_tipo_cuenta_list_by_tipo_documento_relacionado_otro(db)
+    return services.get_tipo_cuenta_list(db)
 
 
 @api.get("/active_list", response_model=List[schemas.TipoCuenta])
@@ -28,7 +28,7 @@ async def read_tipo_cuenta_active_list_by_tipo_documento_relacionado_otro(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.TIPO_CUENTA)),  # noqa: B008
 ):
-    return services.get_tipo_cuenta_active_list_by_tipo_documento_relacionado_otro(db)
+    return services.get_tipo_cuenta_active_list(db)
 
 
 @api.get("/{id}", response_model=schemas.TipoCuenta)
