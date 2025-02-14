@@ -350,6 +350,8 @@ from .tipo_cuenta import (  # noqa
     edit_tipo_cuenta,
     get_tipo_cuenta_active_list_by_tipo_documento_relacionado_otro,
     get_tipo_cuenta_list_by_tipo_documento_relacionado_otro,
+    get_tipo_cuenta_list,
+    get_tipo_cuenta_active_list
 )
 from .tipo_instrumento import get_tipo_instrumento_via_banco  # noqa
 from .tipo_movimiento import (  # noqa

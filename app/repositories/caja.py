@@ -28,7 +28,7 @@ def get_caja_list_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> List[
                 Caja.estado != EstadoEnum.ELIMINADO.value,
             )
         )
-        .order_by(Caja.nombre)
+        .order_by(Caja.id.desc())
         .all()
     )
 
