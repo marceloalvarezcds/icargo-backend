@@ -8,6 +8,7 @@ from sqlalchemy.sql.elements import and_, or_  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Movimiento, OrdenCarga, OrdenCargaAnticipoRetirado
+from app.models.orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from app.schemas import OrdenCargaAnticipoRetiradoForm
 
 
@@ -105,6 +106,55 @@ def delete_orden_carga_anticipo_retirado(db: Session, id: int, modified_by: str)
         db.commit()
         db.delete(obj)
         db.commit()
+
+
+def change_anticipo_status(
+    obj: OrdenCargaAnticipoRetirado,
+    db: Session,
+    status: EstadoEnum,
+    modified_by: str,
+) -> OrdenCargaAnticipoRetirado:
+    # Obtener el movimiento relacionado con la orden de carga
+    movimiento = get_movimiento_by_anticipo_id(db, obj.id)  # Obtiene el movimiento por el ID del anticipo
+    if movimiento:
+        # Actualizar el estado del movimiento
+        movimiento.estado = status.value
+        movimiento.modified_by = modified_by
+        movimiento.modified_at = datetime.now()
+
+        # Guardar los cambios en el movimiento
+        db.commit()
+        db.refresh(movimiento)  # Refrescar el objeto movimiento para obtener los últimos cambios
+
+    return obj
+
+
+def get_anticipo_by_id(db: Session, id: int) -> OrdenCargaAnticipoRetirado:
+    return db.query(OrdenCargaAnticipoRetirado).filter(OrdenCargaAnticipoRetirado.id == id).first()
+
+
+def get_movimiento_by_anticipo_id(db: Session, anticipo_id: int):
+    return db.query(Movimiento).filter(Movimiento.anticipo_id == anticipo_id).first()
+
+
+def get_movimiento_by_anticipo_id_and_id(db: Session, anticipo_id: int, id: int):
+    """
+    Obtiene el movimiento correspondiente al id de OrdenCargaAnticipoRetirado y su anticipo_id.
+    """
+    return db.query(Movimiento).filter(
+        Movimiento.anticipo_id == anticipo_id,
+        Movimiento.id == id  # Asegurándonos de que estamos buscando el movimiento específico
+    ).first()
+
+
+def get_saldo_by_flete_anticipo_id_and_orden_carga_id(
+    db: Session, flete_anticipo_id: int, orden_carga_id: int
+) -> OrdenCargaAnticipoSaldo:
+    return db.query(OrdenCargaAnticipoSaldo).filter(
+        OrdenCargaAnticipoSaldo.flete_anticipo_id == flete_anticipo_id,
+        OrdenCargaAnticipoSaldo.orden_carga_id == orden_carga_id
+    ).first()
+
 
 
 def get_total_anticipo_retirado_by_camion_id(

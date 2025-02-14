@@ -1,3 +1,4 @@
+from app.enums.estado import EstadoEnum
 from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
@@ -72,3 +73,15 @@ async def delete_orden_carga_anticipo_retirado(
     ),
 ):
     return services.delete_orden_carga_anticipo_retirado(db, id, current_user.username)
+
+
+@api.get("/{id}/anular", response_model=schemas.OrdenCargaAnticipoRetirado)
+def anular_anticipo_retirado_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.ANULAR, m.ORDEN_CARGA_ANTICIPO_RETIRADO)),  # noqa: B008
+):
+    return services.change_anticipo_status(
+        db, id, EstadoEnum.ANULADO , current_user.username
+    )

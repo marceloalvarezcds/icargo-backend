@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy import (  # type: ignore
     Column,
     ForeignKey,
@@ -11,6 +12,7 @@ from sqlalchemy.orm import relationship  # type: ignore
 
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
+from app.schemas.movimiento import Movimiento
 from app.utils import number_format
 
 from .flete_anticipo import FleteAnticipo
@@ -214,3 +216,20 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     @hybrid_property
     def unidad_descripcion(self):
         return self.unidad.descripcion if self.unidad else None
+
+    @hybrid_property
+    def estados_movimientos(self):
+        # Obtener todos los movimientos relacionados con la orden de carga
+        movimientos: List[Movimiento] = self.orden_carga.movimientos if self.orden_carga else []
+
+        # Filtrar los movimientos por anticipo_id (debe coincidir con el id de OrdenCargaAnticipoRetirado)
+        movimientos_filtrados = [
+            movimiento for movimiento in movimientos 
+            if movimiento.anticipo_id == self.id  # Aquí solo comparamos con self.id
+        ]
+
+        # Obtener el primer estado del primer movimiento filtrado
+        primer_estado = next((movimiento.estado for movimiento in movimientos_filtrados), None)
+
+        return primer_estado
+

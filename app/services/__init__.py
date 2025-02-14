@@ -198,7 +198,7 @@ from .movimiento import (  # noqa
     get_movimiento_reports_by_gestor_carga_id,
     get_all_movimiento_list_by_estado_cuenta,
     get_movimiento_estado_cuenta_reports_by_contraparte,
-    create_movimiento_by_factura
+    create_movimiento_by_factura,
 )
 from .orden_carga import (  # noqa
     aceptar_orden_carga,
@@ -242,6 +242,7 @@ from .orden_carga_anticipo_retirado import (  # noqa
     edit_orden_carga_anticipo_retirado,
     get_orden_carga_anticipo_retirado_by_id,
     get_orden_carga_anticipo_retirado_pdf_by_id,
+    change_anticipo_status,
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id,

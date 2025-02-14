@@ -1,5 +1,6 @@
-from typing import Optional
+from typing import List, Optional
 
+from app.enums.estado import EstadoEnum
 from pydantic import BaseModel
 
 from .date_model import Date
@@ -47,6 +48,35 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     moneda_nombre: str
     proveedor_nombre: str
     punto_venta_nombre: str
+    punto_venta_pais_nombre: Optional[str] = None
+    tipo_anticipo_descripcion: str
+    tipo_comprobante_descripcion: Optional[str] = None
+    tipo_insumo_descripcion: Optional[str] = None
+    unidad_abreviatura: Optional[str] = None
+    unidad_descripcion: Optional[str] = None
+    estados_movimientos: Optional[str] = None
+    
+    # Auditoría
+    created_by: str
+    created_at: Date
+    modified_by: str
+    modified_at: Date
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True
+
+
+class OrdenCargaAnticipoRetiradoAnulado(BaseModel):
+    id: int
+    estado: EstadoEnum
+    insumo_descripcion: Optional[str] = None
+    insumo_fecha_precio: Optional[Date] = None
+    insumo_moneda_nombre: Optional[str] = None
+    insumo_precio: Optional[RoundedDecimal] = None
+    insumo_tipo_descripcion: Optional[str] = None
+    insumo_unidad_abreviatura: Optional[str] = None
+    insumo_unidad_descripcion: Optional[str] = None
     punto_venta_pais_nombre: Optional[str] = None
     tipo_anticipo_descripcion: str
     tipo_comprobante_descripcion: Optional[str] = None

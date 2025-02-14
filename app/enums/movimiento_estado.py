@@ -8,3 +8,4 @@ class MovimientoEstadoEnum(Enum):
     CONFIRMADO = "Confirmado"
     FINALIZADO = "Finalizado"
     ELIMINADO = "Eliminado"
+    ANULADO = "Anulado"

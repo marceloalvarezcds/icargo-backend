@@ -87,6 +87,7 @@ from .orden_carga_anticipo_porcentaje import (  # noqa
 from .orden_carga_anticipo_retirado import (  # noqa
     OrdenCargaAnticipoRetirado,
     OrdenCargaAnticipoRetiradoForm,
+    OrdenCargaAnticipoRetiradoAnulado,
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     OrdenCargaAnticipoSaldo,

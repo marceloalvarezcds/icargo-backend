@@ -33,6 +33,7 @@ from app.schemas import (
     OrdenCargaRemisionDestino,
     OrdenCargaRemisionOrigen,
     OrdenCargaAnticipoSaldo,
+    Movimiento,
 )
 from app.utils import get_flete_detalle, get_merma_detalle
 
@@ -669,21 +670,37 @@ class OrdenCarga(AuditMixin, Base):
             self.resultado_propietario_saldo
             + self.resultado_propietario_total_anticipos_retirados
         )
-
+    
     @hybrid_property
     def resultado_propietario_total_anticipos_retirados_efectivo(self):
         lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
-        return sum(x.monto_retirado for x in lista if x.concepto == 'EFECTIVO')
+        total_efectivo = 0 
+        for anticipo in lista:
+            if not self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
+                if anticipo.concepto == 'EFECTIVO':
+                    total_efectivo += anticipo.monto_retirado
+        return total_efectivo
 
     @hybrid_property
     def resultado_propietario_total_anticipos_retirados_combustible(self):
         lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
-        return sum(x.monto_retirado for x in lista if x.concepto == 'COMBUSTIBLE')
-    
+        total_combustible = 0
+        for anticipo in lista:
+            if not self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
+                if anticipo.concepto == 'COMBUSTIBLE':
+                    total_combustible += anticipo.monto_retirado
+        return total_combustible
+
     @hybrid_property
     def resultado_propietario_total_anticipos_retirados_lubricantes(self):
         lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
-        return sum(x.monto_retirado for x in lista if x.concepto == 'LUBRICANTES')
+        total_lubricantes = 0
+        for anticipo in lista:
+            if not self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
+                if anticipo.concepto == 'LUBRICANTES':
+                    total_lubricantes += anticipo.monto_retirado
+        return total_lubricantes
+
     
     @hybrid_property
     def resultado_propietario_tarifa_flete(self):
@@ -998,3 +1015,22 @@ class OrdenCarga(AuditMixin, Base):
             for saldo in self.saldos
             if saldo.orden_carga_anticipo_porcentaje.concepto == 'LUBRICANTES'
         )
+    
+    def get_estado_en_movimientos_por_anticipo_id(self, anticipo_id: int, estado: str) -> Optional[Movimiento]:
+        lista: List[Movimiento] = self.movimientos
+        for movimiento in lista:
+            if movimiento.anticipo_id == anticipo_id and movimiento.estado == estado:
+                return movimiento
+        return None
+
+    def find_estado_en_movimientos_por_anticipo_id(self, anticipo_id: int, estado: str) -> bool:
+        encontrado = self.get_estado_en_movimientos_por_anticipo_id(anticipo_id, estado)
+        return encontrado is not None
+
+
+    @hybrid_property
+    def is_anulado(self):
+        for anticipo in self.anticipos:
+            if self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
+                return True
+        return False

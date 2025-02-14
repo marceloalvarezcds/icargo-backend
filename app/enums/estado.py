@@ -17,3 +17,4 @@ class EstadoEnum(Enum):
     NUEVO = "Nuevo"
     PENDIENTE = "Pendiente"
     RECHAZADO = "Rechazado"
+    ANULADO = "Anulado"

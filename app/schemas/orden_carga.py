@@ -156,6 +156,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     is_en_proceso: bool
     is_finalizado: bool
     is_liquidado: bool
+    
     # Campos para la edición
     estado: EstadoEnum
     orden_carga_estado: OrdenCargaEstadoEnum
@@ -287,6 +288,7 @@ class OrdenCargaList(OrdenCargaForm):
     resultado_propietario_total_anticipos_retirados_efectivo: Optional[int] = None
     resultado_propietario_total_anticipos_retirados_combustible: Optional[int] = None
     resultado_propietario_total_anticipos_retirados_lubricantes: Optional[int] = None
+    is_anulado: bool
     resultado_saldo_combustible: Optional[int] = None
     saldo_efectivo: Optional[int] = None
     saldo_combustible: Optional[int] = None
