@@ -31,5 +31,10 @@ def upgrade():
 
 
 def downgrade():
+    op.drop_constraint(
+        "punto_venta_proveedor_sucursal_uk",
+        "punto_venta",
+        type_="unique",
+    )
     op.drop_column("punto_venta", "numero_sucursal")
-    op.drop_constraint("punto_venta_proveedor_sucursal_uk", "punto_venta", type_="unique")
+
