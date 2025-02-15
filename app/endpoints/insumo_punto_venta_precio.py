@@ -62,7 +62,7 @@ async def read_insumo_punto_venta_precio_list(
 
 @api.get(
     "/insumos/punto_venta/{punto_venta_id}",
-    response_model=List[schemas.InsumoPuntoVentaPrecioList],  
+    response_model=List[schemas.InsumoPuntoVentaPrecioList],
 )
 async def read_insumos_by_punto_venta(
     punto_venta_id: int,

@@ -11,7 +11,6 @@ from app.enums import PermisoModeloEnum as m
 
 api = APIRouter()
 
-
 @api.get("/", response_model=List[schemas.Banco])
 async def read_banco_list(
     db: Session = Depends(get_db_session),  # noqa: B008
