@@ -115,6 +115,7 @@ def create_punto_venta(
         longitud=data.longitud,
         ciudad_id=data.ciudad_id,
         modified_by=modified_by,
+        numero_sucursal=data.numero_sucursal
     )
     db.add(obj)
     db.commit()
@@ -146,6 +147,7 @@ def edit_punto_venta(
     obj.ciudad_id = data.ciudad_id
     obj.estado = data.estado
     obj.modified_by = modified_by
+    obj.numero_sucursal = data.numero_sucursal
     obj.modified_at = datetime.now()
     if logo_url:
         obj.logo = logo_url

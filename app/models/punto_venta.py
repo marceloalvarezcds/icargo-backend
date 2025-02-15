@@ -27,8 +27,13 @@ class PuntoVenta(AuditMixin, Base):
 
     __table_args__ = (
         UniqueConstraint(
+            "proveedor_id",
             "tipo_documento_id",
             "numero_documento",
+        ),
+        UniqueConstraint(
+            "proveedor_id",
+            "numero_sucursal",
         ),
     )
     id = Column(Integer, primary_key=True)
@@ -53,6 +58,7 @@ class PuntoVenta(AuditMixin, Base):
     longitud = Column(DECIMAL)
     ciudad_id = Column(Integer, ForeignKey("ciudad.id"))
     ciudad = relationship(Ciudad, uselist=False)
+    numero_sucursal = Column(Integer)
     contactos = relationship(
         "PuntoVentaContactoGestorCarga", back_populates="punto_venta"
     )
@@ -82,7 +88,7 @@ class PuntoVenta(AuditMixin, Base):
     @hybrid_property
     def proveedor_nombre(self):
         return self.proveedor.nombre
-    
+
     @hybrid_property
     def proveedor_documento(self):
         return self.proveedor.numero_documento

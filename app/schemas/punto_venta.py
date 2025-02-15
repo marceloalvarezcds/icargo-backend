@@ -17,6 +17,7 @@ from .tipo_documento import TipoDocumento
 class PuntoVentaBaseModel(BaseModel):
     nombre: str
     nombre_corto: Optional[str] = None
+    numero_sucursal: int
     proveedor_id: int
     tipo_documento_id: int
     numero_documento: str

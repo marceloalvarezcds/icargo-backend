@@ -95,15 +95,15 @@ class InsumoPuntoVenta(AuditMixin, Base):
     @hybrid_property
     def proveedor_nombre(self):
         return self.punto_venta.proveedor_nombre
-    
+
     @hybrid_property
     def proveedor_documento(self):
         return self.punto_venta.proveedor_documento
-    
+
     @hybrid_property
     def created_insumo(self):
         return self.insumo.fecha_creacion
-    
+
     @hybrid_property
     def marca_insumo(self):
         return self.insumo.marca
@@ -111,6 +111,10 @@ class InsumoPuntoVenta(AuditMixin, Base):
     @hybrid_property
     def punto_venta_nombre(self):
         return self.punto_venta.nombre
+
+    @hybrid_property
+    def punto_venta_alias(self):
+        return self.punto_venta.nombre_corto
 
     @hybrid_property
     def punto_venta_direccion(self):
@@ -131,17 +135,17 @@ class InsumoPuntoVenta(AuditMixin, Base):
     @hybrid_property
     def precio(self):
         if self.precios:
-            return self.precios[0].precio 
-        return None  
+            return self.precios[0].precio
+        return None
 
     @hybrid_property
     def fecha_inicio(self):
         if self.precios:
-            return self.precios[0].fecha_inicio 
-        return None  
+            return self.precios[0].fecha_inicio
+        return None
 
     @hybrid_property
     def fecha_fin(self):
         if self.precios:
-            return self.precios[0].fecha_fin 
-        return None  
+            return self.precios[0].fecha_fin
+        return None

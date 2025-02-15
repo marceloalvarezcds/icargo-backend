@@ -19,7 +19,7 @@ class InsumoPuntoVentaPrecioForm(BaseModel):
     moneda_id: Optional[int] = None
     precio: RoundedDecimal
     fecha_inicio: datetime
-  
+
     observacion: Optional[str] = None
     hora_inicio: Optional[str] = None
 
@@ -65,6 +65,7 @@ class InsumoPuntoVentaPrecioList(InsumoPuntoVentaPrecio):
     proveedor_nombre: str
     punto_venta_id: int
     punto_venta_nombre: str
+    punto_venta_alias: Optional[str] = None
     punto_venta_direccion: Optional[str] = None
     punto_venta_logo: Optional[str] = None
     punto_venta_latitud: Optional[Decimal] = None
@@ -83,7 +84,7 @@ class InsumoPuntoVentaPrecioList(InsumoPuntoVentaPrecio):
 class InsumoPuntoVentaPrecioUpdate(BaseModel):
     precio: RoundedDecimal
     fecha_inicio: datetime
-    
+
     hora_inicio: Optional[str] = None
     observacion: Optional[str] = None
 
