@@ -34,7 +34,7 @@ class ProveedorBaseModel(BaseModel):
 class ProveedorForm(ProveedorBaseModel):
     alias: Optional[str] = None
     contactos: List[ContactoForm]
-    created_at: str
+    created_by: Optional[str] = None
 
 
 class ProveedorBase(ProveedorBaseModel):
@@ -44,7 +44,7 @@ class ProveedorBase(ProveedorBaseModel):
     logo: Optional[str] = None
     estado: EstadoEnum
     ciudad: Optional[Ciudad] = None
-
+    created_by: Optional[str] = None
 
 class ProveedorList(ProveedorBase):
     ciudad_nombre: Optional[str] = None

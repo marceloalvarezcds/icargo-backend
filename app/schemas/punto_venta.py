@@ -37,7 +37,7 @@ class PuntoVentaBaseModel(BaseModel):
 class PuntoVentaForm(PuntoVentaBaseModel):
     alias: Optional[str] = None
     contactos: List[ContactoForm]
-    created_at: str
+    created_by: str
 
     class Config:
         orm_mode = True
@@ -62,6 +62,7 @@ class PuntoVentaList(PuntoVentaBase):
     pais_nombre_corto: Optional[str] = None
     proveedor_nombre: str
     tipo_documento_descripcion: Optional[str] = None
+    created_by: str
 
     class Config:
         orm_mode = True

@@ -116,7 +116,7 @@ def create_punto_venta(
         ciudad_id=data.ciudad_id,
         modified_by=modified_by,
         numero_sucursal=data.numero_sucursal,
-        created_at = modified_by,
+        created_by = modified_by,
     )
     db.add(obj)
     db.commit()
