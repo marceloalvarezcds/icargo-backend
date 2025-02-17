@@ -34,6 +34,7 @@ class ProveedorBaseModel(BaseModel):
 class ProveedorForm(ProveedorBaseModel):
     alias: Optional[str] = None
     contactos: List[ContactoForm]
+    created_at: str
 
 
 class ProveedorBase(ProveedorBaseModel):

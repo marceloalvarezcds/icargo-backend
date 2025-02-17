@@ -235,6 +235,7 @@ from .orden_carga import (  # noqa
     get_orden_carga_aceptadas_list,
     get_orden_carga_finalizadas_list,
     edit_remitir_fecha,
+    get_orden_carga_en_proceso_list,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,

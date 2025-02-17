@@ -37,6 +37,11 @@ class PuntoVentaBaseModel(BaseModel):
 class PuntoVentaForm(PuntoVentaBaseModel):
     alias: Optional[str] = None
     contactos: List[ContactoForm]
+    created_at: str
+
+    class Config:
+        orm_mode = True
+        use_enum_values = True
 
 
 class PuntoVentaBase(PuntoVentaBaseModel):

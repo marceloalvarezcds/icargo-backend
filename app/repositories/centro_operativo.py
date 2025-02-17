@@ -76,6 +76,7 @@ def create_centro_operativo(
         clasificacion_id=data.clasificacion_id,
         ciudad_id=data.ciudad_id,
         modified_by=modified_by,
+        created_by = modified_by,
     )
     db.add(obj)
     db.commit()

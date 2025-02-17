@@ -56,6 +56,14 @@ def get_orden_carga_list(
     return repositories.get_orden_carga_list(db)
 
 
+def get_orden_carga_en_proceso_list(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[OrdenCarga]:
+    if gestor_carga_id:
+        return repositories.get_orden_carga_en_proceso_list_by_gestor_carga_id(db, gestor_carga_id)
+    return repositories.get_orden_carga_en_proceso_list(db)
+
+
 def get_orden_carga_aceptadas_list(
     db: Session, gestor_carga_id: Optional[int]
 ) -> List[OrdenCarga]:

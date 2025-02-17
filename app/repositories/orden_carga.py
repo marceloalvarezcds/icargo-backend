@@ -27,6 +27,20 @@ def get_orden_carga_list(db: Session) -> List[OrdenCarga]:
         .all()
     )
 
+def get_orden_carga_en_proceso_list(db: Session) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter(
+            and_(
+                OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
+                OrdenCarga.estado.in_([EstadoEnum.NUEVO.value, EstadoEnum.ACEPTADO.value]),
+            )
+        )
+        .order_by(desc(OrdenCarga.id))
+        .all()
+    )
+
+
 def get_orden_carga_aceptadas_list(db: Session) -> List[OrdenCarga]:
     return (
         db.query(OrdenCarga)
@@ -109,6 +123,24 @@ def get_orden_carga_list_by_gestor_carga_id(
         .order_by(desc(OrdenCarga.id))
         .all()
     )
+
+def get_orden_carga_en_proceso_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter(
+            and_(
+                OrdenCarga.gestor_carga_id == gestor_carga_id,
+                OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
+                # Filtrando solo por ordenes NUEVAS y ACEPTADAS
+                OrdenCarga.estado.in_([EstadoEnum.NUEVO.value, EstadoEnum.ACEPTADO.value]),
+            )
+        )
+        .order_by(desc(OrdenCarga.id))
+        .all()
+    )
+
 
 def get_orden_carga_aceptadas_list_by_gestor_carga_id(
     db: Session, gestor_carga_id: Optional[int]

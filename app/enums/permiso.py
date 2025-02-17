@@ -13,6 +13,7 @@ class PermisoAccionEnum(Enum):
     ELIMINAR = "eliminar"
     ANULAR = "anular"
     LISTAR = "listar"
+    EN_PROCESO = "listar_en_proceso"
     MODIFICAR_CONTACTOS = "modificar_contactos"
     MODIFICAR_ALIAS = "modificar_alias"
     PASAR_A_REVISION = "pasar_a_revision"
