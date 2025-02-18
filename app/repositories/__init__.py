@@ -556,6 +556,7 @@ from .tipo_movimiento import (  # noqa
     get_tipo_movimiento_by_descripcion,
     get_tipo_movimiento_list,
     get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes,
+    get_tipo_movimiento_active_list
 )
 from .tipo_persona import get_tipo_persona_by_descripcion, get_tipo_persona_list  # noqa
 from .tipo_registro import (  # noqa

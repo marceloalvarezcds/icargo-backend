@@ -19,7 +19,7 @@ def get_tipo_movimiento_by_descripcion(
 
 
 def get_tipo_movimiento_list(db: Session) -> List[TipoMovimiento]:
-    return db.query(TipoMovimiento).order_by(TipoMovimiento.descripcion).all()
+    return db.query(TipoMovimiento).order_by(TipoMovimiento.id.desc()).all()
 
 
 def get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes(
@@ -45,6 +45,20 @@ def get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes(
                 TipoCuenta.descripcion != TipoCuentaEnum.VIAJES.value,
                 TipoMovimiento.estado == EstadoEnum.ACTIVO.value,
             )
+        )
+        .order_by(TipoMovimiento.id.desc())
+        .all()
+    )
+
+
+def get_tipo_movimiento_active_list(
+    db: Session,
+) -> List[TipoMovimiento]:
+    return (
+        db.query(TipoMovimiento)
+        .join(TipoMovimiento.cuenta)
+        .filter(
+            TipoMovimiento.estado == EstadoEnum.ACTIVO.value,
         )
         .order_by(TipoMovimiento.id.desc())
         .all()

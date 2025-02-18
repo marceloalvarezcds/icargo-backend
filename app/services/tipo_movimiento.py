@@ -10,6 +10,11 @@ from app.schemas import TipoMovimientoForm
 from app.services import generic_service as service
 
 
+def get_tipo_movimiento_list(
+    db: Session,
+) -> List[TipoMovimiento]:
+    return r.get_tipo_movimiento_list(db)
+
 def get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes(
     db: Session,
 ) -> List[TipoMovimiento]:
@@ -20,6 +25,12 @@ def get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes(
     db: Session,
 ) -> List[TipoMovimiento]:
     return r.get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes(db)
+
+
+def get_tipo_movimiento_active_list(
+    db: Session,
+) -> List[TipoMovimiento]:
+    return r.get_tipo_movimiento_active_list(db)
 
 
 def _check_codigo(codigo: str):

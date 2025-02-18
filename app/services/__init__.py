@@ -360,6 +360,8 @@ from .tipo_movimiento import (  # noqa
     edit_tipo_movimiento,
     get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes,
     get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes,
+    get_tipo_movimiento_list,
+    get_tipo_movimiento_active_list
 )
 from .user import (  # noqa
     change_user_status,

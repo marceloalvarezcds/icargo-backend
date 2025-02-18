@@ -20,7 +20,7 @@ async def read_tipo_movimiento_list(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.TIPO_MOVIMIENTO)),  # noqa: B008
 ):
-    return services.get_tipo_movimiento_list_by_tipo_cuenta_other_than_viajes(db)
+    return services.get_tipo_movimiento_list(db)
 
 
 @api.get("/active_list", response_model=List[schemas.TipoMovimiento])
@@ -28,7 +28,7 @@ async def read_tipo_movimiento_active_list(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.TIPO_MOVIMIENTO)),  # noqa: B008
 ):
-    return services.get_tipo_movimiento_active_list_by_tipo_cuenta_other_than_viajes(db)
+    return services.get_tipo_movimiento_active_list(db)
 
 
 @api.get("/{id}", response_model=schemas.TipoMovimiento)
