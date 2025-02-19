@@ -461,6 +461,7 @@ from .punto_venta import (  # noqa
     get_punto_venta_list,
     get_punto_venta_list_by_gestor_carga_id,
     get_punto_venta_list_with_active_prices_by_gestor_carga_id,
+    get_punto_venta_by_proveedor_sucursal
 )
 from .punto_venta_contacto_gestor_carga import (  # noqa
     create_punto_venta_contacto_gestor_carga,
@@ -469,7 +470,6 @@ from .punto_venta_contacto_gestor_carga import (  # noqa
     get_punto_venta_contacto_gestor_carga_by,
     get_punto_venta_contacto_gestor_carga_by_cargo_id,
     get_punto_venta_contacto_gestor_carga_list_by_punto_venta_id,
-    get_punto_venta_by_proveedor_sucursal,
 )
 from .remitente import (  # noqa
     create_remitente,
