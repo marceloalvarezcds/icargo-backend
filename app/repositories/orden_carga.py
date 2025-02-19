@@ -47,7 +47,7 @@ def get_orden_carga_cerradas_list(db: Session) -> List[OrdenCarga]:
         .filter(
             and_(
                 OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
-                OrdenCarga.estado.in_([EstadoEnum.NUEVO.value, EstadoEnum.ACEPTADO.value]),
+                OrdenCarga.estado.in_([EstadoEnum.CANCELADO.value, EstadoEnum.FINALIZADO.value]),
             )
         )
         .order_by(desc(OrdenCarga.id))
