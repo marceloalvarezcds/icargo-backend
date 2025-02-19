@@ -64,6 +64,14 @@ def get_orden_carga_en_proceso_list(
     return repositories.get_orden_carga_en_proceso_list(db)
 
 
+def get_orden_carga_cerradas_list(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[OrdenCarga]:
+    if gestor_carga_id:
+        return repositories.get_orden_carga_cerradas_list_by_gestor_carga_id(db, gestor_carga_id)
+    return repositories.get_orden_carga_cerradas_list(db)
+
+
 def get_orden_carga_aceptadas_list(
     db: Session, gestor_carga_id: Optional[int]
 ) -> List[OrdenCarga]:
@@ -378,7 +386,7 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "propietario_telefono": obj.camion.propietario.telefono,
         "chofer_nombre": obj.camion_chofer_nombre,
         "chofer_numero_documento": obj.camion_chofer_numero_documento,
-        
+
         "camion_foto": obj.camion.foto,
         "camion_placa": obj.camion_placa,
         "camion_marca_tipo": f"{obj.camion.marca_descripcion}/{obj.camion.tipo_descripcion}",

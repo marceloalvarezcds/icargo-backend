@@ -31,6 +31,14 @@ async def read_orden_carga_en_proceso(
     return services.get_orden_carga_en_proceso_list(db, current_user.gestor_carga_id)
 
 
+@api.get("/cerradas", response_model=List[schemas.OrdenCargaList])
+async def read_orden_carga_en_proceso(
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),
+):
+    return services.get_orden_carga_cerradas_list(db, current_user.gestor_carga_id)
+
 
 @api.get("/aceptadas", response_model=List[schemas.OrdenCargaList])
 async def read_orden_carga_aceptadas(

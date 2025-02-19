@@ -17,10 +17,12 @@ depends_on = None
 
 
 def upgrade():
-    op.execute('insert into tipo_movimiento '\
-        ' (created_by, created_at, modified_by, modified_at, id, descripcion, estado, cuenta_id, codigo ) '\
-        ' values (\'system\', now(), \'system\', now(), 15, \'Fiscal\', \'Activo\', 4, \'8\' )' )
+    pass
+    # op.execute('insert into tipo_movimiento '\
+    #     ' (created_by, created_at, modified_by, modified_at, id, descripcion, estado, cuenta_id, codigo ) '\
+    #     ' values (\'system\', now(), \'system\', now(), 15, \'Fiscal\', \'Activo\', 4, \'8\' )' )
 
 
 def downgrade():
-    op.execute('delete from tipo_movimiento where descripcion = \'Fiscal\' ')
+    pass
+    # op.execute('delete from tipo_movimiento where descripcion = \'Fiscal\' ')

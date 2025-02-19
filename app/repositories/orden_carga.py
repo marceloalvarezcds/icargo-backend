@@ -41,11 +41,25 @@ def get_orden_carga_en_proceso_list(db: Session) -> List[OrdenCarga]:
     )
 
 
+def get_orden_carga_cerradas_list(db: Session) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter(
+            and_(
+                OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
+                OrdenCarga.estado.in_([EstadoEnum.NUEVO.value, EstadoEnum.ACEPTADO.value]),
+            )
+        )
+        .order_by(desc(OrdenCarga.id))
+        .all()
+    )
+
+
 def get_orden_carga_aceptadas_list(db: Session) -> List[OrdenCarga]:
     return (
         db.query(OrdenCarga)
         .filter(
-            OrdenCarga.estado == EstadoEnum.ACEPTADO.value  
+            OrdenCarga.estado == EstadoEnum.ACEPTADO.value
         )
         .order_by(desc(OrdenCarga.id))
         .all()
@@ -56,7 +70,7 @@ def get_orden_carga_finalizadas_list(db: Session) -> List[OrdenCarga]:
     return (
         db.query(OrdenCarga)
         .filter(
-            OrdenCarga.estado == EstadoEnum.FINALIZADO.value  
+            OrdenCarga.estado == EstadoEnum.FINALIZADO.value
         )
         .order_by(desc(OrdenCarga.id))
         .all()
@@ -124,6 +138,7 @@ def get_orden_carga_list_by_gestor_carga_id(
         .all()
     )
 
+
 def get_orden_carga_en_proceso_list_by_gestor_carga_id(
     db: Session, gestor_carga_id: Optional[int]
 ) -> List[OrdenCarga]:
@@ -133,8 +148,24 @@ def get_orden_carga_en_proceso_list_by_gestor_carga_id(
             and_(
                 OrdenCarga.gestor_carga_id == gestor_carga_id,
                 OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
-                # Filtrando solo por ordenes NUEVAS y ACEPTADAS
                 OrdenCarga.estado.in_([EstadoEnum.NUEVO.value, EstadoEnum.ACEPTADO.value]),
+            )
+        )
+        .order_by(desc(OrdenCarga.id))
+        .all()
+    )
+
+
+def get_orden_carga_cerradas_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[OrdenCarga]:
+    return (
+        db.query(OrdenCarga)
+        .filter(
+            and_(
+                OrdenCarga.gestor_carga_id == gestor_carga_id,
+                OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
+                OrdenCarga.estado.in_([EstadoEnum.CANCELADO.value, EstadoEnum.FINALIZADO.value]),
             )
         )
         .order_by(desc(OrdenCarga.id))
@@ -369,7 +400,7 @@ def edit_remitir_fecha(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> OrdenCarga:
-    
+
     obj.created_at = data.created_at
     obj.gestor_carga_id = gestor_carga_id
     obj.modified_by = modified_by
@@ -511,14 +542,14 @@ def cancelar_orden_carga(
     # Revertir el saldo del flete
     flete.saldo += obj.cantidad_nominada
     db.add(flete)
-    
+
     # Cambiar el estado de la orden
     updated_obj = change_orden_carga_status(obj, db, EstadoEnum.CANCELADO, modified_by)
-    
+
     # Confirmar los cambios
     db.commit()
     db.refresh(updated_obj)
-    
+
     return updated_obj
 
 

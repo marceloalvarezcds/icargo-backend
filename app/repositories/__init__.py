@@ -332,6 +332,8 @@ from .orden_carga import (  # noqa
     get_orden_carga_finalizada_count_by_camion_id,
     get_orden_carga_en_proceso_list_by_gestor_carga_id,
     get_orden_carga_en_proceso_list,
+    get_orden_carga_cerradas_list_by_gestor_carga_id,
+    get_orden_carga_cerradas_list,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
