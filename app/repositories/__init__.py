@@ -469,6 +469,7 @@ from .punto_venta_contacto_gestor_carga import (  # noqa
     get_punto_venta_contacto_gestor_carga_by,
     get_punto_venta_contacto_gestor_carga_by_cargo_id,
     get_punto_venta_contacto_gestor_carga_list_by_punto_venta_id,
+    get_punto_venta_by_proveedor_sucursal,
 )
 from .remitente import (  # noqa
     create_remitente,

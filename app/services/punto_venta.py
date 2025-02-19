@@ -59,6 +59,15 @@ async def create_punto_venta(
             status_code=409,
             detail=f"El Punto de Venta con documento {data.numero_documento} ya existe",
         )
+
+    if repositories.get_punto_venta_by_proveedor_sucursal(
+        db, data.proveedor_id, data.numero_sucursal
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail=f"El Punto de Venta numero {data.numero_sucursal} ya existe",
+        )
+
     logo_url = await upload_and_get_image_url(file)
     obj = repositories.create_punto_venta(db, data, logo_url, modified_by)
     update_punto_venta_contacto_list(
@@ -100,6 +109,15 @@ async def edit_punto_venta(
             status_code=409,
             detail=f"El Punto de Venta con documento {data.numero_documento} ya existe",
         )
+
+    if repositories.get_punto_venta_by_proveedor_sucursal(
+        db, data.proveedor_id, data.numero_sucursal
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail=f"El Punto de Venta numero {data.numero_sucursal} ya existe",
+        )
+
     logo_url = await upload_and_get_image_url(file) if file else None
     to_edit_obj = get_punto_venta_by_id(db, id)
     obj = repositories.edit_punto_venta(to_edit_obj, db, data, logo_url, modified_by)

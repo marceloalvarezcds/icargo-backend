@@ -168,3 +168,20 @@ def delete_punto_venta(
     db.commit()
     db.refresh(obj)
     return obj
+
+
+def get_punto_venta_by_proveedor_sucursal(
+    db: Session,
+    proveedor_id: int,
+    sucursal_numero: str,
+) -> Optional[PuntoVenta]:
+    return (
+        db.query(PuntoVenta)
+        .filter(
+            and_(
+                PuntoVenta.numero_sucursal == sucursal_numero,
+                PuntoVenta.proveedor_id == proveedor_id,
+            )
+        )
+        .first()
+    )
