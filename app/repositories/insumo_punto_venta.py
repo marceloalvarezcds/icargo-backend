@@ -4,9 +4,12 @@ from typing import List, Optional
 from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from sqlalchemy.sql.expression import null  # type: ignore
+from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 
 from app.enums import EstadoEnum
 from app.models import Insumo, InsumoPuntoVenta, InsumoPuntoVentaPrecio
+from app.models.punto_venta import PuntoVenta
 from app.schemas import InsumoPuntoVentaPrecioForm
 
 def get_insumo_punto_venta_precio_list(
@@ -166,16 +169,36 @@ def create_insumo_punto_venta(
     gestor_carga_id: int,
     modified_by: str,
 ) -> InsumoPuntoVenta:
-    obj = InsumoPuntoVenta(
-        insumo_id=data.insumo_id,
-        punto_venta_id=data.punto_venta_id,
-        gestor_carga_id=gestor_carga_id,
-        moneda_id=data.moneda_id,
-        estado=EstadoEnum.ACTIVO.value,
-        created_by=modified_by,
-        modified_by=modified_by,
-    )
-    db.add(obj)
-    db.commit()
-    db.refresh(obj)
-    return obj
+    try:
+        obj = InsumoPuntoVenta(
+            insumo_id=data.insumo_id,
+            punto_venta_id=data.punto_venta_id,
+            gestor_carga_id=gestor_carga_id,
+            moneda_id=data.moneda_id,
+            estado=EstadoEnum.ACTIVO.value,
+            created_by=modified_by,
+            modified_by=modified_by,
+        )
+        db.add(obj)
+        db.commit()
+        db.refresh(obj)
+        return obj
+
+    except IntegrityError:
+        db.rollback()
+
+        # Obtener los nombres de insumo y punto de venta
+        insumo_nombre = db.query(Insumo.descripcion).filter(Insumo.id == data.insumo_id).scalar()
+        punto_venta_nombre = db.query(PuntoVenta.nombre_corto).filter(PuntoVenta.id == data.punto_venta_id).scalar()
+
+        raise HTTPException(
+            status_code=400,
+            detail=f"El insumo {insumo_nombre} ya está registrado para el establecimiento {punto_venta_nombre}.",
+        )
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error inesperado: {str(e)}",
+        )

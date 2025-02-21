@@ -19,7 +19,6 @@ class InsumoPuntoVentaPrecioForm(BaseModel):
     moneda_id: Optional[int] = None
     precio: RoundedDecimal
     fecha_inicio: datetime
-
     observacion: Optional[str] = None
     hora_inicio: Optional[str] = None
 
@@ -27,7 +26,9 @@ class InsumoPuntoVentaPrecio(BaseModel):
     id: int
     precio: RoundedDecimal
     fecha_inicio: datetime
-    # fecha_fin: Optional[datetime] = None
+    proveedor_id: Optional[int] = None
+    proveedor_nombre: Optional[str] = None
+    punto_venta_alias: Optional[str] = None
     insumo_unidad_descripcion: Optional[str] = None
     insumo_moneda_nombre: str
     insumo_descripcion: Optional[str] = None

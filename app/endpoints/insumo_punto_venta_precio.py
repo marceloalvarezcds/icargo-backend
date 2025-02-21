@@ -8,6 +8,7 @@ from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+from app.enums.estado import EstadoEnum
 
 api = APIRouter()
 
@@ -113,6 +114,21 @@ async def read_insumo_precio_venta_by_id(
     "/",
     response_model=schemas.InsumoPuntoVentaPrecioList,
 )
+async def add_new_or_update_insumo_punto_venta_precio(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    data: Json[schemas.InsumoPuntoVentaPrecioForm] = Form(...),  # type: ignore  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.INSUMO_PUNTO_VENTA_PRECIO)),  # noqa: B008
+):
+    return services.create_or_update_insumo_punto_venta_precio(
+        db, data, current_user.gestor_carga_id, current_user.username  # type: ignore
+    )
+
+
+@api.post(
+    "/nueva/mercaderia",
+    response_model=schemas.InsumoPuntoVentaPrecioList,
+)
 async def add_new_insumo_punto_venta_precio(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.InsumoPuntoVentaPrecioForm] = Form(...),  # type: ignore  # noqa: B008
@@ -136,4 +152,28 @@ async def edit_insumo_punto_venta_precio(
 ):
     return services.edit_insumo_punto_venta_precio(
         id, db, data, current_user.gestor_carga_id, current_user.username  # type: ignore
+    )
+
+
+@api.get("/{id}/active", response_model=schemas.InsumoPuntoVentaPrecioList)
+def active_insumo_venta_precio_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.INSUMO_PUNTO_VENTA_PRECIO)),  # noqa: B008
+):
+    return services.change_insumo_precio_venta_status(
+        db, id, EstadoEnum.ACTIVO, current_user.username
+    )
+
+
+@api.get("/{id}/inactive", response_model=schemas.InsumoPuntoVentaPrecioList)
+def inactive_insumo_venta_precio_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.INSUMO_PUNTO_VENTA_PRECIO)),  # noqa: B008
+):
+    return services.change_inactive_insumo_precio_venta_status(
+        db, id, EstadoEnum.INACTIVO, current_user.username
     )

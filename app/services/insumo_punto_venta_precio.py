@@ -1,7 +1,8 @@
 from operator import and_
 import os
 from datetime import datetime
-from http.client import HTTPException
+from fastapi import HTTPException
+
 from typing import List, Optional
 from sqlalchemy import desc, func
 from sqlalchemy.orm import aliased
@@ -25,18 +26,25 @@ from openpyxl.styles import Font  # type: ignore
 from app.config import REPORTS_FOLDER
 
 
+def get_insumo_venta_precio_by_id(db: Session, id: int) -> InsumoPuntoVentaPrecio:
+    obj = repositories.get_insumo_venta_precio_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Insumo Venta Precio no encontrado")
+    return obj
+
+
 def get_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int) -> List[models.InsumoPuntoVentaPrecio]:
     return (
         db.query(models.InsumoPuntoVentaPrecio)
         .join(models.InsumoPuntoVenta)  # Unir con InsumoPuntoVenta
         .filter(
-            models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id, 
-            models.InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value  
+            models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
+            models.InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
         )
         .order_by(desc(models.InsumoPuntoVentaPrecio.id))  # Ordenar por id en orden descendente
         .all()
     )
-    
+
 
 def get_inactive_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int) -> List[models.InsumoPuntoVentaPrecio]:
     return (
@@ -54,15 +62,15 @@ def get_inactive_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: in
 def get_active_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int) -> List[models.InsumoPuntoVentaPrecio]:
     results = (
         db.query(models.InsumoPuntoVentaPrecio)
-        .join(models.InsumoPuntoVenta)  
+        .join(models.InsumoPuntoVenta)
         .filter(
-            models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id, 
-            models.InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value  
+            models.InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
+            models.InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
         )
-        .order_by(desc(models.InsumoPuntoVentaPrecio.id))  
+        .order_by(desc(models.InsumoPuntoVentaPrecio.id))
         .all()
     )
-    
+
     seen = set()
     unique_results = []
     for item in results:
@@ -71,6 +79,38 @@ def get_active_insumo_punto_venta_precio_list(db: Session, gestor_carga_id: int)
             seen.add(item.punto_venta_id)
 
     return unique_results
+
+
+def change_insumo_precio_venta_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.InsumoPuntoVentaPrecio:
+    # Obtener el objeto InsumoPuntoVentaPrecio
+    obj = get_insumo_venta_precio_by_id(db, id)
+
+    # Verificar si ya existe un precio activo para el mismo insumo_punto_venta_id
+    existing_active_price = db.query(InsumoPuntoVentaPrecio).filter(
+        and_(
+            InsumoPuntoVentaPrecio.insumo_punto_venta_id == obj.insumo_punto_venta_id,
+            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
+        )
+    ).first()
+
+    # Si existe un precio activo, evitar cambiar el estado
+    if existing_active_price:
+        raise HTTPException(
+            status_code=400,
+            detail="Ya existe un precio activo para este insumo punto de venta."
+        )
+
+    # Si no existe un precio activo, proceder con el cambio de estado
+    return repositories.change_insumo_venta_precio_status(obj, db, status, modified_by)
+
+
+def change_inactive_insumo_precio_venta_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.InsumoPuntoVentaPrecio:
+    obj = get_insumo_venta_precio_by_id(db, id)
+    return repositories.change_insumo_venta_precio_status(obj, db, status, modified_by)
 
 
 
@@ -97,7 +137,7 @@ def get_insumo_punto_venta_precio_list_by_estado_activo(
     return (
         db.query(InsumoPuntoVentaPrecio)
         .join(InsumoPuntoVenta, InsumoPuntoVentaPrecio.insumo_punto_venta_id == InsumoPuntoVenta.id)
-        .join(subquery, 
+        .join(subquery,
               (InsumoPuntoVenta.punto_venta_id == subquery.c.punto_venta_id) &
               (InsumoPuntoVentaPrecio.fecha_inicio == subquery.c.max_fecha_inicio) &
               (InsumoPuntoVentaPrecio.insumo_punto_venta_id == subquery.c.insumo_punto_venta_id))
@@ -131,14 +171,14 @@ def get_insumos_by_punto_venta_id_and_gestor_carga(
 ) -> List[InsumoPuntoVentaPrecio]:
     return (
         db.query(InsumoPuntoVentaPrecio)
-        .join(InsumoPuntoVenta, InsumoPuntoVentaPrecio.insumo_punto_venta_id == InsumoPuntoVenta.id)  
+        .join(InsumoPuntoVenta, InsumoPuntoVentaPrecio.insumo_punto_venta_id == InsumoPuntoVenta.id)
         .filter(
             InsumoPuntoVenta.punto_venta_id == punto_venta_id,
             InsumoPuntoVenta.gestor_carga_id == gestor_carga_id,
             InsumoPuntoVenta.estado != EstadoEnum.ELIMINADO.value,
-            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value  
+            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
         )
-        .order_by(InsumoPuntoVentaPrecio.fecha_inicio.desc())  
+        .order_by(InsumoPuntoVentaPrecio.fecha_inicio.desc())
         .all()
     )
 
@@ -172,6 +212,24 @@ def create_insumo_punto_venta_precio(
     modified_by: str,
 ) -> InsumoPuntoVentaPrecio:
     gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
+    obj = repositories.create_insumo_punto_venta(
+        db,
+        data,
+        gestor_id,
+        modified_by,
+    )
+    return repositories.create_new_insumo_punto_venta_precio_by_insumo_punto_venta(
+        db, obj, data, modified_by
+    )
+
+
+def create_or_update_insumo_punto_venta_precio(
+    db: Session,
+    data: InsumoPuntoVentaPrecioForm,
+    gestor_carga_id: Optional[int],
+    modified_by: str,
+) -> InsumoPuntoVentaPrecio:
+    gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
 
     existing_insumo = (
         db.query(InsumoPuntoVenta)
@@ -184,14 +242,11 @@ def create_insumo_punto_venta_precio(
         .first()
     )
 
-    # Verificar si existe el insumo
     if existing_insumo:
-        # Llamar a la función de actualización, verificando si el precio cambió
         return update_insumo_punto_venta_precio_by_insumo_punto_venta(
             db, existing_insumo, data, modified_by
         )
     else:
-        # Crear un nuevo registro si no existe
         return create_insumo_punto_venta_precio_by_insumo_punto_venta(
             db, data, modified_by
         )
@@ -276,7 +331,7 @@ def update_insumo_punto_venta_precio(
     modified_by: str,
 ) -> InsumoPuntoVentaPrecio:
     existing_record = db.query(InsumoPuntoVentaPrecio).filter(InsumoPuntoVentaPrecio.id == id).first()
-    
+
     if existing_record:
         existing_record.precio = data.precio
         existing_record.fecha_inicio = data.fecha_inicio
@@ -284,14 +339,14 @@ def update_insumo_punto_venta_precio(
         existing_record.modified_by = modified_by
         db.commit()
         db.refresh(existing_record)
-    
+
     return existing_record
 
 
 def edit_insumo_punto_venta_precio(
     id: int,
     db: Session,
-    data: schemas.InsumoPuntoVentaPrecioUpdate,  
+    data: schemas.InsumoPuntoVentaPrecioUpdate,
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> InsumoPuntoVentaPrecio:
@@ -301,7 +356,7 @@ def edit_insumo_punto_venta_precio(
         to_edit_obj = to_edit_obj[0]  # Selecciona el primer objeto si existe
     else:
         raise HTTPException(status_code=404, detail="InsumoPuntoVentaPrecio no encontrado.")
-    
+
     return repositories.edit_insumo_punto_venta_precio(to_edit_obj, db, data, modified_by)
 
 
@@ -315,17 +370,17 @@ def edit_and_create_insumo_punto_venta_precio(
 ) -> InsumoPuntoVentaPrecio:
     gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
     to_edit_obj = repositories.get_insumo_punto_venta_precio_list_by_id_and_gestor_carga_id(db, id, gestor_id)
-    
+
     if not to_edit_obj:
         raise HTTPException(status_code=404, detail="InsumoPuntoVentaPrecio no encontrado.")
-    
-    to_edit_obj = to_edit_obj[0]  
+
+    to_edit_obj = to_edit_obj[0]
     if to_edit_obj.precio != data.precio:
         return repositories.create_new_insumo_punto_venta_precio(db, to_edit_obj, data, modified_by)
-   
+
     return repositories.update_insumo_punto_venta_precio(to_edit_obj, db, data, modified_by)
 
- 
+
 
 def get_insumo_punto_venta_precio_by_id(db: Session, id: int) -> InsumoPuntoVentaPrecio:
     obj = repositories.get_insumo_punto_venta_precio_by_id(db, id)

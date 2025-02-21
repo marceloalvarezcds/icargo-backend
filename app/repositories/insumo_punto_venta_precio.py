@@ -19,6 +19,25 @@ from app.schemas import InsumoPuntoVentaPrecioForm, InsumoPuntoVentaPrecioUpdate
 
 
 
+def get_insumo_venta_precio_by_id(db: Session, id: int):
+    return db.query(InsumoPuntoVentaPrecio).filter(InsumoPuntoVentaPrecio.id == id).first()
+
+
+def change_insumo_venta_precio_status(
+    obj: InsumoPuntoVentaPrecio,
+    db: Session,
+    status: EstadoEnum,
+    modified_by: str,
+) -> InsumoPuntoVentaPrecio:
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+
 def get_insumo_venta_precio_list(db: Session) -> List[InsumoPuntoVentaPrecio]:
     return (
         db.query(InsumoPuntoVentaPrecio)
@@ -177,6 +196,28 @@ def get_insumo_punto_venta_precio_by_id(db: Session, id: int) -> Optional[Insumo
     return db.query(InsumoPuntoVentaPrecio).get(id)
 
 
+def create_new_insumo_punto_venta_precio_by_insumo_punto_venta(
+    db: Session,
+    obj: InsumoPuntoVenta,
+    data: InsumoPuntoVentaPrecioForm,
+    modified_by: str,
+) -> InsumoPuntoVentaPrecio:
+    obj = InsumoPuntoVentaPrecio(
+        insumo_punto_venta_id=obj.id,
+        precio=data.precio,
+        fecha_inicio=data.fecha_inicio,
+        hora_inicio=data.hora_inicio,
+        estado=EstadoEnum.ACTIVO.value,
+        created_by=modified_by,
+        modified_by=modified_by,
+    )
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+
 def create_insumo_punto_venta_precio_by_insumo_punto_venta(
     db: Session,
     data: InsumoPuntoVentaPrecioForm,
@@ -191,11 +232,11 @@ def create_insumo_punto_venta_precio_by_insumo_punto_venta(
         new_price = InsumoPuntoVentaPrecio(
             insumo_punto_venta_id=data.insumo_punto_venta_id,
             precio=data.precio,
-            fecha_inicio=data.fecha_inicio,  # Usar la fecha con la hora modificada
+            fecha_inicio=data.fecha_inicio,
             # fecha_fin=data.fecha_fin,
-            hora_inicio=data.hora_inicio,  # Asignar el objeto de hora
+            hora_inicio=data.hora_inicio,
             observacion=data.observacion,
-            estado=EstadoEnum.ACTIVO.value,  # El nuevo precio es activo
+            estado=EstadoEnum.ACTIVO.value,
             created_by=modified_by,
             modified_by=modified_by,
         )
@@ -219,7 +260,7 @@ def edit_insumo_punto_venta_precio(
     data: InsumoPuntoVentaPrecioUpdate,
     modified_by: str,
 ) -> InsumoPuntoVentaPrecio:
-   
+
     precio_changed = data.precio != obj.precio
     fecha_inicio_changed = data.fecha_inicio and data.fecha_inicio != obj.fecha_inicio
     # fecha_fin_changed = data.fecha_fin and data.fecha_fin != obj.fecha_fin
@@ -237,11 +278,11 @@ def edit_insumo_punto_venta_precio(
         #     obj.fecha_fin = data.fecha_fin
 
         if hora_inicio_changed:
-    
+
             if isinstance(data.hora_inicio, str):
-                obj.hora_inicio = data.hora_inicio  
+                obj.hora_inicio = data.hora_inicio
             else:
-                obj.hora_inicio = data.hora_inicio.strftime("%H:%M") 
+                obj.hora_inicio = data.hora_inicio.strftime("%H:%M")
         if observacion_changed:
             obj.observacion = data.observacion
 
@@ -249,7 +290,7 @@ def edit_insumo_punto_venta_precio(
         obj.modified_at = datetime.now()
 
         db.commit()
-        db.refresh(obj)  
+        db.refresh(obj)
 
     return obj
 
@@ -275,7 +316,7 @@ def create_new_insumo_punto_venta_precio(
     # Cerrar el registro actual estableciendo `fecha_fin`
     # current_price_obj.fecha_fin = datetime.now()
     db.commit()
-    
+
     # Crear un nuevo registro con el precio actualizado
     new_price_record = InsumoPuntoVentaPrecio(
         insumo_punto_venta_id=current_price_obj.insumo_punto_venta_id,
@@ -287,7 +328,7 @@ def create_new_insumo_punto_venta_precio(
     db.add(new_price_record)
     db.commit()
     db.refresh(new_price_record)
-    
+
     return new_price_record
 
 
@@ -300,13 +341,13 @@ def update_insumo_punto_venta_precio(
     # Actualizar otros campos sin cambiar el precio
     if obj.fecha_inicio.date() != data.fecha_inicio.date():
         obj.fecha_inicio = datetime.combine(data.fecha_inicio, obj.fecha_inicio.time())
-    
+
     # if data.fecha_fin is not None and (obj.fecha_fin is None or obj.fecha_fin.date() != data.fecha_fin.date()):
     #     obj.fecha_fin = datetime.combine(data.fecha_fin, obj.fecha_fin.time())
-    
+
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()
     db.refresh(obj)
-    
+
     return obj
