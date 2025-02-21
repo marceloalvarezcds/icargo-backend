@@ -65,7 +65,7 @@ class InsumoPuntoVentaPrecioList(InsumoPuntoVentaPrecio):
     proveedor_id: int
     proveedor_nombre: str
     punto_venta_id: int
-    punto_venta_nombre: str
+    punto_venta_nombre: Optional[str] = None
     punto_venta_alias: Optional[str] = None
     punto_venta_direccion: Optional[str] = None
     punto_venta_logo: Optional[str] = None
