@@ -10,7 +10,6 @@ from app.logger import logger
 
 api = APIRouter()
 
-
 @api.get("/", response_model=List[schemas.EstadoCuenta])
 async def read_estado_cuenta_list(
     db: Session = Depends(get_db_session),  # noqa: B008
