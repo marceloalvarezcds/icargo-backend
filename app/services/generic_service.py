@@ -194,7 +194,7 @@ def check_unique_oc(
 ):
     if skip_unique_check:
         return True  # Si se debe omitir la verificación, simplemente retorna True
-    
+
     exists: Optional[Model] = get_by_unique_columns_or_none(ModelType, db, **unique_columns)  # type: ignore  # noqa: B950
     if id:
         if exists and exists.id != id:  # type: ignore

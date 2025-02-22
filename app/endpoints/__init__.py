@@ -72,7 +72,8 @@ from app.endpoints import (
     unidad,
     user,
     combinacion,
-    contribuyente
+    contribuyente,
+    texto_legal
 )
 
 api = APIRouter()
@@ -229,6 +230,7 @@ api.include_router(tipo_semi.api, prefix="/tipo_semi", tags=["tipo_semi"])
 api.include_router(unidad.api, prefix="/unidad", tags=["unidad"])
 api.include_router(user.api, prefix="/user", tags=["user"])
 api.include_router(contribuyente.api, prefix="/contribuyente", tags=["contribuyente"])
+api.include_router( texto_legal.api, prefix="/texto_legal", tags=["texto_legal"] )
 
 @api.get("/alive")
 def alive() -> dict:

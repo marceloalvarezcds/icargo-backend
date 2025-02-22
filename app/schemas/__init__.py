@@ -194,3 +194,4 @@ from .provision import (
     ProvisionForm
 )
 from .contribuyente import ( Contribuyente )
+from .texto_legal import ( TextoLegalBaseModel, TextoLegalModel )

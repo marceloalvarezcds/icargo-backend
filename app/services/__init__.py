@@ -399,3 +399,10 @@ from .contribuyente import (
     get_list,
     #get_by_id,
 )
+from .texto_legal_service import (
+    get_texto_legal_list,
+    get_texto_legal_list_by_gestor,
+    get_texto_legal_by_id,
+    crear_texto_legal,
+    edit_texto_legal
+)

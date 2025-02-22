@@ -99,6 +99,7 @@ class PermisoModeloEnum(Enum):
     TIPO_SEMI = "tipo_semi"
     UNIDAD = "unidad"
     USER = "usuario"
+    TEXTO_LEGAL ="texto_legal"
 
 
 
@@ -106,7 +107,7 @@ class PermisoModuloEnum(Enum):
     USUARIOS = "1 - Usuarios"
     ENTIDADES = "2 - Entidades"
     FLOTA = "3 - Flota"
-    FLETE = "4 - Pedido" 
+    FLETE = "4 - Pedido"
     OC = "5 - Orden de Carga"
     CAJA_BANCO = "6 - Caja & Banco"
     ESTADO_CUENTA = "7 - Estado de Cuenta"
@@ -201,4 +202,5 @@ permisoModeloTitulo: Dict[str, str] = {
     "tipo_registro": "Tipo de Registro",
     "tipo_semi": "Tipo de Semi",
     "unidad": "Unidad",
+    "texto_legal":"Texto Legal"
 }
