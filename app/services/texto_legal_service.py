@@ -11,8 +11,6 @@ from app.logger import logger
 def get_texto_legal_list_by_gestor(db: Session, gestor_carga_id: Optional[int]) -> List[TextoLegal]:
     if gestor_carga_id:
         lista = service.get_list_all_or_by_gestor_carga_id(TextoLegal, db, gestor_carga_id)
-        logger.info(f"list:::  {lista}")
-        logger.info(f"list:::  {lista[0]}")
         return lista
 
     return service.get_list(TextoLegal, db)
@@ -36,8 +34,6 @@ def crear_texto_legal(
     titulo = data.titulo
     data.gestor_carga_id = usr.gestor_carga_id
 
-    logger.info(f"data:::  {data}")
-
     return service.create(
         TextoLegal,
         db,
@@ -52,7 +48,6 @@ def edit_texto_legal(
     id: int, db: Session, data: TextoLegalBaseModel, usr: AuthUser
 ) -> TextoLegal:
 
-    logger.info(f"edit_texto_legal:::  {data}")
 
     titulo = data.titulo
     data.gestor_carga_id = usr.gestor_carga_id
