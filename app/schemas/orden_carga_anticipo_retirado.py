@@ -47,7 +47,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     insumo_unidad_descripcion: Optional[str] = None
     moneda_nombre: str
     proveedor_nombre: str
-    punto_venta_nombre: str
+    punto_venta_nombre: Optional[str] = None
     punto_venta_pais_nombre: Optional[str] = None
     tipo_anticipo_descripcion: str
     tipo_comprobante_descripcion: Optional[str] = None
@@ -55,7 +55,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     unidad_abreviatura: Optional[str] = None
     unidad_descripcion: Optional[str] = None
     estados_movimientos: Optional[str] = None
-    
+
     # Auditoría
     created_by: str
     created_at: Date
