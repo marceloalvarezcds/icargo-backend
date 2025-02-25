@@ -22,7 +22,7 @@ class InsumoPuntoVenta(BaseModel):
     insumo_unidad_abreviatura: Optional[str]
     insumo_unidad_descripcion: Optional[str]
     moneda_nombre: str
-    punto_venta_nombre: str
+    punto_venta_nombre: Optional[str]
     precios: List[InsumoPuntoVentaPrecio] = []
     precio: Optional[RoundedDecimal]
     proveedor_nombre: Optional[str]
