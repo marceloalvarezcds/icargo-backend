@@ -92,5 +92,6 @@ from .tipo_registro import TipoRegistro  # noqa
 from .tipo_semi import TipoSemi  # noqa
 from .unidad import Unidad  # noqa
 from .user import User, UserRol  # noqa
-from .combinacion import Combinacion
-from .provision import Provision
+from .combinacion import Combinacion # noqa
+from .provision import Provision # noqa
+from .texto_legal import TextoLegal # noqa
