@@ -87,7 +87,6 @@ async def add_new_punto_venta(
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.PUNTO_VENTA)),  # noqa: B008
 ):
-
     return await services.create_punto_venta(
         db, data, file, current_user.gestor_carga_id, current_user.username  # type: ignore
     )
@@ -102,7 +101,6 @@ async def edit_punto_venta(
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.EDITAR, m.PUNTO_VENTA)),  # noqa: B008
 ):
-
     return await services.edit_punto_venta(
         id, db, data, file, current_user.gestor_carga_id, current_user.username  # type: ignore
     )
