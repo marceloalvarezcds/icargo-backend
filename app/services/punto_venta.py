@@ -119,6 +119,7 @@ async def edit_punto_venta(
             detail=f"El Punto de Venta numero {data.numero_sucursal} ya existe",
         )
 
+
     logo_url = await upload_and_get_image_url(file) if file else None
     to_edit_obj = get_punto_venta_by_id(db, id)
     obj = repositories.edit_punto_venta(to_edit_obj, db, data, logo_url, modified_by)
