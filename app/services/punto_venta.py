@@ -110,9 +110,10 @@ async def edit_punto_venta(
             detail=f"El Punto de Venta con documento {data.numero_documento} ya existe",
         )
 
-    if repositories.get_punto_venta_by_proveedor_sucursal(
+    existsSucursal = repositories.get_punto_venta_by_proveedor_sucursal(
         db, data.proveedor_id, data.numero_sucursal
-    ):
+    )
+    if existsSucursal and existsSucursal.id != id:
         raise HTTPException(
             status_code=409,
             detail=f"El Punto de Venta numero {data.numero_sucursal} ya existe",
