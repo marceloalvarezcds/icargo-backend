@@ -1289,17 +1289,23 @@ def edit_movimiento_by_factura(
     factura: FacturaForm,
     modified_by: str,
 ) :
+    mov_iva = None
+    mov_retencion = None
 
-    mov_iva = get_movimiento_by_id(db, facturaModel.iva_movimiento_id)
-    mov_iva.monto= factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else factura.iva,
-    mov_iva.moneda_id= factura.moneda_id
+    if (facturaModel.iva_movimiento_id):
+        mov_iva = get_movimiento_by_id(db, facturaModel.iva_movimiento_id)
+        mov_iva.monto= factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else factura.iva,
+        mov_iva.moneda_id= factura.moneda_id
 
-    mov_retencion = get_movimiento_by_id(db, facturaModel.retencion_movimiento_id)
-    mov_retencion.monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
-    mov_retencion.moneda_id= factura.moneda_id
+    if (facturaModel.retencion_movimiento_id):
+        mov_retencion = get_movimiento_by_id(db, facturaModel.retencion_movimiento_id)
+        mov_retencion.monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
+        mov_retencion.moneda_id= factura.moneda_id
 
     db.commit()
-    db.refresh(mov_iva)
-    db.refresh(mov_retencion)
+    if (mov_iva):
+        db.refresh(mov_iva)
+    if (mov_retencion):
+        db.refresh(mov_retencion)
 
     return facturaModel
