@@ -1309,3 +1309,4 @@ def edit_movimiento_by_factura(
         db.refresh(mov_retencion)
 
     return facturaModel
+
