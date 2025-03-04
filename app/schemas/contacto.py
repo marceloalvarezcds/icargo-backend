@@ -9,7 +9,7 @@ class ContactoBaseModel(BaseModel):
     nombre: str
     apellido: str
     telefono: str
-    email: EmailStr
+    email: Optional[str] = None 
 
 
 class ContactoForm(ContactoBaseModel):

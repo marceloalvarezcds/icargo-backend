@@ -40,7 +40,7 @@ def get_flete_list_by_gestor_carga_id(
             and_(
                 Flete.gestor_carga_id == gestor_carga_id,
                 Flete.estado != EstadoEnum.ELIMINADO.value,
-                Flete.estado != EstadoEnum.INACTIVO.value,
+                # Flete.estado != EstadoEnum.INACTIVO.value,
                 # Flete.publicado == true(),
                 # Flete.es_subasta == false(),
             )
