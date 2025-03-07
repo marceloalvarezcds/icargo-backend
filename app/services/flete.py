@@ -49,7 +49,8 @@ def get_flete_by_id(db: Session, id: int) -> Flete:
     obj = repositories.get_flete_by_id(db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Flete no encontrado")
-    return obj
+
+    return get_flete_detail(obj)
 
 
 def get_flete_detail_by_id(db: Session, id: int) -> schemas.FleteList:
