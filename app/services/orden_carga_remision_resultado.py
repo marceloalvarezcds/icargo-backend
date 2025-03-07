@@ -33,7 +33,7 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
                     ),
 
                     saldo=orden_carga.resultado_gestor_carga_total_flete,
-                    saldo_bruto=orden_carga.resultado_gestor_carga_saldo,
+                    saldo_bruto=orden_carga.resultado_gestor_carga_total_flete_saldo_bruto,
                     complemento_descuento = orden_carga.resultado_gestor_carga_complemento_descuento,
                     # resultado_gestor_carga_saldo (calculo anterior),
                 )
