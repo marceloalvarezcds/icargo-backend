@@ -20,6 +20,13 @@ from .flete_destinatario import (
 )
 
 
+def get_flete_datail_by_id(db: Session, id: int) -> Flete:
+    obj = repositories.get_flete_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Flete no encontrado")
+    return get_flete_detail(obj)
+
+
 def get_flete_detail(model: Flete) -> schemas.Flete:
     obj = schemas.Flete.from_orm(model)
     obj.destinatarios = get_destinatario_selected_list_by_flete(model)
@@ -49,8 +56,7 @@ def get_flete_by_id(db: Session, id: int) -> Flete:
     obj = repositories.get_flete_by_id(db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Flete no encontrado")
-
-    return get_flete_detail(obj)
+    return obj
 
 
 def get_flete_detail_by_id(db: Session, id: int) -> schemas.FleteList:

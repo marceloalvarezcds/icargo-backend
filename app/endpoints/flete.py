@@ -46,7 +46,7 @@ async def read_flete_by_id(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.VER, m.FLETE)),  # noqa: B008
 ):
-    return services.get_flete_detail_by_id(db, id)
+    return services.get_flete_datail_by_id(db, id)
 
 
 @api.post("/", response_model=schemas.Flete)
