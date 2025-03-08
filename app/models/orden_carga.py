@@ -810,7 +810,7 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_gestor_carga_total_descuento(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
-        return sum(x.proveedor_monto for x in lista)
+        return sum(x.proveedor_monto for x in lista if x.proveedor_monto)
 
     @hybrid_property
     def resultado_propietario_total_descuento_a_pagar(self):
