@@ -172,7 +172,7 @@ def create_orden_carga(
         db.add(flete)
         db.commit()
 
-    # update_orden_carga_anticipo_saldo_by_orden_carga_id(db, OrdenCarga.id, modified_by)
+    update_orden_carga_anticipo_saldo_by_orden_carga_id(db, OrdenCarga.id, modified_by)
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list(
         db, obj.id, obj.flete_anticipos, modified_by
     )
