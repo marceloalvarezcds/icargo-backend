@@ -135,6 +135,11 @@ def create_liquidacion_pendiente(
                 punto_venta = data.cabecera.punto_venta_id
                 nombre_contraparte = data.cabecera.contraparte_pdv
                 contraparte_documento = data.cabecera.contraparte_numero_documento_pdv
+        elif data.cabecera.tipo_contraparte_descripcion == TipoContraparteEnum.PUNTO_VENTA.value:
+            proveedor_id = data.cabecera.contraparte_id
+            punto_venta = data.cabecera.punto_venta_id
+            nombre_contraparte = data.cabecera.contraparte_pdv
+            contraparte_documento = data.cabecera.contraparte_numero_documento_pdv
         else:
             propietario_id = data.cabecera.contraparte_id
 

@@ -7,3 +7,4 @@ class TipoContraparteEnum(Enum):
     PROPIETARIO = "Propietario"
     PROVEEDOR = "Proveedor"
     REMITENTE = "Remitente"
+    PUNTO_VENTA = "PUNTO DE VENTA"

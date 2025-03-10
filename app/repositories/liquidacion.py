@@ -172,6 +172,7 @@ def edit_liquidacion(
     obj.remitente_id = data.remitente_id
     obj.gestor_carga_id = gestor_carga_id
     obj.pago_cobro = data.monto
+    obj.es_pago_cobro = data.es_pago_cobro
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()
