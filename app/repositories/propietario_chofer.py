@@ -47,6 +47,7 @@ def create_chofer_by_propietario(
         direccion=data.direccion,
         ciudad_id=data.ciudad_id,
         modified_by=modified_by,
+        created_by=modified_by,
     )
     db.add(obj)
     db.commit()
