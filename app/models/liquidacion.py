@@ -80,7 +80,8 @@ class Liquidacion(AuditMixin, Base):
 
     @hybrid_property
     def es_cobro(self):
-        return self.movimientos_saldo > 0
+        #return self.movimientos_saldo > 0
+        return self.pago_cobro > 0
 
     @hybrid_property
     def esta_pagado(self):
