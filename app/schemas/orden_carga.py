@@ -137,6 +137,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     flete_proyectado: RoundedDecimal
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
+    flete_tarifa_unidad_abreviatura: Optional[str] = None
     flete_tarifa: RoundedDecimal
     flete_tipo: Optional[TipoFleteEnum] = None
     flete_saldo: Optional[int] = None
@@ -156,7 +157,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     is_en_proceso: bool
     is_finalizado: bool
     is_liquidado: bool
-    
+
     # Campos para la edición
     estado: EstadoEnum
     orden_carga_estado: OrdenCargaEstadoEnum
@@ -267,6 +268,7 @@ class OrdenCargaList(OrdenCargaForm):
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
     flete_tipo: Optional[TipoFleteEnum] = None
+    flete_tarifa_unidad_abreviatura: Optional[str] = None
     monto_anticipo_retirado:  Optional[RoundedDecimal] = None
     flete_saldo: Optional[int] = None
     resultado_flete_gestor_carga_merma_valor: Optional[int] = None
