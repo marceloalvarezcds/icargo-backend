@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session  # type: ignore
 from app.enums import EstadoEnum
 from app.models import Semi
 from app.models.combinacion import Combinacion
+from app.models.permiso import Permiso
+from app.models.rol import Rol
 from app.schemas import SemiForm
 
 
@@ -39,6 +41,25 @@ def get_combinaciones_by_semi_id(db: Session, semi_id: int) -> List[Combinacion]
     return db.query(Combinacion).filter(Combinacion.semi_id == semi_id).all()
 
 
+def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> bool:
+    rol = db.query(Rol).filter_by(id=rol_id).first()
+
+    if not rol:
+        return False
+
+    permiso = db.query(Permiso).filter_by(descripcion=permiso_descripcion).first()
+
+    if permiso and permiso in rol.permisos:
+        return True
+
+    return False
+
+
+def get_rol_id_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> Optional[int]:
+    rol = db.query(Rol).filter_by(gestor_carga_id=gestor_carga_id).first()
+
+    return rol.id if rol else None
+
 def create_semi(
     db: Session,
     data: SemiForm,
@@ -50,7 +71,19 @@ def create_semi(
     foto_habilitacion_automotor_frente_url: Optional[str],
     foto_habilitacion_automotor_reverso_url: Optional[str],
     modified_by: str,
+    gestor_carga_id: Optional[int],
 ) -> Semi:
+
+    rol_id = get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
+
+    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 4 - semi", db)
+
+    # Determinar el estado inicial según el permiso
+    if roles_permisos:
+        estado_inicial = EstadoEnum.ACTIVO.value
+    else:
+        estado_inicial = EstadoEnum.PENDIENTE.value
+
     obj = Semi(
         placa=data.placa,
         propietario_id=data.propietario_id,
@@ -93,7 +126,7 @@ def create_semi(
         alto=data.alto,
         ancho=data.ancho,
         volumen=data.volumen,
-        estado=EstadoEnum.PENDIENTE.value,
+        estado=estado_inicial,
         modified_by=modified_by,
         created_by=modified_by,
     )

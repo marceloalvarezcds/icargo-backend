@@ -40,7 +40,7 @@ async def read_semi_list_by_camion_id(
 )
 async def read_semi_list_by_combinacion_camion_id(
     camion_id: int,
-  
+
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.SEMIRREMOLQUE)),  # noqa: B008
@@ -115,6 +115,7 @@ async def add_new_semi(
         foto_habilitacion_transporte_reverso_file,
         foto_habilitacion_automotor_frente_file,
         foto_habilitacion_automotor_reverso_file,
+        current_user.gestor_carga_id,
         current_user.username,
     )
 

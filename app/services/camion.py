@@ -83,6 +83,7 @@ async def create_camion(
         foto_habilitacion_automotor_frente_url,
         foto_habilitacion_automotor_reverso_url,
         modified_by,
+        gestor_carga_id,
     )
 
 

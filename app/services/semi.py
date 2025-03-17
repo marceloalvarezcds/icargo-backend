@@ -24,6 +24,7 @@ async def create_semi(
     foto_habilitacion_transporte_reverso_file: Optional[UploadFile],
     foto_habilitacion_automotor_frente_file: Optional[UploadFile],
     foto_habilitacion_automotor_reverso_file: Optional[UploadFile],
+    gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Semi:
     if repositories.get_semi_by(db, data.placa):
@@ -59,6 +60,7 @@ async def create_semi(
         foto_habilitacion_automotor_frente_url,
         foto_habilitacion_automotor_reverso_url,
         modified_by,
+        gestor_carga_id,
     )
 
 
