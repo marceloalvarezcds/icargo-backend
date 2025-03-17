@@ -482,6 +482,7 @@ from .remitente import (  # noqa
     get_remitente_by_id,
     get_remitente_list,
     get_remitente_list_by_gestor_cuenta_id,
+    get_remitente_list_activo
 )
 from .remitente_contacto_gestor_carga import (  # noqa
     create_remitente_contacto_gestor_carga,
