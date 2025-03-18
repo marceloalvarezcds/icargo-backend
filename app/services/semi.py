@@ -26,6 +26,7 @@ async def create_semi(
     foto_habilitacion_automotor_reverso_file: Optional[UploadFile],
     gestor_carga_id: Optional[int],
     modified_by: str,
+    usuario_id: int,
 ) -> schemas.Semi:
     if repositories.get_semi_by(db, data.placa):
         raise HTTPException(
@@ -61,6 +62,7 @@ async def create_semi(
         foto_habilitacion_automotor_reverso_url,
         modified_by,
         gestor_carga_id,
+        usuario_id,
     )
 
 

@@ -117,6 +117,7 @@ async def add_new_semi(
         foto_habilitacion_automotor_reverso_file,
         current_user.gestor_carga_id,
         current_user.username,
+        current_user.id,
     )
 
 

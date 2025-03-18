@@ -27,10 +27,10 @@ def get_propietario_list_by_gestor_cuenta_id(
         .filter(
             and_(
                 Propietario.gestor_cuenta_id == gestor_cuenta_id,
-                Propietario.estado == EstadoEnum.ACTIVO.value,
+                Propietario.estado != EstadoEnum.ELIMINADO.value,
             )
         )
-        .order_by(Propietario.created_at.desc(), Propietario.nombre)
+        .order_by(Propietario.created_at.desc(), Propietario.id)
         .all()
     )
 

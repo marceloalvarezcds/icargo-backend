@@ -7,6 +7,9 @@ from sqlalchemy.sql.elements import and_, not_  # type: ignore
 from app.enums import EstadoEnum
 from app.models import Camion, Chofer
 from app.models.combinacion import Combinacion
+from app.models.permiso import Permiso
+from app.models.rol import Rol
+from app.models.user import UserRol
 from app.schemas import ChoferEditForm, ChoferForm
 
 
@@ -90,6 +93,25 @@ def get_chofer_by_id(db: Session, id: int) -> Optional[Chofer]:
 def get_combinaciones_by_chofer_id(db: Session, chofer_id: int) -> List[Combinacion]:
     return db.query(Combinacion).filter(Combinacion.chofer_id == chofer_id).all()
 
+def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session, usuario_id: int) -> bool:
+    usuario_rol = db.query(UserRol).filter_by(rol_id=rol_id, user_id=usuario_id).first()
+
+    if not usuario_rol:
+        return False
+
+    permiso = db.query(Permiso).filter_by(descripcion=permiso_descripcion).first()
+
+    if not permiso:
+        return False
+
+    return permiso in usuario_rol.rol.permisos
+
+
+def get_rol_id_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> Optional[int]:
+    rol = db.query(Rol).filter_by(gestor_carga_id=gestor_carga_id).first()
+
+    return rol.id if rol else None
+
 
 def create_chofer(
     db: Session,
@@ -101,7 +123,16 @@ def create_chofer(
     foto_registro_frente_url: Optional[str],
     foto_registro_reverso_url: Optional[str],
     modified_by: str,
+    usuario_id: int,
 ) -> Chofer:
+    rol_id = get_rol_id_by_gestor_carga_id(db, gestor_cuenta_id)
+
+    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 2 - chofer", db, usuario_id)
+
+    if roles_permisos:
+        estado_inicial = EstadoEnum.ACTIVO.value
+    else:
+        estado_inicial = EstadoEnum.PENDIENTE.value
     obj = Chofer(
         nombre=data.nombre,
         tipo_documento_id=data.tipo_documento_id,
@@ -125,7 +156,7 @@ def create_chofer(
         foto_registro_frente=foto_registro_frente_url,
         foto_registro_reverso=foto_registro_reverso_url,
         # fin registro
-        estado=EstadoEnum.PENDIENTE.value,
+        estado=estado_inicial,
         telefono=data.telefono,
         email=data.email,
         direccion=data.direccion,

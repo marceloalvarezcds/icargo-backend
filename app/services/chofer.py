@@ -45,6 +45,7 @@ async def create_chofer(
     foto_documento_reverso_propietario_file: Optional[UploadFile],
     gestor_cuenta_id: Optional[int],
     modified_by: str,
+    usuario_id: int,
 ) -> schemas.Chofer:
     if repositories.get_chofer_by(
         db, data.tipo_documento_id, data.pais_emisor_documento_id, data.numero_documento
@@ -76,6 +77,7 @@ async def create_chofer(
         foto_registro_frente_url,
         foto_registro_reverso_url,
         modified_by,
+        usuario_id,
     )
     create_gestor_carga_chofer(db, obj, gestor_cuenta_id, data.alias, modified_by)
     if data.es_propietario:

@@ -103,6 +103,7 @@ async def add_new_chofer(
         foto_documento_reverso_propietario_file,
         current_user.gestor_carga_id,
         current_user.username,
+        current_user.id,
     )
 
 

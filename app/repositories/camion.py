@@ -10,6 +10,7 @@ from app.models.combinacion import Combinacion
 from app.models.permiso import Permiso
 from app.models.propietario import Propietario
 from app.models.rol import Rol
+from app.models.user import UserRol
 from app.schemas import CamionForm
 
 
@@ -69,18 +70,18 @@ def get_combinaciones_by_camion_id(db: Session, camion_id: int) -> List[Combinac
     return db.query(Combinacion).filter(Combinacion.camion_id == camion_id).all()
 
 
-def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> bool:
-    rol = db.query(Rol).filter_by(id=rol_id).first()
+def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session, usuario_id: int) -> bool:
+    usuario_rol = db.query(UserRol).filter_by(rol_id=rol_id, user_id=usuario_id).first()
 
-    if not rol:
+    if not usuario_rol:
         return False
 
     permiso = db.query(Permiso).filter_by(descripcion=permiso_descripcion).first()
 
-    if permiso and permiso in rol.permisos:
-        return True
+    if not permiso:
+        return False
 
-    return False
+    return permiso in usuario_rol.rol.permisos
 
 
 def get_rol_id_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> Optional[int]:
@@ -101,12 +102,12 @@ def create_camion(
     foto_habilitacion_automotor_reverso_url: Optional[str],
     modified_by: str,
     gestor_carga_id: Optional[int],
+    usuario_id: int,
 ) -> Camion:
     rol_id = get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
 
-    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 3 - tracto", db)
+    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 3 - camión", db, usuario_id)
 
-    # Determinar el estado inicial según el permiso
     if roles_permisos:
         estado_inicial = EstadoEnum.ACTIVO.value
     else:

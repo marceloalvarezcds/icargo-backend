@@ -43,6 +43,7 @@ async def create_camion(
     foto_habilitacion_automotor_reverso_file: Optional[UploadFile],
     gestor_carga_id: Optional[int],
     modified_by: str,
+    usuario_id: int,
 ) -> schemas.Camion:
     gestor_id = get_gestor_carga_by_params(data, gestor_carga_id)
     gestor = repositories.get_gestor_carga_by_id(db, gestor_id)
@@ -84,6 +85,7 @@ async def create_camion(
         foto_habilitacion_automotor_reverso_url,
         modified_by,
         gestor_carga_id,
+        usuario_id,
     )
 
 
