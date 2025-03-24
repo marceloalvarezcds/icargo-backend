@@ -737,12 +737,14 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_propietario_total_complemento(self):
         lista: List[OrdenCargaComplemento] = self.complementos
-        return sum(x.propietario_monto for x in lista)
+        return sum(x.propietario_monto if x.propietario_monto is not None else 0 for x in lista)
+
 
     @hybrid_property
     def resultado_gestor_carga_total_complemento(self):
         lista: List[OrdenCargaComplemento] = self.complementos
-        return sum(x.remitente_monto for x in lista)
+        return sum(x.remitente_monto if x.remitente_monto is not None else 0 for x in lista)
+
 
     @hybrid_property
     def resultado_saldo_combustible(self):
@@ -806,12 +808,13 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_propietario_total_descuento(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
-        return sum(x.propietario_monto for x in lista)
+        return sum(x.propietario_monto if x.propietario_monto is not None else 0 for x in lista)
 
     @hybrid_property
     def resultado_gestor_carga_total_descuento(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
-        return sum(x.proveedor_monto for x in lista if x.proveedor_monto)
+        return sum(x.proveedor_monto if x.proveedor_monto is not None else 0 for x in lista)
+
 
     @hybrid_property
     def resultado_propietario_total_descuento_a_pagar(self):
