@@ -643,19 +643,6 @@ class OrdenCarga(AuditMixin, Base):
         return merma if merma > 0 else 0
 
 
-    def resultado_gestor_carga_saldo(self):
-        return (
-                (
-                    self.resultado_gestor_carga_total_flete
-                    - self.resultado_gestor_carga_merma_valor_total
-                )
-                + (
-                    self.resultado_gestor_carga_total_complemento
-                    - self.resultado_gestor_carga_total_descuento
-                )
-        )
-
-
     @hybrid_property
     def resultado_propietario_saldo(self):
         return (
