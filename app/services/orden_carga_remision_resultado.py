@@ -87,7 +87,7 @@ def get_orden_carga_remision_resultado_list_by_flete(
                     merma_valor_total_moneda_local=(
                         orden_carga.resultado_flete_gestor_carga_merma_valor_total_moneda_local
                     ),
-                    saldo=orden_carga.resultado_flete_gestor_carga_total_flete,
+                    saldo=orden_carga.resultado_flete_gestor_carga_saldo,
                     complemento_descuento = orden_carga.resultado_gestor_carga_complemento_descuento,
 
                     # resultado_flete_gestor_carga_saldo (calculo anterior),
