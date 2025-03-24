@@ -608,10 +608,8 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_gestor_carga_complemento_descuento(self):
-        total_descuento = sum(descuento.proveedor_monto or 0 for descuento in (self.descuentos or []))
-        total_complemento = sum(complemento.remitente_monto or 0 for complemento in (self.complementos or []))
-
-        return total_descuento - total_complemento
+        return (self.resultado_gestor_carga_total_complemento
+                - self.resultado_gestor_carga_total_descuento)
 
 
     @hybrid_property
@@ -659,10 +657,8 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_propietario_complemento_descuento(self):
-        total_descuento = sum(descuento.propietario_monto or 0 for descuento in (self.descuentos or []))
-        total_complemento = sum(complemento.propietario_monto or 0 for complemento in (self.complementos or []))
-
-        return total_descuento - total_complemento
+        return ( self.resultado_propietario_total_complemento
+                - self.resultado_propietario_total_descuento)
 
 
     @hybrid_property
