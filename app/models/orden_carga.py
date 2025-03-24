@@ -591,18 +591,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_gestor_carga_total_flete(self):
-        return (
-            (
-                self.resultado_gestor_carga_total_flete
-                - self.resultado_gestor_carga_merma_valor_total
-            )
-            + (
-                self.resultado_gestor_carga_total_complemento
-                - self.resultado_gestor_carga_total_descuento
-            )
-            
-        )
-        # return self.resultado_gestor_carga_tarifa_flete * self.cantidad_destino
+        return self.resultado_gestor_carga_tarifa_flete * self.cantidad_destino
 
     @hybrid_property
     def resultado_gestor_carga_total_flete_saldo_bruto(self):
@@ -652,6 +641,20 @@ class OrdenCarga(AuditMixin, Base):
             self.diferencia_origen_destino - self.resultado_propietario_tolerancia_kg
         )
         return merma if merma > 0 else 0
+
+
+    def resultado_gestor_carga_saldo(self):
+        return (
+                (
+                    self.resultado_gestor_carga_total_flete
+                    - self.resultado_gestor_carga_merma_valor_total
+                )
+                + (
+                    self.resultado_gestor_carga_total_complemento
+                    - self.resultado_gestor_carga_total_descuento
+                )
+        )
+
 
     @hybrid_property
     def resultado_propietario_saldo(self):
