@@ -48,6 +48,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     moneda_nombre: str
     proveedor_nombre: str
     punto_venta_nombre: Optional[str] = None
+    punto_venta_alias: Optional[str] = None
     punto_venta_pais_nombre: Optional[str] = None
     tipo_anticipo_descripcion: str
     tipo_comprobante_descripcion: Optional[str] = None

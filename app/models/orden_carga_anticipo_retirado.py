@@ -182,6 +182,10 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         return self.punto_venta.nombre
 
     @hybrid_property
+    def punto_venta_alias(self):
+        return self.punto_venta.nombre_corto
+
+    @hybrid_property
     def punto_venta_documento(self):
         return self.punto_venta.numero_documento
 
@@ -221,14 +225,10 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     def estados_movimientos(self):
         # Obtener todos los movimientos relacionados con la orden de carga
         movimientos: List[Movimiento] = self.orden_carga.movimientos if self.orden_carga else []
-
-        # Filtrar los movimientos por anticipo_id (debe coincidir con el id de OrdenCargaAnticipoRetirado)
         movimientos_filtrados = [
-            movimiento for movimiento in movimientos 
-            if movimiento.anticipo_id == self.id  # Aquí solo comparamos con self.id
+            movimiento for movimiento in movimientos
+            if movimiento.anticipo_id == self.id
         ]
-
-        # Obtener el primer estado del primer movimiento filtrado
         primer_estado = next((movimiento.estado for movimiento in movimientos_filtrados), None)
 
         return primer_estado
