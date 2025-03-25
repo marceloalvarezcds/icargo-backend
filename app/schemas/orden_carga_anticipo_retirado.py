@@ -16,6 +16,7 @@ class OrdenCargaAnticipoRetiradoBaseModel(BaseModel):
     numero_comprobante: Optional[str] = None
     moneda_id: int
     monto_retirado: RoundedDecimal
+    monto_litro: Optional[RoundedDecimal] = None
     observacion: Optional[str] = None
     insumo_punto_venta_precio_id: Optional[int] = None
     unidad_id: Optional[int] = None
@@ -35,6 +36,7 @@ class OrdenCargaAnticipoRetiradoForm(OrdenCargaAnticipoRetiradoBaseModel):
 class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     id: int
     concepto: str
+    concepto_detalle: Optional[str] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
@@ -56,6 +58,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     unidad_abreviatura: Optional[str] = None
     unidad_descripcion: Optional[str] = None
     estados_movimientos: Optional[str] = None
+    monto_litro: Optional[RoundedDecimal] = None
 
     # Auditoría
     created_by: str

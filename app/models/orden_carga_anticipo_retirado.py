@@ -71,6 +71,12 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         return self.flete_anticipo.concepto
 
     @hybrid_property
+    def concepto_detalle(self):
+        if self.flete_anticipo.concepto != "EFECTIVO":
+            return self.insumo_descripcion
+        return self.flete_anticipo.concepto
+
+    @hybrid_property
     def detalle(self):
         producto_info = ""
         if self.insumo_punto_venta_precio:
@@ -232,4 +238,11 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         primer_estado = next((movimiento.estado for movimiento in movimientos_filtrados), None)
 
         return primer_estado
+
+    @hybrid_property
+    def monto_litro(self):
+        if self.cantidad_retirada and self.precio_unitario:
+            return self.cantidad_retirada * self.precio_unitario
+        return 0
+
 
