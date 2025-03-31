@@ -1,20 +1,47 @@
 
 from sqlalchemy.orm import Session  # type: ignore
+from sqlalchemy.sql import func  # type: ignore
+from sqlalchemy.sql.elements import and_, or_  # type: ignore
+from sqlalchemy.sql.expression import null  # type: ignore
+from sqlalchemy.orm import Session  # type: ignore
+from app.models import (
+    MonedaCotizacion,
+)
+from app.enums import EstadoEnum
 
-from app.enums.estado import EstadoEnum
-from app.models.moneda_cotizacion import MonedaCotizacion
+def read_cotizacion_moneda(db: Session, moneda_origen: int, moneda_destino:int, gestor_carga_id: int) -> MonedaCotizacion:
 
-
-def get_cotizacion_by_moneda(db: Session, moneda_origen_id: int, moneda_destino_id: int):
-    cotizacion = (
-        db.query(MonedaCotizacion)
-        .filter(
-            MonedaCotizacion.moneda_origen_id == moneda_origen_id,
-            MonedaCotizacion.moneda_destino_id == moneda_destino_id,
-            MonedaCotizacion.estado == EstadoEnum.ACTIVO.value
+    sub_query = (
+        db.query(
+            #MonedaCotizacion.id,
+            func.max(MonedaCotizacion.fecha).label("max_fecha"),
         )
-        .order_by(MonedaCotizacion.fecha.desc())  # Obtener la más reciente
+        .filter(
+            and_(
+                MonedaCotizacion.moneda_origen_id == moneda_origen,
+                MonedaCotizacion.moneda_destino_id == moneda_destino,
+                MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
+                MonedaCotizacion.gestor_carga_id == gestor_carga_id,
+            )
+        )
+    ).subquery()
+
+    return (
+        db.query(MonedaCotizacion)
+        .join(
+            sub_query,
+            and_(
+                sub_query.c.max_fecha == MonedaCotizacion.fecha,
+            ),
+        )
+        .filter(
+            and_(
+                MonedaCotizacion.moneda_origen_id == moneda_origen,
+                MonedaCotizacion.moneda_destino_id == moneda_destino,
+                MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
+                MonedaCotizacion.gestor_carga_id == gestor_carga_id,
+            )
+        )
         .first()
     )
-    return cotizacion  # Retorna la cotización obtenida
 

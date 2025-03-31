@@ -29,11 +29,6 @@ class MonedaCotizacion(AuditMixin, Base):
 
     moneda_origen_id = Column(Integer, ForeignKey("moneda.id"))
     moneda_destino_id = Column(Integer, ForeignKey("moneda.id"))
-
-    # 🔹 Relación correcta, separando origen y destino
-    moneda_origen = relationship("Moneda", foreign_keys=[moneda_origen_id])
-    moneda_destino = relationship("Moneda", foreign_keys=[moneda_destino_id])
-
     fecha = Column(DateTime)
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     cotizacion_moneda = Column(Numeric(38, 10))
