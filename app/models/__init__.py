@@ -95,3 +95,4 @@ from .user import User, UserRol  # noqa
 from .combinacion import Combinacion # noqa
 from .provision import Provision # noqa
 from .texto_legal import TextoLegal # noqa
+from .moneda_cotizacion import MonedaCotizacion # noqa

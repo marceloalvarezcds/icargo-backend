@@ -407,3 +407,4 @@ from .texto_legal_service import (
     crear_texto_legal,
     edit_texto_legal
 )
+from .moneda_cotizacion import (read_cotizacion_moneda)
