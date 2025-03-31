@@ -32,6 +32,7 @@ from app.endpoints import (
     marca_camion,
     marca_semi,
     moneda,
+    moneda_cotizacion,
     movimiento,
     orden_carga,
     orden_carga_anticipo_retirado,
@@ -140,6 +141,7 @@ api.include_router(login.api, prefix="/login", tags=["login"])
 api.include_router(marca_camion.api, prefix="/marca_camion", tags=["marca_camion"])
 api.include_router(marca_semi.api, prefix="/marca_semi", tags=["marca_semi"])
 api.include_router(moneda.api, prefix="/moneda", tags=["moneda"])
+api.include_router(moneda_cotizacion.api, prefix="/moneda_cotizacion", tags=["moneda_cotizacion"])
 api.include_router(movimiento.api, prefix="/movimiento", tags=["movimiento"])
 api.include_router(orden_carga.api, prefix="/orden_carga", tags=["orden_carga"])
 api.include_router(

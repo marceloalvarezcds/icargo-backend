@@ -271,7 +271,7 @@ from .liquidacion import (  # noqa
 from .localidad import get_localidad_by_nombre_and_pais_id, get_localidad_list  # noqa
 from .marca_camion import get_marca_camion_by_descripcion, get_marca_camion_list  # noqa
 from .marca_semi import get_marca_semi_by_descripcion, get_marca_semi_list  # noqa
-from .moneda import get_moneda_by_id, get_moneda_by_simbolo, get_moneda_list  # noqa
+from .moneda import get_moneda_by_id, get_moneda_by_simbolo, get_moneda_list, get_moneda_by_gestor_carga  # noqa
 from .movimiento import (  # noqa
     change_movimiento_status,
     create_movimiento,

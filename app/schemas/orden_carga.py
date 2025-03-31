@@ -127,6 +127,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     flete_destino_nombre: Optional[str] = None
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
+    flete_tarifa_unidad_gestor_carga: Optional[str] = None
     flete_limite_credito: RoundedDecimal
     flete_numero_lote: Optional[str] = None
     flete_monto_efectivo: RoundedDecimal
@@ -144,6 +145,8 @@ class OrdenCarga(OrdenCargaBaseModel):
     linea_disponible: Optional[int] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
+    gestor_carga_moneda_simbolo: Optional[str] = None
+    flete_moneda_id: int
     gestor_carga_moneda_nombre: str
     resultado_gestor_carga_saldo_total: Optional[int] = None
     resultado_propietario_total_anticipos_retirados: Optional[int] = None

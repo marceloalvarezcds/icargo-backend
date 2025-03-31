@@ -69,6 +69,9 @@ from .estado_cuenta import (  # noqa
     get_estado_cuenta_pdv_list,
     get_estado_cuenta_pdv,
 )
+from .moneda_cotizacion import(
+    get_cotizacion_by_moneda
+)
 from .factura import (  # noqa
     create_factura,
     delete_factura,
