@@ -128,7 +128,7 @@ from .estado_cuenta import (  # noqa
     get_saldo_cuenta_contraparte,
     get_estado_cuenta_pdv_list,
     get_estado_cuenta_pdv,
-
+    get_max_date_cotizacion
 )
 from .factura import (  # noqa
     change_factura_status,

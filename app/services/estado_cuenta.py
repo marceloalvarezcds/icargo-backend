@@ -18,8 +18,12 @@ def get_estado_cuenta_list(
     db: Session, gestor_carga_id: Optional[int] = None
 ) -> List[EstadoCuenta]:
     if gestor_carga_id:
+
+        # obtenemos la moneda local de la gestora
+        moneda_local_id=1
+
         results = repositories.get_estado_cuenta_list_by_gestor_carga_id(
-            db, gestor_carga_id
+            db, gestor_carga_id, moneda_local_id
         )
     else:
         results = repositories.get_estado_cuenta_list(db)
@@ -96,6 +100,7 @@ def get_estado_cuenta_by_contraparte(
     punto_venta_id: int = None,
 ) -> Optional[EstadoCuenta]:
     tipo_contraparte = repositories.get_tipo_comprobante_by_id(db, tipo_contraparte_id)
+    # obtenemos la mon local
     if not tipo_contraparte:
         raise HTTPException(status_code=404, detail="Tipo de Contraparte no encontrado")
     if tipo_contraparte.descripcion == TipoContraparteEnum.OTRO.value:
@@ -104,7 +109,7 @@ def get_estado_cuenta_by_contraparte(
         )
     else:
         result = repositories.get_estado_cuenta_by_contraparte_and_tipo(
-            db, contraparte_id, tipo_contraparte_id, punto_venta_id
+            db, contraparte_id, 1, tipo_contraparte_id, punto_venta_id
         )
     if result:
         return EstadoCuenta.from_orm_row(result)
