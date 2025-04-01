@@ -23,3 +23,4 @@ class OrdenCargaRemisionResultado(BaseModel):
     total_combustible: Optional[RoundedDecimal] = None
     saldo_bruto: Optional[RoundedDecimal] = None
     complemento_descuento: Optional[RoundedDecimal] = None
+    flete_tarifa_unidad_gestor_carga: Optional[str] = None

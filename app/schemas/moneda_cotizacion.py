@@ -9,7 +9,6 @@ class MonedaCotizacion(BaseModel):
     gestor_carga_id: int
     moneda_origen_id: int
     moneda_destino_id: int
-    #moneda: Moneda
     fecha: str
     estado: str
     cotizacion_moneda: RoundedDecimal

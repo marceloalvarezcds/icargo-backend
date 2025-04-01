@@ -33,3 +33,12 @@ async def read_moneda_list_by_insumo_id_and_punto_venta_id(
     return services.get_moneda_list_by_insumo_id_and_punto_venta_id(
         db, insumo_id, punto_venta_id, current_user.gestor_carga_id
     )
+
+
+@api.get("/moneda/{gestor_carga_id}", response_model=schemas.Moneda)
+async def read_moneda_by_gestor_carga(
+    gestor_carga_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.MONEDA)),  # noqa: B008
+):
+    return repositories.get_moneda_by_gestor_carga(db, gestor_carga_id)

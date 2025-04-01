@@ -1,7 +1,10 @@
 from typing import List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session  # type: ignore
-from app import  schemas, services
+
+from app import repositories, schemas, services
+
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m

@@ -139,7 +139,6 @@ class OrdenCarga(AuditMixin, Base):
     propietario = relationship(Propietario, uselist=False)
 
 
-
     @hybrid_property
     def anticipos_liberados_descripcion(self):
         return "Liberados" if self.anticipos_liberados else "Bloqueados"
@@ -311,6 +310,10 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_destino_id(self):
         return self.flete.destino_id
+
+    @hybrid_property
+    def flete_moneda_id(self):
+        return self.flete.condicion_gestor_cuenta_moneda_id
 
     @hybrid_property
     def flete_destino_nombre(self):
@@ -579,6 +582,15 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_gestor_carga_tarifa_flete(self):
         return self.condicion_gestor_carga_tarifa
+
+    @hybrid_property
+    def resultado_gestor_carga_tarifa_flete_str(self):
+        """
+        Devuelve la tarifa formateada con la moneda como string.
+        """
+        if self.condicion_gestor_carga_moneda:
+            return f"{self.resultado_gestor_carga_tarifa_flete} {self.condicion_gestor_carga_moneda.simbolo}"
+        return str(self.resultado_gestor_carga_tarifa_flete)
 
 
     @hybrid_property
