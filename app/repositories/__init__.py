@@ -608,3 +608,9 @@ from .provision import ( # noqa
     create_provision,
     get_query_provisiones_by_contraparte_and_gestor_carga_id,
 ) # noqa
+
+from .moneda_cotizacion import (
+    get_moneda_cotizacion_by_id,
+    get_max_date_cotizacio_by_origen_destino,
+    get_ultima_cotizacion
+)

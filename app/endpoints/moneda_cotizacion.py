@@ -10,7 +10,7 @@ api = APIRouter()
 
 @api.get(
     "/cotizacion/moneda_origen/{moneda_origen}/moneda_destino/{moneda_destino}",
-    response_model=List[schemas.MonedaCotizacion],
+    response_model=schemas.MonedaCotizacion,
 )
 async def read_cotizacion_moneda(
     moneda_origen: int,

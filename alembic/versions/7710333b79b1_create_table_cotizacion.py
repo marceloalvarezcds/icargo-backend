@@ -44,21 +44,20 @@ def upgrade():
         sa.Column("moneda_destino_id", sa.Integer(), nullable=False),
         sa.Column(
             "fecha",
-            sa.DateTime(),
-            server_default=sa.text("CURRENT_TIMESTAMP"),
-            nullable=True,
+            sa.Date(),
+            nullable=False,
         ),
         sa.Column(
             "estado", sa.String(length=30), server_default="Activo", nullable=True
         ),
         sa.Column(
-            "cotizacion_moneda", sa.Numeric(precision=38, scale=10), nullable=True
+            "cotizacion_moneda", sa.Numeric(precision=38, scale=10), nullable=False
         ),
         sa.ForeignKeyConstraint(["moneda_origen_id"], ["moneda.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["moneda_destino_id"], ["moneda.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["gestor_carga_id"], ["gestor_carga.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("gestor_carga_id","moneda_origen_id", "moneda_destino_id"),
+        sa.UniqueConstraint("gestor_carga_id","moneda_origen_id", "moneda_destino_id", "fecha"),
     )
 
 
