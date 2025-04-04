@@ -146,7 +146,8 @@ def create_liquidacion(
         modified_by=modified_by,
         pago_cobro=data.monto,
         es_pago_cobro=data.es_pago_cobro,
-        tipo_mov_liquidacion=data.tipo_mov_liquidacion
+        tipo_mov_liquidacion=data.tipo_mov_liquidacion,
+        es_orden_pago=data.es_orden_pago,
     )
     db.add(obj)
     db.commit()
