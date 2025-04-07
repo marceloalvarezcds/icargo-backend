@@ -1,21 +1,18 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
-from sqlalchemy.orm import Query, Session # type: ignore
-from sqlalchemy import case, null, desc
+from sqlalchemy.orm import Query, Session, aliased # type: ignore
+from sqlalchemy import case, null, desc, func
 from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
 from app.enums import MovimientoEstadoEnum, EstadoEnum, TipoAnticipoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
 from app.models import (
     Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta, TipoMovimiento,
-    OrdenCargaAnticipoRetirado, TipoAnticipo, OrdenCarga, Propietario, Remitente,
-    Proveedor, PuntoVenta
-
+    OrdenCargaAnticipoRetirado, Moneda, OrdenCarga, Proveedor, PuntoVenta, MonedaCotizacion
 )
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
 from app.schemas import Movimiento as MovimientoSchema
-from app.enums.tipo_liquidacion import TipoLiquidacion
 
 
 def get_movimiento_list(db: Session) -> List[Movimiento]:
@@ -501,6 +498,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
     contraparte: str,
     contraparte_numero_documento: str,
     gestor_carga_id: int,
+    mon_local_id:int,
     punto_venta_id: Optional[int],
     tipo_movimiento: Optional[str],
     ) -> Query:
@@ -557,14 +555,29 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                     else_=literal_column("false"),
                 ).label("can_edit_oc"),
                 OrdenCarga.documento_fisico.label("documento_fisico"),
+                Moneda.simbolo.label("moneda"),
+                Movimiento.tipo_cambio_moneda.label("tipo_cambio_moneda"),
                 *get_cols_estado_cuenta_case_statement(),
                 )\
                 .join(Movimiento.tipo_movimiento)\
                 .join(Movimiento.cuenta)\
+                .join(Movimiento.moneda)\
                 .outerjoin(Movimiento.orden_carga)\
                 .outerjoin(Movimiento.liquidacion)\
                 .outerjoin(Movimiento.anticipo)\
-                .outerjoin(OrdenCargaAnticipoRetirado.flete_anticipo)
+                .outerjoin(OrdenCargaAnticipoRetirado.flete_anticipo)\
+                # .outerjoin(
+                #     MonedaCotizacion,
+                #     and_(
+                #         MonedaCotizacion.moneda_origen_id == mon_local_id,
+                #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
+                #         MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
+                #         MonedaCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
+                #         MonedaCotizacion.fecha == (
+                #             get_max_date_cotizacion(db, mon_local_id).subquery()
+                #         )
+                #     )
+                # )
 
     query = query.filter(
             and_(
@@ -693,7 +706,13 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
                     Movimiento.liquidacion_id == null(),
                     Movimiento.estado == EstadoEnum.PENDIENTE.value,
                 ),
-                Movimiento.monto,
+                case(
+                    (
+                        Movimiento.moneda_id == 1,
+                        Movimiento.monto,
+                    ),
+                    else_= Movimiento.monto_mon_local,
+                )
             ),
             else_=literal_column("0"),
         ).label("pendiente"),
@@ -792,4 +811,18 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
         #     ),
         #     else_=literal_column("0"),
         # ).label("cantidad_finalizado"),
+    )
+
+
+def get_max_date_cotizacion(db: Session,mon_local_id:int):
+    aliasCotizacion = aliased(MonedaCotizacion)
+
+    return (
+        db.query(func.max(aliasCotizacion.fecha))
+        .filter(
+            aliasCotizacion.moneda_origen_id == mon_local_id,
+            aliasCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
+            aliasCotizacion.estado == EstadoEnum.ACTIVO.value,
+            aliasCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
+        )
     )

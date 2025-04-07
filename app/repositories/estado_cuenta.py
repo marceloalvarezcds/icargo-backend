@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple
 from sqlalchemy import case, exists, func, literal_column, null, desc, nullsfirst
 from sqlalchemy.sql.functions import concat  # type: ignore
 from sqlalchemy.engine.row import Row  # type: ignore
-from sqlalchemy.orm import Query, Session  # type: ignore
+from sqlalchemy.orm import Query, Session, aliased  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from app.enums import EstadoEnum, TipoContraparteEnum
 from app.models import (
@@ -20,7 +20,9 @@ from app.models import (
     TipoInstrumento,
     Factura,
     Provision,
-    InstrumentoVia
+    InstrumentoVia,
+    MonedaCotizacion,
+    Moneda
 )
 from app.repositories.movimiento import get_query_movimientos_by_contraparte_and_gestor_carga_id
 from app.repositories.provision import get_query_provisiones_by_contraparte_and_gestor_carga_id
@@ -114,7 +116,7 @@ def get_estado_cuenta_case_statement() -> Tuple:
     )
 
 
-def get_estado_cuenta_case_statement_new() -> Tuple:
+def get_estado_cuenta_case_statement_new(mon_local_id:int) -> Tuple:
     return (
         literal_column('0').label('punto_venta_id'),
         null().label('contraparte_pdv'),
@@ -123,7 +125,7 @@ def get_estado_cuenta_case_statement_new() -> Tuple:
         TipoContraparte.descripcion.label("tipo_contraparte_descripcion"),
         Movimiento.gestor_carga_id.label("gestor_carga_id"),
         Movimiento.linea_movimiento.label("tipo_flujo"),
-        *get_cols_estado_cuenta_case_statement(),
+        *get_cols_estado_cuenta_case_statement(mon_local_id),
     )
 
 
@@ -140,7 +142,21 @@ def get_estado_cuenta_liquidacion_case_statement_new() -> Tuple:
     )
 
 
-def get_estado_cuenta_chofer(db: Session) -> Query:
+def get_max_date_cotizacion(db: Session,mon_local_id:int):
+    aliasCotizacion = aliased(MonedaCotizacion)
+
+    return (
+        db.query(func.max(aliasCotizacion.fecha))
+        .filter(
+            aliasCotizacion.moneda_origen_id == mon_local_id,
+            aliasCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
+            aliasCotizacion.estado == EstadoEnum.ACTIVO.value,
+            aliasCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
+        )
+    )
+
+
+def get_estado_cuenta_chofer(db: Session, mon_local_id:int) -> Query:
     return (
         db.query(
             Movimiento.chofer_id.label("contraparte_id"),
@@ -148,10 +164,22 @@ def get_estado_cuenta_chofer(db: Session) -> Query:
             null().label("contraparte_alias"),
             Chofer.numero_documento.label("contraparte_numero_documento"),
             literal_column('false').label("es_pdv"),
-            *get_estado_cuenta_case_statement_new(),
+            *get_estado_cuenta_case_statement_new(mon_local_id),
         )
         .join(Movimiento.chofer)
         .join(Movimiento.tipo_contraparte)
+        # .outerjoin(
+        #     MonedaCotizacion,
+        #     and_(
+        #         MonedaCotizacion.moneda_origen_id == 1,
+        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
+        #         MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
+        #         MonedaCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
+        #         MonedaCotizacion.fecha == (
+        #             get_max_date_cotizacion(db, 1).subquery()
+        #         )
+        #     )
+        # )
     )
 
 
@@ -171,7 +199,7 @@ def get_estado_cuenta_chofer_liquidacion(db: Session) -> Query:
     )
 
 
-def get_estado_cuenta_propietario(db: Session) -> Query:
+def get_estado_cuenta_propietario(db: Session, mon_local_id:int) -> Query:
     return (
         db.query(
             Movimiento.propietario_id.label("contraparte_id"),
@@ -179,10 +207,22 @@ def get_estado_cuenta_propietario(db: Session) -> Query:
             null().label("contraparte_alias"),
             Propietario.ruc.label("contraparte_numero_documento"),
             literal_column('false').label("es_pdv"),
-            *get_estado_cuenta_case_statement_new(),
+            *get_estado_cuenta_case_statement_new(mon_local_id),
         )
         .join(Movimiento.propietario)
         .join(Movimiento.tipo_contraparte)
+        # .outerjoin(
+        #     MonedaCotizacion,
+        #     and_(
+        #         MonedaCotizacion.moneda_origen_id == mon_local_id,
+        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
+        #         MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
+        #         MonedaCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
+        #         MonedaCotizacion.fecha == (
+        #             get_max_date_cotizacion(db, mon_local_id).subquery()
+        #         )
+        #     )
+        # )
     )
 
 
@@ -202,7 +242,7 @@ def get_estado_cuenta_propietario_liquidacion(db: Session) -> Query:
     )
 
 
-def get_estado_cuenta_proveedor(db: Session) -> Query:
+def get_estado_cuenta_proveedor(db: Session, mon_local_id:int) -> Query:
     return (
         db.query(
             Movimiento.proveedor_id.label("contraparte_id"),
@@ -210,11 +250,23 @@ def get_estado_cuenta_proveedor(db: Session) -> Query:
             concat(Proveedor.nombre_corto).label("contraparte_alias"),
             Proveedor.numero_documento.label("contraparte_numero_documento"),
             exists().where(PuntoVenta.proveedor_id == Proveedor.id).label("es_pdv"),
-            *get_estado_cuenta_case_statement_new(),
+            *get_estado_cuenta_case_statement_new(mon_local_id),
         )
         .join(Movimiento.proveedor)
         #.filter(~exists().where(PuntoVenta.proveedor_id == Proveedor.id))
         .join(Movimiento.tipo_contraparte)
+        # .outerjoin(
+        #     MonedaCotizacion,
+        #     and_(
+        #         MonedaCotizacion.moneda_origen_id == mon_local_id,
+        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
+        #         MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
+        #         MonedaCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
+        #         MonedaCotizacion.fecha == (
+        #             get_max_date_cotizacion(db, mon_local_id).subquery()
+        #         )
+        #     )
+        # )
     )
 
 
@@ -235,7 +287,7 @@ def get_estado_cuenta_proveedor_liquidacion(db: Session) -> Query:
     )
 
 
-def get_estado_cuenta_remitente(db: Session) -> Query:
+def get_estado_cuenta_remitente(db: Session, mon_local_id:int) -> Query:
     return (
         db.query(
             Movimiento.remitente_id.label("contraparte_id"),
@@ -243,10 +295,22 @@ def get_estado_cuenta_remitente(db: Session) -> Query:
             null().label("contraparte_alias"),
             Remitente.numero_documento.label("contraparte_numero_documento"),
             literal_column('false').label("es_pdv"),
-            *get_estado_cuenta_case_statement_new(),
+            *get_estado_cuenta_case_statement_new(mon_local_id),
         )
         .join(Movimiento.remitente)
         .join(Movimiento.tipo_contraparte)
+        # .outerjoin(
+        #     MonedaCotizacion,
+        #     and_(
+        #         MonedaCotizacion.moneda_origen_id == mon_local_id,
+        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
+        #         MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
+        #         MonedaCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
+        #         MonedaCotizacion.fecha == (
+        #             get_max_date_cotizacion(db, mon_local_id).subquery()
+        #         )
+        #     )
+        # )
     )
 
 
@@ -266,7 +330,7 @@ def get_estado_cuenta_remitente_liquidacion(db: Session) -> Query:
     )
 
 
-def get_estado_cuenta_otro(db: Session) -> Query:
+def get_estado_cuenta_otro(db: Session, mon_local_id:int) -> Query:
     return (
         db.query(
             Movimiento.tipo_contraparte_id.label("contraparte_id"),
@@ -276,7 +340,7 @@ def get_estado_cuenta_otro(db: Session) -> Query:
                 "contraparte_numero_documento"
             ),
             literal_column('false').label("es_pdv"),
-            *get_estado_cuenta_case_statement_new(),
+            *get_estado_cuenta_case_statement_new(mon_local_id),
         )
         .join(Movimiento.tipo_contraparte)
         # .outerjoin(Movimiento.liquidacion)
@@ -376,14 +440,14 @@ def get_estado_cuenta_pdv_subquery(db: Session) -> Query:
     return proveedorPdv.union_all(proveedorPdvProvision, proveedorPdvLiquidacion)
 
 
-def get_estado_cuenta_subquery(db: Session) -> Query:
+def get_estado_cuenta_subquery(db: Session, mon_local_id:int) -> Query:
 
-    chofer = get_estado_cuenta_chofer(db)
-    propietario = get_estado_cuenta_propietario(db)
-    proveedor = get_estado_cuenta_proveedor(db)
+    chofer = get_estado_cuenta_chofer(db, mon_local_id)
+    propietario = get_estado_cuenta_propietario(db, mon_local_id)
+    proveedor = get_estado_cuenta_proveedor(db, mon_local_id)
     #proveedorPdv = get_estado_cuenta_proveedor_pdv(db)
-    remitente = get_estado_cuenta_remitente(db)
-    otro = get_estado_cuenta_otro(db)
+    remitente = get_estado_cuenta_remitente(db, mon_local_id)
+    otro = get_estado_cuenta_otro(db, mon_local_id)
 
     choferProvision = get_provision_chofer(db)
     propietarioProvision = get_provision_propietario(db)
@@ -402,7 +466,7 @@ def get_estado_cuenta_subquery(db: Session) -> Query:
     return chofer.union_all(choferLiquidacion, choferProvision, propietario, propietarioLiquidacion,
         propietarioProvision, proveedor, proveedorLiquidacion, proveedorProvision, # proveedorPdv, proveedorPdvLiquidacion, proveedorPdvProvision
         remitente, remitenteLiquidacion, remitenteProvision, otro, otroLiquidacion)
-    #return chofer.union_all(proveedor, proveedorProvision, proveedorLiquidacion)
+    #return chofer.union_all(proveedor, proveedorLiquidacion)
 
 
 def get_estado_cuenta_group_by_query(db: Session, table: Query) -> Query:
@@ -498,10 +562,10 @@ def get_estado_cuenta_list(db: Session) -> List[Row]:
 
 
 def get_estado_cuenta_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: int
+    db: Session, gestor_carga_id: int, mon_local_id:int
 ) -> List[Row]:
     table = (
-        get_estado_cuenta_subquery(db)
+        get_estado_cuenta_subquery(db, mon_local_id)
         .filter(Movimiento.gestor_carga_id == gestor_carga_id)
         .subquery()
     )
@@ -511,10 +575,11 @@ def get_estado_cuenta_list_by_gestor_carga_id(
 def get_estado_cuenta_by_contraparte_and_tipo(
     db: Session,
     contraparte_id: int,
+    mon_local:int,
     tipo_contraparte_id: Optional[int],
     punto_venta_id: int = None
 ) -> Optional[Row]:
-    subquery = get_estado_cuenta_subquery(db).subquery()
+    subquery = get_estado_cuenta_subquery(db, mon_local).subquery()
     table = (
         db.query(subquery)
         .filter(
@@ -626,7 +691,7 @@ def get_estado_cuenta_pdv(
 
 
 
-def get_cols_estado_cuenta_case_statement() -> Tuple:
+def get_cols_estado_cuenta_case_statement(mon_local_id:int) -> Tuple:
     return (
         literal_column("0").label("provision"),
         case(
@@ -635,7 +700,14 @@ def get_cols_estado_cuenta_case_statement() -> Tuple:
                     Movimiento.liquidacion_id == null(),
                     Movimiento.estado == EstadoEnum.PENDIENTE.value,
                 ),
-                Movimiento.monto,
+                case(
+                    (
+                        Movimiento.moneda_id == mon_local_id,
+                        Movimiento.monto,
+                    ),
+                    #else_= Movimiento.monto*MonedaCotizacion.cotizacion_moneda,
+                    else_= Movimiento.monto_mon_local,
+                )
             ),
             else_=literal_column("0"),
         ).label("pendiente"),
@@ -646,7 +718,8 @@ def get_cols_estado_cuenta_case_statement() -> Tuple:
                     Movimiento.estado == EstadoEnum.CONFIRMADO.value,
                     Movimiento.estado == EstadoEnum.FINALIZADO.value,
                 ),
-                Movimiento.monto,
+                #Movimiento.monto,
+                Movimiento.monto_mon_local,
             ),
             else_=literal_column("0"),
         ).label("confirmado"),
@@ -793,6 +866,8 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             literal_column("false").label("es_editable"),
             literal_column("false").label("can_edit_oc"),
             literal_column("false").label("documento_fisico"),
+            Moneda.simbolo.label("moneda"),
+            literal_column("1").label("tipo_cambio_moneda"),
             literal_column("0"),
             literal_column("0"),
             literal_column("0"),
@@ -807,6 +882,7 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
         )\
         .join(Liquidacion.instrumentos)\
         .join(Instrumento.via)\
+        .join(Liquidacion.moneda)\
         .join(Instrumento.tipo_instrumento)\
         .outerjoin(Liquidacion.facturas)\
         .filter(
@@ -848,6 +924,9 @@ def nuevo_endpint(
     linea_movimiento: Optional[str],
     ) -> List[Row]:
 
+    #obtenemos la moneda local de la gestora
+    mon_local_id=1
+
     query_provisiones = get_query_provisiones_by_contraparte_and_gestor_carga_id(
         db, tipo_contraparte_id, contraparte_id, contraparte, contraparte_numero_documento,
         gestor_carga_id, punto_venta_id
@@ -855,7 +934,7 @@ def nuevo_endpint(
 
     query_movimientos = get_query_movimientos_by_contraparte_and_gestor_carga_id(
         db, tipo_contraparte_id, contraparte_id, contraparte, contraparte_numero_documento,
-        gestor_carga_id, punto_venta_id, linea_movimiento
+        gestor_carga_id, mon_local_id, punto_venta_id, linea_movimiento
     )
 
     query_instrumentos = get_query_instrumentos_by_contraparte_and_gestor_carga_id(
@@ -882,6 +961,8 @@ def nuevo_endpint(
         table.c.es_editable.label("es_editable"),
         table.c.can_edit_oc.label("can_edit_oc"),
         table.c.documento_fisico.label("documento_fisico"),
+        table.c.moneda.label("moneda"),
+        table.c.tipo_cambio_moneda.label("tipo_cambio_moneda"),
         table.c.provision.label("provision"),
         table.c.pendiente.label("pendiente"),
         table.c.en_proceso.label("en_proceso"),

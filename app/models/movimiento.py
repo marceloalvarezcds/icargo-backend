@@ -96,10 +96,19 @@ class Movimiento(AuditMixin, Base):
     remitente = relationship(Remitente, uselist=False)
     punto_venta_id = Column(Integer)
     linea_movimiento = Column(String(20))
+    monto_mon_local = Column(Numeric(38, 10))
 
     @hybrid_property
     def es_cobro(self):
         return self.monto > 0
+
+    @hybrid_property
+    def credito_ml(self):
+        return self.monto_mon_local if self.monto > 0 else 0
+
+    @hybrid_property
+    def debito_ml(self):
+        return self.monto_mon_local * -1 if self.monto < 0 else 0
 
     @hybrid_property
     def credito(self):

@@ -15,7 +15,9 @@ class MonedaCotizacion(EstadoBaseModel):
     gestor_carga_id: int
     moneda_origen_id: int
     moneda_destino_id: int
-    fecha: Optional[datetime] = None
+    fecha: Optional[date] = None
+    #fecha: str
+    estado: Optional[str] = None
     cotizacion_moneda: RoundedDecimal
 
     class Config:

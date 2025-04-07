@@ -62,7 +62,7 @@ from .localidad import Localidad  # noqa
 from .marca_camion import MarcaCamion  # noqa
 from .marca_semi import MarcaSemi  # noqa
 from .moneda import Moneda  # noqa
-from .moneda_cotizacion import MonedaCotizacion
+#from .moneda_cotizacion import MonedaCotizacion
 from .movimiento import (  # noqa
     Movimiento,
     MovimientoFleteEditForm,

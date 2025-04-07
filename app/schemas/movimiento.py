@@ -78,12 +78,14 @@ class Movimiento(MovimientoBaseModel):
     moneda: Moneda
     # Campos calculados
     credito: RoundedDecimal
+    credito_ml: RoundedDecimal
     camion_placa: Optional[str]
     chofer_nombre: Optional[str]
     chofer_numero_documento: Optional[str]
     concepto: str
     cuenta_codigo_descripcion: str
     debito: RoundedDecimal
+    debito_ml: RoundedDecimal
     destino_nombre: Optional[str]
     es_cobro: bool
     fecha_pago_cobro: Optional[Date]
@@ -93,6 +95,7 @@ class Movimiento(MovimientoBaseModel):
     moneda_nombre: str
     moneda_simbolo: str
     monto_ml: RoundedDecimal
+    monto_mon_local: RoundedDecimal
     origen_nombre: Optional[str]
     producto_descripcion: Optional[str]
     propietario_nombre: Optional[str]

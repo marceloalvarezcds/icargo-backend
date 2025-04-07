@@ -35,6 +35,8 @@ class MovimientoEstadoCuenta(BaseModel):
     es_editable: bool
     can_edit_oc: bool
     documento_fisico: Optional[bool]
+    moneda: Optional[str]
+    tipo_cambio_moneda: Optional[RoundedDecimal]
     provision: Optional[RoundedDecimal]
     pendiente: RoundedDecimal
     en_proceso: RoundedDecimal

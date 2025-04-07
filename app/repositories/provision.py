@@ -9,7 +9,8 @@ from app.enums import (
 from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
 from app.models import (
     TipoCuenta,
-    Provision
+    Provision,
+    Moneda
 )
 from app.schemas import ProvisionForm
 
@@ -96,7 +97,15 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
                 literal_column("false").label("es_editable"),
                 literal_column("false").label("can_edit_oc"),
                 literal_column("false").label("documento_fisico"),
-                Provision.monto.label("provision"),
+                Moneda.simbolo.label("moneda"),
+                Provision.tipo_cambio_moneda.label("tipo_cambio_moneda"),
+                case(
+                    (
+                        Provision.moneda_id == 1,
+                        Provision.monto,
+                    ),
+                    else_= Provision.monto*Provision.tipo_cambio_moneda,
+                ).label("provision"),
                 literal_column("0").label("pendiente"),
                 literal_column("0").label("en_proceso"),
                 literal_column("0").label("confirmado"),
@@ -104,6 +113,7 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
                 )\
                 .join(Provision.tipo_movimiento)\
                 .join(Provision.cuenta)\
+                .join(Provision.moneda)\
                 .outerjoin(Provision.anticipo)\
 
     query = query.filter(
