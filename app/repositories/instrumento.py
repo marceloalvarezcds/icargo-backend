@@ -63,8 +63,11 @@ def create_instrumento(
         # Solo para cheque
         cheque_es_diferido=data.cheque_es_diferido,
         cheque_fecha_vencimiento=data.cheque_fecha_vencimiento,
+        tipo_cambio_moneda=data.tipo_cambio_moneda,
+        moneda_id=data.moneda_id,
         created_by=modified_by,
         modified_by=modified_by,
+        monto_ml=(data.credito + data.debito)*data.tipo_cambio_moneda
     )
     db.add(obj)
     db.commit()

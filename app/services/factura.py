@@ -26,13 +26,13 @@ async def create_factura(
             status_code=409, detail=f"La Factura Nº {data.numero_factura} ya existe"
         )
 
-    # foto_url = 'foto' # await upload_and_get_image_url(foto_file) if foto_file else None
+    #foto_url = 'foto' # await upload_and_get_image_url(foto_file) if foto_file else None
     foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
     factura = repositories.create_factura(db, data, foto_url, modified_by)
 
     if data.sentido_mov_iva or data.sentido_mov_retencion:
         service.create_movimiento_by_factura(db, data, gestor_carga_id, modified_by, factura)
-        liquidacionService.refresh_pago_cobro(db, data.liquidacion_id, modified_by)
+        #liquidacionService.refresh_pago_cobro(db, data.liquidacion_id, modified_by)
 
     return factura
 
@@ -62,11 +62,11 @@ async def edit_factura(
     to_edit_obj = get_factura_by_id(db, id)
 
     foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
-    # foto_url = 'foto url' if foto_file else None
+    #foto_url = 'foto url' 
 
     if to_edit_obj.iva_movimiento_id or to_edit_obj.retencion_movimiento_id:
         service.edit_movimiento_by_factura(db, to_edit_obj, data, modified_by)
-        liquidacionService.refresh_pago_cobro(db, data.liquidacion_id, modified_by)
+        #liquidacionService.refresh_pago_cobro(db, data.liquidacion_id, modified_by)
 
     return repositories.edit_factura(to_edit_obj, db, data, foto_url, modified_by)
 
@@ -76,7 +76,7 @@ def delete_factura(db: Session, id: int, modified_by: str) -> Factura:
 
     if co.iva_movimiento_id or co.retencion_movimiento_id:
         service.delete_movimiento_by_factura(db, co, modified_by)
-        liquidacionService.refresh_pago_cobro(db, co.liquidacion_id, modified_by)
+        #liquidacionService.refresh_pago_cobro(db, co.liquidacion_id, modified_by)
 
     factura = repositories.delete_factura(co, db, modified_by)
 

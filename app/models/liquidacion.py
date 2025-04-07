@@ -84,7 +84,8 @@ class Liquidacion(AuditMixin, Base):
     @hybrid_property
     def es_cobro(self):
         #return self.movimientos_saldo > 0
-        return self.pago_cobro > 0
+        #return self.pago_cobro > 0
+        return self.es_pago_cobro == 'PAGO'
 
     @hybrid_property
     def esta_pagado(self):
@@ -120,8 +121,11 @@ class Liquidacion(AuditMixin, Base):
 
     @hybrid_property
     def saldo_residual(self):
-        # return abs(self.movimientos_saldo) - self.instrumentos_saldo
-        return abs(self.pago_cobro) - self.instrumentos_saldo
+        if self.es_orden_pago:
+            return abs(self.pago_cobro) - self.instrumentos_saldo
+        else:
+            return abs(self.movimientos_saldo) - self.instrumentos_saldo
+        
 
     @hybrid_property
     def moneda_nombre(self):

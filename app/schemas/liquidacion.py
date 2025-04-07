@@ -62,6 +62,7 @@ class LiquidacionForm(BaseModel):
     saldo_cc: Optional[RoundedDecimal]
     tipo_mov_liquidacion: str
     es_orden_pago: bool
+    tipo_cambio_moneda: Optional[RoundedDecimal]
 
 
 class Liquidacion(LiquidacionForm):
