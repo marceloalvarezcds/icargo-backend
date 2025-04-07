@@ -32,6 +32,7 @@ class OrdenCargaComplemento(AuditMixin, Base):
     anticipado = Column(Boolean, server_default=text("false"))
     # INICIO Monto a pagar al Propietario
     propietario_monto = Column(Numeric(38, 10))
+    propietario_monto_ml = Column(Numeric(38, 10))
     propietario_moneda_id = Column(Integer, ForeignKey("moneda.id"))
     propietario_moneda = relationship(
         Moneda, uselist=False, foreign_keys=[propietario_moneda_id]
@@ -43,6 +44,7 @@ class OrdenCargaComplemento(AuditMixin, Base):
     # FIN Monto a pagar al Propietario
     # INICIO Monto a cobrar al Remitente
     remitente_monto = Column(Numeric(38, 10))
+    remitente_monto_ml = Column(Numeric(38, 10))
     remitente_moneda_id = Column(Integer, ForeignKey("moneda.id"))
     remitente_moneda = relationship(
         Moneda, uselist=False, foreign_keys=[remitente_moneda_id]

@@ -1,5 +1,5 @@
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
 
 from app.schemas.rounded_decimal_model import RoundedDecimal
@@ -17,8 +17,7 @@ class MonedaCotizacion(EstadoBaseModel):
     moneda_destino_id: int
     fecha: Optional[date] = None
     #fecha: str
-    estado: Optional[str] = None
-    cotizacion_moneda: RoundedDecimal
+    cotizacion_moneda: Optional[RoundedDecimal]
 
     class Config:
         orm_mode = True
