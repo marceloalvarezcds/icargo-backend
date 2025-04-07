@@ -25,7 +25,6 @@ def read_cotizacion_moneda(db: Session, moneda_origen: int, moneda_destino:int, 
             )
         )
     ).subquery()
-
     return (
         db.query(MonedaCotizacion)
         .join(
@@ -45,3 +44,17 @@ def read_cotizacion_moneda(db: Session, moneda_origen: int, moneda_destino:int, 
         .first()
     )
 
+def get_cotizacion_moneda(db: Session, moneda_id: int, gestor_carga_id: int) -> MonedaCotizacion:
+
+    resultado = (
+        db.query(MonedaCotizacion)
+        .filter(
+            MonedaCotizacion.moneda_origen_id == moneda_id,
+            MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
+            MonedaCotizacion.gestor_carga_id == gestor_carga_id,
+        )
+        .order_by(MonedaCotizacion.fecha.desc())
+        .first()
+    )
+
+    return resultado

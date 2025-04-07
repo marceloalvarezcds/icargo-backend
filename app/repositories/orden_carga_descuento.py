@@ -18,6 +18,8 @@ def create_orden_carga_descuento(
     db: Session,
     data: OrdenCargaDescuentoForm,
     modified_by: str,
+    proveedor_monto_ml: Optional[float] = None,
+    propietario_monto_ml: Optional[float] = None,
 ) -> OrdenCargaDescuento:
     obj = OrdenCargaDescuento(
         concepto_id=data.concepto_id,
@@ -26,10 +28,12 @@ def create_orden_carga_descuento(
         anticipado=data.anticipado,
         # INICIO Monto a cobrar al Propietario
         propietario_monto=data.propietario_monto,
+        propietario_monto_ml=propietario_monto_ml,
         propietario_moneda_id=data.propietario_moneda_id,
         # FIN Monto a cobrar al Propietario
         # INICIO Monto a pagar al Proveedor
         proveedor_monto=data.proveedor_monto,
+        proveedor_monto_ml=proveedor_monto_ml,
         proveedor_moneda_id=data.proveedor_moneda_id,
         proveedor_id=data.proveedor_id,
         # FIN Monto a pagar al Proveedor

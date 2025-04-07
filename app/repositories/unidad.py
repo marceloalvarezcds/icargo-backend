@@ -17,3 +17,6 @@ def get_unidad_list(db: Session) -> List[Unidad]:
         )
         .order_by(Unidad.descripcion).all()
     )
+
+def get_unidad_by_id(db: Session, unidad_id: int):
+    return db.query(Unidad).filter(Unidad.id == unidad_id).first()

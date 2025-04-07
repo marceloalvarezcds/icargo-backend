@@ -17,3 +17,12 @@ async def read_unidad_list(
     _: bool = Depends(Permiso(a.LISTAR, m.UNIDAD)),  # noqa: B008
 ):
     return repositories.get_unidad_list(db)
+
+
+@api.get("/{unidad_id}/conversion", response_model=schemas.Unidad)
+async def get_unidad_conversion(
+    unidad_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.UNIDAD)),  # noqa: B008
+):
+    return repositories.get_unidad_by_id(db, unidad_id)

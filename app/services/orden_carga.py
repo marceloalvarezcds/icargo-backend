@@ -47,6 +47,9 @@ from .orden_carga_anticipo_saldo import (
     update_orden_carga_anticipo_saldo_by_orden_carga_id,
 )
 
+from .moneda_cotizacion import get_cotizacion_moneda
+from app.repositories.moneda import get_moneda_by_gestor_carga
+
 
 def get_orden_carga_list(
     db: Session, gestor_carga_id: Optional[int]
@@ -135,15 +138,11 @@ def create_orden_carga(
     rol_id = repositories.get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
     roles_permisos = repositories.rol_tiene_permiso(rol_id, "Cambiar_estado 1 - orden de carga", db)
 
-    if roles_permisos:
-        estado_inicial = EstadoEnum.ACEPTADO
-    else:
-        estado_inicial = EstadoEnum.NUEVO
+    estado_inicial = EstadoEnum.ACEPTADO if roles_permisos else EstadoEnum.NUEVO
 
     camion = db.query(Camion).filter(Camion.id == data.camion_id).first()
     if not camion:
         raise HTTPException(status_code=404, detail="Camión no encontrado")
-
 
     if estado_inicial == EstadoEnum.ACEPTADO:
         cant_oc_aceptadas = repositories.get_orden_carga_aceptada_count_by_camion_id(db, data.camion_id)
@@ -153,10 +152,23 @@ def create_orden_carga(
                 status_code=HTTPStatus.LOCKED,
                 detail=f"El camión con placa {camion.placa} ha alcanzado el límite de órdenes activas permitidas ({camion.limite_cantidad_oc_activas})."
             )
-    camion_semi_neto = get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
-        db, data.camion_id, data.semi_id, flete.producto_id, gestor_carga_id
-    )
-    data.camion_semi_neto_id = camion_semi_neto.id if camion_semi_neto else None
+    moneda_gestor_carga = get_moneda_by_gestor_carga(db, gestor_carga_id)
+    if not moneda_gestor_carga:
+        raise HTTPException(status_code=404, detail="Moneda del gestor de carga no encontrada.")
+
+    cotizacion_condicion_origen_gestor_carga = get_cotizacion_moneda(db, flete.condicion_gestor_carga_moneda_id, gestor_carga_id)
+    cotizacion_origen_condicion_propietario = get_cotizacion_moneda(db, flete.condicion_propietario_moneda_id, gestor_carga_id)
+
+    cotizacion_origen_gestor_carga = get_cotizacion_moneda(db, flete.merma_gestor_carga_moneda_id, gestor_carga_id)
+    cotizacion_origen_propietario = get_cotizacion_moneda(db, flete.merma_propietario_moneda_id, gestor_carga_id)
+
+    cotizacion_destino_gestor_carga_ml = get_cotizacion_moneda(db, moneda_gestor_carga.id, gestor_carga_id)
+
+    merma_gestor_carga_valor_ml = flete.merma_gestor_carga_valor * cotizacion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
+    merma_propietario_valor_ml= flete.merma_propietario_valor * cotizacion_origen_propietario.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
+
+    condicion_gestor_carga_tarifa_ml = flete.condicion_gestor_carga_tarifa * cotizacion_condicion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
+    condicion_propietario_tarifa_ml= flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
 
     obj = repositories.create_orden_carga(
         db,
@@ -165,14 +177,16 @@ def create_orden_carga(
         gestor_carga_id,
         modified_by,
         estado_inicial,
+        condicion_gestor_carga_tarifa_ml,
+        condicion_propietario_tarifa_ml,
+        merma_gestor_carga_valor_ml,
+        merma_propietario_valor_ml
     )
-
     if estado_inicial in [EstadoEnum.ACEPTADO, EstadoEnum.NUEVO]:
         flete.saldo -= data.cantidad_nominada
         db.add(flete)
         db.commit()
 
-    # update_orden_carga_anticipo_saldo_by_orden_carga_id(db, OrdenCarga.id, modified_by)
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list(
         db, obj.id, obj.flete_anticipos, modified_by
     )

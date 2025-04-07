@@ -15,20 +15,26 @@ from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
 from app.enums.estado import EstadoEnum
 from app.models.gestor_carga import GestorCarga
+from app.models.moneda import Moneda
 
 
 class MonedaCotizacion(AuditMixin, Base):
     __tablename__ = "moneda_cotizacion"
     __table_args__ = (
-        UniqueConstraint("gestor_carga_id", "moneda_origen_id", "moneda_destino_id"),
+        UniqueConstraint("gestor_carga_id", "moneda_origen_id", "moneda_destino_id", "fecha"),
     )
 
     id = Column(Integer, primary_key=True)
     gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
-    gestor_carga = relationship(GestorCarga, uselist=False)
+    gestor_carga = relationship("GestorCarga")
 
     moneda_origen_id = Column(Integer, ForeignKey("moneda.id"))
     moneda_destino_id = Column(Integer, ForeignKey("moneda.id"))
-    fecha = Column(DateTime)
-    estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
-    cotizacion_moneda = Column(Numeric(38, 10))
+
+    moneda_origen = relationship("Moneda", foreign_keys=[moneda_origen_id])
+    moneda_destino = relationship("Moneda", foreign_keys=[moneda_destino_id])
+
+    fecha = Column(DateTime, nullable=False)
+    estado = Column(String(15), server_default=EstadoEnum.ACTIVO.value)
+    cotizacion_moneda = Column(Numeric(38, 10), nullable=False)
+

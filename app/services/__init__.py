@@ -70,7 +70,7 @@ from .estado_cuenta import (  # noqa
     get_estado_cuenta_pdv,
 )
 from .moneda_cotizacion import(
-    get_cotizacion_by_moneda
+    read_cotizacion_moneda
 )
 from .factura import (  # noqa
     create_factura,
@@ -410,4 +410,4 @@ from .texto_legal_service import (
     crear_texto_legal,
     edit_texto_legal
 )
-from .moneda_cotizacion import (read_cotizacion_moneda)
+from .moneda_cotizacion import (read_cotizacion_moneda, get_cotizacion_moneda)
