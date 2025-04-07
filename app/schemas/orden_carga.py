@@ -38,6 +38,10 @@ class OrdenCargaForm(BaseModel):
     combinacion_id: Optional[int] = None
     cantidad_nominada: RoundedDecimal
     comentarios: Optional[str] = None
+    condicion_gestor_carga_tarifa_ml: Optional[RoundedDecimal] = None
+    condicion_propietario_tarifa_ml: Optional[RoundedDecimal] = None
+    merma_gestor_carga_valor_ml: Optional[RoundedDecimal] = None
+    merma_propietario_valor_ml: Optional[RoundedDecimal] = None
 
     class Config:
         orm_mode = True
@@ -150,7 +154,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     gestor_carga_moneda_nombre: str
     resultado_gestor_carga_saldo_total: Optional[int] = None
     resultado_propietario_total_anticipos_retirados: Optional[int] = None
-    saldo_efectivo: Optional[int] = None
+    saldo_efectivo: Optional[RoundedDecimal] = None
     saldo_combustible: Optional[int] = None
     # Historial de Estados
     is_aceptado: bool
@@ -175,10 +179,15 @@ class OrdenCarga(OrdenCargaBaseModel):
     # inicio - Condiciones para el Gestor de Carga
     condicion_gestor_cuenta_tarifa: Optional[int] = None
     condicion_gestor_carga_moneda: Optional[Moneda] = None
+    condicion_gestor_moneda_simbolo: Optional[str] = None
+    condicion_gestor_carga_moneda_id: Optional[int] = None
     # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda: Optional[Moneda] = None
     condicion_propietario_tarifa: Optional[int] = None
+    condicion_propietario_moneda_simbolo: Optional[str] = None
+    condicion_propietario_moneda_id: Optional[int] = None
+
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
@@ -226,6 +235,8 @@ class OrdenCarga(OrdenCargaBaseModel):
     total_anticipo_efectivo:  Optional[int] = None
     total_anticipo_combustible:  Optional[int] = None
     total_anticipo_lubricantes:  Optional[int] = None
+    resultado_gestor_carga_merma_valor_total_moneda_local: Optional[RoundedDecimal]= None
+    monto_anticipo: Optional[RoundedDecimal]= None
     # Auditoría
     created_by: str
     created_at: Date
@@ -295,8 +306,8 @@ class OrdenCargaList(OrdenCargaForm):
     resultado_propietario_total_anticipos_retirados_lubricantes: Optional[int] = None
     is_anulado: bool
     resultado_saldo_combustible: Optional[int] = None
-    saldo_efectivo: Optional[int] = None
     saldo_combustible: Optional[int] = None
+    saldo_efectivo: Optional[RoundedDecimal] = None
     # INICIO Tramo de OC
     origen_id: Optional[int] = None
     origen_nombre: Optional[str] = None

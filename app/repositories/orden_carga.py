@@ -330,13 +330,18 @@ def create_orden_carga(
     gestor_carga_id: Optional[int],
     modified_by: str,
     estado_inicial: EstadoEnum,
+    condicion_gestor_carga_tarifa_ml: Optional[float] = None,
+    condicion_propietario_tarifa_ml: Optional[float] = None,
+    merma_gestor_carga_valor_ml: Optional[float] = None,
+    merma_propietario_valor_ml: Optional[float] = None,
+
 ) -> OrdenCarga:
 
     obj = OrdenCarga(
         camion_id=data.camion_id,
         camion_semi_neto_id=data.camion_semi_neto_id,
         semi_id=data.semi_id,
-        chofer_id = data.chofer_id,
+        chofer_id=data.chofer_id,
         propietario_id=data.propietario_id,
         flete_id=data.flete_id,
         combinacion_id=data.combinacion_id,
@@ -348,21 +353,24 @@ def create_orden_carga(
         # inicio - Condiciones para el Gestor de Carga
         condicion_gestor_carga_moneda_id=flete.condicion_gestor_carga_moneda_id,
         condicion_gestor_carga_tarifa=flete.condicion_gestor_carga_tarifa,
+        condicion_gestor_carga_tarifa_ml=condicion_gestor_carga_tarifa_ml,
         # fin - Condiciones para el Gestor de Cuenta
         # inicio - Condiciones para el Propietario
         condicion_propietario_moneda_id=flete.condicion_propietario_moneda_id,
         condicion_propietario_tarifa=flete.condicion_propietario_tarifa,
-        # fin - Condiciones para el Gestor de Carga
-        # inicio - Condiciones para el Propietario
+        condicion_propietario_tarifa_ml=condicion_propietario_tarifa_ml,
+        # fin - Condiciones para el Propietario
         # INICIO Mermas de Fletes
         # inicio - Mermas para el Gestor de Carga
         merma_gestor_carga_valor=flete.merma_gestor_carga_valor,
+        merma_gestor_carga_valor_ml=merma_gestor_carga_valor_ml,  # Nueva columna para la merma convertida
         merma_gestor_carga_moneda_id=flete.merma_gestor_carga_moneda_id,
         merma_gestor_carga_es_porcentual=flete.merma_gestor_carga_es_porcentual,
         merma_gestor_carga_tolerancia=flete.merma_gestor_carga_tolerancia,
         # fin - Mermas para el Gestor de Carga
         # inicio - Mermas para el Propietario
-        merma_propietario_valor=flete.merma_propietario_valor,
+        merma_propietario_valor=flete.merma_propietario_valor, # Nueva columna para la merma convertida
+        merma_propietario_valor_ml=merma_propietario_valor_ml,
         merma_propietario_moneda_id=flete.merma_propietario_moneda_id,
         merma_propietario_es_porcentual=flete.merma_propietario_es_porcentual,
         merma_propietario_tolerancia=flete.merma_propietario_tolerancia,
@@ -372,8 +380,10 @@ def create_orden_carga(
         created_by=modified_by,
         modified_by=modified_by,
     )
+
     if estado_inicial == EstadoEnum.ACEPTADO:
         obj.anticipos_liberados = True
+
     db.add(obj)
     db.commit()
     db.refresh(obj)
@@ -391,6 +401,7 @@ def create_orden_carga(
         )
 
     return change_orden_carga_status(obj, db, estado_inicial, modified_by)
+
 
 
 def edit_remitir_fecha(

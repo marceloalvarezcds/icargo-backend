@@ -16,10 +16,12 @@ class OrdenCargaComplementoForm(BaseModel):
     anticipado: Optional[bool] = False
     # INICIO Monto a pagar al Propietario
     propietario_monto: RoundedDecimal
+    propietario_monto_ml: Optional[RoundedDecimal] = None
     propietario_moneda: Moneda
     # FIN Monto a pagar al Propietario
     # INICIO Monto a cobrar al Remitente
     remitente_monto: Optional[RoundedDecimal] = None
+    remitente_monto_ml: Optional[RoundedDecimal] = None
     remitente_moneda: Optional[Moneda] = None
     # FIN Monto a cobrar al Remitente
     orden_carga_id: int

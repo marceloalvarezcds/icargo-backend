@@ -33,6 +33,7 @@ class OrdenCargaDescuento(AuditMixin, Base):
     anticipado = Column(Boolean, server_default=text("false"))
     # INICIO Monto a cobrar al Propietario
     propietario_monto = Column(Numeric(38, 10))
+    propietario_monto_ml = Column(Numeric(38, 10))
     propietario_moneda_id = Column(Integer, ForeignKey("moneda.id"))
     propietario_moneda = relationship(
         Moneda, uselist=False, foreign_keys=[propietario_moneda_id]
@@ -44,6 +45,7 @@ class OrdenCargaDescuento(AuditMixin, Base):
     # FIN Monto a cobrar al Propietario
     # INICIO Monto a pagar al Proveedor
     proveedor_monto = Column(Numeric(38, 10))
+    proveedor_monto_ml = Column(Numeric(38, 10))
     proveedor_moneda_id = Column(Integer, ForeignKey("moneda.id"))
     proveedor_moneda = relationship(
         Moneda, uselist=False, foreign_keys=[proveedor_moneda_id]

@@ -84,6 +84,7 @@ class OrdenCarga(AuditMixin, Base):
         Moneda, uselist=False, foreign_keys=[condicion_gestor_carga_moneda_id]
     )
     condicion_gestor_carga_tarifa = Column(Numeric(38, 10))
+    condicion_gestor_carga_tarifa_ml = Column(Numeric(38, 10))
     # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda_id = Column(Integer, ForeignKey("moneda.id"))
@@ -91,11 +92,14 @@ class OrdenCarga(AuditMixin, Base):
         Moneda, uselist=False, foreign_keys=[condicion_propietario_moneda_id]
     )
     condicion_propietario_tarifa = Column(Numeric(38, 10))
+    condicion_propietario_tarifa_ml = Column(Numeric(38, 10))
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
     # inicio - Mermas para el Gestor de Carga
     merma_gestor_carga_valor = Column(Numeric(38, 10))
+        # Nueva columna
+    merma_gestor_carga_valor_ml = Column(Numeric(38, 10))
     merma_gestor_carga_moneda_id = Column(Integer, ForeignKey("moneda.id"))
     merma_gestor_carga_moneda = relationship(
         Moneda, uselist=False, foreign_keys=[merma_gestor_carga_moneda_id]
@@ -105,6 +109,7 @@ class OrdenCarga(AuditMixin, Base):
     # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
     merma_propietario_valor = Column(Numeric(38, 10))
+    merma_propietario_valor_ml = Column(Numeric(38, 10))
     merma_propietario_moneda_id = Column(Integer, ForeignKey("moneda.id"))
     merma_propietario_moneda = relationship(
         Moneda, uselist=False, foreign_keys=[merma_propietario_moneda_id]
@@ -293,7 +298,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def total_anticipo_complemento(self):
-        return sum(x.propietario_monto for x in self.complementos if x.anticipado)
+        return sum(x.propietario_monto_ml for x in self.complementos if x.anticipado)
 
     @hybrid_property
     def flete_saldo(self):
@@ -547,7 +552,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_gestor_carga_merma_valor_total(self):
-        return self.merma_gestor_carga_valor * self.resultado_gestor_carga_merma
+        return self.merma_gestor_carga_valor_ml * self.resultado_gestor_carga_merma
 
     @hybrid_property
     def resultado_gestor_carga_merma_valor_total_moneda_local(self):
@@ -773,15 +778,29 @@ class OrdenCarga(AuditMixin, Base):
         return sobrante_combustible
 
     @hybrid_property
-    def saldo_efectivo(self):
-        fa = aliased(FleteAnticipo)
-        total_saldo = sum(
-            saldo.saldo or 0
-            for saldo in self.saldos
-            if saldo.flete_anticipo and saldo.flete_anticipo.tipo_insumo_id is None
-        )
+    def monto_anticipo(self):
+        tarifa = self.condicion_gestor_carga_tarifa_ml or 0
+        cantidad = self.cantidad_nominada or 0
 
-        return total_saldo
+        # Obtener el porcentaje del anticipo para "combustible"
+        porcentaje_combustible = 0
+        for anticipo in self.porcentaje_anticipos:
+            if anticipo.concepto and anticipo.concepto.upper() == 'COMBUSTIBLE':
+                porcentaje_combustible = anticipo.anticipo_porcentaje or 0
+                break
+
+        # Imprimir el resultado para "combustible"
+        print(f"📊 Concepto: COMBUSTIBLE, Porcentaje: {porcentaje_combustible}%")
+
+        # Calcular el monto_anticipo con el porcentaje de combustible
+        return tarifa * cantidad * (porcentaje_combustible / 100)
+
+
+    @hybrid_property
+    def saldo_efectivo(self):
+        monto = self.flete_monto_efectivo_complemento or 0
+        anticipos = self.resultado_propietario_total_anticipos_retirados_efectivo or 0
+        return monto - anticipos
 
     @hybrid_property
     def saldo_combustible(self):
@@ -826,7 +845,6 @@ class OrdenCarga(AuditMixin, Base):
     def resultado_gestor_carga_total_descuento(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
         return sum(x.proveedor_monto if x.proveedor_monto is not None else 0 for x in lista)
-
 
     @hybrid_property
     def resultado_propietario_total_descuento_a_pagar(self):
@@ -1069,3 +1087,11 @@ class OrdenCarga(AuditMixin, Base):
             if self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
                 return True
         return False
+
+    @hybrid_property
+    def condicion_gestor_moneda_simbolo(self):
+        return self.condicion_gestor_carga_moneda.simbolo
+
+    @hybrid_property
+    def condicion_propietario_moneda_simbolo(self):
+        return self.condicion_propietario_moneda.simbolo
