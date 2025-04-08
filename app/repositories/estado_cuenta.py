@@ -427,6 +427,7 @@ def get_estado_cuenta_proveedor_pdv_liquidacion(db: Session) -> Query:
             Liquidacion.tipo_mov_liquidacion.label("tipo_flujo"),
             *get_cols_estado_cuenta_liquidacion_case_statement(),
         )
+        .join(Instrumento.liquidacion)
         .join(Liquidacion.proveedor)
         .join(Liquidacion.tipo_contraparte)
         .join(PuntoVenta,

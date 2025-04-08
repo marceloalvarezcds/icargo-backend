@@ -23,7 +23,7 @@ def get_estado_cuenta_list(
         moneda_local_id=1
 
         results = repositories.get_estado_cuenta_list_by_gestor_carga_id(
-            db, gestor_carga_id, moneda_local_id
+            db, gestor_carga_id
         )
     else:
         results = repositories.get_estado_cuenta_list(db)
