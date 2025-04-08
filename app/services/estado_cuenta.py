@@ -19,7 +19,7 @@ def get_estado_cuenta_list(
 ) -> List[EstadoCuenta]:
     if gestor_carga_id:
 
-        # obtenemos la moneda local de la gestora
+        # TODO obtenemos la moneda local de la gestora
         moneda_local_id=1
 
         results = repositories.get_estado_cuenta_list_by_gestor_carga_id(
