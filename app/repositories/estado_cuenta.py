@@ -149,7 +149,7 @@ def get_max_date_cotizacion(db: Session,mon_local_id:int):
         db.query(func.max(aliasCotizacion.fecha))
         .filter(
             aliasCotizacion.moneda_origen_id == mon_local_id,
-            aliasCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga especÃ­fico
+            aliasCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
             aliasCotizacion.estado == EstadoEnum.ACTIVO.value,
             aliasCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
         )
@@ -172,7 +172,7 @@ def get_estado_cuenta_chofer(db: Session, mon_local_id:int) -> Query:
         #     MonedaCotizacion,
         #     and_(
         #         MonedaCotizacion.moneda_origen_id == 1,
-        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga especÃ­fico
+        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
         #         MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
         #         MonedaCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
         #         MonedaCotizacion.fecha == (
@@ -215,7 +215,7 @@ def get_estado_cuenta_propietario(db: Session, mon_local_id:int) -> Query:
         #     MonedaCotizacion,
         #     and_(
         #         MonedaCotizacion.moneda_origen_id == mon_local_id,
-        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga especÃ­fico
+        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
         #         MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
         #         MonedaCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
         #         MonedaCotizacion.fecha == (
@@ -259,7 +259,7 @@ def get_estado_cuenta_proveedor(db: Session, mon_local_id:int) -> Query:
         #     MonedaCotizacion,
         #     and_(
         #         MonedaCotizacion.moneda_origen_id == mon_local_id,
-        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga especÃ­fico
+        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
         #         MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
         #         MonedaCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
         #         MonedaCotizacion.fecha == (
@@ -303,7 +303,7 @@ def get_estado_cuenta_remitente(db: Session, mon_local_id:int) -> Query:
         #     MonedaCotizacion,
         #     and_(
         #         MonedaCotizacion.moneda_origen_id == mon_local_id,
-        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga especÃ­fico
+        #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
         #         MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
         #         MonedaCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
         #         MonedaCotizacion.fecha == (
