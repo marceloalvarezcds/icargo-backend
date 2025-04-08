@@ -5,6 +5,8 @@ from sqlalchemy import (  # type: ignore
     Integer,
     String,
     Text,
+    Boolean,
+    text,
 )
 from sqlalchemy.sql.elements import and_ # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
@@ -63,6 +65,7 @@ class Liquidacion(AuditMixin, Base):
     punto_venta_id = Column(Integer, ForeignKey("punto_venta.id"))
     saldo_cc = Column(Numeric(38, 10))
     tipo_mov_liquidacion = Column(String(20))
+    es_orden_pago = Column(Boolean, server_default=text("false"))
 
     # Listas
     movimientos = relationship(
@@ -81,7 +84,8 @@ class Liquidacion(AuditMixin, Base):
     @hybrid_property
     def es_cobro(self):
         #return self.movimientos_saldo > 0
-        return self.pago_cobro > 0
+        #return self.pago_cobro > 0
+        return self.es_pago_cobro == 'PAGO'
 
     @hybrid_property
     def esta_pagado(self):
@@ -117,8 +121,11 @@ class Liquidacion(AuditMixin, Base):
 
     @hybrid_property
     def saldo_residual(self):
-        # return abs(self.movimientos_saldo) - self.instrumentos_saldo
-        return abs(self.pago_cobro) - self.instrumentos_saldo
+        if self.es_orden_pago:
+            return abs(self.pago_cobro) - self.instrumentos_saldo
+        else:
+            return abs(self.movimientos_saldo) - self.instrumentos_saldo
+        
 
     @hybrid_property
     def moneda_nombre(self):

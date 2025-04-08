@@ -193,6 +193,7 @@ def get_estado_cuenta_chofer_liquidacion(db: Session) -> Query:
             literal_column('false').label("es_pdv"),
             *get_estado_cuenta_liquidacion_case_statement_new(),
         )
+        .join(Instrumento.liquidacion)
         .join(Liquidacion.chofer)
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.estado != 'Cancelado')
@@ -236,6 +237,7 @@ def get_estado_cuenta_propietario_liquidacion(db: Session) -> Query:
             literal_column('false').label("es_pdv"),
             *get_estado_cuenta_liquidacion_case_statement_new(),
         )
+        .join(Instrumento.liquidacion)
         .join(Liquidacion.propietario)
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.estado != 'Cancelado')
@@ -280,6 +282,7 @@ def get_estado_cuenta_proveedor_liquidacion(db: Session) -> Query:
             exists().where(PuntoVenta.proveedor_id == Proveedor.id).label("es_pdv"),
             *get_estado_cuenta_liquidacion_case_statement_new(),
         )
+        .join(Instrumento.liquidacion)
         .join(Liquidacion.proveedor)
         #.filter(~exists().where(PuntoVenta.proveedor_id == Proveedor.id))
         .join(Liquidacion.tipo_contraparte)
@@ -324,6 +327,7 @@ def get_estado_cuenta_remitente_liquidacion(db: Session) -> Query:
             literal_column('false').label("es_pdv"),
             *get_estado_cuenta_liquidacion_case_statement_new(),
         )
+        .join(Instrumento.liquidacion)
         .join(Liquidacion.remitente)
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.estado != 'Cancelado')
@@ -358,6 +362,7 @@ def get_estado_cuenta_otro_liquidacion(db: Session) -> Query:
             literal_column('false').label("es_pdv"),
             *get_estado_cuenta_liquidacion_case_statement_new(),
         )
+        .join(Instrumento.liquidacion)
         .join(Liquidacion.tipo_contraparte)
         .filter(TipoContraparte.descripcion == TipoContraparteEnum.OTRO.value)
         .filter(Liquidacion.estado != 'Cancelado')
@@ -440,7 +445,7 @@ def get_estado_cuenta_pdv_subquery(db: Session) -> Query:
     return proveedorPdv.union_all(proveedorPdvProvision, proveedorPdvLiquidacion)
 
 
-def get_estado_cuenta_subquery(db: Session, mon_local_id:int) -> Query:
+def get_estado_cuenta_subquery(db: Session, mon_local_id:int=1) -> Query:
 
     chofer = get_estado_cuenta_chofer(db)
     propietario = get_estado_cuenta_propietario(db)
@@ -562,10 +567,10 @@ def get_estado_cuenta_list(db: Session) -> List[Row]:
 
 
 def get_estado_cuenta_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: int, mon_local_id:int
+    db: Session, gestor_carga_id: int
 ) -> List[Row]:
     table = (
-        get_estado_cuenta_subquery(db, mon_local_id)
+        get_estado_cuenta_subquery(db, 1)
         .filter(Movimiento.gestor_carga_id == gestor_carga_id)
         .subquery()
     )
@@ -760,7 +765,8 @@ def get_cols_estado_cuenta_liquidacion_case_statement() -> Tuple:
                 and_(
                     Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
                 ),
-                Liquidacion.pago_cobro*-1,
+                #Liquidacion.pago_cobro*-1,
+                (Instrumento.monto_ml*-1)
             ),
             else_=literal_column("0"),
         ).label("finalizado"),
@@ -868,7 +874,7 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             literal_column("false").label("can_edit_oc"),
             literal_column("false").label("documento_fisico"),
             Moneda.simbolo.label("moneda"),
-            literal_column("1").label("tipo_cambio_moneda"),
+            Instrumento.tipo_cambio_moneda.label("tipo_cambio_moneda"),
             literal_column("0"),
             literal_column("0"),
             literal_column("0"),
@@ -876,14 +882,16 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             case(
                 (
                     Instrumento.credito == 0,
-                    ((Instrumento.debito*-1) + Instrumento.provision),
+                    #((Instrumento.debito*-1) + Instrumento.provision),
+                    (Instrumento.monto_ml*-1),
                 ),
-                else_= (Instrumento.credito + Instrumento.provision)
+                #else_= (Instrumento.credito + Instrumento.provision)
+                else_= (Instrumento.monto_ml)
             ).label("finalizado"),
         )\
-        .join(Liquidacion.instrumentos)\
+        .join(Instrumento.liquidacion)\
         .join(Instrumento.via)\
-        .join(Liquidacion.moneda)\
+        .join(Instrumento.moneda)\
         .join(Instrumento.tipo_instrumento)\
         .outerjoin(Liquidacion.facturas)\
         .filter(

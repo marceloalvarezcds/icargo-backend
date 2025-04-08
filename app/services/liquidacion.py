@@ -91,7 +91,7 @@ def create_liquidacion_pendiente(
     data: LiquidacionCabeceraMovimientosForm,
     gestor_carga_id: Optional[int],
     modified_by: str,
-) -> Movimiento:
+) -> Liquidacion:
     gestor_id = None
     chofer_id = None
     propietario_id = None
@@ -108,7 +108,7 @@ def create_liquidacion_pendiente(
         gestor_id = get_gestor_carga_by_params(movimiento, gestor_carga_id)
         nombre_contraparte = movimiento.contraparte
         contraparte_documento = movimiento.contraparte_numero_documento
-        moneda = movimiento.moneda_id
+        moneda = data.moneda.id
         if movimiento.es_chofer:
             chofer_id = movimiento.chofer_id
         elif movimiento.es_proveedor:
@@ -122,7 +122,7 @@ def create_liquidacion_pendiente(
         else:
             propietario_id = movimiento.propietario_id
     else:
-        moneda = data.cabecera.moneda_id
+        moneda = data.moneda.id
         nombre_contraparte = data.cabecera.contraparte
         contraparte_documento = data.cabecera.contraparte_numero_documento
         if data.cabecera.tipo_contraparte_descripcion == TipoContraparteEnum.CHOFER.value:
@@ -162,7 +162,8 @@ def create_liquidacion_pendiente(
             punto_venta_id=punto_venta,
             es_pago_cobro=data.es_pago_cobro,
             monto=data.monto,
-            tipo_mov_liquidacion=data.tipo_mov_liquidacion
+            tipo_mov_liquidacion=data.tipo_mov_liquidacion,
+            es_orden_pago=data.es_orden_pago
         ),
         gestor_id,
         modified_by,
