@@ -1224,11 +1224,11 @@ def create_movimiento_by_factura(
                 detalle=tipo_movimiento.descripcion,
                 monto = factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else  factura.iva,
                 moneda_id=factura.moneda_id,
-                tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+                tipo_cambio_moneda=factura.tipo_cambio_moneda,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
                 fecha= datetime.now(),
                 fecha_cambio_moneda=datetime.now(),
                 tipo_movimiento_info='IVA',
-                linea_movimiento=liquidacion.tipo_mov_liquidacion,
+                linea_movimiento=liquidacion.tipo_mov_liquidacion
             ),
             gestor_carga_id,
             modified_by,
@@ -1256,7 +1256,7 @@ def create_movimiento_by_factura(
                 detalle=tipo_movimiento.descripcion,
                 monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
                 moneda_id=factura.moneda_id,
-                tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+                tipo_cambio_moneda=factura.tipo_cambio_moneda,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
                 fecha= datetime.now(),
                 fecha_cambio_moneda=datetime.now(),
                 tipo_movimiento_info='RETENCION',

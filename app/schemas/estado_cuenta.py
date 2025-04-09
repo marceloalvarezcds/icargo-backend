@@ -15,7 +15,7 @@ class EstadoCuentaForm(BaseModel):
     contraparte_numero_documento_pdv: Optional[str]
     tipo_contraparte_id: int
     tipo_contraparte_descripcion: str
-    moneda_id: int
+    moneda_id: Optional[int]
 
 
 class EstadoCuenta(BaseModel):

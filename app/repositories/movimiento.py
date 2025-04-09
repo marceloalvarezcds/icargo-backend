@@ -400,7 +400,8 @@ def create_movimiento(
         modified_by=modified_by,
         tipo_movimiento_info=data.tipo_movimiento_info,
         punto_venta_id=data.punto_venta_id,
-        linea_movimiento= data.linea_movimiento if data.linea_movimiento else TipoAnticipoEnum.EFECTIVO.value
+        linea_movimiento=data.linea_movimiento if data.linea_movimiento else TipoAnticipoEnum.EFECTIVO.value,
+        monto_mon_local=data.monto*data.tipo_cambio_moneda
     )
     db.add(obj)
     db.commit()
@@ -707,13 +708,14 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
                     Movimiento.liquidacion_id == null(),
                     Movimiento.estado == EstadoEnum.PENDIENTE.value,
                 ),
-                case(
-                    (
-                        Movimiento.moneda_id == 1,
-                        Movimiento.monto,
-                    ),
-                    else_= Movimiento.monto_mon_local,
-                )
+                #case(
+                #    (
+                #        Movimiento.moneda_id == 1,
+                #        Movimiento.monto,
+                #    ),
+                #    else_= Movimiento.monto_mon_local,
+                #)
+                Movimiento.monto_mon_local,
             ),
             else_=literal_column("0"),
         ).label("pendiente"),
@@ -723,7 +725,7 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
                     Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
                     Movimiento.estado == EstadoEnum.EN_PROCESO.value,
                 ),
-                Movimiento.monto,
+                Movimiento.monto_mon_local,
             ),
             else_=literal_column("0"),
         ).label("en_proceso"),
@@ -747,7 +749,7 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
                         Movimiento.estado == EstadoEnum.FINALIZADO.value,
                     ),
                 ),
-                Movimiento.monto,
+                Movimiento.monto_mon_local,
             ),
             else_=literal_column("0"),
         ).label("confirmado"),
