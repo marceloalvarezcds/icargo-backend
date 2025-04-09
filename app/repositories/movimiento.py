@@ -401,7 +401,7 @@ def create_movimiento(
         tipo_movimiento_info=data.tipo_movimiento_info,
         punto_venta_id=data.punto_venta_id,
         linea_movimiento=data.linea_movimiento if data.linea_movimiento else TipoAnticipoEnum.EFECTIVO.value,
-        monto_mon_local=data.monto*data.tipo_cambio_moneda
+        # monto_mon_local=data.monto*data.tipo_cambio_moneda
     )
     db.add(obj)
     db.commit()
