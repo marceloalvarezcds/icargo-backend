@@ -382,6 +382,7 @@ def create_movimiento(
         fecha=data.fecha,
         detalle=data.detalle,
         monto=data.monto,
+        monto_mon_local=data.monto_mon_local,
         moneda_id=data.moneda_id,
         tipo_cambio_moneda=data.tipo_cambio_moneda,
         fecha_cambio_moneda=data.fecha_cambio_moneda,

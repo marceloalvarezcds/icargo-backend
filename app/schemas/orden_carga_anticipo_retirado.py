@@ -16,6 +16,7 @@ class OrdenCargaAnticipoRetiradoBaseModel(BaseModel):
     numero_comprobante: Optional[str] = None
     moneda_id: int
     monto_retirado: RoundedDecimal
+    monto_mon_local: Optional[RoundedDecimal] = None
     monto_litro: Optional[RoundedDecimal] = None
     observacion: Optional[str] = None
     insumo_punto_venta_precio_id: Optional[int] = None

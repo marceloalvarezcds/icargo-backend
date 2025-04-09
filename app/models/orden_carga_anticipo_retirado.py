@@ -51,6 +51,7 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
     moneda = relationship(Moneda, uselist=False)
     monto_retirado = Column(Numeric(38, 10))
+    monto_mon_local = Column(Numeric(38, 10))
     observacion = Column(Text)
     # OPCIONALES
     insumo_punto_venta_precio_id = Column(
@@ -125,6 +126,14 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     def insumo_moneda_nombre(self):
         return (
             self.insumo_punto_venta_precio.moneda_nombre
+            if self.insumo_punto_venta_precio
+            else None
+        )
+
+    @hybrid_property
+    def insumo_moneda_id(self):
+        return (
+            self.insumo_punto_venta_precio.moneda_id
             if self.insumo_punto_venta_precio
             else None
         )

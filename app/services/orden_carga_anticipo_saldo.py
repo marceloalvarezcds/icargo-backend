@@ -21,6 +21,9 @@ from .orden_carga_anticipo_porcentaje_create import (
     get_orden_carga_anticipo_porcentaje_by,
 )
 
+from .moneda_cotizacion import get_cotizacion_moneda
+from app.repositories.moneda import get_moneda_by_gestor_carga
+
 
 def create_orden_carga_anticipo_saldo(
     db: Session,
@@ -45,6 +48,7 @@ def create_orden_carga_anticipo_saldo(
     tipo_insumo_actual = flete_anticipo_actual.tipo_insumo_id
 
     saldo_actualizado = data.saldo
+    saldo_actualizado_ml = data.saldo_ml
     for anticipo in sorted_anticipos:
 
         if anticipo.flete_anticipo_id != data.flete_anticipo_id:
@@ -61,10 +65,19 @@ def create_orden_carga_anticipo_saldo(
                 saldo_actualizado -= anticipo.total_retirado
             elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:  # Lubricantes
                 saldo_actualizado -= anticipo.total_retirado
+                            # Restar según el tipo de insumo
+            if tipo_insumo_id is None and tipo_insumo_actual is None:  # Efectivo
+                saldo_actualizado_ml -= anticipo.total_retirado
+            elif tipo_insumo_id == 1 and tipo_insumo_actual == 1:  # Combustible
+                saldo_actualizado_ml -= anticipo.total_retirado
+            elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:  # Lubricantes
+                saldo_actualizado_ml -= anticipo.total_retirado
+
     return repositories.create_orden_carga_anticipo_saldo(
         db,
         data,
         saldo_actualizado,
+        saldo_actualizado_ml,
         modified_by
     )
 
@@ -218,6 +231,7 @@ def update_orden_carga_anticipo_saldo(
     total_complemento: Decimal,
     modified_by: str,
 ) -> Optional[schemas.OrdenCargaAnticipoSaldo]:
+    moneda_gestor_carga = get_moneda_by_gestor_carga(db, orden_carga.gestor_carga_id)
     flete_anticipo_id = flete_anticipo.id
     orden_carga_id = orden_carga.id
     camion: Camion = orden_carga.camion
@@ -246,20 +260,46 @@ def update_orden_carga_anticipo_saldo(
         if porcentaje_anticipo
         else flete_anticipo.porcentaje
     )
+    cotizacion_condicion_origen = get_cotizacion_moneda(db, orden_carga.condicion_propietario_moneda_id, orden_carga.gestor_carga_id)
+    cotizacion_destino = get_cotizacion_moneda(db, moneda_gestor_carga.id, orden_carga.gestor_carga_id)
+    # orden_carga.flete_proyectado = orden_carga.flete_tarifa * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda
+
+    # # flete_proyectado_ml = condicion_propietario_tarifa_ml * orden_carga.cantidad_nominada
+    # print(f"Flete Proyectado ml : {orden_carga.flete_proyectado}")
     oc_limite = (
         orden_carga.flete_proyectado * (porcentaje / Decimal(100))
         if porcentaje
         else Decimal(0)
     )
-    oc_monto_retirado = monto_retirado + (
-        exists.total_retirado if exists else Decimal(0)
+    oc_limite_ml = (
+        orden_carga.flete_proyectado * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda * (porcentaje / Decimal(100))
+        if porcentaje
+        else Decimal(0)
     )
+    oc_monto_retirado = monto_retirado + (
+         exists.total_retirado * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda  if exists else Decimal(0)
+    )
+
+    oc_monto_retirado_ml = monto_retirado + (
+        exists.total_retirado * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda  if exists else Decimal(0)
+    )
+    print("oc_monto_retirado_ml ajustado:", oc_monto_retirado_ml)
     oc_monto_disponible = oc_limite + total_complemento - oc_monto_retirado
+    oc_monto_disponible_ml = oc_limite_ml - oc_monto_retirado_ml
     saldo = (
         camion_monto_disponible
         if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible
         else oc_monto_disponible
     )
+    saldo_ml = (
+        camion_monto_disponible
+        if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible_ml
+        else oc_monto_disponible_ml
+    )
+    print(f"oc_limite_ml: {oc_limite_ml}")
+    print(f"oc_monto_retirado: {oc_monto_retirado}")
+    print(f"oc_monto_disponible_ml: {oc_monto_disponible_ml}")
+
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, flete_anticipo_id, orden_carga_id
     )
@@ -276,9 +316,11 @@ def update_orden_carga_anticipo_saldo(
             orden_carga_id=orden_carga_id,
             orden_carga_anticipo_porcentaje_id=porcentaje_anticipo.id,
             total_anticipo=oc_limite,
+            total_anticipo_ml=oc_limite_ml,
             total_complemento=total_complemento,
             total_retirado=oc_monto_retirado,
             saldo=saldo,
+            saldo_ml=saldo_ml,
         )
         anticipo_saldo = edit_orden_carga_anticipo_saldo(
             exists.id,
@@ -292,9 +334,11 @@ def update_orden_carga_anticipo_saldo(
             orden_carga_id=orden_carga_id,
             orden_carga_anticipo_porcentaje_id=porcentaje_anticipo.id,
             total_anticipo=oc_limite,
+            total_anticipo_ml=oc_limite_ml,
             total_complemento=total_complemento,
             total_retirado=oc_monto_retirado,
             saldo=saldo,
+            saldo_ml=saldo_ml,
         )
         anticipo_saldo = create_orden_carga_anticipo_saldo(
             db,

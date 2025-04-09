@@ -447,6 +447,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.gestor_carga.moneda_simbolo
 
     @hybrid_property
+    def gestor_carga_moneda_id(self):
+        return self.gestor_carga.moneda_id
+
+    @hybrid_property
     def is_aceptado(self):
         return self.find_estado_in_historial(EstadoEnum.ACEPTADO)
 
@@ -699,13 +703,17 @@ class OrdenCarga(AuditMixin, Base):
         )
 
     @hybrid_property
+    def anticipo_retirado_moneda_insumo_id(self):
+         return self.anticipos.insumo_moneda_id
+
+    @hybrid_property
     def resultado_propietario_total_anticipos_retirados_efectivo(self):
         lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
         total_efectivo = 0
         for anticipo in lista:
             if not self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
                 if anticipo.concepto == 'EFECTIVO':
-                    total_efectivo += anticipo.monto_retirado
+                    total_efectivo += anticipo.monto_mon_local
         return total_efectivo
 
     @hybrid_property
@@ -715,7 +723,7 @@ class OrdenCarga(AuditMixin, Base):
         for anticipo in lista:
             if not self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
                 if anticipo.concepto == 'COMBUSTIBLE':
-                    total_combustible += anticipo.monto_retirado
+                    total_combustible += anticipo.monto_mon_local
         return total_combustible
 
     @hybrid_property
@@ -725,7 +733,7 @@ class OrdenCarga(AuditMixin, Base):
         for anticipo in lista:
             if not self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
                 if anticipo.concepto == 'LUBRICANTES':
-                    total_lubricantes += anticipo.monto_retirado
+                    total_lubricantes += anticipo.monto_mon_local
         return total_lubricantes
 
 
@@ -788,11 +796,6 @@ class OrdenCarga(AuditMixin, Base):
             if anticipo.concepto and anticipo.concepto.upper() == 'COMBUSTIBLE':
                 porcentaje_combustible = anticipo.anticipo_porcentaje or 0
                 break
-
-        # Imprimir el resultado para "combustible"
-        print(f"📊 Concepto: COMBUSTIBLE, Porcentaje: {porcentaje_combustible}%")
-
-        # Calcular el monto_anticipo con el porcentaje de combustible
         return tarifa * cantidad * (porcentaje_combustible / 100)
 
 

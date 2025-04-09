@@ -31,6 +31,7 @@ class MovimientoBaseModel(BaseModel):
     fecha: Optional[Date]
     detalle: Optional[str]
     monto: RoundedDecimal
+    monto_mon_local: Optional[RoundedDecimal]
     moneda_id: int
     tipo_cambio_moneda: Optional[RoundedDecimal]
     fecha_cambio_moneda: Optional[Date]
@@ -78,7 +79,7 @@ class Movimiento(MovimientoBaseModel):
     moneda: Moneda
     # Campos calculados
     credito: RoundedDecimal
-    credito_ml: RoundedDecimal
+    credito_ml: Optional[RoundedDecimal]
     camion_placa: Optional[str]
     chofer_nombre: Optional[str]
     chofer_numero_documento: Optional[str]
@@ -95,7 +96,7 @@ class Movimiento(MovimientoBaseModel):
     moneda_nombre: str
     moneda_simbolo: str
     monto_ml: RoundedDecimal
-    monto_mon_local: RoundedDecimal
+    monto_mon_local: Optional[RoundedDecimal]
     origen_nombre: Optional[str]
     producto_descripcion: Optional[str]
     propietario_nombre: Optional[str]

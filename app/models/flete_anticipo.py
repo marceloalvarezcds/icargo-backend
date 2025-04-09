@@ -47,3 +47,8 @@ class FleteAnticipo(AuditMixin, Base):
     @hybrid_property
     def concepto_efectivo(self):
      return self.tipo_descripcion
+
+
+    @hybrid_property
+    def tipo_insumo_moneda_id(self):
+        return self.anticipos.insumo_moneda_nombre

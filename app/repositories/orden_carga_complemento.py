@@ -20,8 +20,7 @@ def create_orden_carga_complemento(
     db: Session,
     data: OrdenCargaComplementoForm,
     modified_by: str,
-    remitente_monto_ml: Optional[float] = None,
-    propietario_monto_ml: Optional[float] = None,
+
 ) -> OrdenCargaComplemento:
     obj = OrdenCargaComplemento(
         concepto_id=data.concepto.id,
@@ -30,13 +29,13 @@ def create_orden_carga_complemento(
         anticipado=data.anticipado,
         # INICIO Monto a pagar al Propietario
         propietario_monto=data.propietario_monto,
-        propietario_monto_ml=propietario_monto_ml,
+        propietario_monto_ml= data.propietario_monto_ml,
         propietario_moneda_id=data.propietario_moneda.id,
         # FIN Monto a pagar al Propietario
         # INICIO Monto a cobrar al Remitente
         remitente_monto=data.remitente_monto,
         remitente_moneda_id=data.remitente_moneda.id if data.remitente_moneda else None,
-        remitente_monto_ml=remitente_monto_ml,
+        remitente_monto_ml= data.remitente_monto_ml,
         # FIN Monto a cobrar al Remitente
         orden_carga_id=data.orden_carga_id,
         flete_id=data.flete_id,

@@ -156,6 +156,8 @@ class OrdenCarga(OrdenCargaBaseModel):
     resultado_propietario_total_anticipos_retirados: Optional[int] = None
     saldo_efectivo: Optional[RoundedDecimal] = None
     saldo_combustible: Optional[int] = None
+    gestor_carga_moneda_id: Optional[int] = None
+    anticipo_retirado_moneda_insumo_id: Optional[int] = None
     # Historial de Estados
     is_aceptado: bool
     is_cancelado: bool
@@ -185,6 +187,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda: Optional[Moneda] = None
     condicion_propietario_tarifa: Optional[int] = None
+    condicion_propietario_tarifa_ml: Optional[RoundedDecimal] = None
     condicion_propietario_moneda_simbolo: Optional[str] = None
     condicion_propietario_moneda_id: Optional[int] = None
 
@@ -308,11 +311,13 @@ class OrdenCargaList(OrdenCargaForm):
     resultado_saldo_combustible: Optional[int] = None
     saldo_combustible: Optional[int] = None
     saldo_efectivo: Optional[RoundedDecimal] = None
+    monto_anticipo: Optional[RoundedDecimal]= None
     # INICIO Tramo de OC
     origen_id: Optional[int] = None
     origen_nombre: Optional[str] = None
     destino_id: Optional[int] = None
     destino_nombre: Optional[str] = None
+    anticipo_retirado_moneda_insumo_id: Optional[int] = None
     # FIN Tramo de OC
     cantidad_destino: RoundedDecimal
     cantidad_origen: RoundedDecimal

@@ -104,11 +104,17 @@ class Movimiento(AuditMixin, Base):
 
     @hybrid_property
     def credito_ml(self):
+        if self.monto is None or self.monto_mon_local is None:
+            return 0
         return self.monto_mon_local if self.monto > 0 else 0
+
 
     @hybrid_property
     def debito_ml(self):
+        if self.monto is None or self.monto_mon_local is None:
+            return 0
         return self.monto_mon_local * -1 if self.monto < 0 else 0
+
 
     @hybrid_property
     def credito(self):
