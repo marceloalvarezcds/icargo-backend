@@ -76,7 +76,7 @@ class Flete(AuditMixin, Base):
         Moneda, uselist=False, foreign_keys=[condicion_propietario_moneda_id]
     )
     condicion_propietario_tarifa = Column(Numeric(38, 10))
-   
+
     condicion_propietario_unidad_id = Column(Integer, ForeignKey("unidad.id"))
     condicion_propietario_unidad = relationship(
         Unidad, uselist=False, foreign_keys=[condicion_propietario_unidad_id]

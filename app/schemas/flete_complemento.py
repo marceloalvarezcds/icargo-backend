@@ -15,10 +15,12 @@ class FleteComplementoForm(BaseModel):
     anticipado: Optional[bool] = False
     # INICIO Monto a pagar al Propietario
     propietario_monto: Optional[RoundedDecimal] = None
+    propietario_monto_ml: Optional[RoundedDecimal] = None
     propietario_moneda_id: Optional[int] = None
     # FIN Monto a pagar al Propietario
     # INICIO Monto a cobrar al Remitente
     remitente_monto: Optional[RoundedDecimal] = None
+    remitente_monto_ml: Optional[RoundedDecimal] = None
     remitente_moneda_id: Optional[int] = None
     # FIN Monto a cobrar al Remitente
 

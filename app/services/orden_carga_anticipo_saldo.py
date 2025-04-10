@@ -262,10 +262,7 @@ def update_orden_carga_anticipo_saldo(
     )
     cotizacion_condicion_origen = get_cotizacion_moneda(db, orden_carga.condicion_propietario_moneda_id, orden_carga.gestor_carga_id)
     cotizacion_destino = get_cotizacion_moneda(db, moneda_gestor_carga.id, orden_carga.gestor_carga_id)
-    # orden_carga.flete_proyectado = orden_carga.flete_tarifa * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda
 
-    # # flete_proyectado_ml = condicion_propietario_tarifa_ml * orden_carga.cantidad_nominada
-    # print(f"Flete Proyectado ml : {orden_carga.flete_proyectado}")
     oc_limite = (
         orden_carga.flete_proyectado * (porcentaje / Decimal(100))
         if porcentaje
@@ -283,7 +280,6 @@ def update_orden_carga_anticipo_saldo(
     oc_monto_retirado_ml = monto_retirado + (
         exists.total_retirado * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda  if exists else Decimal(0)
     )
-    print("oc_monto_retirado_ml ajustado:", oc_monto_retirado_ml)
     oc_monto_disponible = oc_limite + total_complemento - oc_monto_retirado
     oc_monto_disponible_ml = oc_limite_ml - oc_monto_retirado_ml
     saldo = (
@@ -296,9 +292,6 @@ def update_orden_carga_anticipo_saldo(
         if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible_ml
         else oc_monto_disponible_ml
     )
-    print(f"oc_limite_ml: {oc_limite_ml}")
-    print(f"oc_monto_retirado: {oc_monto_retirado}")
-    print(f"oc_monto_disponible_ml: {oc_monto_disponible_ml}")
 
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, flete_anticipo_id, orden_carga_id

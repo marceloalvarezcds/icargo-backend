@@ -51,10 +51,12 @@ def create_flete_complemento(
         anticipado=data.anticipado,
         # INICIO Monto a pagar al Propietario
         propietario_monto=data.propietario_monto,
+        propietario_monto_ml=data.propietario_monto_ml,
         propietario_moneda_id=data.propietario_moneda_id,
         # FIN Monto a pagar al Propietario
         # INICIO Monto a cobrar al Remitente
         remitente_monto=data.remitente_monto,
+        remitente_monto_ml=data.remitente_monto_ml,
         remitente_moneda_id=data.remitente_moneda_id,
         # FIN Monto a cobrar al Remitente
         modified_by=modified_by,

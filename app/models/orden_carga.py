@@ -762,13 +762,13 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_propietario_total_complemento(self):
         lista: List[OrdenCargaComplemento] = self.complementos
-        return sum(x.propietario_monto if x.propietario_monto is not None else 0 for x in lista)
+        return sum(x.propietario_monto_ml if x.propietario_monto_ml is not None else 0 for x in lista)
 
 
     @hybrid_property
     def resultado_gestor_carga_total_complemento(self):
         lista: List[OrdenCargaComplemento] = self.complementos
-        return sum(x.remitente_monto if x.remitente_monto is not None else 0 for x in lista)
+        return sum(x.remitente_monto_ml if x.remitente_monto_ml is not None else 0 for x in lista)
 
 
     @hybrid_property
@@ -784,19 +784,6 @@ class OrdenCarga(AuditMixin, Base):
         sobrante_combustible = total_anticipo_combustible - total_retirado_combustible
 
         return sobrante_combustible
-
-    @hybrid_property
-    def monto_anticipo(self):
-        tarifa = self.condicion_gestor_carga_tarifa_ml or 0
-        cantidad = self.cantidad_nominada or 0
-
-        # Obtener el porcentaje del anticipo para "combustible"
-        porcentaje_combustible = 0
-        for anticipo in self.porcentaje_anticipos:
-            if anticipo.concepto and anticipo.concepto.upper() == 'COMBUSTIBLE':
-                porcentaje_combustible = anticipo.anticipo_porcentaje or 0
-                break
-        return tarifa * cantidad * (porcentaje_combustible / 100)
 
 
     @hybrid_property
@@ -830,7 +817,7 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_propietario_total_complemento_a_cobrar(self):
         lista: List[OrdenCargaComplemento] = self.complementos
-        return sum(x.remitente_monto for x in lista if x.remitente_monto)
+        return sum(x.remitente_monto_ml for x in lista if x.remitente_monto_ml)
 
     @hybrid_property
     def resultado_diferencia_complemento(self):
@@ -842,17 +829,17 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_propietario_total_descuento(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
-        return sum(x.propietario_monto if x.propietario_monto is not None else 0 for x in lista)
+        return sum(x.propietario_monto_ml if x.propietario_monto_ml is not None else 0 for x in lista)
 
     @hybrid_property
     def resultado_gestor_carga_total_descuento(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
-        return sum(x.proveedor_monto if x.proveedor_monto is not None else 0 for x in lista)
+        return sum(x.proveedor_monto_ml if x.proveedor_monto_ml is not None else 0 for x in lista)
 
     @hybrid_property
     def resultado_propietario_total_descuento_a_pagar(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
-        return sum(x.proveedor_monto for x in lista if x.proveedor_monto)
+        return sum(x.proveedor_monto_ml for x in lista if x.proveedor_monto_ml)
 
     @hybrid_property
     def resultado_diferencia_descuento(self):
