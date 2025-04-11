@@ -14,3 +14,4 @@ alembic upgrade head
 
 # Create initial data in DB
 # python /app/app/database/initial_data.py
+
