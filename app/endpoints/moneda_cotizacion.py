@@ -18,4 +18,4 @@ async def get_cotizacion_by_moneda(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.MONEDA)),  # noqa: B008
 ):
-    return services.get_cotizacion_by_moneda(db, moneda_origen_id, moneda_destino_id)
+    return services.read_cotizacion_moneda(db, moneda_origen_id, moneda_destino_id)
