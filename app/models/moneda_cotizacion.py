@@ -29,7 +29,7 @@ class MonedaCotizacion(AuditMixin, Base):
     gestor_carga = relationship(GestorCarga, uselist=False)
     moneda_origen_id = Column(Integer, ForeignKey("moneda.id"))
     moneda_destino_id = Column(Integer, ForeignKey("moneda.id"))
-    moneda = relationship(Moneda, uselist=False)
+    #moneda = relationship(Moneda, uselist=False)
     fecha = Column(DateTime)
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     cotizacion_moneda = Column(Numeric(38, 10))

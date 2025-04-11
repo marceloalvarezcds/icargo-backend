@@ -1,16 +1,17 @@
-from datetime import datetime
 from typing import Optional
+from pydantic import BaseModel
+from .rounded_decimal_model import RoundedDecimal
+from .moneda import Moneda
 
-from app.schemas.rounded_decimal_model import RoundedDecimal
-from .estado_base_model import EstadoBaseModel
 
-
-class MonedaCotizacion(EstadoBaseModel):
+class MonedaCotizacion(BaseModel):
     id: int
     gestor_carga_id: int
     moneda_origen_id: int
     moneda_destino_id: int
-    fecha: Optional[datetime] = None
+    #moneda: Moneda
+    fecha: str
+    estado: str
     cotizacion_moneda: RoundedDecimal
 
     class Config:
