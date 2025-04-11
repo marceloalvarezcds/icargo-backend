@@ -3,7 +3,7 @@
 node('linux-docker') {
 
     def REGISTRY_IMAGE_URL="registry.gitlab.com/cds.py/icargo/icargo-v1/icargo-backend"; 
-    def WEBHOOKS_URL="http://51.159.102.111:19988";
+    def WEBHOOKS_URL="http://51.159.176.45:19988";
 
     stage('Preparation') {
         checkout scm;
@@ -20,8 +20,8 @@ node('linux-docker') {
     try {
         stage('Docker build') {
             def imageName = "${REGISTRY_IMAGE_URL}:${env.BRANCH_NAME}";
-            if (env.BRANCH_NAME == 'testing') {
-                imageName = "${REGISTRY_IMAGE_URL}:testing";
+            if (env.BRANCH_NAME == 'main') {
+                imageName = "${REGISTRY_IMAGE_URL}:main";
             }
 
             docker.withRegistry('https://registry.gitlab.com', 'dante_jenkins') {
@@ -49,8 +49,8 @@ node('linux-docker') {
     }
 
    stage('Aprovisioning') {
-        if (env.BRANCH_NAME == 'testing') {
-            sh "curl ${WEBHOOKS_URL}/hooks/redeploy-icargo-backend-testing"
+        if (env.BRANCH_NAME == 'main') {
+            sh "curl ${WEBHOOKS_URL}/hooks/redeploy-icargo-backend-produccion"
         }
     }
 
