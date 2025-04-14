@@ -164,12 +164,18 @@ def create_orden_carga(
 
     cotizacion_destino_gestor_carga_ml = get_cotizacion_moneda(db, moneda_gestor_carga.id, gestor_carga_id)
 
-    merma_gestor_carga_valor_ml = flete.merma_gestor_carga_valor * cotizacion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
-    merma_propietario_valor_ml= flete.merma_propietario_valor * cotizacion_origen_propietario.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
-
-    condicion_gestor_carga_tarifa_ml = flete.condicion_gestor_carga_tarifa * cotizacion_condicion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
-    condicion_propietario_tarifa_ml= flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
-
+    merma_gestor_carga_valor_ml = round(
+        flete.merma_gestor_carga_valor * cotizacion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
+    )
+    merma_propietario_valor_ml = round(
+        flete.merma_propietario_valor * cotizacion_origen_propietario.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
+    )
+    condicion_gestor_carga_tarifa_ml = round(
+        flete.condicion_gestor_carga_tarifa * cotizacion_condicion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
+    )
+    condicion_propietario_tarifa_ml = round(
+        flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
+    )
     obj = repositories.create_orden_carga(
         db,
         data,

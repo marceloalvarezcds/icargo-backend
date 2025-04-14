@@ -268,16 +268,17 @@ def update_orden_carga_anticipo_saldo(
         if porcentaje
         else Decimal(0)
     )
-    oc_limite_ml = (
+    oc_limite_ml = round(
         orden_carga.flete_proyectado * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda * (porcentaje / Decimal(100))
         if porcentaje
         else Decimal(0)
     )
-    oc_monto_retirado = monto_retirado + (
-         exists.total_retirado * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda  if exists else Decimal(0)
+    oc_monto_retirado = monto_retirado + round(
+        exists.total_retirado * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda
+        if exists else Decimal(0)
     )
 
-    oc_monto_retirado_ml = monto_retirado + (
+    oc_monto_retirado_ml = monto_retirado + round(
         exists.total_retirado * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda  if exists else Decimal(0)
     )
     oc_monto_disponible = oc_limite + total_complemento - oc_monto_retirado
