@@ -593,16 +593,6 @@ class OrdenCarga(AuditMixin, Base):
         return self.condicion_gestor_carga_tarifa
 
     @hybrid_property
-    def resultado_gestor_carga_tarifa_flete_str(self):
-        """
-        Devuelve la tarifa formateada con la moneda como string.
-        """
-        if self.condicion_gestor_carga_moneda:
-            return f"{self.resultado_gestor_carga_tarifa_flete} {self.condicion_gestor_carga_moneda.simbolo}"
-        return str(self.resultado_gestor_carga_tarifa_flete)
-
-
-    @hybrid_property
     def resultado_gestor_carga_tolerancia_kg(self):
         return (
             (self.merma_gestor_carga_tolerancia / 100) * self.cantidad_origen

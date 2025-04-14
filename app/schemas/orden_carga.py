@@ -146,6 +146,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     flete_tarifa: RoundedDecimal
     flete_tipo: Optional[TipoFleteEnum] = None
     flete_saldo: Optional[int] = None
+    flete_tarifa_unidad: Optional[str] = None
     linea_disponible: Optional[int] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
