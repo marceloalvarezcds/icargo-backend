@@ -70,7 +70,7 @@ from .estado_cuenta import (  # noqa
     get_estado_cuenta_pdv,
 )
 from .moneda_cotizacion import(
-    get_cotizacion_by_moneda
+    read_cotizacion_moneda
 )
 from .factura import (  # noqa
     create_factura,
