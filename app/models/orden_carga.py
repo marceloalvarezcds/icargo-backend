@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 import select
 from typing import List, Optional, Union
 
@@ -364,6 +364,25 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_numero_lote(self):
         return self.flete.numero_lote
+
+    @hybrid_property
+    def flete_saldo_efectivo(self):
+        porcentaje = self.flete.porcentaje_efectivo / Decimal(100)
+        subtotal = self.condicion_propietario_tarifa_ml * self.cantidad_nominada * porcentaje
+        resultado = subtotal + self.total_anticipo_complemento
+        return resultado.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+    @hybrid_property
+    def flete_saldo_combustible(self):
+        porcentaje = self.flete.porcentaje_combustible / Decimal(100)
+        subtotal = self.condicion_propietario_tarifa_ml * self.cantidad_nominada * porcentaje
+        return subtotal.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+    @hybrid_property
+    def flete_saldo_lubricante(self):
+        porcentaje = self.flete.porcentaje_lubricante / Decimal(100)
+        subtotal = self.condicion_propietario_tarifa_ml * self.cantidad_nominada * porcentaje
+        return subtotal.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
 
     @hybrid_property
     def flete_monto_efectivo(self):

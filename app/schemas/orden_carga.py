@@ -155,8 +155,9 @@ class OrdenCarga(OrdenCargaBaseModel):
     gestor_carga_moneda_nombre: str
     resultado_gestor_carga_saldo_total: Optional[int] = None
     resultado_propietario_total_anticipos_retirados: Optional[int] = None
-    saldo_efectivo: Optional[RoundedDecimal] = None
-    saldo_combustible: Optional[int] = None
+    flete_saldo_efectivo: Optional[RoundedDecimal] = None
+    flete_saldo_combustible: Optional[int] = None
+    flete_saldo_lubricante: Optional[int] = None
     gestor_carga_moneda_id: Optional[int] = None
     anticipo_retirado_moneda_insumo_id: Optional[int] = None
     # Historial de Estados

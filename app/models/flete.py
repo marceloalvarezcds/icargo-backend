@@ -17,6 +17,8 @@ from app.database.base import Base
 from app.enums import EstadoEnum, TipoFleteEnum
 from app.utils import (
     get_flete_anticipo_efectivo,
+    get_flete_anticipo_combustible,
+    get_flete_anticipo_lubricante,
     get_porcentaje_maximo_by_flete_anticipo_list,
 )
 
@@ -263,6 +265,24 @@ class Flete(AuditMixin, Base):
         return (
             anticipo_efectivo.porcentaje
             if (anticipo_efectivo and anticipo_efectivo.porcentaje)
+            else 0
+        )
+
+    @hybrid_property
+    def porcentaje_combustible(self):
+        anticipo_combustible = get_flete_anticipo_combustible(self.anticipos)
+        return (
+            anticipo_combustible.porcentaje
+            if (anticipo_combustible and anticipo_combustible.porcentaje)
+            else 0
+        )
+
+    @hybrid_property
+    def porcentaje_lubricante(self):
+        anticipo_lubricante = get_flete_anticipo_lubricante(self.anticipos)
+        return (
+            anticipo_lubricante.porcentaje
+            if (anticipo_lubricante and anticipo_lubricante.porcentaje)
             else 0
         )
 
