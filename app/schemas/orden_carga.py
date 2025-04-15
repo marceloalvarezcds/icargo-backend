@@ -132,6 +132,8 @@ class OrdenCarga(OrdenCargaBaseModel):
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
     flete_tarifa_unidad_gestor_carga: Optional[str] = None
+    flete_merma_unidad_gestor_carga: Optional[str] = None
+    flete_merma_unidad: Optional[str] = None
     flete_limite_credito: RoundedDecimal
     flete_numero_lote: Optional[str] = None
     flete_monto_efectivo: RoundedDecimal

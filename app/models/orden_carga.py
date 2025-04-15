@@ -498,6 +498,14 @@ class OrdenCarga(AuditMixin, Base):
         return self.find_estado_in_historial(EstadoEnum.LIQUIDADO)
 
     @hybrid_property
+    def flete_merma_unidad(self):
+        return f"{self.flete.merma_propietario_moneda.simbolo}/{self.flete.merma_propietario_unidad.abreviatura}"  # noqa
+
+    @hybrid_property
+    def flete_merma_unidad_gestor_carga(self):
+        return f"{self.flete.merma_gestor_cuenta_moneda.simbolo}/{self.flete.merma_gestor_cuenta_unidad.abreviatura}"  # noqa
+
+    @hybrid_property
     def merma_gestor_carga_detalle(self):
         return get_merma_detalle(
             self,
@@ -657,7 +665,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_propietario_merma_valor_total(self):
-        return self.merma_propietario_valor * self.resultado_propietario_merma
+        return self.merma_propietario_valor_ml * self.resultado_propietario_merma
 
     @hybrid_property
     def resultado_propietario_merma_valor_total_moneda_local(self):
