@@ -138,6 +138,8 @@ class OrdenCarga(OrdenCargaBaseModel):
     flete_numero_lote: Optional[str] = None
     flete_monto_efectivo: RoundedDecimal
     flete_monto_efectivo_complemento: RoundedDecimal
+    flete_monto_combustible: Optional[RoundedDecimal] = None
+    flete_monto_lubricante: Optional[RoundedDecimal] = None
     flete_origen_id: Optional[int] = None
     flete_origen_nombre: Optional[str] = None
     flete_producto_descripcion: str

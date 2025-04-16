@@ -393,6 +393,14 @@ class OrdenCarga(AuditMixin, Base):
         return self.total_anticipo_complemento + self.flete_monto_efectivo
 
     @hybrid_property
+    def flete_monto_combustible(self):
+        return (self.flete.porcentaje_combustible / Decimal(100))  * self.flete_proyectado
+
+    @hybrid_property
+    def flete_monto_lubricante(self):
+        return (self.flete.porcentaje_lubricante / Decimal(100))  * self.flete_proyectado
+
+    @hybrid_property
     def flete_origen_id(self):
         return self.flete.origen_id
 
@@ -620,6 +628,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.condicion_gestor_carga_tarifa
 
     @hybrid_property
+    def resultado_gestor_carga_tarifa_flete_ml(self):
+        return self.condicion_gestor_carga_tarifa_ml
+
+    @hybrid_property
     def resultado_gestor_carga_tolerancia_kg(self):
         return (
             (self.merma_gestor_carga_tolerancia / 100) * self.cantidad_origen
@@ -629,7 +641,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_gestor_carga_total_flete(self):
-        return self.resultado_gestor_carga_tarifa_flete * self.cantidad_destino
+        return self.resultado_gestor_carga_tarifa_flete_ml * self.cantidad_destino
 
     @hybrid_property
     def resultado_gestor_carga_total_flete_saldo_bruto(self):
@@ -759,6 +771,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.condicion_propietario_tarifa
 
     @hybrid_property
+    def resultado_propietario_tarifa_flete_ml(self):
+        return self.condicion_propietario_tarifa_ml
+
+    @hybrid_property
     def resultado_propietario_tolerancia_kg(self):
         return (
             (self.merma_propietario_tolerancia / 100) * self.cantidad_origen
@@ -867,7 +883,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_propietario_total_flete(self):
-        return self.resultado_propietario_tarifa_flete * self.cantidad_destino
+        return self.resultado_propietario_tarifa_flete_ml * self.cantidad_destino
 
     # fin - propietario
 
