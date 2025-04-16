@@ -67,11 +67,11 @@ def create_orden_carga_anticipo_saldo(
                 saldo_actualizado -= anticipo.total_retirado
                             # Restar según el tipo de insumo
             if tipo_insumo_id is None and tipo_insumo_actual is None:  # Efectivo
-                saldo_actualizado_ml -= anticipo.total_retirado
+                saldo_actualizado_ml -= anticipo.total_retirado_ml
             elif tipo_insumo_id == 1 and tipo_insumo_actual == 1:  # Combustible
-                saldo_actualizado_ml -= anticipo.total_retirado
+                saldo_actualizado_ml -= anticipo.total_retirado_ml
             elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:  # Lubricantes
-                saldo_actualizado_ml -= anticipo.total_retirado
+                saldo_actualizado_ml -= anticipo.total_retirado_ml
 
     return repositories.create_orden_carga_anticipo_saldo(
         db,
@@ -116,7 +116,6 @@ def get_orden_carga_by_combinacion_id(db: Session, combinacion_id: int)  -> Orde
     return obj
 
 
-
 def get_orden_carga_anticipo_saldo_by_id(
     db: Session, id: int
 ) -> OrdenCargaAnticipoSaldo:
@@ -150,8 +149,6 @@ def get_flete_anticipo_id_by_flete_id_and_orden_carga_id(
         FleteAnticipo.flete_id == flete_id,
         FleteAnticipo.orden_carga_id == orden_carga_id
     ).first()
-
-
 
 
 def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
@@ -197,7 +194,7 @@ def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
 
 def get_total_complemento(complementos: List[OrdenCargaComplemento], es_efectivo: bool):
     if es_efectivo:
-        return sum(x.propietario_monto for x in complementos if x.anticipado)
+        return sum(x.propietario_monto_ml for x in complementos if x.anticipado)
     else:
         return 0
 
@@ -264,12 +261,12 @@ def update_orden_carga_anticipo_saldo(
     cotizacion_destino = get_cotizacion_moneda(db, moneda_gestor_carga.id, orden_carga.gestor_carga_id)
 
     oc_limite = (
-        orden_carga.flete_proyectado * (porcentaje / Decimal(100))
+        orden_carga.flete_proyectado_ml * (porcentaje / Decimal(100))
         if porcentaje
         else Decimal(0)
     )
     oc_limite_ml = round(
-        orden_carga.flete_proyectado * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda * (porcentaje / Decimal(100))
+        orden_carga.flete_proyectado_ml * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda * (porcentaje / Decimal(100))
         if porcentaje
         else Decimal(0)
     )
@@ -314,7 +311,6 @@ def update_orden_carga_anticipo_saldo(
             total_complemento=total_complemento,
             total_retirado=oc_monto_retirado,
             saldo=saldo,
-            saldo_ml=saldo_ml,
         )
         anticipo_saldo = edit_orden_carga_anticipo_saldo(
             exists.id,
@@ -332,7 +328,7 @@ def update_orden_carga_anticipo_saldo(
             total_complemento=total_complemento,
             total_retirado=oc_monto_retirado,
             saldo=saldo,
-            saldo_ml=saldo_ml,
+
         )
         anticipo_saldo = create_orden_carga_anticipo_saldo(
             db,

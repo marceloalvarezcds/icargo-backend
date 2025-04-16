@@ -386,7 +386,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_monto_efectivo(self):
-        return (self.flete.porcentaje_efectivo / Decimal(100)) * self.flete_proyectado
+        return (self.flete.porcentaje_efectivo / Decimal(100)) * self.flete_proyectado_ml
 
     @hybrid_property
     def flete_monto_efectivo_complemento(self):
@@ -394,11 +394,11 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def flete_monto_combustible(self):
-        return (self.flete.porcentaje_combustible / Decimal(100))  * self.flete_proyectado
+        return (self.flete.porcentaje_combustible / Decimal(100))  * self.flete_proyectado_ml
 
     @hybrid_property
     def flete_monto_lubricante(self):
-        return (self.flete.porcentaje_lubricante / Decimal(100))  * self.flete_proyectado
+        return (self.flete.porcentaje_lubricante / Decimal(100))  * self.flete_proyectado_ml
 
     @hybrid_property
     def flete_origen_id(self):
@@ -430,6 +430,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.flete_tarifa * self.cantidad_nominada
 
     @hybrid_property
+    def flete_proyectado_ml(self):
+        return self.flete_tarifa_ml * self.cantidad_nominada
+
+    @hybrid_property
     def flete_remitente_nombre(self):
         return self.flete.remitente_nombre
 
@@ -440,6 +444,10 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_tarifa(self):
         return self.flete.condicion_propietario_tarifa
+
+    @hybrid_property
+    def flete_tarifa_ml(self):
+        return self.condicion_propietario_tarifa_ml
 
     @hybrid_property
     def flete_tarifa_gestor_carga(self):

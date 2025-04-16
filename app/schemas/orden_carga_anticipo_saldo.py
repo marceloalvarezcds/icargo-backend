@@ -15,7 +15,7 @@ class OrdenCargaAnticipoSaldoForm(BaseModel):
     total_retirado: RoundedDecimal
     total_retirado_ml: Optional[RoundedDecimal]=None
     saldo: RoundedDecimal
-    saldo_ml: RoundedDecimal
+    saldo_ml: Optional[RoundedDecimal]=None
 
 class OrdenCargaAnticipoSaldo(OrdenCargaAnticipoSaldoForm):
     id: int
