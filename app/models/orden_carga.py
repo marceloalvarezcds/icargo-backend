@@ -654,15 +654,16 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_gestor_carga_total_flete_saldo_bruto(self):
         return (
-                (
-                    self.resultado_gestor_carga_total_flete
-                    - self.resultado_gestor_carga_merma_valor_total
-                )
-                + (
-                    self.resultado_gestor_carga_total_complemento
-                    - self.resultado_gestor_carga_total_descuento
-                )
+            (
+                round(self.resultado_gestor_carga_total_flete, -2)
+                - round(self.resultado_gestor_carga_merma_valor_total, -2)
+            )
+            + (
+                round(self.resultado_gestor_carga_total_complemento, -2)
+                - round(self.resultado_gestor_carga_total_descuento, -2)
+            )
         )
+
 
     @hybrid_property
     def resultado_gestor_carga_complemento_descuento(self):
@@ -702,15 +703,16 @@ class OrdenCarga(AuditMixin, Base):
     def resultado_propietario_saldo(self):
         return (
             (
-                self.resultado_propietario_total_flete
-                - self.resultado_propietario_merma_valor_total
+                round(self.resultado_propietario_total_flete, -2)
+                - round(self.resultado_propietario_merma_valor_total, -2)
             )
             + (
-                self.resultado_propietario_total_complemento
-                - self.resultado_propietario_total_descuento
+                round(self.resultado_propietario_total_complemento, -2)
+                - round(self.resultado_propietario_total_descuento, -2)
             )
-            - self.resultado_propietario_total_anticipos_retirados
+            - round(self.resultado_propietario_total_anticipos_retirados, -2)
         )
+
 
     @hybrid_property
     def resultado_propietario_complemento_descuento(self):
@@ -722,16 +724,17 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_propietario_saldo_bruto(self):
-        return (
-            (
-                self.resultado_propietario_total_flete
-                - self.resultado_propietario_merma_valor_total
-            )
-            + (
-                self.resultado_propietario_total_complemento
-                - self.resultado_propietario_total_descuento
-            )
-        )
+      return (
+          (
+              round(self.resultado_propietario_total_flete, -2)
+              - round(self.resultado_propietario_merma_valor_total, -2)
+          )
+          + (
+              round(self.resultado_propietario_total_complemento, -2)
+              - round(self.resultado_propietario_total_descuento, -2)
+          )
+      )
+
 
     @hybrid_property
     def resultado_propietario_saldo_total(self):
