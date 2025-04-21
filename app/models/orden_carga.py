@@ -704,8 +704,8 @@ class OrdenCarga(AuditMixin, Base):
         return (
           self.resultado_propietario_saldo_bruto
             - (
-                self.resultado_propietario_total_complemento
-                + self.resultado_propietario_total_descuento
+                self.resultado_propietario_total_anticipos_retirados_efectivo
+                + self.resultado_propietario_total_anticipos_retirados_combustible
             )
         )
 
