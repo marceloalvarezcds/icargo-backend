@@ -702,15 +702,12 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_propietario_saldo(self):
         return (
-            (
-                round(self.resultado_propietario_total_flete, -2)
-                - round(self.resultado_propietario_merma_valor_total, -2)
+          self.resultado_propietario_saldo_bruto
+            - (
+                self.resultado_propietario_total_complemento
+                + self.resultado_propietario_total_descuento
             )
-            + (
-                round(self.resultado_propietario_total_complemento, -2)
-                - round(self.resultado_propietario_total_descuento, -2)
-            )
-            - round(self.resultado_propietario_total_anticipos_retirados, -2)
+            - self.resultado_propietario_total_anticipos_retirados
         )
 
 
