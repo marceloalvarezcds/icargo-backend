@@ -707,7 +707,6 @@ class OrdenCarga(AuditMixin, Base):
                 self.resultado_propietario_total_complemento
                 + self.resultado_propietario_total_descuento
             )
-            - self.resultado_propietario_total_anticipos_retirados
         )
 
 
