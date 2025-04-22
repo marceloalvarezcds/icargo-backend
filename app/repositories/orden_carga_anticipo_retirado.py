@@ -183,7 +183,7 @@ def get_total_anticipo_retirado_by_camion_id(
     subquery: Query = (
         db.query(
             OrdenCargaAnticipoRetirado.id.label("id"),
-            OrdenCargaAnticipoRetirado.monto_retirado.label("monto_retirado"),
+            OrdenCargaAnticipoRetirado.monto_mon_local.label("monto_mon_local"),
         )
         .distinct()
         # .select_from(Movimiento)
@@ -202,5 +202,5 @@ def get_total_anticipo_retirado_by_camion_id(
         .subquery()
     )
     return db.query(
-        func.sum(subquery.c.monto_retirado).label("monto_retirado")
+        func.sum(subquery.c.monto_mon_local).label("monto_mon_local")
     ).first()[0]

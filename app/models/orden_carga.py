@@ -389,6 +389,10 @@ class OrdenCarga(AuditMixin, Base):
         return (self.flete.porcentaje_efectivo / Decimal(100)) * self.flete_proyectado_ml
 
     @hybrid_property
+    def flete_monto_efectivo(self):
+        return (self.flete.porcentaje_efectivo / Decimal(100)) * self.flete_proyectado
+
+    @hybrid_property
     def flete_monto_efectivo_complemento(self):
         return self.total_anticipo_complemento + self.flete_monto_efectivo
 

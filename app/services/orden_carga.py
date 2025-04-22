@@ -188,6 +188,12 @@ def create_orden_carga(
         merma_gestor_carga_valor_ml,
         merma_propietario_valor_ml
     )
+    flete.orden_carga_id = obj.id
+    flete.is_in_orden_carga = True
+
+    db.add(flete)
+    db.commit()  
+
     if estado_inicial in [EstadoEnum.ACEPTADO, EstadoEnum.NUEVO]:
         flete.saldo -= data.cantidad_nominada
         db.add(flete)
