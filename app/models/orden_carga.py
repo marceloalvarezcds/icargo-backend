@@ -174,11 +174,19 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def camion_marca(self):
-        return self.camion.marca.descripcion
+        return (
+            self.camion.marca.descripcion
+            if self.camion.marca
+            else ""
+        )
 
     @hybrid_property
     def camion_color(self):
-        return self.camion.color.descripcion
+        return (
+            self.camion.color.descripcion
+            if self.camion.color
+            else ""
+        )
 
     @hybrid_property
     def camion_chofer_numero_documento(self):
