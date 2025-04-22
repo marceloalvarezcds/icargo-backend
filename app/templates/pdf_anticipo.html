@@ -56,7 +56,7 @@
 
     .firma p {
       text-align: center;
-      line-height: 35px;
+      line-height: 20px;
     }
 
     .fs1 {
@@ -151,14 +151,41 @@
     .table0 .td:last-of-type {
       width: 366px;
     }
+
+    .align-down {
+      align-self: flex-end;
+    }
+
+    .gestor-logo{
+      img {
+        width: 150px;
+      }
+    }
+
+    .logo-container{
+      img {
+        width: 120px;
+      }
+    }
+
+    .text-right{
+      text-align: right;
+    }
+
+    hr {
+      border: 1px solid #d1d3d4;
+      margin: 1px;
+    }
+
   </style>
 </head>
 
 <body>
   {% for x in times %}
   <div>
+
     <div class="table table0 fs2">
-      <div class="box td gestor-logo">
+      <div class="td gestor-logo">
         {% if gestor_carga_logo %}
         <img src="{{gestor_carga_logo}}" />
         {% else %}
@@ -168,77 +195,132 @@
         </div>
         {% endif %}
       </div>
-      <div class="box td flex1">
+      <div class="td flex1">
         <p class="bold fs3 lh3">{{gestor_carga_nombre}}</p>
         <p class="fs5 lh3">
-          <span class="bold fs5 lh3">Dirección: </span
-          >{{gestor_carga_direccion}}
+          <span class="bold fs5 lh3">{{gestor_carga_documento}}</span>
         </p>
         <p class="fs5 lh3">
-          <span class="bold fs5 lh3">Fecha/Hora: </span>{{anticipo_fecha}}
+          <span class="bold fs5 lh3">Dirección: </span>
+          {{gestor_carga_direccion}}
         </p>
-        <p class="fs5 lh3">
+      </div>
+      <div class="td flex1">
+        <p class="bold fs3 lh3 text-right">VALE DE ANTICIPO N°: {{id}}</p>
+        <p class="fs5 lh3 text-right">
+          <span class="bold fs5 lh3">Fecha: </span>{{anticipo_fecha}}
+        </p>
+        <p class="fs5 lh3 text-right">
           <span class="bold fs5 lh3">Usuario: </span>{{anticipo_usuario}}
         </p>
-      </div>
-      <div class="box td">
-        <p class="blue bold fs1 lh1">Anticipo Nro. {{id}}</p>
-        <p class="bold fs5 lh3">
-          Orden de carga Nro:
-          <span class="fs5 lh3">{{orden_carga_id}}</span>
-        </p>
-        <p class="bold fs5 lh3">
-          Pedido Nro: <span class="fs5 lh3">{{flete_id}}</span>
+        <p class="fs5 lh3 text-right">
+          <span class="bold fs5 lh3">O.C.: </span>{{orden_carga_id}}
         </p>
       </div>
     </div>
-    <div class="gap table mt10">
-      <div class="box flex1 td">
-        <p class="bold fs4 lh3">Propietario</p>
-        <p class="fs4 lh3">Nombre: {{propietario_nombre}}</p>
-      </div>
-      <div class="box flex1 td">
-        <p class="bold fs4 lh3">Chofer</p>
-        <p class="fs4 lh3">
-          Nombre: {{chofer_nombre}}
-        </p>
-        <p class="fs4 lh3">
-          Cédula de Identidad: {{chofer_numero_documento}}
-        </p>
-        <p class="fs4 lh3">Teléfono: {{chofer_telefono}}</p>
-      </div>
-      <div class="box flex1 td">
-        <p class="bold fs5 lh3">Placa del camión</p>
-        <p class="blue bold fs2 lh2">{{camion_placa}}</p>
-      </div>
-    </div>
+
+    <hr>
+
     <div class="gap table">
-      <div class="box flex1 td">
-        <p class="bold fs5 lh3">Proveedor</p>
-        <p class="fs5 lh3">Nombre: {{proveedor_nombre}}</p>
-        <p class="fs5 lh3">Documento: {{proveedor_numero_documento}}</p>
-        <p class="fs5 lh3">Dirección: {{proveedor_direccion}}</p>
-      </div>
-      <div class="box flex1 td">
-        <p class="bold fs5 lh3">Producto</p>
-        <p class="blue bold fs2 lh2">{{insumo_descripcion}}</p>
-        <p class="blue bold fs2 lh2">
-          Precio: {{insumo_precio}} {{insumo_unidad}}
+
+      <div class="flex1 td">
+        <p class="fs4 lh3">
+          <span  class="bold fs5 lh3">CONTRAPARTE:</span> {{propietario_nombre}}
         </p>
       </div>
-      <div class="box flex1 td">
-        <p class="bold fs5 lh3">Importe</p>
-        <p class="blue bold fs2 lh2">{{unidad}} {{monto}}</p>
+      <div class="flex1 td">
+        <p class="fs4 lh3">
+          <span  class="bold fs5 lh3">TIPO:</span> Propietario
+        </p>
       </div>
+      <div class="flex1 td">
+        <p class="fs4 lh3">
+          <span  class="bold fs5 lh3">Doc. N°:</span> {{propietario_documento}}
+        </p>
+      </div>
+
     </div>
+
+    <hr>
+
+    <div class="gap table">
+
+      <div class="flex1 td">
+        <p class="fs4 lh3">
+          <span  class="bold fs5 lh3">PDV:</span> {{proveedor_pdv_nombre}}
+        </p>
+        <p class="fs4 lh3">
+          <span  class="bold fs5 lh3">Direccion:</span> {{proveedor_direccion}}
+        </p>
+        <p class="fs4 lh3">
+          <span  class="bold fs5 lh3">Proveedor:</span> {{proveedor_nombre}}
+        </p>
+      </div>
+
+      <div class="flex1 td align-down">
+        <p class="fs4 lh3">
+          <span  class="bold fs5 lh3">Doc N°:</span> {{proveedor_numero_documento}}
+        </p>
+      </div>
+
+    </div>
+
+    <hr>
+
+    <div class="gap table">
+
+      <div class="flex1 td">
+        <p class="fs5 lh3">
+          <span  class="bold fs5 lh3">Importe:</span> {{unidad}} {{monto}}
+        </p>
+        <p class="fs5 lh3">
+          <span  class="bold fs5 lh3">En Letras:</span> Quinientos Mil Guaranies
+        </p>
+      </div>
+
+    </div>
+
+    <hr>
+
+    <div class="gap table">
+
+      <div class="flex1 td">
+        <p class="fs5 lh3">
+          <span  class="bold fs5 lh3">Chofer:</span> {{chofer_nombre}}
+        </p>
+        <p class="fs5 lh3">
+          <span  class="bold fs5 lh3">Tracto:</span> {{camion_placa}}
+        </p>
+      </div>
+
+      <div class="flex1 td align-down">
+        <p class="fs5 lh3">
+          <span  class="bold fs5 lh3">Marca:</span> {{camion_marca}}
+        </p>
+      </div>
+
+      <div class="flex1 td">
+        <p class="fs5 lh3">
+          <span  class="bold fs5 lh3">Doc.N°:</span> {{chofer_numero_documento}}
+        </p>
+        <p class="fs5 lh3">
+          <span  class="bold fs5 lh3">Color:</span> {{camion_color}}
+        </p>
+      </div>
+
+    </div>
+
     <div class="firma-container">
       <div class="firma">
-        <p class="bold fs5 lh3">Firma de la Transportadora</p>
+        <p class="bold fs5 lh3">Gestora de Carga</p>
+        <p class="bold fs5 lh3">Usuario OC</p>
       </div>
       <div class="firma">
-        <p class="bold fs5 lh3">Firma del Chofer</p>
+        <p class="bold fs5 lh3">Conductor</p>
+        <p class="bold fs5 lh3">Doc.N°: {{chofer_numero_documento}}</p>
       </div>
     </div>
+
     <div class="logo-container table box align-center mt10">
       <p class="fs6 lh4 flex1">
         iCargo es solo una Herramienta de Gestión y no constituye parte alguna
@@ -252,6 +334,7 @@
         entre estas partes
       </p>
     </div>
+
     {% if x == 0 %}
     <div class="dashed"></div>
     {% endif %}
