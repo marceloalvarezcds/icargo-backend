@@ -170,7 +170,7 @@ def change_anticipo_status(
 
 
 def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
-    try:
+    #try:
         logger.info('Inicio del proceso de generación de PDF')
 
         # Obtención del objeto de anticipo
@@ -214,7 +214,8 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
             "proveedor_pdv_nombre": obj.punto_venta.nombre_corto,
             "proveedor_numero_documento": obj.punto_venta.proveedor.numero_documento,
             "proveedor_direccion": obj.punto_venta.proveedor.direccion,
-            "insumo_descripcion": obj.insumo_descripcion or "Viático",
+            #"insumo_descripcion": obj.insumo_descripcion or "Viático",
+            "insumo_descripcion": "Viático",
             "insumo_precio": number_format(obj.insumo_precio) if obj.insumo_precio else 1,
             "insumo_unidad": obj.insumo_unidad_abreviatura or "",
             "monto": number_format(obj.monto_retirado),
@@ -234,6 +235,6 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
         return f"anticipo_{id}.pdf"
         #return HTMLResponse(content=source_html, status_code=200)
 
-    except Exception as e:
-        logger.error(f'Error al generar el PDF: {e}')
-        raise HTTPException(status_code=500, detail="Error al generar el PDF")
+    #except Exception as e:
+    #    logger.error(f'Error al generar el PDF: {e}')
+    #    raise HTTPException(status_code=500, detail="Error al generar el PDF")
