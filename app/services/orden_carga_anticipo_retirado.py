@@ -23,6 +23,8 @@ from .orden_carga_anticipo_porcentaje_create import (
 )
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
 from .user import get_user_by_username
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 
 
 def get_tipo_anticipo_by_id(db: Session, id: int) -> TipoAnticipo:
@@ -137,12 +139,12 @@ def change_anticipo_status(
     # Verificar si existe un movimiento asociado y actualizarlo
     # Aquí usamos el `id` de la `OrdenCargaAnticipoRetirado` para encontrar el movimiento específico
     movimiento = repositories.get_movimiento_by_anticipo_id(db, co.id)
-    
+
     if movimiento:
         movimiento.estado = status.value
         movimiento.modified_by = modified_by
         movimiento.modified_at = datetime.now()
-        
+
         # Guardar los cambios en el movimiento
         db.commit()
         db.refresh(movimiento)
@@ -168,7 +170,7 @@ def change_anticipo_status(
 
 
 def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
-    try:
+    #try:
         logger.info('Inicio del proceso de generación de PDF')
 
         # Obtención del objeto de anticipo
@@ -197,17 +199,23 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
             "flete_id": orden_carga.flete_id,
             "gestor_carga_logo": gestor_carga.logo,
             "gestor_carga_nombre": gestor_carga.nombre,
+            "gestor_carga_documento": gestor_carga.numero_documento,
             "gestor_carga_direccion": gestor_carga.direccion,
             "anticipo_fecha": obj.created_at.strftime("%Y-%m-%d / %H:%M:%S"),
             "anticipo_usuario": usuario_nombre,
             "propietario_nombre": orden_carga.camion_propietario_nombre,
+            "propietario_documento": orden_carga.camion_propietario_documento,
             "chofer_nombre": orden_carga.combinacion.chofer_nombre,
             "chofer_numero_documento": orden_carga.combinacion.chofer_numero_documento,
             "camion_placa": orden_carga.camion_placa,
+            "camion_marca": orden_carga.camion_marca,
+            "camion_color": orden_carga.camion_color,
             "proveedor_nombre": obj.proveedor_nombre,
+            "proveedor_pdv_nombre": obj.punto_venta.nombre_corto,
             "proveedor_numero_documento": obj.punto_venta.proveedor.numero_documento,
             "proveedor_direccion": obj.punto_venta.proveedor.direccion,
-            "insumo_descripcion": obj.insumo_descripcion or "Viático",
+            #"insumo_descripcion": obj.insumo_descripcion or "Viático",
+            "insumo_descripcion": "Viático",
             "insumo_precio": number_format(obj.insumo_precio) if obj.insumo_precio else 1,
             "insumo_unidad": obj.insumo_unidad_abreviatura or "",
             "monto": number_format(obj.monto_retirado),
@@ -218,13 +226,15 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
         template = templateEnv.get_template("pdf_anticipo.html")
         source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
 
+        logger.info('html generado exitosamente')
         # Generación del PDF
         pdf_filename = os.path.join(REPORTS_FOLDER, f"anticipo_{id}.pdf")
         from_string(source_html, pdf_filename, {"page-size": "Legal"})
 
         logger.info('PDF generado exitosamente')
         return f"anticipo_{id}.pdf"
+        #return HTMLResponse(content=source_html, status_code=200)
 
-    except Exception as e:
-        logger.error(f'Error al generar el PDF: {e}')
-        raise HTTPException(status_code=500, detail="Error al generar el PDF")
+    #except Exception as e:
+    #    logger.error(f'Error al generar el PDF: {e}')
+    #    raise HTTPException(status_code=500, detail="Error al generar el PDF")
