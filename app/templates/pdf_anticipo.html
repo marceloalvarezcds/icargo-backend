@@ -156,18 +156,6 @@
       align-self: flex-end;
     }
 
-    .gestor-logo{
-      img {
-        width: 50px;
-      }
-    }
-
-    .logo-container{
-      img {
-        width: 50px;
-      }
-    }
-
     .text-right{
       text-align: right;
     }
@@ -187,7 +175,7 @@
     <div class="table table0 fs2">
       <div class="td gestor-logo">
         {% if gestor_carga_logo %}
-        <img src="{{gestor_carga_logo}}" />
+        <img src="{{gestor_carga_logo}}" style="width: 150px; height: 60px" />
         {% else %}
         <div class="center fs3 lh3 bold gray">
           LOGO
@@ -257,6 +245,8 @@
         </p>
       </div>
 
+      <div class="flex1 td align-down"></div>
+
       <div class="flex1 td align-down">
         <p class="fs4 lh3">
           <span  class="bold fs5 lh3">Doc N°:</span> {{proveedor_numero_documento}}
@@ -275,6 +265,9 @@
         </p>
         <p class="fs5 lh3">
           <span  class="bold fs5 lh3">En Letras:</span> Quinientos Mil Guaranies
+        </p>
+        <p class="fs5 lh3">
+          <span  class="bold fs5 lh3">Observación:</span> ...
         </p>
       </div>
 
@@ -322,6 +315,9 @@
     </div>
 
     <div class="logo-container table box align-center mt10">
+      <div style="width: 150px; height: 60px">
+        <img src="{{logo}}" alt="iCargo" />
+      </div>
       <p class="fs6 lh4 flex1">
         iCargo es solo una Herramienta de Gestión y no constituye parte alguna
         en la Cadena de Operaciones, limitándose su aporte solo al Registro,
