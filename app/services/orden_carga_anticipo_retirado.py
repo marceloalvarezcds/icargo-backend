@@ -229,7 +229,7 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
         logger.info('html generado exitosamente')
         # Generación del PDF
         pdf_filename = os.path.join(REPORTS_FOLDER, f"anticipo_{id}.pdf")
-        from_string(source_html, pdf_filename, options={"enable-local-file-access": "", "page-size": "Legal"})
+        from_string(source_html, pdf_filename, {"page-size": "Legal"})
 
         logger.info('PDF generado exitosamente')
         return f"anticipo_{id}.pdf"
