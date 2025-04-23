@@ -191,6 +191,7 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
         # Obtención del usuario
         usuario = get_user_by_username(db, obj.created_by)
         usuario_nombre = f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
+        OUTPUT_FILENAME = f"anticipo_{id}.pdf"
 
         # Datos para el PDF
         data = {
@@ -225,14 +226,12 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
         template = templateEnv.get_template("pdf_anticipo.html")
         source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
         logger.info(f'LOGO_IMAGE_URL: {LOGO_IMAGE_URL}')
-
         logger.info('html generado exitosamente')
         # Generación del PDF
-        pdf_filename = os.path.join(REPORTS_FOLDER, f"anticipo_{id}.pdf")
+        pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
         from_string(source_html, pdf_filename, {"page-size": "Legal"})
-
         logger.info('PDF generado exitosamente')
-        return f"anticipo_{id}.pdf"
+        return OUTPUT_FILENAME
         #return HTMLResponse(content=source_html, status_code=200)
 
     #except Exception as e:

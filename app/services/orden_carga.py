@@ -192,7 +192,7 @@ def create_orden_carga(
     flete.is_in_orden_carga = True
 
     db.add(flete)
-    db.commit()  
+    db.commit()
 
     if estado_inicial in [EstadoEnum.ACEPTADO, EstadoEnum.NUEVO]:
         flete.saldo -= data.cantidad_nominada
@@ -427,6 +427,8 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "usuario": obj.created_by,
     }
     source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
+    logger.info(f'LOGO_IMAGE_URL: {LOGO_IMAGE_URL}')
+    logger.info('html generado exitosamente')
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
     from_string(source_html, pdf_filename, {"page-size": "Legal"})
     return OUTPUT_FILENAME
