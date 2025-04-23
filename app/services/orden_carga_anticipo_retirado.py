@@ -171,69 +171,68 @@ def change_anticipo_status(
 
 def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
     #try:
-        logger.info('Inicio del proceso de generación de PDF')
+    logger.info('Inicio del proceso de generación de PDF')
 
-        # Obtención del objeto de anticipo
-        obj = repositories.get_orden_carga_anticipo_retirado_by_id(db, id)
-        if not obj:
-            raise HTTPException(status_code=404, detail="Anticipo no encontrado")
+    # Obtención del objeto de anticipo
+    obj = repositories.get_orden_carga_anticipo_retirado_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Anticipo no encontrado")
 
-        # Obtención de la orden de carga
-        orden_carga = repositories.get_orden_carga_by_id(db, obj.orden_carga_id)
-        if not orden_carga:
-            raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
+    # Obtención de la orden de carga
+    orden_carga = repositories.get_orden_carga_by_id(db, obj.orden_carga_id)
+    if not orden_carga:
+        raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
 
-        # Obtención del gestor de carga
-        gestor_carga = repositories.get_gestor_carga_by_id(db, orden_carga.gestor_carga_id)
-        if not gestor_carga:
-            raise HTTPException(status_code=404, detail="Gestor de carga no encontrado")
+    # Obtención del gestor de carga
+    gestor_carga = repositories.get_gestor_carga_by_id(db, orden_carga.gestor_carga_id)
+    if not gestor_carga:
+        raise HTTPException(status_code=404, detail="Gestor de carga no encontrado")
 
-        # Obtención del usuario
-        usuario = get_user_by_username(db, obj.created_by)
-        usuario_nombre = f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
-        OUTPUT_FILENAME = f"anticipo_{id}.pdf"
+    # Obtención del usuario
+    usuario = get_user_by_username(db, obj.created_by)
+    usuario_nombre = f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
+    OUTPUT_FILENAME = f"anticipo_{id}.pdf"
 
-        # Datos para el PDF
-        data = {
-            "id": id,
-            "orden_carga_id": orden_carga.id,
-            "flete_id": orden_carga.flete_id,
-            "gestor_carga_logo": gestor_carga.logo,
-            "gestor_carga_nombre": gestor_carga.nombre,
-            "gestor_carga_documento": gestor_carga.numero_documento,
-            "gestor_carga_direccion": gestor_carga.direccion,
-            "anticipo_fecha": obj.created_at.strftime("%Y-%m-%d / %H:%M:%S"),
-            "anticipo_usuario": usuario_nombre,
-            "propietario_nombre": orden_carga.camion_propietario_nombre,
-            "propietario_documento": orden_carga.camion_propietario_documento,
-            "chofer_nombre": orden_carga.combinacion.chofer_nombre,
-            "chofer_numero_documento": orden_carga.combinacion.chofer_numero_documento,
-            "camion_placa": orden_carga.camion_placa,
-            "camion_marca": orden_carga.camion_marca,
-            "camion_color": orden_carga.camion_color,
-            "proveedor_nombre": obj.proveedor_nombre,
-            "proveedor_pdv_nombre": obj.punto_venta.nombre_corto,
-            "proveedor_numero_documento": obj.punto_venta.proveedor.numero_documento,
-            "proveedor_direccion": obj.punto_venta.proveedor.direccion,
-            "insumo_descripcion": obj.insumo_descripcion or "Viático",
-            "insumo_precio": number_format(obj.insumo_precio) if obj.insumo_precio else 1,
-            "insumo_unidad": obj.insumo_unidad_abreviatura or "",
-            "monto": number_format(obj.monto_retirado),
-            "unidad": obj.unidad_abreviatura or "",
-        }
+    # Datos para el PDF
+    data = {
+        "id": id,
+        "orden_carga_id": orden_carga.id,
+        "flete_id": orden_carga.flete_id,
+        "gestor_carga_logo": gestor_carga.logo,
+        "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_documento": gestor_carga.numero_documento,
+        "gestor_carga_direccion": gestor_carga.direccion,
+        "anticipo_fecha": obj.created_at.strftime("%Y-%m-%d / %H:%M:%S"),
+        "anticipo_usuario": usuario_nombre,
+        "propietario_nombre": orden_carga.camion_propietario_nombre,
+        "propietario_documento": orden_carga.camion_propietario_documento,
+        "chofer_nombre": orden_carga.combinacion.chofer_nombre,
+        "chofer_numero_documento": orden_carga.combinacion.chofer_numero_documento,
+        "camion_placa": orden_carga.camion_placa,
+        "camion_marca": orden_carga.camion_marca,
+        "camion_color": orden_carga.camion_color,
+        "proveedor_nombre": obj.proveedor_nombre,
+        "proveedor_pdv_nombre": obj.punto_venta.nombre_corto,
+        "proveedor_numero_documento": obj.punto_venta.proveedor.numero_documento,
+        "proveedor_direccion": obj.punto_venta.proveedor.direccion,
+        "insumo_descripcion": obj.insumo_descripcion or "Viático",
+        "insumo_precio": number_format(obj.insumo_precio) if obj.insumo_precio else 1,
+        "insumo_unidad": obj.insumo_unidad_abreviatura or "",
+        "monto": number_format(obj.monto_retirado),
+        "unidad": obj.unidad_abreviatura or "",
+    }
 
-        # Renderizado del template
-        template = templateEnv.get_template("pdf_anticipo.html")
-        source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
-        logger.info(f'LOGO_IMAGE_URL: {LOGO_IMAGE_URL}')
-        logger.info('html generado exitosamente')
-        # Generación del PDF
-        pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
-        from_string(source_html, pdf_filename, {"page-size": "Legal"})
-        logger.info('PDF generado exitosamente')
-        return OUTPUT_FILENAME
-        #return HTMLResponse(content=source_html, status_code=200)
-
+    # Renderizado del template
+    template: Template = templateEnv.get_template("pdf_anticipo.html")
+    source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
+    logger.info(f'LOGO_IMAGE_URL: {LOGO_IMAGE_URL}')
+    logger.info('html generado exitosamente')
+    # Generación del PDF
+    pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
+    from_string(source_html, pdf_filename, {"page-size": "Legal"})
+    logger.info('PDF generado exitosamente')
+    #return HTMLResponse(content=source_html, status_code=200)
+    return OUTPUT_FILENAME
     #except Exception as e:
     #    logger.error(f'Error al generar el PDF: {e}')
     #    raise HTTPException(status_code=500, detail="Error al generar el PDF")

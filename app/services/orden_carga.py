@@ -365,6 +365,8 @@ def get_orden_carga_list_by_combinacion_id(
 
 
 def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
+    logger.info('Inicio del proceso de generación de PDF')
+
     obj = repositories.get_orden_carga_by_id(db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Orden de Carga no encontrada")
