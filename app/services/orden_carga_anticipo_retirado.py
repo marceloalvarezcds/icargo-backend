@@ -10,7 +10,7 @@ from pdfkit import from_string  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas, logger
-from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
+from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv, STATICS_FOLDER, dir_path
 from app.enums import TipoAnticipoEnum, TipoInsumoEnum
 from app.models import Camion, OrdenCargaAnticipoRetirado, TipoAnticipo, TipoInsumo
 from app.schemas.rounded_decimal_model import RoundedDecimal
@@ -224,12 +224,14 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
 
     # Renderizado del template
     template: Template = templateEnv.get_template("pdf_anticipo.html")
-    source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
-    logger.info(f'LOGO_IMAGE_URL: {LOGO_IMAGE_URL}')
+    STATICS_FOLDER_lOGO = os.path.join(dir_path, "statics/logo-icargo.png")
+    source_html = template.render(logo=STATICS_FOLDER_lOGO, times=range(2), **data)
+    logger.info(f'LOGO_IMAGE_URL: {STATICS_FOLDER_lOGO}')
     logger.info('html generado exitosamente')
+    logger.info(f'html: {source_html}')
     # Generación del PDF
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
-    from_string(source_html, pdf_filename, {"page-size": "Legal"})
+    from_string(source_html, pdf_filename, {"enable-local-file-access": "", "page-size": "Legal"})
     logger.info('PDF generado exitosamente')
     #return HTMLResponse(content=source_html, status_code=200)
     return OUTPUT_FILENAME
