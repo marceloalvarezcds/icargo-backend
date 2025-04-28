@@ -365,6 +365,8 @@ def get_orden_carga_list_by_combinacion_id(
 
 
 def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
+    logger.info('Inicio del proceso de generación de PDF')
+
     obj = repositories.get_orden_carga_by_id(db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Orden de Carga no encontrada")
@@ -427,6 +429,8 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "usuario": obj.created_by,
     }
     source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
+    logger.info(f'LOGO_IMAGE_URL: {LOGO_IMAGE_URL}')
+    logger.info('html generado exitosamente')
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
     from_string(source_html, pdf_filename, {"page-size": "Legal"})
     return OUTPUT_FILENAME
