@@ -230,7 +230,7 @@ def create_movimiento_by_anticipo(
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=anticipo.detalle,
             monto=-anticipo.monto_retirado,
-            monto_mon_local=anticipo.monto_mon_local,
+            monto_mon_local=-anticipo.monto_mon_local,
             moneda_id=anticipo.moneda_id,
             tipo_cambio_moneda=tipo_cambio_moneda,
             fecha_cambio_moneda=datetime.now(),
