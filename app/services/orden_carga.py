@@ -174,7 +174,7 @@ def create_orden_carga(
         flete.condicion_gestor_carga_tarifa * cotizacion_condicion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
     )
     condicion_propietario_tarifa_ml = round(
-        flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
+        flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / flete.condicion_propietario_unidad_conversion #Nuevo calculo divido conversion
     )
     obj = repositories.create_orden_carga(
         db,
@@ -192,7 +192,7 @@ def create_orden_carga(
     flete.is_in_orden_carga = True
 
     db.add(flete)
-    db.commit()  
+    db.commit()
 
     if estado_inicial in [EstadoEnum.ACEPTADO, EstadoEnum.NUEVO]:
         flete.saldo -= data.cantidad_nominada

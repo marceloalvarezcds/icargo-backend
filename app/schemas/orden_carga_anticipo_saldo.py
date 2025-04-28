@@ -10,12 +10,12 @@ class OrdenCargaAnticipoSaldoForm(BaseModel):
     orden_carga_id: int
     orden_carga_anticipo_porcentaje_id: int
     total_anticipo: RoundedDecimal
-    total_anticipo_ml: RoundedDecimal
+    # total_anticipo_ml: RoundedDecimal
     total_complemento: RoundedDecimal
     total_retirado: RoundedDecimal
-    total_retirado_ml: Optional[RoundedDecimal]=None
+
     saldo: RoundedDecimal
-    saldo_ml: Optional[RoundedDecimal]=None
+
 
 class OrdenCargaAnticipoSaldo(OrdenCargaAnticipoSaldoForm):
     id: int

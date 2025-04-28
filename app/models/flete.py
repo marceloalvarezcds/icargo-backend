@@ -135,6 +135,7 @@ class Flete(AuditMixin, Base):
         cascade="save-update,delete,delete-orphan",
         back_populates="flete",
     )
+    # is_in_orden_carga = Column(Boolean, default=False)
     # FIN Emisión de Órdenes
 
     @hybrid_property
@@ -180,6 +181,10 @@ class Flete(AuditMixin, Base):
     @hybrid_property
     def condicion_propietario_unidad_descripcion(self):
         return self.condicion_propietario_unidad.descripcion
+
+    @hybrid_property
+    def condicion_propietario_unidad_conversion(self):
+        return self.condicion_propietario_unidad.conversion_kg
 
     @hybrid_property
     def destino_nombre(self):

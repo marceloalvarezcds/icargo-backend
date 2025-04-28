@@ -48,7 +48,7 @@ def create_orden_carga_anticipo_saldo(
     tipo_insumo_actual = flete_anticipo_actual.tipo_insumo_id
 
     saldo_actualizado = data.saldo
-    saldo_actualizado_ml = data.saldo_ml
+    # saldo_actualizado_ml = data.saldo_ml
     for anticipo in sorted_anticipos:
 
         if anticipo.flete_anticipo_id != data.flete_anticipo_id:
@@ -65,19 +65,18 @@ def create_orden_carga_anticipo_saldo(
                 saldo_actualizado -= anticipo.total_retirado
             elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:  # Lubricantes
                 saldo_actualizado -= anticipo.total_retirado
-                            # Restar según el tipo de insumo
-            if tipo_insumo_id is None and tipo_insumo_actual is None:  # Efectivo
-                saldo_actualizado_ml -= anticipo.total_retirado_ml
-            elif tipo_insumo_id == 1 and tipo_insumo_actual == 1:  # Combustible
-                saldo_actualizado_ml -= anticipo.total_retirado_ml
-            elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:  # Lubricantes
-                saldo_actualizado_ml -= anticipo.total_retirado_ml
+            #                 # Restar según el tipo de insumo
+            # if tipo_insumo_id is None and tipo_insumo_actual is None:  # Efectivo
+            #     saldo_actualizado_ml -= anticipo.total_retirado_ml
+            # elif tipo_insumo_id == 1 and tipo_insumo_actual == 1:  # Combustible
+            #     saldo_actualizado_ml -= anticipo.total_retirado_ml
+            # elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:  # Lubricantes
+            #     saldo_actualizado_ml -= anticipo.total_retirado_ml
 
     return repositories.create_orden_carga_anticipo_saldo(
         db,
         data,
         saldo_actualizado,
-        saldo_actualizado_ml,
         modified_by
     )
 
@@ -254,12 +253,7 @@ def update_orden_carga_anticipo_saldo(
         if camion_limite
         else None
     )
-    # print(f"\n=== INFO CAMIÓN ===")
-    # print(f"Camión ID: {camion.id}")
-    # print(f"Limite Anticipos Camión: {camion_limite}")
-    # print(f"Total Retirado Camión (pendiente o en proceso): {camion_monto_retirado}")
-    # print(f"Monto Retirado Actual: {monto_retirado_ml}")
-    # print(f"Saldo Disponible Camión: {camion_monto_disponible}")
+
     exists = repositories.get_orden_carga_anticipo_saldo_by(
         db, flete_anticipo_id, orden_carga_id
     )
@@ -297,11 +291,11 @@ def update_orden_carga_anticipo_saldo(
         if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible
         else oc_monto_disponible
     )
-    saldo_ml = (
-        camion_monto_disponible
-        if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible_ml
-        else oc_monto_disponible_ml
-    )
+    # saldo_ml = (
+    #     camion_monto_disponible
+    #     if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible_ml
+    #     else oc_monto_disponible_ml
+    # )
 
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, flete_anticipo_id, orden_carga_id
