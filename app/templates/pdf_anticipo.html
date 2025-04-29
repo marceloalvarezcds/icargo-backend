@@ -194,7 +194,11 @@
         </p>
       </div>
       <div class="td flex1">
-        <p class="bold fs3 lh3 text-right">VALE DE ANTICIPO N°: {{id}}</p>
+        {% if concepto == 'EFECTIVO' %}
+          <p class="bold fs3 lh3 text-right">VALE DE ANTICIPO N°: {{id}}</p>
+        {% else %}
+          <p class="bold fs3 lh3 text-right">VALE DE PROVISION N°: {{id}}</p>
+        {% endif %}
         <p class="fs5 lh3 text-right">
           <span class="bold fs5 lh3">Fecha: </span>{{anticipo_fecha}}
         </p>
@@ -225,7 +229,13 @@
         <p class="fs4 lh3">
           <span  class="bold fs5 lh3">Doc. N°:</span> {{propietario_documento}}
         </p>
+
+        <p class="fs4 lh3">
+          <span  class="bold fs5 lh3">Concepto:</span> {{concepto}}
+        </p>
       </div>
+
+
 
     </div>
 
@@ -259,17 +269,53 @@
 
     <div class="gap table">
 
-      <div class="flex1 td">
-        <p class="fs5 lh3">
-          <span  class="bold fs5 lh3">Importe:</span> {{unidad}} {{monto}}
-        </p>
-        <p class="fs5 lh3">
-          <span  class="bold fs5 lh3">En Letras:</span> Quinientos Mil Guaranies
-        </p>
-        <p class="fs5 lh3">
-          <span  class="bold fs5 lh3">Observación:</span> ...
-        </p>
-      </div>
+      {% if concepto == 'EFECTIVO' %}
+        <div class="flex1 td">
+          <p class="fs5 lh3">
+            <span  class="bold fs5 lh3">Importe:</span> {{unidad}} {{monto}}
+          </p>
+          <p class="fs5 lh3">
+            <span  class="bold fs5 lh3">En Letras:</span> Quinientos Mil Guaranies
+          </p>
+          <p class="fs5 lh3">
+            <span  class="bold fs5 lh3">Observación:</span> {{observacion}}
+          </p>
+        </div>
+      {% else %}
+
+        <div class="flex1 td">
+          <p class="fs5 lh3">
+            <span  class="bold fs5 lh3">Mercaderia:</span> {{insumo_descripcion}}
+          </p>
+
+          <p class="fs5 lh3">
+            <span  class="bold fs5 lh3">En Letras:</span> Quinientos Mil Guaranies
+          </p>
+          <p class="fs5 lh3">
+            <span  class="bold fs5 lh3">Observación:</span> ...
+          </p>
+
+        </div>
+
+        <div class="flex1 td">
+          <p class="fs5 lh3">
+            <span  class="bold fs5 lh3">Cantidad:</span> {{cantidad_retirada}}
+          </p>
+        </div>
+
+        <div class="flex1 td">
+          <p class="fs5 lh3">
+            <span  class="bold fs5 lh3">Precio:</span> {{insumo_precio}}
+          </p>
+        </div>
+
+        <div class="flex1 td">
+          <p class="fs5 lh3">
+            <span  class="bold fs5 lh3">Importe:</span> {{unidad}} {{monto}}
+          </p>
+        </div>
+
+      {% endif %}
 
     </div>
 
