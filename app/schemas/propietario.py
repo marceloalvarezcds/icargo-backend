@@ -4,6 +4,7 @@ from typing import Any, List, Optional
 from pydantic import BaseModel
 
 from app.enums import EstadoEnum
+from app.schemas.rounded_decimal_model import RoundedDecimal
 
 from .ciudad import Ciudad
 from .contacto import ContactoForm
@@ -20,7 +21,7 @@ from .tipo_registro import TipoRegistro
 class PropietarioBaseModel(BaseModel):
     nombre: str
     nombre_corto: Optional[str] = None
-    composicion_juridica_id: int
+    composicion_juridica_id: Optional[int] = None
     ruc: str
     digito_verificador: Optional[str] = None
     pais_origen_id: Optional[int] = None
@@ -151,6 +152,10 @@ class Propietario(PropietarioBase):
     contactos: List[PropietarioContactoGestorCargaList] = []
     gestor_carga_propietario: Optional[GestorCargaPropietario] = None
     oc_with_anticipos_liberados: Optional[int] = None
+    # promedio_propietario_gestor: Optional[RoundedDecimal] = None
+    # promedio_propietario_general: Optional[RoundedDecimal] = None
+    # cantidad_propietario_evaluaciones: Optional[RoundedDecimal] = None
+    # cantidad_propietario_evaluaciones_gestor: Optional[RoundedDecimal] = None
 
     @classmethod
     def from_orm(cls, obj: Any) -> "Propietario":
