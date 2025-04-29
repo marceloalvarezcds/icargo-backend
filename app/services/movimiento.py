@@ -457,7 +457,7 @@ def create_movimiento_by_descuento(
         )
               # Cotización de la moneda
     cotizacion_moneda_origen = db.query(MonedaCotizacion.cotizacion_moneda).filter(
-        MonedaCotizacion.moneda_origen_id == descuento.remitente_moneda_id
+        MonedaCotizacion.moneda_origen_id == descuento.proveedor_moneda_id
     ).order_by(MonedaCotizacion.fecha.desc()).first()
 
     tipo_cambio_moneda = cotizacion_moneda_origen[0] if cotizacion_moneda_origen else 1
