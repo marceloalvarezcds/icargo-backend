@@ -215,11 +215,14 @@ def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
         "proveedor_pdv_nombre": obj.punto_venta.nombre_corto,
         "proveedor_numero_documento": obj.punto_venta.proveedor.numero_documento,
         "proveedor_direccion": obj.punto_venta.proveedor.direccion,
+        "concepto": obj.concepto,
         "insumo_descripcion": obj.insumo_descripcion or "Viático",
         "insumo_precio": number_format(obj.insumo_precio) if obj.insumo_precio else 1,
         "insumo_unidad": obj.insumo_unidad_abreviatura or "",
+        "cantidad_retirada": number_format(obj.cantidad_retirada) if obj.cantidad_retirada else 1,
         "monto": number_format(obj.monto_retirado),
         "unidad": obj.unidad_abreviatura or "",
+        "observacion": obj.observacion or "",
     }
 
     # Renderizado del template
