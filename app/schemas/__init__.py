@@ -196,4 +196,4 @@ from .provision import (
 )
 from .contribuyente import ( Contribuyente )
 from .texto_legal import ( TextoLegalBaseModel, TextoLegalModel )
-from .moneda_cotizacion import( MonedaCotizacion )
+from .moneda_cotizacion import( MonedaCotizacion, MonedaCotizacionForm )

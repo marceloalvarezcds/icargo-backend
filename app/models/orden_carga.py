@@ -197,6 +197,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.camion.chofer_puede_recibir_anticipos
 
     @hybrid_property
+    def combinacion_chofer_puede_recibir_anticipos(self):
+        return self.combinacion.puede_recibir_anticipos
+
+    @hybrid_property
     def camion_estado(self):
         return self.camion.estado
 

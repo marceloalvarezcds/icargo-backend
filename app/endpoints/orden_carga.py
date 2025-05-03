@@ -143,7 +143,6 @@ async def read_combinacion_by_orden_carga_id(
     return services.get_ordenes_carga_by_combinacion_id_and_nuevo(db, combinacion_id)
 
 
-
 @api.get("/combinacion/finalizar/{combinacion_id}", response_model=List[schemas.OrdenCargaList])
 async def read_combinacion_by_orden_carga_id(
     combinacion_id: int,

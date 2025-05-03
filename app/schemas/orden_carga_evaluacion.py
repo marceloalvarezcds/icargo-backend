@@ -34,11 +34,21 @@ class OrdenCargaEvaluacionesHistorial(OrdenCargaEvaluacionesHistorialForm):
     oc_semi_placa: Optional[str] = None
     oc_chofer_nombre: Optional[str] = None
     oc_beneficiario_nombre: Optional[str] = None
+    oc_origen_nombre: Optional[str] = None
+    oc_destino_nombre: Optional[str] = None
+    promedio_tracto_gestor: Optional[RoundedDecimal] = None
+    promedio_tracto_general: Optional[RoundedDecimal] = None
+    promedio_semi_gestor: Optional[RoundedDecimal] = None
+    promedio_semi_general: Optional[RoundedDecimal] = None
+    promedio_chofer_gestor: Optional[RoundedDecimal] = None
+    promedio_chofer_general: Optional[RoundedDecimal] = None
+    promedio_propietario_gestor: Optional[RoundedDecimal] = None
+    promedio_propietario_general: Optional[RoundedDecimal] = None
     created_by: str
     created_at: Date
     modified_by: str
     modified_at: Date
-    
+
 
     class Config:
         orm_mode = True

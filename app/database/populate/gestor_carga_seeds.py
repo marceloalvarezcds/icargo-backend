@@ -20,7 +20,7 @@ from .centro_operativo_seeds import (
 from .chofer_seeds import cargill_chofer_seeds, multiple_chofer_seeds
 # from .propietario_seeds import cargill_propietario_seeds, multiple_propietario_seeds
 # from .proveedor_seeds import cargill_proveedor_seeds, multiple_proveedor_seeds
-# from .remitente_seeds import cargill_remitente_seeds, multiple_remitente_seeds
+from .remitente_seeds import cargill_remitente_seeds, multiple_remitente_seeds
 from .user_seeds import user_seeds
 
 
@@ -104,14 +104,14 @@ def gestor_carga_seeds(db: Session):
         try:
             multiple_centro_operativo_seeds(db, gestor_carga1)
             cargill_centro_operativo_seeds(db, gestor_carga2)
-            multiple_proveedor_seeds(db, gestor_carga1)
-            cargill_proveedor_seeds(db, gestor_carga2)
+            # multiple_proveedor_seeds(db, gestor_carga1)
+            # cargill_proveedor_seeds(db, gestor_carga2)
             multiple_remitente_seeds(db, gestor_carga1)
             cargill_remitente_seeds(db, gestor_carga2)
             multiple_chofer_seeds(db, gestor_carga1)
             cargill_chofer_seeds(db, gestor_carga2)
-            multiple_propietario_seeds(db, gestor_carga1)
-            cargill_propietario_seeds(db, gestor_carga2)
+            # multiple_propietario_seeds(db, gestor_carga1)
+            # cargill_propietario_seeds(db, gestor_carga2)
             # camion y semi deben estar creados para la combinación
             camion_semi_producto_combination_seeds(db, gestor_carga1)
             camion_semi_producto_combination_seeds(db, gestor_carga2)

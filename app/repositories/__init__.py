@@ -382,6 +382,7 @@ from .orden_carga_comentarios_historial import create_orden_carga_comentarios_hi
 from .orden_carga_evaluacion import (  # noqa
     get_orden_carga_evaluaciones_historial_by_id,
     create_orden_carga_evaluacion,
+    get_evaluacion_list,
 )
 
 from .orden_carga_remision_destino import (  # noqa
@@ -612,5 +613,6 @@ from .provision import ( # noqa
 from .moneda_cotizacion import (
     get_moneda_cotizacion_by_id,
     get_max_date_cotizacio_by_origen_destino,
-    get_ultima_cotizacion
+    get_ultima_cotizacion,
+    get_moneda_cotizacion_list_by_gestor_carga_id
 )

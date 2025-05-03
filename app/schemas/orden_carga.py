@@ -112,6 +112,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     camion_placa: str
     camion_propietario_nombre: str
     camion_propietario_puede_recibir_anticipos: bool
+    combinacion_chofer_puede_recibir_anticipos: bool
     combinacion_propietario_id: Optional[int] = None
     combinacion_chofer_id: Optional[int] = None
     combinacion_chofer_doc: Optional[str] = None

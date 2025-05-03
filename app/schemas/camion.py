@@ -104,6 +104,10 @@ class Camion(CamionForm):
     tipo: Optional[TipoCamion] = None
     color: Optional[Color] = None
     is_in_combinacion: Optional[bool] = None
+    promedio_tracto_gestor: Optional[RoundedDecimal] = None
+    promedio_tracto_general: Optional[RoundedDecimal] = None
+    cantidad_tracto_evaluaciones: Optional[RoundedDecimal] = None
+    cantidad_tracto_evaluaciones_gestor: Optional[RoundedDecimal] = None
     # FIN Detalles del Camión
     created_by: str
     created_at: datetime

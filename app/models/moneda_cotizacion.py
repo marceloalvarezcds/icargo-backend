@@ -8,6 +8,7 @@ from sqlalchemy import (  # type: ignore
     Date,
 )
 
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
 
@@ -33,7 +34,20 @@ class MonedaCotizacion(AuditMixin, Base):
     moneda_origen = relationship("Moneda", uselist=False, foreign_keys=[moneda_origen_id])
     moneda_destino = relationship("Moneda", uselist=False, foreign_keys=[moneda_destino_id])
 
-    fecha = Column(Date, nullable=False) 
+    fecha = Column(Date, nullable=False)
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     cotizacion_moneda = Column(Numeric(38, 10), nullable=False)
+
+
+    @hybrid_property
+    def gestor_carga_nombre(self):
+        return self.gestor_carga.nombre
+
+    @hybrid_property
+    def moneda_origen_nombre(self):
+        return self.moneda_origen.nombre
+
+    @hybrid_property
+    def moneda_destino_nombre(self):
+        return self.moneda_destino.nombre
 

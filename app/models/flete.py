@@ -135,7 +135,7 @@ class Flete(AuditMixin, Base):
         cascade="save-update,delete,delete-orphan",
         back_populates="flete",
     )
-    # is_in_orden_carga = Column(Boolean, default=False)
+    is_in_orden_carga = Column(Boolean, default=False)
     # FIN Emisión de Órdenes
 
     @hybrid_property
