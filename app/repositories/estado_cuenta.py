@@ -772,7 +772,7 @@ def get_cols_estado_cuenta_liquidacion_case_statement() -> Tuple:
                 and_(
                     Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
                 ),
-                (Instrumento.monto_ml*-1)
+                (Instrumento.monto_ml)
             ),
             else_=literal_column("0"),
         ).label("finalizado"),
@@ -885,15 +885,15 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             literal_column("0"),
             literal_column("0"),
             literal_column("0"),
-            case(
-                (
-                    Instrumento.credito == 0,
+            #case(
+            #    (
+            #        Instrumento.credito == 0,
                     #((Instrumento.debito*-1) + Instrumento.provision),
-                    (Instrumento.monto_ml*-1),
-                ),
+            #        (Instrumento.monto_ml),
+            #    ),
                 #else_= (Instrumento.credito + Instrumento.provision)
-                else_= (Instrumento.monto_ml)
-            ).label("finalizado"),
+             #   else_= (Instrumento.monto_ml)
+            Instrumento.monto_ml.label("finalizado"),
         )\
         .join(Instrumento.liquidacion)\
         .join(Instrumento.via)\
