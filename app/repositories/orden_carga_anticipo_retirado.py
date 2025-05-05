@@ -7,7 +7,7 @@ from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import Movimiento, OrdenCarga, OrdenCargaAnticipoRetirado
+from app.models import Movimiento, OrdenCarga, OrdenCargaAnticipoRetirado, Camion
 from app.models.orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from app.schemas import OrdenCargaAnticipoRetiradoForm
 
@@ -134,20 +134,27 @@ def change_anticipo_status(
     status: EstadoEnum,
     modified_by: str,
 ) -> OrdenCargaAnticipoRetirado:
-    # Obtener el movimiento relacionado con la orden de carga
-    movimiento = get_movimiento_by_anticipo_id(db, obj.id)  # Obtiene el movimiento por el ID del anticipo
+
+    movimiento = get_movimiento_by_anticipo_id(db, obj.id)
     if movimiento:
-        # Actualizar el estado del movimiento
+
         movimiento.estado = status.value
         movimiento.modified_by = modified_by
         movimiento.modified_at = datetime.now()
 
-        # Guardar los cambios en el movimiento
         db.commit()
-        db.refresh(movimiento)  # Refrescar el objeto movimiento para obtener los últimos cambios
+        db.refresh(movimiento)  
 
     return obj
 
+
+def get_camion_by_orden_carga_id(db: Session, orden_carga_id: int):
+    return (
+        db.query(Camion)
+        .join(OrdenCarga, Camion.id == OrdenCarga.camion_id)
+        .filter(OrdenCarga.id == orden_carga_id)
+        .first()
+    )
 
 def get_anticipo_by_id(db: Session, id: int) -> OrdenCargaAnticipoRetirado:
     return db.query(OrdenCargaAnticipoRetirado).filter(OrdenCargaAnticipoRetirado.id == id).first()

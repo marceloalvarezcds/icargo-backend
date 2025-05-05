@@ -127,17 +127,13 @@ def delete_orden_carga_anticipo_retirado(
 def change_anticipo_status(
     db: Session, id: int, status: EstadoEnum, modified_by: str
 ) -> schemas.OrdenCargaAnticipoRetirado:
-    # Obtener la OrdenCargaAnticipoRetirado específica por su ID
     co = repositories.get_anticipo_by_id(db, id)
 
     if not co:
         raise HTTPException(status_code=404, detail="OrdenCargaAnticipoRetirado no encontrada")
 
-    # Actualizar el estado de la OrdenCargaAnticipoRetirado
     co = repositories.change_anticipo_status(co, db, status, modified_by)
 
-    # Verificar si existe un movimiento asociado y actualizarlo
-    # Aquí usamos el `id` de la `OrdenCargaAnticipoRetirado` para encontrar el movimiento específico
     movimiento = repositories.get_movimiento_by_anticipo_id(db, co.id)
 
     if movimiento:
@@ -145,27 +141,32 @@ def change_anticipo_status(
         movimiento.modified_by = modified_by
         movimiento.modified_at = datetime.now()
 
-        # Guardar los cambios en el movimiento
         db.commit()
         db.refresh(movimiento)
 
-        # Obtener el saldo actual de la OrdenCargaAnticipoSaldo
         saldo = repositories.get_saldo_by_flete_anticipo_id_and_orden_carga_id(
             db, co.flete_anticipo_id, co.orden_carga_id
         )
 
         if saldo:
-            # Restar el monto retirado anulado
             saldo.total_retirado -= co.monto_retirado
-
-            # Sumar al saldo nuevamente el monto retirado anulado
             saldo.saldo += co.monto_retirado
 
-            # Guardar los cambios en el saldo
             db.commit()
             db.refresh(saldo)
 
+        # Solo si el camión tiene límite de anticipos
+        camion = repositories.get_camion_by_orden_carga_id(db, co.orden_carga_id)
+
+        if camion and camion.limite_monto_anticipos is not None:
+            camion.total_anticipos_retirados_en_estado_pendiente_o_en_proceso -= co.monto_retirado
+            camion.modified_by = modified_by
+            camion.modified_at = datetime.now()
+
+            db.commit()
+            db.refresh(camion)
     return co
+
 
 
 

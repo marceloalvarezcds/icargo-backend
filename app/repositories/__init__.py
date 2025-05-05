@@ -350,6 +350,7 @@ from .orden_carga_anticipo_retirado import (  # noqa
     get_movimiento_by_anticipo_id,
     get_movimiento_by_anticipo_id_and_id,
     get_saldo_by_flete_anticipo_id_and_orden_carga_id,
+    get_camion_by_orden_carga_id,
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     create_orden_carga_anticipo_saldo,
