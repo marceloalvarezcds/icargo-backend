@@ -545,24 +545,26 @@ def cancelar_orden_carga(
     db: Session,
     modified_by: str,
 ) -> OrdenCarga:
-    # Crear historial de estados
     create_orden_carga_estado_historial(db, obj.id, EstadoEnum.CANCELADO, modified_by)
-    # Verificar si la orden tiene un flete asociado
     flete = obj.flete
-
     # Revertir el saldo del flete
     flete.saldo += obj.cantidad_nominada
     db.add(flete)
 
-    # Cambiar el estado de la orden
+    # Eliminar complementos asociados
+    for complemento in obj.complementos:
+        db.delete(complemento)
+
+    # Eliminar descuentos asociados
+    for descuento in obj.descuentos:
+        db.delete(descuento)
+
     updated_obj = change_orden_carga_status(obj, db, EstadoEnum.CANCELADO, modified_by)
 
-    # Confirmar los cambios
     db.commit()
     db.refresh(updated_obj)
 
     return updated_obj
-
 
 
 def conciliar_orden_carga(

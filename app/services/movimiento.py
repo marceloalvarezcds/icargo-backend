@@ -278,7 +278,7 @@ def create_movimiento_by_flete(
         )
         # Cotización de la moneda
     cotizacion_moneda_origen = db.query(MonedaCotizacion.cotizacion_moneda).filter(
-        MonedaCotizacion.moneda_origen_id == orden_carga.flete.condicion_gestor_cuenta_moneda_id
+        MonedaCotizacion.moneda_origen_id == orden_carga.flete.condicion_propietario_moneda_id
     ).order_by(MonedaCotizacion.fecha.desc()).first()
 
     tipo_cambio_moneda = cotizacion_moneda_origen[0] if cotizacion_moneda_origen else 1
@@ -296,7 +296,7 @@ def create_movimiento_by_flete(
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.flete_gestor_carga_detalle,
             monto=-orden_carga.resultado_gestor_carga_total_flete,
-            moneda_id=orden_carga.flete.condicion_gestor_cuenta_moneda_id,
+            moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
             tipo_cambio_moneda=tipo_cambio_moneda,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             remitente_id=orden_carga.flete.remitente_id,
