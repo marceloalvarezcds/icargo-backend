@@ -665,6 +665,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.resultado_gestor_carga_tarifa_flete_ml * self.cantidad_destino
 
     @hybrid_property
+    def resultado_gestor_carga_total_flete_oc(self):
+        return self.resultado_gestor_carga_tarifa_flete * self.cantidad_destino
+
+    @hybrid_property
     def resultado_gestor_carga_total_flete_saldo_bruto(self):
         return (
             (
@@ -904,6 +908,10 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_propietario_total_flete(self):
+        return self.resultado_propietario_tarifa_flete_ml * self.cantidad_destino
+
+    @hybrid_property
+    def resultado_propietario_total_flete_oc(self):
         return self.resultado_propietario_tarifa_flete * self.cantidad_destino
 
     # fin - propietario
