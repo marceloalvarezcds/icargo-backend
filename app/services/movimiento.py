@@ -303,7 +303,7 @@ def create_movimiento_by_flete(
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.flete_gestor_carga_detalle,
             monto=-orden_carga.resultado_gestor_carga_total_flete_oc,
-            moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
+            moneda_id=orden_carga.flete.condicion_gestor_carga_moneda_id,
             tipo_cambio_moneda=tipo_cambio_moneda_gestor,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             remitente_id=orden_carga.flete.remitente_id,
