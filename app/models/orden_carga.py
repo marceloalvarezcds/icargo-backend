@@ -904,7 +904,7 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_propietario_total_flete(self):
-        return self.resultado_propietario_tarifa_flete_ml * self.cantidad_destino
+        return self.resultado_propietario_tarifa_flete * self.cantidad_destino
 
     # fin - propietario
 
