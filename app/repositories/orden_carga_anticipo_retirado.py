@@ -67,24 +67,6 @@ def create_orden_carga_anticipo_retirado(
         created_by=modified_by,
         modified_by=modified_by,
     )
-    #     # Imprimir los valores que se van a guardar en la base de datos
-    # print("Guardando los siguientes datos en la base de datos:")
-    # print(f"flete_anticipo_id: {data.flete_anticipo_id}")
-    # print(f"orden_carga_id: {data.orden_carga_id}")
-    # print(f"orden_carga_anticipo_porcentaje_id: {data.orden_carga_anticipo_porcentaje_id}")
-    # print(f"punto_venta_id: {data.punto_venta_id}")
-    # print(f"tipo_comprobante_id: {data.tipo_comprobante_id}")
-    # print(f"numero_comprobante: {data.numero_comprobante}")
-    # print(f"moneda_id: {data.moneda_id}")
-    # print(f"monto_retirado: {data.monto_retirado}")
-    # print(f"monto_retirado_ml: {data.monto_mon_local}")
-    # print(f"observacion: {data.observacion}")
-    # print(f"insumo_punto_venta_precio_id: {data.insumo_punto_venta_precio_id}")
-    # print(f"unidad_id: {data.unidad_id}")
-    # print(f"cantidad_retirada: {data.cantidad_retirada}")
-    # print(f"precio_unitario: {data.precio_unitario}")
-    # print(f"created_by: {modified_by}")
-    # print(f"modified_by: {modified_by}")
 
     db.add(obj)
     db.commit()
@@ -143,7 +125,7 @@ def change_anticipo_status(
         movimiento.modified_at = datetime.now()
 
         db.commit()
-        db.refresh(movimiento)  
+        db.refresh(movimiento)
 
     return obj
 

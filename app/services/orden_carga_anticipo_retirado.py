@@ -62,9 +62,10 @@ def create_orden_carga_anticipo_retirado(
     modified_by: str,
 ) -> schemas.OrdenCargaAnticipoRetirado:
     if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
-        data.monto_retirado = RoundedDecimal(
-            data.cantidad_retirada * data.precio_unitario
-        )
+        if data.monto_retirado is None:  # Solo si monto_retirado está vacío
+            data.monto_retirado = RoundedDecimal(
+                data.cantidad_retirada * data.precio_unitario
+            )
     update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, data.flete_anticipo_id, data.orden_carga_id
