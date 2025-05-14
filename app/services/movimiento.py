@@ -276,14 +276,14 @@ def create_movimiento_by_flete(
             status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
-        # Cotización de la moneda
+    # Cotización de la moneda gestor
     cotizacion_moneda_origen_gestor = db.query(MonedaCotizacion.cotizacion_moneda).filter(
         MonedaCotizacion.moneda_origen_id == orden_carga.flete.condicion_gestor_carga_moneda_id
     ).order_by(MonedaCotizacion.fecha.desc()).first()
 
     tipo_cambio_moneda_gestor = cotizacion_moneda_origen_gestor[0] if cotizacion_moneda_origen_gestor else 1
 
-            # Cotización de la moneda
+    # Cotización de la moneda propietario
     cotizacion_moneda_origen = db.query(MonedaCotizacion.cotizacion_moneda).filter(
         MonedaCotizacion.moneda_origen_id == orden_carga.flete.condicion_propietario_moneda_id
     ).order_by(MonedaCotizacion.fecha.desc()).first()
@@ -302,7 +302,7 @@ def create_movimiento_by_flete(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.flete_gestor_carga_detalle,
-            monto=-orden_carga.resultado_gestor_carga_total_flete_oc,
+            monto=-orden_carga.resultado_gestor_carga_total_flete_oc / orden_carga.flete_tarifa_unidad_conversion_gestor,
             moneda_id=orden_carga.flete.condicion_gestor_carga_moneda_id,
             tipo_cambio_moneda=tipo_cambio_moneda_gestor,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
@@ -326,7 +326,7 @@ def create_movimiento_by_flete(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.flete_propietario_detalle,
-            monto=orden_carga.resultado_propietario_total_flete_oc,
+            monto=orden_carga.resultado_propietario_total_flete_oc / orden_carga.flete_tarifa_unidad_conversion_propietario,
             moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
             tipo_cambio_moneda=tipo_cambio_moneda,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),

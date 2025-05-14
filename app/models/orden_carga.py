@@ -479,6 +479,14 @@ class OrdenCarga(AuditMixin, Base):
         return self.flete.condicion_gestor_carga_unidad.abreviatura # noqa
 
     @hybrid_property
+    def flete_tarifa_unidad_conversion_gestor(self):
+        return self.flete.condicion_gestor_carga_unidad.conversion_kg # noqa
+
+    @hybrid_property
+    def flete_tarifa_unidad_conversion_propietario(self):
+        return self.flete.condicion_propietario_unidad.conversion_kg # noqa
+
+    @hybrid_property
     def flete_tipo(self):
         return self.flete.tipo_flete
 
