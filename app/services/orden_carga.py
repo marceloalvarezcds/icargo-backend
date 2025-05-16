@@ -19,6 +19,8 @@ from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, STATICS_URL, templateEnv
 from app.enums import EstadoEnum
 from app.models import Camion, Flete, GestorCarga, OrdenCarga, OrdenCargaComentariosHistorial
+from app.models.orden_carga_complemento import OrdenCargaComplemento
+from app.models.orden_carga_descuento import OrdenCargaDescuento
 from app.schemas.audit_database import AuditDatabase as A
 from app.utils import number_format, send_email_with_template_by_thread
 
@@ -32,8 +34,8 @@ from .orden_carga_anticipo_porcentaje import (
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list,
     edit_orden_carga_anticipo_porcentaje_by_oc_porcentaje_anticipos,
 )
-from .orden_carga_anticipo_saldo import get_orden_carga_by_id, get_orden_carga_by_combinacion_id
-from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete
+from .orden_carga_anticipo_saldo import get_orden_carga_by_id, get_orden_carga_by_combinacion_id, get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id
+from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete, change_flete_create_orden_carga_complemento_by_flete
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete
 from .orden_carga_remision_resultado import (
     get_orden_carga_remision_resultado_list_by_flete,
@@ -120,6 +122,22 @@ def create_complementos_and_descuentos(
         create_orden_carga_complemento_by_flete(db, obj, c, modified_by)
     for d in flete.descuentos:
         create_orden_carga_descuento_by_flete(db, obj, d, modified_by)
+
+
+def change_flete_create_complementos_and_descuentos(
+    db: Session, obj: OrdenCarga, flete: Flete, modified_by: str
+):
+
+    complementos_existentes_ids = {c.flete_id for c in obj.complementos}
+    descuentos_existentes_ids = {d.flete_id for d in obj.descuentos}
+
+    for c in flete.complementos:
+        if c.flete_id not in complementos_existentes_ids:
+            change_flete_create_orden_carga_complemento_by_flete(db, obj, c, modified_by)
+
+    for d in flete.descuentos:
+        if d.flete_id not in descuentos_existentes_ids:
+            create_orden_carga_descuento_by_flete(db, obj, d, modified_by)
 
 
 def create_orden_carga(
@@ -221,7 +239,7 @@ def create_orden_carga_comentarios_historial(
         created_by=created_by,
         modified_by=modified_by,
     )
-    # Guardar en la base de datos
+
     db.add(nuevo_comentario)
     db.commit()
     db.refresh(nuevo_comentario)
@@ -946,4 +964,111 @@ def get_orden_carga_list_detail(
 ) -> OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     return obj
+
+
+def update_complementos_y_descuentos_oc(
+    db: Session,
+    orden_carga_id: int,
+    nuevo_flete_id: int,
+    modified_by: str
+):
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
+    if not orden_carga:
+        raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
+
+    flete_viejo_id = orden_carga.flete_id
+    if not flete_viejo_id:
+        return
+
+    # Eliminar los complementos de OC que provienen del flete viejo
+    db.query(OrdenCargaComplemento).filter(
+        OrdenCargaComplemento.orden_carga_id == orden_carga_id,
+        OrdenCargaComplemento.flete_id == flete_viejo_id
+    ).delete(synchronize_session=False)
+
+    # Eliminar los descuentos de OC que provienen del flete viejo
+    db.query(OrdenCargaDescuento).filter(
+        OrdenCargaDescuento.orden_carga_id == orden_carga_id,
+        OrdenCargaDescuento.flete_id == flete_viejo_id
+    ).delete(synchronize_session=False)
+
+    db.commit()
+
+    nuevo_flete = db.query(Flete).filter(Flete.id == nuevo_flete_id).first()
+    if not nuevo_flete:
+        raise HTTPException(status_code=404, detail="Nuevo flete no encontrado")
+
+    for anticipo in nuevo_flete.anticipos:
+        if anticipo.tipo_insumo_id in [1, 2]:  # Puedes ajustar el tipo de anticipo si es necesario
+            print(f"Calculando saldo con anticipo_id={anticipo.id}")
+
+            # Aquí calculas el saldo del anticipo para este nuevo flete
+            saldo_anticipo = get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
+                db, anticipo.id, orden_carga_id, modified_by
+            )
+            print(f"Saldo del anticipo: {saldo_anticipo}")
+
+    change_flete_create_complementos_and_descuentos(db, orden_carga, nuevo_flete, modified_by)
+
+    db.commit()
+
+
+
+def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, current_user: schemas.AuthUser) -> schemas.RecalculoCondicionesResponse:
+    flete = repositories.get_flete_by_id(db, flete_id)
+    if not flete:
+        raise HTTPException(status_code=404, detail="Flete no encontrado")
+
+    gestor_carga_id = current_user.gestor_carga_id
+    moneda_gc = get_moneda_by_gestor_carga(db, gestor_carga_id)
+    if not moneda_gc:
+        raise HTTPException(status_code=404, detail="Moneda del gestor no encontrada")
+
+    flete_anticipo = flete.anticipos[0] if flete.anticipos else None
+    if not flete_anticipo:
+        raise HTTPException(status_code=404, detail="No se encontró anticipo asociado al flete")
+
+
+    cot_gc_cond = get_cotizacion_moneda(db, flete.condicion_gestor_carga_moneda_id, gestor_carga_id)
+    cot_prop_cond = get_cotizacion_moneda(db, flete.condicion_propietario_moneda_id, gestor_carga_id)
+    cot_gc_merma = get_cotizacion_moneda(db, flete.merma_gestor_carga_moneda_id, gestor_carga_id)
+    cot_prop_merma = get_cotizacion_moneda(db, flete.merma_propietario_moneda_id, gestor_carga_id)
+    cot_destino = get_cotizacion_moneda(db, moneda_gc.id, gestor_carga_id)
+
+    # Recalcular los valores
+    condicion_gestor_carga_tarifa_ml = (
+        flete.condicion_gestor_carga_tarifa * cot_gc_cond.cotizacion_moneda / cot_destino.cotizacion_moneda
+    )
+    condicion_propietario_tarifa_ml = (
+        flete.condicion_propietario_tarifa * cot_prop_cond.cotizacion_moneda / flete.condicion_propietario_unidad_conversion
+    )
+    merma_gestor_carga_valor_ml = (
+        flete.merma_gestor_carga_valor * cot_gc_merma.cotizacion_moneda / cot_destino.cotizacion_moneda
+    )
+    merma_propietario_valor_ml = (
+        flete.merma_propietario_valor * cot_prop_merma.cotizacion_moneda / cot_destino.cotizacion_moneda
+    )
+
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
+
+    if not orden_carga:
+        raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
+
+    orden_carga.condicion_gestor_carga_tarifa_ml = condicion_gestor_carga_tarifa_ml
+    orden_carga.condicion_propietario_tarifa_ml = condicion_propietario_tarifa_ml
+    orden_carga.merma_gestor_carga_valor_ml = merma_gestor_carga_valor_ml
+    orden_carga.merma_propietario_valor_ml = merma_propietario_valor_ml
+
+    db.commit()
+    db.refresh(orden_carga)
+
+    # Agregado: actualizar complementos y descuentos según el nuevo flete
+    update_complementos_y_descuentos_oc(db=db, orden_carga_id=orden_carga_id, nuevo_flete_id=flete_id, modified_by=current_user.username)
+
+    return schemas.RecalculoCondicionesResponse(
+        condicion_gestor_carga_tarifa_ml=orden_carga.condicion_gestor_carga_tarifa_ml,
+        condicion_propietario_tarifa_ml=orden_carga.condicion_propietario_tarifa_ml,
+        merma_gestor_carga_valor_ml=orden_carga.merma_gestor_carga_valor_ml,
+        merma_propietario_valor_ml=orden_carga.merma_propietario_valor_ml,
+    )
 

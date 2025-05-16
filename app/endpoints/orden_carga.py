@@ -421,3 +421,14 @@ async def read_orden_carga_list_by_id(
     _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.get_orden_carga_list_detail(db, id, current_user)
+
+
+@api.get("/orden-carga/recalcular-condiciones/{flete_id}/{orden_carga_id}", response_model=schemas.RecalculoCondicionesResponse)
+async def read_recalculo_condiciones(
+    flete_id: int,
+    orden_carga_id: int,  # Añadido el parámetro orden_carga_id
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.recalcular_condiciones(db, flete_id, orden_carga_id, current_user)

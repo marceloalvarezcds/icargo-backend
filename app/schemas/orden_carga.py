@@ -145,6 +145,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     flete_origen_nombre: Optional[str] = None
     flete_producto_descripcion: str
     flete_proyectado: RoundedDecimal
+    flete_proyectado_ml: Optional[RoundedDecimal] = None
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
     flete_tarifa_unidad_abreviatura: Optional[str] = None
@@ -187,6 +188,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     # INICIO Cantidad y Flete
     # inicio - Condiciones para el Gestor de Carga
     condicion_gestor_cuenta_tarifa: Optional[int] = None
+    condicion_gestor_carga_tarifa_ml: Optional[int] = None
     condicion_gestor_carga_moneda: Optional[Moneda] = None
     condicion_gestor_moneda_simbolo: Optional[str] = None
     condicion_gestor_carga_moneda_id: Optional[int] = None
@@ -206,12 +208,14 @@ class OrdenCarga(OrdenCargaBaseModel):
     merma_gestor_carga_es_porcentual_descripcion: str
     merma_gestor_carga_tolerancia: Optional[int] = None
     merma_gestor_carga_valor: Optional[int] = None
+    merma_gestor_carga_valor_ml: Optional[RoundedDecimal] = None
     # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
     merma_propietario_moneda: Optional[Moneda] = None
     merma_propietario_es_porcentual_descripcion: str
     merma_propietario_tolerancia: Optional[int] = None
     merma_propietario_valor: Optional[int] = None
+    merma_propietario_valor_ml: Optional[RoundedDecimal] = None
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
     # Relaciones Listas
@@ -363,3 +367,10 @@ class OrdenCargaUpdateForm(BaseModel):
 
 class OrdenCargaUpdateFecha(BaseModel):
     created_at: Optional[Date] = None
+
+
+class RecalculoCondicionesResponse(BaseModel):
+    condicion_gestor_carga_tarifa_ml: float
+    condicion_propietario_tarifa_ml: float
+    merma_gestor_carga_valor_ml: float
+    merma_propietario_valor_ml: float
