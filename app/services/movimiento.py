@@ -573,14 +573,14 @@ def create_movimiento_by_merma(
         )
     # Cotización de la moneda gestor
     cotizacion_moneda_origen_gestor = db.query(MonedaCotizacion.cotizacion_moneda).filter(
-        MonedaCotizacion.moneda_origen_id == orden_carga.flete.condicion_gestor_cuenta_moneda_id
+        MonedaCotizacion.moneda_origen_id == orden_carga.flete.merma_gestor_cuenta_moneda_id
     ).order_by(MonedaCotizacion.fecha.desc()).first()
 
     tipo_cambio_moneda_gestor = cotizacion_moneda_origen_gestor[0] if cotizacion_moneda_origen_gestor else 1
 
         # Cotización de la moneda propietario
     cotizacion_moneda_origen_propietario = db.query(MonedaCotizacion.cotizacion_moneda).filter(
-        MonedaCotizacion.moneda_origen_id == orden_carga.flete.condicion_propietario_moneda_id
+        MonedaCotizacion.moneda_origen_id == orden_carga.flete.merma_propietario_moneda_id
     ).order_by(MonedaCotizacion.fecha.desc()).first()
 
     tipo_cambio_moneda_propietario = cotizacion_moneda_origen_propietario[0] if cotizacion_moneda_origen_propietario else 1
@@ -599,7 +599,7 @@ def create_movimiento_by_merma(
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.merma_gestor_carga_detalle,
             monto=orden_carga.resultado_gestor_carga_merma_valor_total,
-            moneda_id=orden_carga.flete.condicion_gestor_cuenta_moneda_id,
+            moneda_id=orden_carga.flete.merma_gestor_cuenta_moneda_id,
             tipo_cambio_moneda=tipo_cambio_moneda_gestor,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             remitente_id=orden_carga.flete.remitente_id,
@@ -623,7 +623,7 @@ def create_movimiento_by_merma(
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.merma_propietario_detalle,
             monto=-orden_carga.resultado_propietario_merma_valor_total,
-            moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
+            moneda_id=orden_carga.flete.merma_propietario_moneda_id,
             tipo_cambio_moneda=tipo_cambio_moneda_propietario,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             propietario_id=orden_carga.propietario_id,
