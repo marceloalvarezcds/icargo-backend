@@ -50,6 +50,8 @@ class OrdenCargaForm(BaseModel):
 class OrdenCargaBaseModel(BaseModel):
     camion_id: Optional[int] = None
     semi_id: Optional[int] = None
+    chofer_id: Optional[int] = None
+    propietario_id: Optional[int] = None
     flete_id: Optional[int] = None
     cantidad_nominada: Optional[RoundedDecimal] = None
     comentarios: Optional[str] = None
