@@ -78,8 +78,6 @@ def create_orden_carga_evaluacion(
     data: OrdenCargaEvaluacionesHistorialForm,
     modified_by: str,
 ) -> OrdenCargaEvaluacionesHistorial:
-    print(f"[INFO] Creando evaluación para orden_carga_id={data.orden_carga_id}")
-
     obj = OrdenCargaEvaluacionesHistorial(
         orden_carga_id=data.orden_carga_id,
         comentarios=data.comentarios,
@@ -111,7 +109,6 @@ def create_orden_carga_evaluacion(
 
     # Calcular promedios generales
     promedios_generales = calcular_promedios_generales(db)
-    print(f"[DEBUG] Promedios generales: {promedios_generales}")
 
     obj.promedio_carga_general = promedios_generales["carga"]
     obj.promedio_descarga_general = promedios_generales["descarga"]
@@ -123,7 +120,6 @@ def create_orden_carga_evaluacion(
 
     # CAMIÓN
     if data.camion_id:
-        print(f"[INFO] Buscando Camion con ID {data.camion_id}")
         camion = db.query(Camion).filter(Camion.id == data.camion_id).one()
 
         camion.promedio_tracto_general = promedios_generales["tracto"]
@@ -142,7 +138,6 @@ def create_orden_carga_evaluacion(
 
     # SEMI
     if data.semi_id:
-        print(f"[INFO] Buscando Semi con ID {data.semi_id}")
         semi = db.query(Semi).filter(Semi.id == data.semi_id).one()
 
         semi.promedio_semi_general = promedios_generales["semi"]
@@ -161,14 +156,7 @@ def create_orden_carga_evaluacion(
 
     # CHOFER
     if data.chofer_id:
-        print(f"[INFO] Buscando Chofer con ID {data.chofer_id}")
-        available_chofer_ids = db.query(Chofer.id).all()
-        print(f"[DEBUG] IDs disponibles en la tabla Chofer: {available_chofer_ids}")
-        try:
-            chofer = db.query(Chofer).filter(Chofer.id == data.chofer_id).one()
-        except Exception as e:
-            print(f"[ERROR] No se encontró el Chofer con ID {data.chofer_id}")
-            raise e
+        chofer = db.query(Chofer).filter(Chofer.id == data.chofer_id).one()
 
         chofer.promedio_chofer_general = promedios_generales["chofer"]
         chofer.cantidad_chofer_evaluaciones = contar_calificaciones_generales(
@@ -186,7 +174,6 @@ def create_orden_carga_evaluacion(
 
     # PROPIETARIO
     if data.propietario_id:
-        print(f"[INFO] Buscando Propietario con ID {data.propietario_id}")
         propietario = db.query(Propietario).filter(Propietario.id == data.propietario_id).one()
 
         propietario.promedio_propietario_general = promedios_generales["propietario"]
@@ -205,7 +192,6 @@ def create_orden_carga_evaluacion(
 
     db.commit()
     db.refresh(obj)
-    print(f"[INFO] Evaluación finalizada con ID: {obj.id}")
     return obj
 
 
