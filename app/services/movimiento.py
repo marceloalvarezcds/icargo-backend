@@ -693,9 +693,8 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
     data.cuenta_id = tipo_cuenta.id
     data.tipo_movimiento_id = tipo_movimiento.id
     data.es_editable = True
-    data.tipo_cambio_moneda = RoundedDecimal(
-        1
-    )  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+   # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+    data.tipo_cambio_moneda = RoundedDecimal(data.tipo_cambio_moneda)
     data.fecha_cambio_moneda = fecha
     if not data.fecha:
         data.fecha = fecha

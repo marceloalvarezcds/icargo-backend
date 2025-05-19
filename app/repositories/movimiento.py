@@ -449,6 +449,7 @@ def edit_movimiento(
     obj.tipo_movimiento_id = data.tipo_movimiento_id
     obj.detalle = data.detalle
     obj.monto = data.monto
+    obj.monto_mon_local= data.monto_mon_local if data.monto_mon_local else data.monto*data.tipo_cambio_moneda,
     obj.moneda_id = data.moneda_id
     obj.tipo_cambio_moneda = data.tipo_cambio_moneda
     obj.fecha_cambio_moneda = data.fecha_cambio_moneda

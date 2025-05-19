@@ -5,7 +5,7 @@ from sqlalchemy.sql.functions import concat  # type: ignore
 from sqlalchemy.engine.row import Row  # type: ignore
 from sqlalchemy.orm import Query, Session, aliased  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
-from app.enums import EstadoEnum, TipoContraparteEnum
+from app.enums import EstadoEnum, LiquidacionEstadoEnum,TipoContraparteEnum
 from app.models import (
     Chofer,
     Instrumento,
@@ -769,8 +769,9 @@ def get_cols_estado_cuenta_liquidacion_case_statement() -> Tuple:
         literal_column("0").label("confirmado"),
         case(
             (
-                and_(
-                    Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+                or_(
+                    Liquidacion.etapa == LiquidacionEstadoEnum.FINALIZADO.value,
+                    Liquidacion.estado == LiquidacionEstadoEnum.SALDO_CERRADO.value
                 ),
                 (Instrumento.monto_ml)
             ),
@@ -780,8 +781,9 @@ def get_cols_estado_cuenta_liquidacion_case_statement() -> Tuple:
         literal_column("0").label("cantidad_confirmado"),
         case(
             (
-                and_(
-                    Liquidacion.etapa == EstadoEnum.FINALIZADO.value,
+                or_(
+                    Liquidacion.etapa == LiquidacionEstadoEnum.FINALIZADO.value,
+                    Liquidacion.estado == LiquidacionEstadoEnum.SALDO_CERRADO.value
                 ),
                 literal_column("1"),
             ),
