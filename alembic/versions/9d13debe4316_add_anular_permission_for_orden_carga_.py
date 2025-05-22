@@ -17,6 +17,7 @@ depends_on = None
 
 
 def upgrade():
+    pass
     #op.execute(
     #    "INSERT INTO permiso "
     #    "(modified_by, modified_at, accion, modelo, descripcion, created_by, created_at, modulo, modelo_titulo, is_for_superuser) VALUES "
