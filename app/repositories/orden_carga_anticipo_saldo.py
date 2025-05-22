@@ -72,7 +72,6 @@ def create_orden_carga_anticipo_saldo(
     db: Session,
     data: OrdenCargaAnticipoSaldoForm,
     saldo_actualizado: float,
-    saldo_actualizado_ml: float,
     modified_by: str,
 ) -> OrdenCargaAnticipoSaldo:
     obj = OrdenCargaAnticipoSaldo(
@@ -80,12 +79,10 @@ def create_orden_carga_anticipo_saldo(
         orden_carga_id=data.orden_carga_id,
         orden_carga_anticipo_porcentaje_id=data.orden_carga_anticipo_porcentaje_id,
         total_anticipo=data.total_anticipo,
-        total_anticipo_ml=data.total_anticipo_ml,
+        # total_anticipo_ml=data.total_anticipo_ml,
         total_complemento=data.total_complemento,
         total_retirado=data.total_retirado,
-        total_retirado_ml=data.total_retirado_ml,
         saldo=saldo_actualizado,
-        saldo_ml=saldo_actualizado_ml,
         created_by=modified_by,
         modified_by=modified_by,
     )

@@ -350,6 +350,7 @@ from .orden_carga_anticipo_retirado import (  # noqa
     get_movimiento_by_anticipo_id,
     get_movimiento_by_anticipo_id_and_id,
     get_saldo_by_flete_anticipo_id_and_orden_carga_id,
+    get_camion_by_orden_carga_id,
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     create_orden_carga_anticipo_saldo,
@@ -382,6 +383,7 @@ from .orden_carga_comentarios_historial import create_orden_carga_comentarios_hi
 from .orden_carga_evaluacion import (  # noqa
     get_orden_carga_evaluaciones_historial_by_id,
     create_orden_carga_evaluacion,
+    get_evaluacion_list,
 )
 
 from .orden_carga_remision_destino import (  # noqa
@@ -612,5 +614,6 @@ from .provision import ( # noqa
 from .moneda_cotizacion import (
     get_moneda_cotizacion_by_id,
     get_max_date_cotizacio_by_origen_destino,
-    get_ultima_cotizacion
+    get_ultima_cotizacion,
+    get_moneda_cotizacion_list_by_gestor_carga_id
 )

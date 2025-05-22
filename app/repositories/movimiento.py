@@ -13,6 +13,7 @@ from app.models import (
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
 from app.schemas import Movimiento as MovimientoSchema
+from app.repositories.moneda import get_moneda_by_gestor_carga
 
 
 def get_movimiento_list(db: Session) -> List[Movimiento]:
@@ -382,7 +383,7 @@ def create_movimiento(
         fecha=data.fecha,
         detalle=data.detalle,
         monto=data.monto,
-        monto_mon_local=data.monto_mon_local,
+        monto_mon_local= data.monto_mon_local if data.monto_mon_local else data.monto*data.tipo_cambio_moneda,
         moneda_id=data.moneda_id,
         tipo_cambio_moneda=data.tipo_cambio_moneda,
         fecha_cambio_moneda=data.fecha_cambio_moneda,
@@ -448,6 +449,7 @@ def edit_movimiento(
     obj.tipo_movimiento_id = data.tipo_movimiento_id
     obj.detalle = data.detalle
     obj.monto = data.monto
+    obj.monto_mon_local= data.monto_mon_local if data.monto_mon_local else data.monto*data.tipo_cambio_moneda,
     obj.moneda_id = data.moneda_id
     obj.tipo_cambio_moneda = data.tipo_cambio_moneda
     obj.fecha_cambio_moneda = data.fecha_cambio_moneda
@@ -559,7 +561,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                 OrdenCarga.documento_fisico.label("documento_fisico"),
                 Moneda.simbolo.label("moneda"),
                 Movimiento.tipo_cambio_moneda.label("tipo_cambio_moneda"),
-                *get_cols_estado_cuenta_case_statement(),
+                *get_cols_estado_cuenta_case_statement(mon_local_id),
                 )\
                 .join(Movimiento.tipo_movimiento)\
                 .join(Movimiento.cuenta)\
@@ -621,9 +623,12 @@ def get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
     punto_venta_id: Optional[int]
 ) -> List[MovimientoEstadoCuenta]:
 
+    moneda_local= get_moneda_by_gestor_carga(db, gestor_carga_id)
+    moneda_local_id = moneda_local.id if moneda_local else 1
+
     query = get_query_movimientos_by_contraparte_and_gestor_carga_id(
         db, tipo_contraparte_id, contraparte_id, contraparte, contraparte_numero_documento,
-        gestor_carga_id, punto_venta_id)
+        gestor_carga_id, moneda_local_id, punto_venta_id )
 
     results = query.order_by(Movimiento.id.desc(), Movimiento.contraparte).all()
 
@@ -699,7 +704,7 @@ def get_all_movimiento_instrumento_estado_cuenta_list(
     return []
 
 
-def get_cols_estado_cuenta_case_statement() -> tuple:
+def get_cols_estado_cuenta_case_statement(mon_local_id:int) -> tuple:
     return (
         literal_column("0").label("provision"),
         case(
@@ -708,14 +713,13 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
                     Movimiento.liquidacion_id == null(),
                     Movimiento.estado == EstadoEnum.PENDIENTE.value,
                 ),
-                #case(
-                #    (
-                #        Movimiento.moneda_id == 1,
-                #        Movimiento.monto,
-                #    ),
-                #    else_= Movimiento.monto_mon_local,
-                #)
-                Movimiento.monto_mon_local,
+                case(
+                    (
+                        Movimiento.moneda_id == mon_local_id,
+                        Movimiento.monto,
+                    ),
+                    else_= Movimiento.monto_mon_local,
+                )
             ),
             else_=literal_column("0"),
         ).label("pendiente"),
@@ -725,7 +729,13 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
                     Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
                     Movimiento.estado == EstadoEnum.EN_PROCESO.value,
                 ),
-                Movimiento.monto_mon_local,
+                case(
+                    (
+                        Movimiento.moneda_id == mon_local_id,
+                        Movimiento.monto,
+                    ),
+                    else_= Movimiento.monto_mon_local,
+                )
             ),
             else_=literal_column("0"),
         ).label("en_proceso"),
@@ -749,7 +759,13 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
                         Movimiento.estado == EstadoEnum.FINALIZADO.value,
                     ),
                 ),
-                Movimiento.monto_mon_local,
+                case(
+                    (
+                        Movimiento.moneda_id == mon_local_id,
+                        Movimiento.monto,
+                    ),
+                    else_= Movimiento.monto_mon_local,
+                )
             ),
             else_=literal_column("0"),
         ).label("confirmado"),

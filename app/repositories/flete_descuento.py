@@ -14,6 +14,7 @@ def get_flete_descuento_by(
     propietario_monto: int,
     proveedor_moneda_id: int,
     proveedor_monto: int,
+    proveedor_monto_ml: int,
     flete_id: int,
 ) -> Optional[FleteDescuento]:
     return (
@@ -24,6 +25,7 @@ def get_flete_descuento_by(
             FleteDescuento.propietario_monto == propietario_monto,
             FleteDescuento.proveedor_moneda_id == proveedor_moneda_id,
             FleteDescuento.proveedor_monto == proveedor_monto,
+            FleteDescuento.proveedor_monto == proveedor_monto_ml,
             FleteDescuento.flete_id == flete_id,
         )
         .first()
@@ -50,10 +52,12 @@ def create_flete_descuento(
         habilitar_pago_proveedor=data.habilitar_pago_proveedor,
         # INICIO Monto a cobrar al Propietario
         propietario_monto=data.propietario_monto,
+        propietario_monto_ml=data.propietario_monto_ml,
         propietario_moneda_id=data.propietario_moneda_id,
         # FIN Monto a cobrar al Propietario
         # INICIO Monto a pagar al Proveedor
         proveedor_monto=data.proveedor_monto,
+        proveedor_monto_ml=data.proveedor_monto_ml,
         proveedor_moneda_id=data.proveedor_moneda_id,
         proveedor_id=data.proveedor_id,
         # FIN Monto a pagar al Proveedor

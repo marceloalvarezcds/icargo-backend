@@ -50,6 +50,8 @@ class OrdenCargaForm(BaseModel):
 class OrdenCargaBaseModel(BaseModel):
     camion_id: Optional[int] = None
     semi_id: Optional[int] = None
+    chofer_id: Optional[int] = None
+    propietario_id: Optional[int] = None
     flete_id: Optional[int] = None
     cantidad_nominada: Optional[RoundedDecimal] = None
     comentarios: Optional[str] = None
@@ -112,6 +114,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     camion_placa: str
     camion_propietario_nombre: str
     camion_propietario_puede_recibir_anticipos: bool
+    combinacion_chofer_puede_recibir_anticipos: bool
     combinacion_propietario_id: Optional[int] = None
     combinacion_chofer_id: Optional[int] = None
     combinacion_chofer_doc: Optional[str] = None
@@ -132,20 +135,26 @@ class OrdenCarga(OrdenCargaBaseModel):
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
     flete_tarifa_unidad_gestor_carga: Optional[str] = None
+    flete_merma_unidad_gestor_carga: Optional[str] = None
+    flete_merma_unidad: Optional[str] = None
     flete_limite_credito: RoundedDecimal
     flete_numero_lote: Optional[str] = None
     flete_monto_efectivo: RoundedDecimal
     flete_monto_efectivo_complemento: RoundedDecimal
+    flete_monto_combustible: Optional[RoundedDecimal] = None
+    flete_monto_lubricante: Optional[RoundedDecimal] = None
     flete_origen_id: Optional[int] = None
     flete_origen_nombre: Optional[str] = None
     flete_producto_descripcion: str
     flete_proyectado: RoundedDecimal
+    flete_proyectado_ml: Optional[RoundedDecimal] = None
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
     flete_tarifa_unidad_abreviatura: Optional[str] = None
     flete_tarifa: RoundedDecimal
     flete_tipo: Optional[TipoFleteEnum] = None
     flete_saldo: Optional[int] = None
+    flete_tarifa_unidad: Optional[str] = None
     linea_disponible: Optional[int] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
@@ -154,8 +163,9 @@ class OrdenCarga(OrdenCargaBaseModel):
     gestor_carga_moneda_nombre: str
     resultado_gestor_carga_saldo_total: Optional[int] = None
     resultado_propietario_total_anticipos_retirados: Optional[int] = None
-    saldo_efectivo: Optional[RoundedDecimal] = None
-    saldo_combustible: Optional[int] = None
+    flete_saldo_efectivo: Optional[RoundedDecimal] = None
+    flete_saldo_combustible: Optional[int] = None
+    flete_saldo_lubricante: Optional[int] = None
     gestor_carga_moneda_id: Optional[int] = None
     anticipo_retirado_moneda_insumo_id: Optional[int] = None
     # Historial de Estados
@@ -180,6 +190,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     # INICIO Cantidad y Flete
     # inicio - Condiciones para el Gestor de Carga
     condicion_gestor_cuenta_tarifa: Optional[int] = None
+    condicion_gestor_carga_tarifa_ml: Optional[int] = None
     condicion_gestor_carga_moneda: Optional[Moneda] = None
     condicion_gestor_moneda_simbolo: Optional[str] = None
     condicion_gestor_carga_moneda_id: Optional[int] = None
@@ -199,12 +210,14 @@ class OrdenCarga(OrdenCargaBaseModel):
     merma_gestor_carga_es_porcentual_descripcion: str
     merma_gestor_carga_tolerancia: Optional[int] = None
     merma_gestor_carga_valor: Optional[int] = None
+    merma_gestor_carga_valor_ml: Optional[RoundedDecimal] = None
     # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
     merma_propietario_moneda: Optional[Moneda] = None
     merma_propietario_es_porcentual_descripcion: str
     merma_propietario_tolerancia: Optional[int] = None
     merma_propietario_valor: Optional[int] = None
+    merma_propietario_valor_ml: Optional[RoundedDecimal] = None
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
     # Relaciones Listas
@@ -356,3 +369,10 @@ class OrdenCargaUpdateForm(BaseModel):
 
 class OrdenCargaUpdateFecha(BaseModel):
     created_at: Optional[Date] = None
+
+
+class RecalculoCondicionesResponse(BaseModel):
+    condicion_gestor_carga_tarifa_ml: float
+    condicion_propietario_tarifa_ml: float
+    merma_gestor_carga_valor_ml: float
+    merma_propietario_valor_ml: float

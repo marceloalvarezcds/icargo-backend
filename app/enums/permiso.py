@@ -56,6 +56,7 @@ class PermisoModeloEnum(Enum):
     MARCA_CAMION = "marca_camion"
     MARCA_SEMI = "marca_semi"
     MONEDA = "moneda"
+    MONEDA_COTIZACION = "moneda_cotizacion"
     MOVIMIENTO = "movimiento"
     ORDEN_CARGA = "orden_carga"
     ORDEN_CARGA_ANTICIPO_RETIRADO = "orden_carga_anticipo_retirado"
@@ -164,6 +165,7 @@ permisoModeloTitulo: Dict[str, str] = {
     "rentabilidad": "Rentabilidad",
     # BIBLIOTECA
     "cargo": "Cargo",
+    "moneda_cotizacion": "Cotizacion",
     "insumo_punto_venta": "Insumo Punto de Venta",
     "insumo_punto_venta_precio": "Precio de Insumo en Punto de Venta",
     # PARAMETROS

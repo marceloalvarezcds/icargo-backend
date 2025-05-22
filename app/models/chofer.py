@@ -6,6 +6,7 @@ from sqlalchemy import (  # type: ignore
     Integer,
     String,
     text,
+    Numeric,
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
@@ -74,6 +75,11 @@ class Chofer(AuditMixin, Base):
     puede_recibir_anticipos = Column(Boolean, server_default=text("true"))
     gestores = relationship("GestorCargaChofer", back_populates="chofer")
 
+    promedio_chofer_gestor = Column(Numeric(38, 1), nullable=True)
+    promedio_chofer_general = Column(Numeric(38, 1), nullable=True)
+    cantidad_chofer_evaluaciones = Column(Numeric(38, 1), nullable=True)
+    cantidad_chofer_evaluaciones_gestor = Column(Numeric(38, 1), nullable=True)
+
     @hybrid_property
     def ciudad_nombre(self):
         return self.ciudad.nombre if self.ciudad else None
@@ -117,7 +123,7 @@ class Chofer(AuditMixin, Base):
     @hybrid_property
     def pais_nombre(self):
         return self.ciudad.localidad.pais.nombre if self.ciudad else None
-    
+
     @hybrid_property
     def telefono_chofer(self):
         return self.telefono if self.telefono else None

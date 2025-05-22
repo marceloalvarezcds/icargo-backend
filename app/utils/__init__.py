@@ -2,6 +2,8 @@ from .camel_to_snake import camel_to_snake  # noqa
 from .flete_anticipo import (  # noqa
     get_flete_anticipo_by_tipo_insumo_descripcion,
     get_flete_anticipo_efectivo,
+    get_flete_anticipo_combustible,
+    get_flete_anticipo_lubricante,
     get_porcentaje_maximo_by_flete_anticipo_list,
 )
 from .gestor_carga import get_gestor_carga_by_params  # noqa

@@ -10,7 +10,7 @@ from pdfkit import from_string  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas, logger
-from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
+from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv, STATICS_FOLDER, dir_path
 from app.enums import TipoAnticipoEnum, TipoInsumoEnum
 from app.models import Camion, OrdenCargaAnticipoRetirado, TipoAnticipo, TipoInsumo
 from app.schemas.rounded_decimal_model import RoundedDecimal
@@ -23,6 +23,8 @@ from .orden_carga_anticipo_porcentaje_create import (
 )
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
 from .user import get_user_by_username
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 
 
 def get_tipo_anticipo_by_id(db: Session, id: int) -> TipoAnticipo:
@@ -60,9 +62,10 @@ def create_orden_carga_anticipo_retirado(
     modified_by: str,
 ) -> schemas.OrdenCargaAnticipoRetirado:
     if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
-        data.monto_retirado = RoundedDecimal(
-            data.cantidad_retirada * data.precio_unitario
-        )
+        if data.monto_retirado is None:  # Solo si monto_retirado está vacío
+            data.monto_retirado = RoundedDecimal(
+                data.cantidad_retirada * data.precio_unitario
+            )
     update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, data.flete_anticipo_id, data.orden_carga_id
@@ -125,106 +128,118 @@ def delete_orden_carga_anticipo_retirado(
 def change_anticipo_status(
     db: Session, id: int, status: EstadoEnum, modified_by: str
 ) -> schemas.OrdenCargaAnticipoRetirado:
-    # Obtener la OrdenCargaAnticipoRetirado específica por su ID
     co = repositories.get_anticipo_by_id(db, id)
 
     if not co:
         raise HTTPException(status_code=404, detail="OrdenCargaAnticipoRetirado no encontrada")
 
-    # Actualizar el estado de la OrdenCargaAnticipoRetirado
     co = repositories.change_anticipo_status(co, db, status, modified_by)
 
-    # Verificar si existe un movimiento asociado y actualizarlo
-    # Aquí usamos el `id` de la `OrdenCargaAnticipoRetirado` para encontrar el movimiento específico
     movimiento = repositories.get_movimiento_by_anticipo_id(db, co.id)
-    
+
     if movimiento:
         movimiento.estado = status.value
         movimiento.modified_by = modified_by
         movimiento.modified_at = datetime.now()
-        
-        # Guardar los cambios en el movimiento
+
         db.commit()
         db.refresh(movimiento)
 
-        # Obtener el saldo actual de la OrdenCargaAnticipoSaldo
         saldo = repositories.get_saldo_by_flete_anticipo_id_and_orden_carga_id(
             db, co.flete_anticipo_id, co.orden_carga_id
         )
 
         if saldo:
-            # Restar el monto retirado anulado
             saldo.total_retirado -= co.monto_retirado
-
-            # Sumar al saldo nuevamente el monto retirado anulado
             saldo.saldo += co.monto_retirado
 
-            # Guardar los cambios en el saldo
             db.commit()
             db.refresh(saldo)
 
+        # Solo si el camión tiene límite de anticipos
+        camion = repositories.get_camion_by_orden_carga_id(db, co.orden_carga_id)
+
+        if camion and camion.limite_monto_anticipos is not None:
+            camion.total_anticipos_retirados_en_estado_pendiente_o_en_proceso -= co.monto_retirado
+            camion.modified_by = modified_by
+            camion.modified_at = datetime.now()
+
+            db.commit()
+            db.refresh(camion)
     return co
 
 
 
+
 def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:
-    try:
-        logger.info('Inicio del proceso de generación de PDF')
+    #try:
+    logger.info('Inicio del proceso de generación de PDF')
 
-        # Obtención del objeto de anticipo
-        obj = repositories.get_orden_carga_anticipo_retirado_by_id(db, id)
-        if not obj:
-            raise HTTPException(status_code=404, detail="Anticipo no encontrado")
+    # Obtención del objeto de anticipo
+    obj = repositories.get_orden_carga_anticipo_retirado_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Anticipo no encontrado")
 
-        # Obtención de la orden de carga
-        orden_carga = repositories.get_orden_carga_by_id(db, obj.orden_carga_id)
-        if not orden_carga:
-            raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
+    # Obtención de la orden de carga
+    orden_carga = repositories.get_orden_carga_by_id(db, obj.orden_carga_id)
+    if not orden_carga:
+        raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
 
-        # Obtención del gestor de carga
-        gestor_carga = repositories.get_gestor_carga_by_id(db, orden_carga.gestor_carga_id)
-        if not gestor_carga:
-            raise HTTPException(status_code=404, detail="Gestor de carga no encontrado")
+    # Obtención del gestor de carga
+    gestor_carga = repositories.get_gestor_carga_by_id(db, orden_carga.gestor_carga_id)
+    if not gestor_carga:
+        raise HTTPException(status_code=404, detail="Gestor de carga no encontrado")
 
-        # Obtención del usuario
-        usuario = get_user_by_username(db, obj.created_by)
-        usuario_nombre = f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
+    # Obtención del usuario
+    usuario = get_user_by_username(db, obj.created_by)
+    usuario_nombre = f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
+    OUTPUT_FILENAME = f"anticipo_{id}.pdf"
 
-        # Datos para el PDF
-        data = {
-            "id": id,
-            "orden_carga_id": orden_carga.id,
-            "flete_id": orden_carga.flete_id,
-            "gestor_carga_logo": gestor_carga.logo,
-            "gestor_carga_nombre": gestor_carga.nombre,
-            "gestor_carga_direccion": gestor_carga.direccion,
-            "anticipo_fecha": obj.created_at.strftime("%Y-%m-%d / %H:%M:%S"),
-            "anticipo_usuario": usuario_nombre,
-            "propietario_nombre": orden_carga.camion_propietario_nombre,
-            "chofer_nombre": orden_carga.combinacion.chofer_nombre,
-            "chofer_numero_documento": orden_carga.combinacion.chofer_numero_documento,
-            "camion_placa": orden_carga.camion_placa,
-            "proveedor_nombre": obj.proveedor_nombre,
-            "proveedor_numero_documento": obj.punto_venta.proveedor.numero_documento,
-            "proveedor_direccion": obj.punto_venta.proveedor.direccion,
-            "insumo_descripcion": obj.insumo_descripcion or "Viático",
-            "insumo_precio": number_format(obj.insumo_precio) if obj.insumo_precio else 1,
-            "insumo_unidad": obj.insumo_unidad_abreviatura or "",
-            "monto": number_format(obj.monto_retirado),
-            "unidad": obj.unidad_abreviatura or "",
-        }
+    # Datos para el PDF
+    data = {
+        "id": id,
+        "orden_carga_id": orden_carga.id,
+        "flete_id": orden_carga.flete_id,
+        "gestor_carga_logo": gestor_carga.logo,
+        "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_documento": gestor_carga.numero_documento,
+        "gestor_carga_direccion": gestor_carga.direccion,
+        "anticipo_fecha": obj.created_at.strftime("%Y-%m-%d / %H:%M:%S"),
+        "anticipo_usuario": usuario_nombre,
+        "propietario_nombre": orden_carga.camion_propietario_nombre,
+        "propietario_documento": orden_carga.camion_propietario_documento,
+        "chofer_nombre": orden_carga.combinacion.chofer_nombre,
+        "chofer_numero_documento": orden_carga.combinacion.chofer_numero_documento,
+        "camion_placa": orden_carga.camion_placa,
+        "camion_marca": orden_carga.camion_marca,
+        "camion_color": orden_carga.camion_color,
+        "proveedor_nombre": obj.proveedor_nombre,
+        "proveedor_pdv_nombre": obj.punto_venta.nombre_corto,
+        "proveedor_numero_documento": obj.punto_venta.proveedor.numero_documento,
+        "proveedor_direccion": obj.punto_venta.proveedor.direccion,
+        "concepto": obj.concepto,
+        "insumo_descripcion": obj.insumo_descripcion or "Viático",
+        "insumo_precio": number_format(obj.insumo_precio) if obj.insumo_precio else 1,
+        "insumo_unidad": obj.insumo_unidad_abreviatura or "",
+        "cantidad_retirada": number_format(obj.cantidad_retirada) if obj.cantidad_retirada else 1,
+        "monto": number_format(obj.monto_retirado),
+        "unidad": obj.unidad_abreviatura or "",
+        "observacion": obj.observacion or "",
+    }
 
-        # Renderizado del template
-        template = templateEnv.get_template("pdf_anticipo.html")
-        source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
-
-        # Generación del PDF
-        pdf_filename = os.path.join(REPORTS_FOLDER, f"anticipo_{id}.pdf")
-        from_string(source_html, pdf_filename, {"page-size": "Legal"})
-
-        logger.info('PDF generado exitosamente')
-        return f"anticipo_{id}.pdf"
-
-    except Exception as e:
-        logger.error(f'Error al generar el PDF: {e}')
-        raise HTTPException(status_code=500, detail="Error al generar el PDF")
+    # Renderizado del template
+    template: Template = templateEnv.get_template("pdf_anticipo.html")
+    STATICS_FOLDER_lOGO = os.path.join(dir_path, "statics/logo-icargo.png")
+    source_html = template.render(logo=STATICS_FOLDER_lOGO, times=range(2), **data)
+    logger.info(f'LOGO_IMAGE_URL: {STATICS_FOLDER_lOGO}')
+    logger.info('html generado exitosamente')
+    logger.info(f'html: {source_html}')
+    # Generación del PDF
+    pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
+    from_string(source_html, pdf_filename, {"enable-local-file-access": "", "page-size": "Legal"})
+    logger.info('PDF generado exitosamente')
+    #return HTMLResponse(content=source_html, status_code=200)
+    return OUTPUT_FILENAME
+    #except Exception as e:
+    #    logger.error(f'Error al generar el PDF: {e}')
+    #    raise HTTPException(status_code=500, detail="Error al generar el PDF")

@@ -8,7 +8,10 @@ from app.enums import PermisoModuloEnum as u
 from app.models import OrdenCarga
 from app.schemas import OrdenCargaRemisionResultado
 from app.services.permiso import check_permiso
+from decimal import Decimal, ROUND_DOWN
 
+def truncate(value, decimals=2):
+    return float(Decimal(value).quantize(Decimal(f"1.{'0'*decimals}"), rounding=ROUND_DOWN))
 
 def get_orden_carga_remision_resultado_list_by_orden_carga(
     db: Session, orden_carga: OrdenCarga, user_id: int
@@ -29,12 +32,12 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
                     merma=orden_carga.resultado_gestor_carga_merma,
                     merma_valor_total=orden_carga.resultado_gestor_carga_merma_valor_total,
                     merma_valor_total_moneda_local=(
-                        orden_carga.resultado_gestor_carga_merma_valor_total_moneda_local
+                        truncate(orden_carga.resultado_gestor_carga_merma_valor_total_moneda_local)
                     ),
 
-                    saldo=orden_carga.resultado_gestor_carga_total_flete_saldo_bruto,
-                    saldo_bruto=orden_carga.resultado_gestor_carga_total_flete_saldo_bruto,
-                    complemento_descuento = orden_carga.resultado_gestor_carga_complemento_descuento,
+                    saldo=truncate(orden_carga.resultado_gestor_carga_total_flete_saldo_bruto),
+                    saldo_bruto=truncate(orden_carga.resultado_gestor_carga_total_flete_saldo_bruto),
+                    complemento_descuento = truncate(orden_carga.resultado_gestor_carga_complemento_descuento),
                     # resultado_gestor_carga_saldo (calculo anterior),
                 )
             )
@@ -49,16 +52,16 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
                 merma=orden_carga.resultado_propietario_merma,
                 merma_valor_total=orden_carga.resultado_propietario_merma_valor_total,
                 merma_valor_total_moneda_local=(
-                    orden_carga.resultado_propietario_merma_valor_total_moneda_local
+                    truncate(orden_carga.resultado_propietario_merma_valor_total_moneda_local)
                 ),
                 total_complemento=orden_carga.resultado_propietario_total_complemento,
                 total_descuento=orden_carga.resultado_propietario_total_descuento,
                 total_anticipo=orden_carga.resultado_propietario_total_anticipos_retirados,
-                saldo=orden_carga.resultado_propietario_saldo,
-                total_efectivo=orden_carga.resultado_propietario_total_anticipos_retirados_efectivo,
-                total_combustible=orden_carga.resultado_propietario_total_anticipos_retirados_combustible,
-                saldo_bruto=orden_carga.resultado_propietario_saldo_bruto,
-                complemento_descuento = orden_carga.resultado_propietario_complemento_descuento,
+                saldo= truncate(orden_carga.resultado_propietario_saldo),
+                total_efectivo= truncate(orden_carga.resultado_propietario_total_anticipos_retirados_efectivo),
+                total_combustible= truncate(orden_carga.resultado_propietario_total_anticipos_retirados_combustible),
+                saldo_bruto= truncate(orden_carga.resultado_propietario_saldo_bruto),
+                complemento_descuento = truncate(orden_carga.resultado_propietario_complemento_descuento),
             )
         )
     return lista

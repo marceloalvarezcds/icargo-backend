@@ -247,6 +247,7 @@ from .orden_carga import (  # noqa
     edit_remitir_fecha,
     get_orden_carga_en_proceso_list,
     get_orden_carga_cerradas_list,
+    recalcular_condiciones,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
@@ -412,4 +413,4 @@ from .texto_legal_service import (
     crear_texto_legal,
     edit_texto_legal
 )
-from .moneda_cotizacion import (read_cotizacion_moneda, get_cotizacion_moneda)
+from .moneda_cotizacion import (read_cotizacion_moneda, get_cotizacion_moneda, update_moneda_cotizacion_by_gestor_moneda_fecha, get_moneda_cotizacion_by_id)

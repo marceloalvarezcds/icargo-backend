@@ -10,7 +10,6 @@ from app import repositories
 from app.config import REPORTS_FOLDER
 from app.enums import TipoContraparteEnum
 from app.schemas import EstadoCuenta, MovimientoEstadoCuenta, ContraparteEstadoCuenta
-from app.schemas.rounded_decimal_model import RoundedDecimal
 from app.logger import logger
 
 
@@ -19,12 +18,13 @@ def get_estado_cuenta_list(
 ) -> List[EstadoCuenta]:
     if gestor_carga_id:
 
-        # TODO obtenemos la moneda local de la gestora
-        moneda_local_id=1
+        moneda_local= repositories.get_moneda_by_gestor_carga(db, gestor_carga_id)
+        moneda_local_id = moneda_local.id if moneda_local else 1
 
         results = repositories.get_estado_cuenta_list_by_gestor_carga_id(
-            db, gestor_carga_id
+            db, gestor_carga_id, moneda_local_id
         )
+
     else:
         results = repositories.get_estado_cuenta_list(db)
     return EstadoCuenta.result_of_query_to_list(results)
@@ -32,6 +32,7 @@ def get_estado_cuenta_list(
 
 def get_estado_cuenta_pdv_list(
     db: Session,
+    gestor_carga_id:int,
     tipo_flujo: Optional[str] = None,
     contraparte_id: Optional[int] = None,
     contraparte: Optional[str] = None,
@@ -39,12 +40,11 @@ def get_estado_cuenta_pdv_list(
     punto_venta_id: Optional[int] = None,
 ) -> List[EstadoCuenta]:
 
-    # return error message
-    #if contraparte and tipo_flujo is None:
-    #    return None
+    moneda_local= repositories.get_moneda_by_gestor_carga(db, gestor_carga_id)
+    moneda_local_id = moneda_local.id if moneda_local else 1
 
     results = repositories.get_estado_cuenta_pdv_list(
-        db, tipo_flujo, contraparte_id, contraparte, contraparte_numero_documento, punto_venta_id
+        db, moneda_local_id, tipo_flujo, contraparte_id, contraparte, contraparte_numero_documento, punto_venta_id
     )
 
     return EstadoCuenta.result_of_query_to_list(results)
@@ -52,6 +52,7 @@ def get_estado_cuenta_pdv_list(
 
 def get_estado_cuenta_pdv(
     db: Session,
+    gestor_carga_id:int,
     tipo_flujo: Optional[str] = None,
     contraparte_id: Optional[int] = None,
     contraparte: Optional[str] = None,
@@ -59,12 +60,11 @@ def get_estado_cuenta_pdv(
     punto_venta_id: Optional[int] = None,
 ) -> Optional[EstadoCuenta]:
 
-    # return error message
-    #if contraparte and tipo_flujo is None:
-    #    return None
+    moneda_local= repositories.get_moneda_by_gestor_carga(db, gestor_carga_id)
+    moneda_local_id = moneda_local.id if moneda_local else 1
 
     result = repositories.get_estado_cuenta_pdv(
-        db, tipo_flujo, contraparte_id, contraparte, contraparte_numero_documento, punto_venta_id
+        db, moneda_local_id, tipo_flujo, contraparte_id, contraparte, contraparte_numero_documento, punto_venta_id
     )
 
     logger.info("result")

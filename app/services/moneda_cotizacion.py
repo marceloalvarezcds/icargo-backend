@@ -1,18 +1,27 @@
 
+from typing import Optional
 from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql import func  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
 from sqlalchemy.sql.expression import null  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 from app.enums.estado import EstadoEnum
+from fastapi import HTTPException, status
 from app.models import (
     MonedaCotizacion,
 )
 from app import repositories
+from app.schemas.moneda_cotizacion import MonedaCotizacionForm
+from app.utils.gestor_carga import get_gestor_carga_by_params
 
 def read_cotizacion_moneda(db: Session, moneda_origen: int, moneda_destino: int, gestor_carga_id: int) -> MonedaCotizacion:
-    # Delegar la lógica de la consulta al repositorio
     return repositories.get_ultima_cotizacion(db, moneda_origen, moneda_destino, gestor_carga_id)
+
+def get_moneda_cotizacion_by_id(db: Session, id: int) -> MonedaCotizacion:
+    obj = repositories.get_moneda_cotizacion_by_id(db, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Insumo no encontrado")
+    return obj
 
 def get_cotizacion_moneda(db: Session, moneda_id: int, gestor_carga_id: int) -> MonedaCotizacion:
     resultado = (
@@ -26,3 +35,88 @@ def get_cotizacion_moneda(db: Session, moneda_id: int, gestor_carga_id: int) -> 
         .first()
     )
     return resultado
+
+
+def update_moneda_cotizacion_by_gestor_moneda_fecha(
+    db: Session,
+    data: MonedaCotizacionForm,
+    modified_by: str,
+) -> MonedaCotizacion:
+    from datetime import datetime
+
+    # Asegurar que la fecha sea solo tipo date
+    fecha = data.fecha.date() if isinstance(data.fecha, datetime) else data.fecha
+
+    # Verificar si ya existe una cotización con la misma fecha, moneda_origen y cotizacion_moneda
+    existing_cotizacion = db.query(MonedaCotizacion).filter(
+        MonedaCotizacion.gestor_carga_id == data.gestor_carga_id,
+        MonedaCotizacion.moneda_origen_id == data.moneda_origen_id,
+        MonedaCotizacion.cotizacion_moneda == data.cotizacion_moneda,
+        MonedaCotizacion.fecha == fecha,
+    ).first()
+
+    if existing_cotizacion:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ya existe una cotización con la misma fecha, moneda origen y cotización."
+        )
+
+    current_cotizacion = db.query(MonedaCotizacion).filter(
+        MonedaCotizacion.gestor_carga_id == data.gestor_carga_id,
+        MonedaCotizacion.moneda_origen_id == data.moneda_origen_id,
+        MonedaCotizacion.moneda_destino_id == data.moneda_destino_id,
+        MonedaCotizacion.fecha == fecha,
+    ).first()
+
+    cotizaciones_activas = db.query(MonedaCotizacion).filter(
+        MonedaCotizacion.gestor_carga_id == data.gestor_carga_id,
+        MonedaCotizacion.moneda_origen_id == data.moneda_origen_id,
+        MonedaCotizacion.moneda_destino_id == data.moneda_destino_id,
+        MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
+    ).all()
+
+    for cotizacion in cotizaciones_activas:
+        cotizacion.estado = EstadoEnum.INACTIVO.value
+        cotizacion.modified_by = modified_by
+
+    if current_cotizacion:
+        if current_cotizacion.cotizacion_moneda != data.cotizacion_moneda:
+            new_cotizacion = MonedaCotizacion(
+                gestor_carga_id=data.gestor_carga_id,
+                moneda_origen_id=data.moneda_origen_id,
+                moneda_destino_id=data.moneda_destino_id,
+                fecha=fecha,
+                cotizacion_moneda=data.cotizacion_moneda,
+                estado=EstadoEnum.ACTIVO.value,
+                created_by=modified_by,
+                modified_by=modified_by,
+            )
+            db.add(new_cotizacion)
+            db.commit()
+            db.refresh(new_cotizacion)
+            return new_cotizacion
+        else:
+            current_cotizacion.modified_by = modified_by
+            db.commit()
+            db.refresh(current_cotizacion)
+            return current_cotizacion
+    else:
+
+        new_cotizacion = MonedaCotizacion(
+            gestor_carga_id=data.gestor_carga_id,
+            moneda_origen_id=data.moneda_origen_id,
+            moneda_destino_id=data.moneda_destino_id,
+            fecha=fecha,
+            cotizacion_moneda=data.cotizacion_moneda,
+            estado=EstadoEnum.ACTIVO.value,
+            created_by=modified_by,
+            modified_by=modified_by,
+        )
+        db.add(new_cotizacion)
+        db.commit()
+        db.refresh(new_cotizacion)
+        return new_cotizacion
+
+
+
+

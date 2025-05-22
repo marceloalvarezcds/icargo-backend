@@ -119,6 +119,7 @@ class Flete(FleteFormBaseModel):
     complementos: List[FleteComplemento]
     descuentos: List[FleteDescuento]
     tipo_flete: Optional[TipoFleteEnum] = None
+    is_in_orden_carga: bool
     info: str
     created_by: str
     created_at: Date

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import Movimiento, OrdenCarga, OrdenCargaAnticipoRetirado
+from app.models import Movimiento, OrdenCarga, OrdenCargaAnticipoRetirado, Camion
 from app.models.orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from app.schemas import OrdenCargaAnticipoRetiradoForm
 
@@ -67,24 +67,6 @@ def create_orden_carga_anticipo_retirado(
         created_by=modified_by,
         modified_by=modified_by,
     )
-    #     # Imprimir los valores que se van a guardar en la base de datos
-    # print("Guardando los siguientes datos en la base de datos:")
-    # print(f"flete_anticipo_id: {data.flete_anticipo_id}")
-    # print(f"orden_carga_id: {data.orden_carga_id}")
-    # print(f"orden_carga_anticipo_porcentaje_id: {data.orden_carga_anticipo_porcentaje_id}")
-    # print(f"punto_venta_id: {data.punto_venta_id}")
-    # print(f"tipo_comprobante_id: {data.tipo_comprobante_id}")
-    # print(f"numero_comprobante: {data.numero_comprobante}")
-    # print(f"moneda_id: {data.moneda_id}")
-    # print(f"monto_retirado: {data.monto_retirado}")
-    # print(f"monto_retirado_ml: {data.monto_mon_local}")
-    # print(f"observacion: {data.observacion}")
-    # print(f"insumo_punto_venta_precio_id: {data.insumo_punto_venta_precio_id}")
-    # print(f"unidad_id: {data.unidad_id}")
-    # print(f"cantidad_retirada: {data.cantidad_retirada}")
-    # print(f"precio_unitario: {data.precio_unitario}")
-    # print(f"created_by: {modified_by}")
-    # print(f"modified_by: {modified_by}")
 
     db.add(obj)
     db.commit()
@@ -134,20 +116,27 @@ def change_anticipo_status(
     status: EstadoEnum,
     modified_by: str,
 ) -> OrdenCargaAnticipoRetirado:
-    # Obtener el movimiento relacionado con la orden de carga
-    movimiento = get_movimiento_by_anticipo_id(db, obj.id)  # Obtiene el movimiento por el ID del anticipo
+
+    movimiento = get_movimiento_by_anticipo_id(db, obj.id)
     if movimiento:
-        # Actualizar el estado del movimiento
+
         movimiento.estado = status.value
         movimiento.modified_by = modified_by
         movimiento.modified_at = datetime.now()
 
-        # Guardar los cambios en el movimiento
         db.commit()
-        db.refresh(movimiento)  # Refrescar el objeto movimiento para obtener los últimos cambios
+        db.refresh(movimiento)
 
     return obj
 
+
+def get_camion_by_orden_carga_id(db: Session, orden_carga_id: int):
+    return (
+        db.query(Camion)
+        .join(OrdenCarga, Camion.id == OrdenCarga.camion_id)
+        .filter(OrdenCarga.id == orden_carga_id)
+        .first()
+    )
 
 def get_anticipo_by_id(db: Session, id: int) -> OrdenCargaAnticipoRetirado:
     return db.query(OrdenCargaAnticipoRetirado).filter(OrdenCargaAnticipoRetirado.id == id).first()
@@ -183,7 +172,7 @@ def get_total_anticipo_retirado_by_camion_id(
     subquery: Query = (
         db.query(
             OrdenCargaAnticipoRetirado.id.label("id"),
-            OrdenCargaAnticipoRetirado.monto_retirado.label("monto_retirado"),
+            OrdenCargaAnticipoRetirado.monto_mon_local.label("monto_mon_local"),
         )
         .distinct()
         # .select_from(Movimiento)
@@ -202,5 +191,5 @@ def get_total_anticipo_retirado_by_camion_id(
         .subquery()
     )
     return db.query(
-        func.sum(subquery.c.monto_retirado).label("monto_retirado")
+        func.sum(subquery.c.monto_mon_local).label("monto_mon_local")
     ).first()[0]

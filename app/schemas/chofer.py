@@ -4,6 +4,7 @@ from typing import Any, Optional
 from pydantic import BaseModel
 
 from app.enums import EstadoEnum
+from app.schemas.rounded_decimal_model import RoundedDecimal
 
 from .ciudad import Ciudad
 from .date_model import Date
@@ -154,6 +155,10 @@ class Chofer(ChoferBase):
     modified_at: datetime
     gestor_carga_chofer: Optional[GestorCargaChofer] = None
     oc_with_anticipos_liberados: Optional[int] = None
+    promedio_chofer_gestor: Optional[RoundedDecimal] = None
+    promedio_chofer_general: Optional[RoundedDecimal] = None
+    cantidad_chofer_evaluaciones: Optional[RoundedDecimal] = None
+    cantidad_chofer_evaluaciones_gestor: Optional[RoundedDecimal] = None
 
     @classmethod
     def from_orm(cls, obj: Any) -> "Chofer":
