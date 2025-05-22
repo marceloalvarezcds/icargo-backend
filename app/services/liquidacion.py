@@ -593,9 +593,11 @@ def change_movimiento_list_status(
         mov.modified_by = modified_by
         mov.modified_at = datetime.now()
         if (
-            mov.anticipo
-            and estado == LiquidacionEstadoEnum.CONFIRMADO
-            or estado == LiquidacionEstadoEnum.FINALIZADO
+            mov.anticipo and (
+                estado == LiquidacionEstadoEnum.CONFIRMADO
+                or estado == LiquidacionEstadoEnum.FINALIZADO
+                or estado == LiquidacionEstadoEnum.PENDIENTE
+            )
         ):
             db.commit()
             anticipo: OrdenCargaAnticipoRetirado = mov.anticipo
