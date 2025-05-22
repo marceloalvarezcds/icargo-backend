@@ -17,11 +17,11 @@ depends_on = None
 
 
 def upgrade():
-    op.execute(
-        "INSERT INTO permiso "
-        "(modified_by, modified_at, accion, modelo, descripcion, created_by, created_at, modulo, modelo_titulo, is_for_superuser) VALUES "
-        "('system', now(), 'anular', 'orden_carga_anticipo_retirado', 'Anular 5 - anticipo retirado', 'system', now(), '5 - Orden de Carga', '5 - Anticipo Retirado', false)"
-    )
+    #op.execute(
+    #    "INSERT INTO permiso "
+    #    "(modified_by, modified_at, accion, modelo, descripcion, created_by, created_at, modulo, modelo_titulo, is_for_superuser) VALUES "
+    #    "('system', now(), 'anular', 'orden_carga_anticipo_retirado', 'Anular 5 - anticipo retirado', 'system', now(), '5 - Orden de Carga', '5 - Anticipo Retirado', false)"
+    #)
 
 def downgrade():
     op.execute("DELETE FROM permiso WHERE modelo = 'orden_carga_anticipo_retirado' AND accion = 'anular'")
