@@ -22,11 +22,11 @@ def upgrade():
         "(modified_by, modified_at, accion, modelo, descripcion, created_by, created_at, modulo, modelo_titulo, is_for_superuser) VALUES "
         "('system', now(), 'listar', 'orden_carga_evaluacion', 'Listar 10 - evaluacion', 'system', now(), '5 - Orden de Carga', 'Evaluacion', false)"
     )
-    op.execute(
-        "INSERT INTO permiso "
-        "(modified_by, modified_at, accion, modelo, descripcion, created_by, created_at, modulo, modelo_titulo, is_for_superuser) VALUES "
-        "('system', now(), 'crear', 'orden_carga_evaluacion', 'Crear 10 - evaluacion', 'system', now(), '5 - Orden de Carga', 'Evaluacion', false)"
-    )
+    ##op.execute(
+    ##    "INSERT INTO permiso "
+    ##    "(modified_by, modified_at, accion, modelo, descripcion, created_by, created_at, modulo, modelo_titulo, is_for_superuser) VALUES "
+    ##    "('system', now(), 'crear', 'orden_carga_evaluacion', 'Crear 10 - evaluacion', 'system', now(), '5 - Orden de Carga', 'Evaluacion', false)"
+    ##)
     op.execute(
         "INSERT INTO permiso "
         "(modified_by, modified_at, accion, modelo, descripcion, created_by, created_at, modulo, modelo_titulo, is_for_superuser) VALUES "
