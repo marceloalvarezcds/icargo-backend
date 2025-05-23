@@ -170,17 +170,32 @@ def create_orden_carga(
                 status_code=HTTPStatus.LOCKED,
                 detail=f"El camión con placa {camion.placa} ha alcanzado el límite de órdenes activas permitidas ({camion.limite_cantidad_oc_activas})."
             )
+
     moneda_gestor_carga = get_moneda_by_gestor_carga(db, gestor_carga_id)
     if not moneda_gestor_carga:
         raise HTTPException(status_code=404, detail="Moneda del gestor de carga no encontrada.")
 
+    def validar_cotizacion(cotizacion, moneda_origen_id: int, descripcion: str):
+        if not cotizacion or cotizacion.cotizacion_moneda is None:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Falta la cotización para {descripcion} (moneda_id={moneda_origen_id})."
+            )
+
     cotizacion_condicion_origen_gestor_carga = get_cotizacion_moneda(db, flete.condicion_gestor_carga_moneda_id, gestor_carga_id)
+    validar_cotizacion(cotizacion_condicion_origen_gestor_carga, flete.condicion_gestor_carga_moneda_id, "condición gestor de carga")
+
     cotizacion_origen_condicion_propietario = get_cotizacion_moneda(db, flete.condicion_propietario_moneda_id, gestor_carga_id)
+    validar_cotizacion(cotizacion_origen_condicion_propietario, flete.condicion_propietario_moneda_id, "condición propietario")
 
     cotizacion_origen_gestor_carga = get_cotizacion_moneda(db, flete.merma_gestor_carga_moneda_id, gestor_carga_id)
+    validar_cotizacion(cotizacion_origen_gestor_carga, flete.merma_gestor_carga_moneda_id, "merma gestor de carga")
+
     cotizacion_origen_propietario = get_cotizacion_moneda(db, flete.merma_propietario_moneda_id, gestor_carga_id)
+    validar_cotizacion(cotizacion_origen_propietario, flete.merma_propietario_moneda_id, "merma propietario")
 
     cotizacion_destino_gestor_carga_ml = get_cotizacion_moneda(db, moneda_gestor_carga.id, gestor_carga_id)
+    validar_cotizacion(cotizacion_destino_gestor_carga_ml, moneda_gestor_carga.id, "destino gestor de carga")
 
     merma_gestor_carga_valor_ml = (
         flete.merma_gestor_carga_valor * cotizacion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
@@ -192,7 +207,7 @@ def create_orden_carga(
         flete.condicion_gestor_carga_tarifa * cotizacion_condicion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
     )
     condicion_propietario_tarifa_ml = (
-        flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / flete.condicion_propietario_unidad_conversion #Nuevo calculo divido conversion
+        flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / flete.condicion_propietario_unidad_conversion
     )
 
     obj = repositories.create_orden_carga(
@@ -207,9 +222,9 @@ def create_orden_carga(
         merma_gestor_carga_valor_ml,
         merma_propietario_valor_ml
     )
+
     flete.orden_carga_id = obj.id
     flete.is_in_orden_carga = True
-
     db.add(flete)
     db.commit()
 
@@ -222,6 +237,8 @@ def create_orden_carga(
         db, obj.id, obj.flete_anticipos, modified_by
     )
     create_complementos_and_descuentos(db, obj, flete, modified_by)
+
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
 
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 

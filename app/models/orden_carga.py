@@ -310,7 +310,10 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def total_anticipo_complemento(self):
+        if not self.complementos:
+            return 0
         return sum(x.propietario_monto_ml for x in self.complementos if x.anticipado)
+
 
     @hybrid_property
     def flete_saldo(self):
