@@ -186,9 +186,10 @@ def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
 
 def get_total_complemento(complementos: List[OrdenCargaComplemento], es_efectivo: bool):
     if es_efectivo:
-        return sum(x.propietario_monto_ml for x in complementos if x.anticipado)
+        return sum((x.propietario_monto_ml or 0) for x in complementos if x.anticipado)
     else:
         return 0
+
 
 
 def edit_orden_carga_anticipo_saldo(
