@@ -240,7 +240,6 @@ def create_orden_carga(
 
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
-    return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
 def create_orden_carga_comentarios_historial(
