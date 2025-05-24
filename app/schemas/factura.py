@@ -29,7 +29,7 @@ class FacturaForm(BaseModel):
     iva_movimiento_id: Optional[int]
     retencion_movimiento_id: Optional[int]
     punto_venta_id: Optional[int]
-    tipo_cambio_moneda: int
+    tipo_cambio_moneda: Optional[int]
 
 class FacturaResponse(BaseModel):
     liquidacion_id: int
