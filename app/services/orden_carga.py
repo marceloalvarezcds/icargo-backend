@@ -4,6 +4,7 @@ from http import HTTPStatus
 from typing import List, Optional, cast
 
 from app.enums.tipo_anticipo import TipoAnticipoEnum
+from app.models.chofer import Chofer
 from app.models.combinacion import Combinacion
 from app.models.flete_anticipo import FleteAnticipo
 from fastapi import HTTPException
@@ -21,6 +22,7 @@ from app.enums import EstadoEnum
 from app.models import Camion, Flete, GestorCarga, OrdenCarga, OrdenCargaComentariosHistorial
 from app.models.orden_carga_complemento import OrdenCargaComplemento
 from app.models.orden_carga_descuento import OrdenCargaDescuento
+from app.models.propietario import Propietario
 from app.schemas.audit_database import AuditDatabase as A
 from app.utils import number_format, send_email_with_template_by_thread
 
@@ -341,6 +343,55 @@ def get_orden_carga_combinacion_detail(
 ) -> schemas.OrdenCarga:
     obj =  get_orden_carga_by_combinacion_id(db, id)
     return get_orden_carga_with_resultado(db, obj, current_user.id)
+
+
+def validar_habilitacion_para_anticipos(
+    db: Session,
+    chofer_id: int,
+    propietario_id: int,
+    combinacion_id: int
+) -> bool:
+    # Validar chofer
+    chofer = db.query(Chofer).filter(Chofer.id == chofer_id).first()
+    if not chofer:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Chofer no encontrado."
+        )
+    if not chofer.puede_recibir_anticipos:
+        raise HTTPException(
+            status_code=HTTPStatus.LOCKED,
+            detail="El Chofer no está habilitado para recibir anticipos."
+        )
+
+    # Validar propietario
+    propietario = db.query(Propietario).filter(Propietario.id == propietario_id).first()
+    if not propietario:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Propietario no encontrado."
+        )
+    if not propietario.puede_recibir_anticipos:
+        raise HTTPException(
+            status_code=HTTPStatus.LOCKED,
+            detail="El Propietario no está habilitado para recibir anticipos."
+        )
+
+    # Validar combinación
+    combinacion = db.query(Combinacion).filter(Combinacion.id == combinacion_id).first()
+    if not combinacion:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Combinación no encontrada."
+        )
+    if combinacion.estado != EstadoEnum.ACTIVO.value:
+        raise HTTPException(
+            status_code=HTTPStatus.LOCKED,
+            detail="La combinación está inactiva."
+        )
+
+    return True
+
 
 
 def get_ordenes_carga_by_combinacion_id(db: Session, combinacion_id: int) -> List[OrdenCarga]:

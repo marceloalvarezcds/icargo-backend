@@ -81,6 +81,7 @@ from .orden_carga import (  # noqa
     OrdenCargaUpdateForm,
     OrdenCargaUpdateFecha,
     RecalculoCondicionesResponse,
+    AnticiposPorOrdenCarga,
 )
 from .orden_carga_anticipo_porcentaje import (  # noqa
     OrdenCargaAnticipoPorcentaje,

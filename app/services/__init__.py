@@ -248,6 +248,7 @@ from .orden_carga import (  # noqa
     get_orden_carga_en_proceso_list,
     get_orden_carga_cerradas_list,
     recalcular_condiciones,
+    validar_habilitacion_para_anticipos,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,

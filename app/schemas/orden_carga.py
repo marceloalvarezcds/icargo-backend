@@ -376,3 +376,14 @@ class RecalculoCondicionesResponse(BaseModel):
     condicion_propietario_tarifa_ml: float
     merma_gestor_carga_valor_ml: float
     merma_propietario_valor_ml: float
+
+
+class AnticiposPorOrdenCarga(BaseModel):
+    id: int
+    chofer_id: Optional[int] = None
+    propietario_id: Optional[int] = None
+    combinacion_chofer_puede_recibir_anticipos: Optional[bool] = None
+    camion_propietario_puede_recibir_anticipos: Optional[bool] = None
+
+    class Config:
+        orm_mode = True
