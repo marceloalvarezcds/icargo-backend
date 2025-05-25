@@ -64,15 +64,18 @@ class OrdenCargaBaseModel(BaseModel):
     # inicio - Condiciones para el Gestor de Carga
     condicion_gestor_carga_moneda_id: Optional[int] = None
     condicion_gestor_carga_tarifa: Optional[RoundedDecimal] = None
+    condicion_gestor_carga_tarifa_ml: Optional[RoundedDecimal] = None
     # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda_id: Optional[int] = None
     condicion_propietario_tarifa: Optional[RoundedDecimal] = None
+    condicion_propietario_tarifa_ml: Optional[RoundedDecimal] = None
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
     # inicio - Mermas para el Gestor de Carga
     merma_gestor_carga_valor: Optional[RoundedDecimal] = None
+    merma_gestor_carga_valor_ml: Optional[RoundedDecimal] = None
     merma_gestor_carga_moneda_id: Optional[int] = None
     merma_gestor_carga_es_porcentual: Optional[bool] = False
     merma_gestor_carga_tolerancia: Optional[RoundedDecimal] = None

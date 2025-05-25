@@ -768,6 +768,7 @@ def edit_movimiento_by_gestor_flete(
         OrdenCargaEditForm(
             condicion_gestor_carga_moneda_id=data.moneda_id,
             condicion_gestor_carga_tarifa=data.tarifa,
+            condicion_gestor_carga_tarifa_ml=data.tarifa,
         ),
         gestor_carga_id,
         modified_by,
@@ -804,6 +805,7 @@ def edit_movimiento_by_gestor_merma(
             merma_gestor_carga_moneda_id=data.moneda_id,
             merma_gestor_carga_tolerancia=data.tolerancia,
             merma_gestor_carga_valor=data.valor,
+            merma_gestor_carga_valor_ml=data.valor,
         ),
         gestor_carga_id,
         modified_by,
@@ -848,6 +850,7 @@ def edit_movimiento_by_propietario_flete(
         OrdenCargaEditForm(
             condicion_propietario_moneda_id=data.moneda_id,
             condicion_propietario_tarifa=data.tarifa,
+            condicion_propietario_tarifa_ml=data.tarifa,
         ),
         gestor_carga_id,
         modified_by,
@@ -884,6 +887,7 @@ def edit_movimiento_by_propietario_merma(
             merma_propietario_moneda_id=data.moneda_id,
             merma_propietario_tolerancia=data.tolerancia,
             merma_propietario_valor=data.valor,
+            merma_propietario_valor_ml=data.valor,
         ),
         gestor_carga_id,
         modified_by,
@@ -1287,7 +1291,7 @@ def create_movimiento_by_factura(
                 detalle=tipo_movimiento.descripcion,
                 monto = factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else  factura.iva,
                 moneda_id=factura.moneda_id,
-                tipo_cambio_moneda=factura.tipo_cambio_moneda,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+                tipo_cambio_moneda=factura.tipo_cambio_moneda if factura.tipo_cambio_moneda else 1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
                 fecha= datetime.now(),
                 fecha_cambio_moneda=datetime.now(),
                 tipo_movimiento_info='IVA',
@@ -1319,7 +1323,7 @@ def create_movimiento_by_factura(
                 detalle=tipo_movimiento.descripcion,
                 monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
                 moneda_id=factura.moneda_id,
-                tipo_cambio_moneda=factura.tipo_cambio_moneda,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+                tipo_cambio_moneda=factura.tipo_cambio_moneda if factura.tipo_cambio_moneda else 1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
                 fecha= datetime.now(),
                 fecha_cambio_moneda=datetime.now(),
                 tipo_movimiento_info='RETENCION',
