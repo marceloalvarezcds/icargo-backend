@@ -114,7 +114,6 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
                 .join(Provision.tipo_movimiento)\
                 .join(Provision.cuenta)\
                 .join(Provision.moneda)\
-                .outerjoin(Provision.anticipo)\
 
     query = query.filter(
             and_(

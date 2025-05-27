@@ -19,7 +19,6 @@ from .chofer import Chofer
 from .gestor_carga import GestorCarga
 from .moneda import Moneda
 from .orden_carga import OrdenCarga
-from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 from .orden_carga_complemento import OrdenCargaComplemento
 from .orden_carga_descuento import OrdenCargaDescuento
 from .propietario import Propietario
