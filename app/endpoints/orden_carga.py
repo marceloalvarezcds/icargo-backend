@@ -450,3 +450,12 @@ async def pueden_recibir_anticipos(
         combinacion_id=combinacion_id,
     )
 
+
+@api.get("/{id}/recalcular-provisiones", response_model=schemas.OrdenCarga)
+def recalcular_provisiones(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.recalcular_provisiones(db, id, current_user)

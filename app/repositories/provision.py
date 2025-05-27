@@ -47,8 +47,6 @@ def create_provision(
         moneda_id=data.moneda_id,
         tipo_cambio_moneda=data.tipo_cambio_moneda,
         fecha_cambio_moneda=data.fecha_cambio_moneda,
-        # En caso de ser movimiento de anticipo
-        anticipo_id=data.anticipo_id,
         # En caso de ser movimiento de complemento o descuento
         complemento_id=data.complemento_id,
         descuento_id=data.descuento_id,

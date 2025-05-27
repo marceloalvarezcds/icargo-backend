@@ -82,6 +82,7 @@ class OrdenCargaBaseModel(BaseModel):
     # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
     merma_propietario_valor: Optional[RoundedDecimal] = None
+    merma_propietario_valor_ml: Optional[RoundedDecimal] = None
     merma_propietario_moneda_id: Optional[int] = None
     merma_propietario_es_porcentual: Optional[bool] = False
     merma_propietario_tolerancia: Optional[RoundedDecimal] = None
