@@ -414,15 +414,20 @@ def edit_monto_movimiento(
     obj: Movimiento,
     db: Session,
     monto: Decimal,
+    monto_ml: Decimal,
     detalle: str,
     moneda_id: Optional[int],
+    tipo_cambio_moneda: Optional[Decimal],
     gestor_carga_id: int,
     modified_by: str,
 ) -> Movimiento:
     obj.monto = monto
+    obj.monto_mon_local = monto_ml
     obj.detalle = detalle
     if moneda_id:
         obj.moneda_id = moneda_id
+    obj.tipo_cambio_moneda = tipo_cambio_moneda if tipo_cambio_moneda else 1
+    obj.fecha_cambio_moneda = datetime.now() if tipo_cambio_moneda else obj.fecha_cambio_moneda
     obj.gestor_carga_id = gestor_carga_id
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()

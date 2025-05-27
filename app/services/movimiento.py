@@ -768,19 +768,21 @@ def edit_movimiento_by_gestor_flete(
         OrdenCargaEditForm(
             condicion_gestor_carga_moneda_id=data.moneda_id,
             condicion_gestor_carga_tarifa=data.tarifa,
-            condicion_gestor_carga_tarifa_ml=data.tarifa,
+            condicion_gestor_carga_tarifa_ml=
+                ( data.tarifa * (data.tipo_cambio_moneda if data.tipo_cambio_moneda else 1 )),
         ),
         gestor_carga_id,
         modified_by,
     )
     moneda_id = data.moneda_id
     moneda = get_moneda_by_id(db, moneda_id)
-    monto = orden.resultado_gestor_carga_total_flete * -1
+    monto = orden.resultado_gestor_carga_total_flete_oc * -1
+    monto_ml = orden.resultado_gestor_carga_total_flete * -1
     unidad = orden.flete.condicion_gestor_cuenta_unidad
     tarifa = data.tarifa if data.tarifa else orden.flete_tarifa_gestor_carga
     detalle = get_flete_detalle(orden, tarifa, moneda, unidad)
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, monto_ml, detalle, moneda_id, data.tipo_cambio_moneda, gestor_carga_id, modified_by
     )
 
 
@@ -805,14 +807,17 @@ def edit_movimiento_by_gestor_merma(
             merma_gestor_carga_moneda_id=data.moneda_id,
             merma_gestor_carga_tolerancia=data.tolerancia,
             merma_gestor_carga_valor=data.valor,
-            merma_gestor_carga_valor_ml=data.valor,
+            merma_gestor_carga_valor_ml=(
+                data.valor * (data.tipo_cambio_moneda if data.tipo_cambio_moneda else 1 ))
         ),
         gestor_carga_id,
         modified_by,
     )
     moneda_id = data.moneda_id
     moneda = get_moneda_by_id(db, moneda_id)
+    #falta merma moneda original
     monto = orden.resultado_gestor_carga_merma_valor_total
+    monto_ml = orden.resultado_gestor_carga_merma_valor_total
     valor = data.valor if data.valor else orden.merma_gestor_carga_valor
     tolerancia = data.tolerancia if data.valor else orden.merma_gestor_carga_tolerancia
     es_porcentual = (
@@ -827,7 +832,7 @@ def edit_movimiento_by_gestor_merma(
         orden.flete.merma_gestor_cuenta_unidad,
     )
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, monto_ml, detalle, moneda_id, data.tipo_cambio_moneda, gestor_carga_id, modified_by
     )
 
 
@@ -850,19 +855,20 @@ def edit_movimiento_by_propietario_flete(
         OrdenCargaEditForm(
             condicion_propietario_moneda_id=data.moneda_id,
             condicion_propietario_tarifa=data.tarifa,
-            condicion_propietario_tarifa_ml=data.tarifa,
+            condicion_propietario_tarifa_ml=( data.tarifa * ( data.tipo_cambio_moneda if data.tipo_cambio_moneda else 1) ),
         ),
         gestor_carga_id,
         modified_by,
     )
     moneda_id = data.moneda_id
     moneda = get_moneda_by_id(db, moneda_id)
-    monto = orden.resultado_propietario_total_flete
+    monto = orden.resultado_propietario_total_flete_oc
+    monto_ml = orden.resultado_propietario_total_flete
     unidad = orden.flete.condicion_propietario_unidad
     tarifa = data.tarifa if data.tarifa else orden.flete_tarifa
     detalle = get_flete_detalle(orden, tarifa, moneda, unidad)
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, monto_ml, detalle, moneda_id, data.tipo_cambio_moneda, gestor_carga_id, modified_by
     )
 
 
@@ -887,14 +893,17 @@ def edit_movimiento_by_propietario_merma(
             merma_propietario_moneda_id=data.moneda_id,
             merma_propietario_tolerancia=data.tolerancia,
             merma_propietario_valor=data.valor,
-            merma_propietario_valor_ml=data.valor,
+            merma_propietario_valor_ml=(
+                data.valor * (data.tipo_cambio_moneda if data.tipo_cambio_moneda else 1 )),
         ),
         gestor_carga_id,
         modified_by,
     )
     moneda_id = data.moneda_id
     moneda = get_moneda_by_id(db, moneda_id)
+    #falta merma moneda original
     monto = orden.resultado_propietario_merma_valor_total * -1
+    monto_ml = orden.resultado_propietario_merma_valor_total * -1
     valor = data.valor if data.valor else orden.merma_propietario_valor
     tolerancia = data.tolerancia if data.valor else orden.merma_propietario_tolerancia
     es_porcentual = (
@@ -909,7 +918,7 @@ def edit_movimiento_by_propietario_merma(
         orden.flete.merma_propietario_unidad,
     )
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, monto_ml, detalle, moneda_id, data.tipo_cambio_moneda, gestor_carga_id, modified_by
     )
 
 
