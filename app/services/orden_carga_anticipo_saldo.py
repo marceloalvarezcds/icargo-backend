@@ -279,11 +279,11 @@ def update_orden_carga_anticipo_saldo(
         else oc_monto_disponible
     )
 
-    if saldo < 0:
-        raise HTTPException(
-            status_code=400,
-            detail="Saldo insuficiente para realizar el retiro.",
-        )
+    # if saldo < 0:
+    #     raise HTTPException(
+    #         status_code=400,
+    #         detail="Saldo insuficiente para realizar el retiro.",
+    #     )
 
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, flete_anticipo_id, orden_carga_id
