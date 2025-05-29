@@ -377,14 +377,7 @@ def borrar_provisiones_by_conciliacion_oc(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ):
-    logger.info('#################################')
-    logger.info('#################################')
-    logger.info('#################################')
     db.query(Provision).filter(Provision.orden_carga_id == orden_carga.id).delete()
-    logger.info('#################################')
-    logger.info('#################################')
-    logger.info('#################################')
-    logger.info('#################################')
     db.commit()
 
 def create_provision(

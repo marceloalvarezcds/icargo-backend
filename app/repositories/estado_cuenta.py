@@ -1097,22 +1097,23 @@ def get_provision_proveedor_pdv(db: Session) -> Query:
         )
         .join(Provision.proveedor)
         .join(Provision.tipo_contraparte)
-        .outerjoin(Provision.anticipo)
-        .outerjoin(PuntoVenta, or_(
-            OrdenCargaAnticipoRetirado.punto_venta_id == PuntoVenta.id,
-            PuntoVenta.id == case(
-                (
+        #.outerjoin(Provision.anticipo)
+        .outerjoin(PuntoVenta,
+        #    or_(
+        #    OrdenCargaAnticipoRetirado.punto_venta_id == PuntoVenta.id,
+            PuntoVenta.id == Provision.punto_venta_id,)
+        #       case(
+        #        (#
 
-                    Provision.punto_venta_id == null(),
-                    OrdenCargaAnticipoRetirado.punto_venta_id,
-                ),
-                    else_=Provision.punto_venta_id,
-            )
-            )
-        )
+        #            Provision.punto_venta_id == null(),
+        #            OrdenCargaAnticipoRetirado.punto_venta_id,
+        #        ),
+        #            else_=Provision.punto_venta_id,
+        #    )
+        #    )
+        #)
         .filter(
             or_(
-                Provision.anticipo_id != None,
                 Provision.punto_venta_id != None
             )
         )

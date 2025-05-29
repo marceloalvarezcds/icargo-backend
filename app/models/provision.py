@@ -19,7 +19,6 @@ from .chofer import Chofer
 from .gestor_carga import GestorCarga
 from .moneda import Moneda
 from .orden_carga import OrdenCarga
-from .orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 from .orden_carga_complemento import OrdenCargaComplemento
 from .orden_carga_descuento import OrdenCargaDescuento
 from .propietario import Propietario
@@ -61,13 +60,11 @@ class Provision(AuditMixin, Base):
     moneda = relationship(Moneda, uselist=False)
     tipo_cambio_moneda = Column(Numeric(38, 10))
     fecha_cambio_moneda = Column(DateTime)
-    # En caso de ser movimiento de anticipo
-    anticipo_id = Column(Integer, ForeignKey("orden_carga_anticipo_retirado.id"))
-    anticipo = relationship(OrdenCargaAnticipoRetirado, uselist=False)
+
     # En caso de ser movimiento de complemento o descuento
-    complemento_id = Column(Integer, ForeignKey("orden_carga_complemento.id"))
+    complemento_id = Column(Integer, ForeignKey("orden_carga_complemento.id", onupdate="CASCADE", ondelete="CASCADE"))
     complemento = relationship(OrdenCargaComplemento, uselist=False)
-    descuento_id = Column(Integer, ForeignKey("orden_carga_descuento.id"))
+    descuento_id = Column(Integer, ForeignKey("orden_carga_descuento.id", onupdate="CASCADE", ondelete="CASCADE"))
     descuento = relationship(OrdenCargaDescuento, uselist=False)
     # IDs para referencia a las tablas de las contraparte
     chofer_id = Column(Integer, ForeignKey("chofer.id"))

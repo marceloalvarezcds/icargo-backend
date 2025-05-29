@@ -708,12 +708,26 @@ def finalizar_orden_carga(
     return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
+def recalcular_provisiones(db: Session, id: int, current_user: schemas.AuthUser) -> schemas.OrdenCarga:
+    obj = get_orden_carga_by_id(db, id)
+    #primero borramos todas las proviciones
+    borrar_provisiones_by_conciliacion_oc(
+        db, obj, current_user.gestor_carga_id, current_user.username
+    )
+    #segundo recreamos proviciones
+    create_provision_by_finalizar_oc(
+        db, obj, current_user.gestor_carga_id, current_user.username
+    )
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
+
+
+
 def liquidar_orden_carga(
     db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.liquidar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user.id)
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
 def send_oc_mail(db: Session, id: int):

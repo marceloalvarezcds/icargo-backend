@@ -60,6 +60,7 @@ class MovimientoForm(MovimientoBaseModel):
 class MovimientoFleteEditForm(BaseModel):
     moneda_id: Optional[int] = None
     tarifa: Optional[RoundedDecimal] = None
+    tipo_cambio_moneda: Optional[RoundedDecimal] = None
 
 
 class MovimientoMermaEditForm(BaseModel):
@@ -67,6 +68,7 @@ class MovimientoMermaEditForm(BaseModel):
     moneda_id: Optional[int] = None
     es_porcentual: Optional[bool] = False
     tolerancia: Optional[RoundedDecimal] = None
+    tipo_cambio_moneda: Optional[RoundedDecimal] = None
 
 
 class Movimiento(MovimientoBaseModel):
