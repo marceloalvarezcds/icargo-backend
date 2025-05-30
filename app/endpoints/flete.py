@@ -99,7 +99,7 @@ def cancel_flete_by_id(
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.FLETE)),  # noqa: B008
 ):
     return services.change_flete_status(
-        db, id, EstadoEnum.INACTIVO, current_user.username
+        db, id, EstadoEnum.CANCELADO, current_user.username
     )
 
 
@@ -147,3 +147,14 @@ async def read_flete_by_id(
     _: bool = Depends(Permiso(a.VER, m.FLETE)),  # noqa: B008
 ):
     return services.get_flete_detail_by_id(db, id)
+
+
+@api.put("/{id}/cantidad", response_model=schemas.Flete)
+async def update_flete_cantidad(
+    id: int,
+    data: schemas.FleteCantidadUpdate,
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.EDITAR, m.FLETE)),
+):
+    return services.update_flete_cantidad(id, data.condicion_cantidad, db, current_user.username)

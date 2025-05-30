@@ -50,6 +50,7 @@ class Flete(AuditMixin, Base):
     es_subasta = Column(Boolean, server_default=text("false"))
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     saldo = Column(Numeric(38, 10))
+    cargado = Column(Numeric(38, 10), nullable=True)
     # INICIO Tramo de Fletes
     origen_id = Column(Integer, ForeignKey("centro_operativo.id"))
     origen = relationship(CentroOperativo, uselist=False, foreign_keys=[origen_id])

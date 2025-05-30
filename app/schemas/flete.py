@@ -35,6 +35,7 @@ class FleteFormBaseModel(BaseModel):
     # INICIO Cantidad y Flete
     condicion_cantidad: RoundedDecimal
     saldo: Optional[RoundedDecimal]
+    cargado: Optional[RoundedDecimal]
     # inicio - Condiciones para el Gestor de Carga
     condicion_gestor_carga_moneda_id: int
     condicion_gestor_carga_tarifa: RoundedDecimal
@@ -140,6 +141,7 @@ class FleteList(FleteFormBaseModel):
     id: int
     remitente_nombre: str
     producto_descripcion: str
+    is_in_orden_carga: bool
     tipo_carga_descripcion: Optional[str] = None
     publicado_descripcion: str
     estado: EstadoEnum
@@ -182,3 +184,7 @@ class FleteList(FleteFormBaseModel):
     class Config:
         orm_mode = True
         use_enum_values = True
+
+
+class FleteCantidadUpdate(BaseModel):
+    condicion_cantidad: RoundedDecimal

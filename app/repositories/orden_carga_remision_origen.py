@@ -4,8 +4,11 @@ from typing import List, Optional
 from sqlalchemy.orm import Session  # type: ignore
 
 from app.models import OrdenCargaRemisionOrigen
+from app.models.flete import Flete
+from app.models.orden_carga import OrdenCarga
 from app.schemas import OrdenCargaRemisionOrigenForm
 from app.logger import logger
+from sqlalchemy import func
 
 def get_orden_carga_remision_origen_list_by_orden_carga_id(
     db: Session, orden_carga_id: int
@@ -55,6 +58,26 @@ def create_orden_carga_remision_origen(
     db.add(obj)
     db.commit()
     db.refresh(obj)
+
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == data.orden_carga_id).first()
+    if orden_carga and orden_carga.flete_id:
+        flete = db.query(Flete).filter(Flete.id == orden_carga.flete_id).first()
+        if flete:
+            diferencia = orden_carga.cantidad_nominada - data.cantidad  # nominada - remisionada
+            flete.saldo += diferencia  # se devuelve al saldo
+
+            # Calcular la suma total de remisiones asociadas al flete
+            total_remisionado = (
+                db.query(func.sum(OrdenCargaRemisionOrigen.cantidad))
+                .join(OrdenCarga, OrdenCargaRemisionOrigen.orden_carga_id == OrdenCarga.id)
+                .filter(OrdenCarga.flete_id == flete.id)
+                .scalar()
+            ) or 0
+
+            flete.cargado = total_remisionado
+            db.add(flete)
+            db.commit()
+
     return obj
 
 
@@ -92,7 +115,7 @@ def delete_orden_carga_remision_origen(db: Session, id: int, modified_by: str):
 def get_remision_origen_list_by_nro_remito(
     db: Session, nro_remito: Optional[str] = None
 ) -> List[OrdenCargaRemisionOrigen]:
-    
+
     if nro_remito:
         return (
             db.query(OrdenCargaRemisionOrigen)

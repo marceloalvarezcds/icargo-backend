@@ -27,7 +27,7 @@ from .estado_cuenta import ( # noqa
     ContraparteEstadoCuenta
 )
 from .factura import Factura, FacturaForm  # noqa
-from .flete import Flete, FleteForm, FleteList  # noqa
+from .flete import Flete, FleteForm, FleteList, FleteCantidadUpdate  # noqa
 from .flete_anticipo import FleteAnticipo, FleteAnticipoForm  # noqa
 from .flete_complemento import FleteComplemento, FleteComplementoForm  # noqa
 from .flete_descuento import FleteDescuento, FleteDescuentoForm  # noqa

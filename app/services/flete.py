@@ -63,6 +63,30 @@ def get_flete_detail_by_id(db: Session, id: int) -> schemas.FleteList:
     return get_flete_by_id(db, id)
 
 
+def update_flete_cantidad(
+    id: int,
+    condicion_cantidad: int,
+    db: Session,
+    modified_by: str,
+) -> schemas.Flete:
+    obj = get_flete_by_id(db, id)
+
+    # Calcular diferencia entre nueva y original
+    diferencia = condicion_cantidad - obj.condicion_cantidad
+
+    # Actualizar la cantidad
+    obj.condicion_cantidad = condicion_cantidad
+
+    # Ajustar el saldo sumando la diferencia
+    obj.saldo += diferencia
+
+    obj.modified_by = modified_by
+    db.commit()
+    db.refresh(obj)
+    return get_flete_detail(obj)
+
+
+
 def edit_flete(
     id: int,
     db: Session,

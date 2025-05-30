@@ -211,6 +211,14 @@ def create_orden_carga(
     condicion_propietario_tarifa_ml = (
         flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / flete.condicion_propietario_unidad_conversion
     )
+    # Validar que la cantidad nominada no supere el saldo del flete
+    if data.cantidad_nominada > flete.saldo:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"La cantidad nominada ({data.cantidad_nominada}) supera el saldo disponible del flete ({flete.saldo})."
+            )
+        )
 
     obj = repositories.create_orden_carga(
         db,
@@ -232,6 +240,11 @@ def create_orden_carga(
 
     if estado_inicial in [EstadoEnum.ACEPTADO, EstadoEnum.NUEVO]:
         flete.saldo -= data.cantidad_nominada
+        if flete.cargado is None:
+            flete.cargado = 0
+        #  Sumar la cantidad nominada al cargado acumulado
+        flete.cargado += data.cantidad_nominada
+
         db.add(flete)
         db.commit()
 
@@ -241,7 +254,6 @@ def create_orden_carga(
     create_complementos_and_descuentos(db, obj, flete, modified_by)
 
     return get_orden_carga_with_resultado(db, obj, current_user.id)
-
 
 
 def create_orden_carga_comentarios_historial(
