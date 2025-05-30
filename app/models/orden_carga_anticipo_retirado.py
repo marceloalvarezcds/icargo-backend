@@ -9,12 +9,9 @@ from sqlalchemy import (  # type: ignore
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
-from app.schemas.movimiento import Movimiento
 from app.utils import number_format
-
 from .flete_anticipo import FleteAnticipo
 from .insumo_punto_venta_precio import InsumoPuntoVentaPrecio
 from .moneda import Moneda
@@ -66,6 +63,7 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     precio_unitario = Column(
         Numeric(38, 10)
     )  # No se usa para calcular los movimientos, solo para cargar por el momento
+    movimientos = relationship("Movimiento", back_populates="anticipo")
 
     @hybrid_property
     def concepto(self):
@@ -256,6 +254,11 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         primer_estado = next((movimiento.estado for movimiento in movimientos_filtrados), None)
 
         return primer_estado
+
+    @hybrid_property
+    def estado_movimiento_propietario(self):
+        movimiento_propietario = next((x for x in self.movimientos if x.propietario_id != None), None)
+        return movimiento_propietario.estado if movimiento_propietario else None
 
     @hybrid_property
     def monto_litro(self):

@@ -59,6 +59,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     unidad_abreviatura: Optional[str] = None
     unidad_descripcion: Optional[str] = None
     estados_movimientos: Optional[str] = None
+    estado_movimiento_propietario: Optional[str] = None
     monto_litro: Optional[RoundedDecimal] = None
 
     # Auditoría

@@ -133,6 +133,7 @@ def change_anticipo_status(
     if not co:
         raise HTTPException(status_code=404, detail="OrdenCargaAnticipoRetirado no encontrada")
 
+    # TODO: aca se esta estan actualizando dos veces el mismo registro
     co = repositories.change_anticipo_status(co, db, status, modified_by)
 
     movimiento = repositories.get_movimiento_by_anticipo_id(db, co.id)
