@@ -626,6 +626,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.merma_gestor_carga_valor_ml * self.resultado_gestor_carga_merma
 
     @hybrid_property
+    def resultado_gestor_carga_merma_valor_total_by_movimiento(self):
+        return self.merma_gestor_carga_valor * self.resultado_gestor_carga_merma
+
+    @hybrid_property
     def resultado_gestor_carga_merma_valor_total_moneda_local(self):
         return self.resultado_gestor_carga_merma_valor_total
 
@@ -714,6 +718,10 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_propietario_merma_valor_total(self):
         return self.merma_propietario_valor_ml * self.resultado_propietario_merma
+
+    @hybrid_property
+    def resultado_propietario_merma_valor_total_by_movimiento(self):
+        return self.merma_propietario_valor * self.resultado_propietario_merma
 
     @hybrid_property
     def resultado_propietario_merma_valor_total_moneda_local(self):

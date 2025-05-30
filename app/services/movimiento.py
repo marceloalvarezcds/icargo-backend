@@ -598,7 +598,7 @@ def create_movimiento_by_merma(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.merma_gestor_carga_detalle,
-            monto=orden_carga.resultado_gestor_carga_merma_valor_total,
+            monto=orden_carga.resultado_gestor_carga_merma_valor_total_by_movimiento,
             moneda_id=orden_carga.flete.merma_gestor_cuenta_moneda_id,
             tipo_cambio_moneda=tipo_cambio_moneda_gestor,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
@@ -622,7 +622,7 @@ def create_movimiento_by_merma(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.merma_propietario_detalle,
-            monto=-orden_carga.resultado_propietario_merma_valor_total,
+            monto=-orden_carga.resultado_propietario_merma_valor_total_by_movimiento,
             moneda_id=orden_carga.flete.merma_propietario_moneda_id,
             tipo_cambio_moneda=tipo_cambio_moneda_propietario,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
