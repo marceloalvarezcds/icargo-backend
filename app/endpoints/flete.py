@@ -122,6 +122,16 @@ def unpublish_flete_by_id(
 ):
     return services.change_flete_public_status(db, id, False, current_user.username)
 
+@api.get("/{id}/active/flete", response_model=schemas.Flete)
+def active_flete_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.FLETE)),  # noqa: B008
+):
+    return services.change_flete_status(
+        db, id, EstadoEnum.ACTIVO, current_user.username
+    )
 
 @api.get(
     "/destinatarios/{remitente_id}/{origen_id}/{destino_id}",
@@ -137,6 +147,17 @@ def read_flete_destinatario_list_by_id(
 ):
     return services.get_destinatario_list_by(
         db, remitente_id, origen_id, destino_id, current_user.gestor_carga_id
+    )
+
+@api.get("/{id}/inactive/flete", response_model=schemas.Flete)
+def inactive_flete_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.FLETE)),  # noqa: B008
+):
+    return services.change_flete_status(
+        db, id, EstadoEnum.INACTIVO, current_user.username
     )
 
 

@@ -151,8 +151,8 @@ def change_anticipo_status(
         )
 
         if saldo:
-            saldo.total_retirado -= co.monto_retirado
-            saldo.saldo += co.monto_retirado
+            saldo.total_retirado -= co.monto_mon_local
+            saldo.saldo += co.monto_mon_local
 
             db.commit()
             db.refresh(saldo)
@@ -161,7 +161,7 @@ def change_anticipo_status(
         camion = repositories.get_camion_by_orden_carga_id(db, co.orden_carga_id)
 
         if camion and camion.limite_monto_anticipos is not None:
-            camion.total_anticipos_retirados_en_estado_pendiente_o_en_proceso -= co.monto_retirado
+            camion.total_anticipos_retirados_en_estado_pendiente_o_en_proceso -= co.monto_mon_local
             camion.modified_by = modified_by
             camion.modified_at = datetime.now()
 

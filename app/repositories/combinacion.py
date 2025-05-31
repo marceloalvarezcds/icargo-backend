@@ -24,7 +24,7 @@ def get_combinacion_list(db: Session) -> List[Combinacion]:
     return (
         db.query(Combinacion)
         .filter(Combinacion.estado != EstadoEnum.ELIMINADO.value)
-        .order_by(Combinacion.id.desc()) 
+        .order_by(Combinacion.id.desc())
         .all()
     )
 
@@ -41,7 +41,7 @@ def get_combinacion_list_by_gestor_carga_id(
             ),
             Combinacion.estado != EstadoEnum.ELIMINADO.value,
         )
-        .order_by(Combinacion.id.desc()) 
+        .order_by(Combinacion.id.desc())
         .all()
     )
 
@@ -103,7 +103,7 @@ def get_camion_list_by_combinacion_id(
         .order_by(
             Combinacion.camion_id, Combinacion.semi_id
         )
-        
+
         .all()
     )
 
@@ -135,7 +135,7 @@ def get_semi_list_by_camion_id(
         .filter(
             and_(
                 # Combinacion.camion_id == camion_id,
-                
+
                 Combinacion.gestor_carga_id == gestor_carga_id,
                 Combinacion.estado != EstadoEnum.ELIMINADO.value,
             )
@@ -144,7 +144,7 @@ def get_semi_list_by_camion_id(
             Combinacion.camion_id, Combinacion.semi_id
         )
         .all()
-        
+
     )
 
 def get_semi_list_by_camion_id_null(
@@ -155,7 +155,7 @@ def get_semi_list_by_camion_id_null(
         .filter(
             and_(
                 # Combinacion.camion_id == camion_id,
-            
+
                 Combinacion.gestor_carga_id == gestor_carga_id,
                 Combinacion.estado != EstadoEnum.ELIMINADO.value,
             )
@@ -270,7 +270,7 @@ def get_combinacion_tracto_propietario_ids(
         Combinacion.camion_id == camion_id,
         Combinacion.gestor_carga_id == gestor_carga_id
     ).first()
-    
+
     # Verificamos si la combinación existe y si el propietario es diferente.
     if combinacion and combinacion.propietario_id != propietario_id:
         return combinacion
@@ -357,7 +357,7 @@ def change_combinacion_status(
             .where(Camion.id == obj.camion_id)
             .values(is_in_combinacion=False)
         )
-    
+
     db.commit()
     db.refresh(obj)
     return obj
@@ -386,11 +386,29 @@ def edit_combinacion(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Combinacion:
+    # Actualizar campos principales de la combinación
     combinacion.chofer_id = data.chofer_id
     combinacion.semi_id = data.semi_id
     combinacion.propietario_id = data.propietario_id
     combinacion.gestor_carga_id = gestor_carga_id
     combinacion.modified_by = modified_by
+
+    # Actualizar estado de "puede_recibir_anticipos" en propietario
+    if data.propietario_id is not None:
+        db.execute(
+            update(Propietario)
+            .where(Propietario.id == data.propietario_id)
+            .values(puede_recibir_anticipos=data.anticipo_propietario)
+        )
+
+    # Actualizar estado de "puede_recibir_anticipos" en chofer
+    if data.chofer_id is not None:
+        db.execute(
+            update(Chofer)
+            .where(Chofer.id == data.chofer_id)
+            .values(puede_recibir_anticipos=data.puede_recibir_anticipos)
+        )
+
     db.commit()
     db.refresh(combinacion)
     return combinacion
@@ -398,10 +416,10 @@ def edit_combinacion(
 
 def gestor_carga_tiene_permiso(gestor_carga_id: int, permiso_descripcion: str, db: Session) -> bool:
     gestor_carga = db.query(GestorCarga).filter_by(id=gestor_carga_id).first()
-    
+
     if not gestor_carga:
         return False
-    
+
     for rol in gestor_carga.roles:
         permiso = db.query(Permiso).filter_by(descripcion=permiso_descripcion).first()
         if permiso and permiso in rol.permisos:
@@ -413,7 +431,7 @@ def gestor_carga_tiene_permiso(gestor_carga_id: int, permiso_descripcion: str, d
 
 def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> bool:
     rol = db.query(Rol).filter_by(id=rol_id).first()
-    
+
     if not rol:
         return False
 
@@ -427,7 +445,7 @@ def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> boo
 
 def get_rol_id_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> Optional[int]:
     rol = db.query(Rol).filter_by(gestor_carga_id=gestor_carga_id).first()
-  
+
     return rol.id if rol else None
 
 
@@ -480,7 +498,7 @@ def create_combinacion(
         )
 
     db.commit()
-    
+
     # Actualizar datos de otros relacionados
     db.execute(
         update(Propietario)
@@ -495,6 +513,6 @@ def create_combinacion(
         .values(puede_recibir_anticipos=data.puede_recibir_anticipos)
     )
     db.commit()
-    
+
     return combinacion
 
