@@ -80,10 +80,12 @@ def edit_flete_descuento(
     obj.habilitar_pago_proveedor = data.habilitar_pago_proveedor
     # INICIO Monto a cobrar al Propietario
     obj.propietario_monto = data.propietario_monto
+    obj.propietario_monto_ml=data.propietario_monto_ml,
     obj.propietario_moneda_id = data.propietario_moneda_id
     # FIN Monto a cobrar al Propietario
     # INICIO Monto a pagar al Proveedor
     obj.proveedor_monto = data.proveedor_monto
+    obj.proveedor_monto_ml=data.proveedor_monto_ml,
     obj.proveedor_moneda_id = data.proveedor_moneda_id
     obj.proveedor_id = data.proveedor_id
     # FIN Monto a pagar al Proveedor

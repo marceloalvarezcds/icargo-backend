@@ -191,7 +191,6 @@ def get_total_complemento(complementos: List[OrdenCargaComplemento], es_efectivo
         return 0
 
 
-
 def edit_orden_carga_anticipo_saldo(
     id: int,
     db: Session,
@@ -358,7 +357,7 @@ def update_orden_carga_anticipo_saldo_by_form(
     )
 
     if flete_anticipo.tipo_descripcion == enums.TipoAnticipoEnum.INSUMOS.value:
-        monto_retirado = data.monto_retirado - last_monto_retirado
+        monto_retirado = data.monto_mon_local - last_monto_retirado
     else:
         monto_retirado = data.monto_mon_local - last_monto_retirado
 

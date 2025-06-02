@@ -796,7 +796,7 @@ class OrdenCarga(AuditMixin, Base):
         for anticipo in lista:
             if not self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
                 if anticipo.concepto == 'COMBUSTIBLE':
-                    total_combustible += anticipo.monto_retirado
+                    total_combustible += anticipo.monto_mon_local
         return total_combustible
 
     @hybrid_property
@@ -806,7 +806,7 @@ class OrdenCarga(AuditMixin, Base):
         for anticipo in lista:
             if not self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
                 if anticipo.concepto == 'LUBRICANTES':
-                    total_lubricantes += anticipo.monto_retirado
+                    total_lubricantes += anticipo.monto_mon_local
         return total_lubricantes
 
 
