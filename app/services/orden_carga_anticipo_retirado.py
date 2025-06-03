@@ -133,10 +133,16 @@ def change_anticipo_status(
     if not co:
         raise HTTPException(status_code=404, detail="OrdenCargaAnticipoRetirado no encontrada")
 
-    # TODO: aca se esta estan actualizando dos veces el mismo registro
-    co = repositories.change_anticipo_status(co, db, status, modified_by)
-
     movimiento = repositories.get_movimiento_by_anticipo_id(db, co.id)
+
+    # No permitir anular si el movimiento tiene liquidacion_id distinto de None
+    if movimiento and movimiento.liquidacion_id is not None:
+        raise HTTPException(
+            status_code=400,
+            detail=f"No se puede anular el anticipo porque se encuentra en una liquidacion (liquidacion_id = {movimiento.liquidacion_id})."
+        )
+
+    co = repositories.change_anticipo_status(co, db, status, modified_by)
 
     if movimiento:
         movimiento.estado = status.value
@@ -157,7 +163,6 @@ def change_anticipo_status(
             db.commit()
             db.refresh(saldo)
 
-        # Solo si el camión tiene límite de anticipos
         camion = repositories.get_camion_by_orden_carga_id(db, co.orden_carga_id)
 
         if camion and camion.limite_monto_anticipos is not None:
@@ -167,7 +172,9 @@ def change_anticipo_status(
 
             db.commit()
             db.refresh(camion)
+
     return co
+
 
 
 
