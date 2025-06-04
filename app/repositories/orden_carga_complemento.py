@@ -60,10 +60,12 @@ def edit_orden_carga_complemento(
     obj.anticipado = data.anticipado
     # INICIO Monto a pagar al Propietario
     obj.propietario_monto = data.propietario_monto
+    obj.propietario_monto_ml = data.propietario_monto_ml
     obj.propietario_moneda_id = data.propietario_moneda.id
     # FIN Monto a pagar al Propietario
     # INICIO Monto a cobrar al Remitente
     obj.remitente_monto = data.remitente_monto
+    obj.remitente_monto_ml = data.remitente_monto_ml
     obj.remitente_moneda_id = (
         data.remitente_moneda.id if data.remitente_moneda else None
     )

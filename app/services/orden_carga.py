@@ -1070,20 +1070,34 @@ def update_complementos_y_descuentos_oc(
         raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
 
     flete_viejo_id = orden_carga.flete_id
-    if not flete_viejo_id:
+
+    if flete_viejo_id == nuevo_flete_id:
+        # No hay cambio de flete, no hacer nada
+        # print("Flete no cambió. No se actualizan complementos ni descuentos.")
         return
 
-    # Eliminar los complementos de OC que provienen del flete viejo
-    db.query(OrdenCargaComplemento).filter(
+    # Eliminar complementos y descuentos SOLO si el viejo tenía alguno
+    tiene_complementos_viejos = db.query(OrdenCargaComplemento).filter(
         OrdenCargaComplemento.orden_carga_id == orden_carga_id,
         OrdenCargaComplemento.flete_id == flete_viejo_id
-    ).delete(synchronize_session=False)
+    ).count() > 0
 
-    # Eliminar los descuentos de OC que provienen del flete viejo
-    db.query(OrdenCargaDescuento).filter(
+    tiene_descuentos_viejos = db.query(OrdenCargaDescuento).filter(
         OrdenCargaDescuento.orden_carga_id == orden_carga_id,
         OrdenCargaDescuento.flete_id == flete_viejo_id
-    ).delete(synchronize_session=False)
+    ).count() > 0
+
+    if tiene_complementos_viejos:
+        db.query(OrdenCargaComplemento).filter(
+            OrdenCargaComplemento.orden_carga_id == orden_carga_id,
+            OrdenCargaComplemento.flete_id == flete_viejo_id
+        ).delete(synchronize_session=False)
+
+    if tiene_descuentos_viejos:
+        db.query(OrdenCargaDescuento).filter(
+            OrdenCargaDescuento.orden_carga_id == orden_carga_id,
+            OrdenCargaDescuento.flete_id == flete_viejo_id
+        ).delete(synchronize_session=False)
 
     db.commit()
 
@@ -1092,35 +1106,39 @@ def update_complementos_y_descuentos_oc(
         raise HTTPException(status_code=404, detail="Nuevo flete no encontrado")
 
     for anticipo in nuevo_flete.anticipos:
-        if anticipo.tipo_insumo_id in [1, 2]:  # Puedes ajustar el tipo de anticipo si es necesario
-            print(f"Calculando saldo con anticipo_id={anticipo.id}")
-
-            # Aquí calculas el saldo del anticipo para este nuevo flete
+        if anticipo.tipo_insumo_id in [1, 2]:
             saldo_anticipo = get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
                 db, anticipo.id, orden_carga_id, modified_by
             )
-            print(f"Saldo del anticipo: {saldo_anticipo}")
+            # print(f"Saldo del anticipo: {saldo_anticipo}")
 
+    # Crear complementos y descuentos del nuevo flete
     change_flete_create_complementos_and_descuentos(db, orden_carga, nuevo_flete, modified_by)
 
     db.commit()
 
 
-
 def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, current_user: schemas.AuthUser) -> schemas.RecalculoCondicionesResponse:
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
+    if not orden_carga:
+        return
+
+    # Solo recalcular si el flete es diferente al actual
+    if orden_carga.flete_id == flete_id:
+        return
+
     flete = repositories.get_flete_by_id(db, flete_id)
     if not flete:
-        raise HTTPException(status_code=404, detail="Flete no encontrado")
+        return
 
     gestor_carga_id = current_user.gestor_carga_id
     moneda_gc = get_moneda_by_gestor_carga(db, gestor_carga_id)
     if not moneda_gc:
-        raise HTTPException(status_code=404, detail="Moneda del gestor no encontrada")
+        return
 
     flete_anticipo = flete.anticipos[0] if flete.anticipos else None
     if not flete_anticipo:
-        raise HTTPException(status_code=404, detail="No se encontró anticipo asociado al flete")
-
+        return
 
     cot_gc_cond = get_cotizacion_moneda(db, flete.condicion_gestor_carga_moneda_id, gestor_carga_id)
     cot_prop_cond = get_cotizacion_moneda(db, flete.condicion_propietario_moneda_id, gestor_carga_id)
@@ -1142,11 +1160,8 @@ def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, curr
         flete.merma_propietario_valor * cot_prop_merma.cotizacion_moneda / cot_destino.cotizacion_moneda
     )
 
-    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
-
-    if not orden_carga:
-        raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
-
+    # Actualizar flete en la orden de carga
+    orden_carga.flete_id = flete_id
     orden_carga.condicion_gestor_carga_tarifa_ml = condicion_gestor_carga_tarifa_ml
     orden_carga.condicion_propietario_tarifa_ml = condicion_propietario_tarifa_ml
     orden_carga.merma_gestor_carga_valor_ml = merma_gestor_carga_valor_ml
@@ -1155,8 +1170,13 @@ def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, curr
     db.commit()
     db.refresh(orden_carga)
 
-    # Agregado: actualizar complementos y descuentos según el nuevo flete
-    update_complementos_y_descuentos_oc(db=db, orden_carga_id=orden_carga_id, nuevo_flete_id=flete_id, modified_by=current_user.username)
+    # Actualizar complementos y descuentos según el nuevo flete
+    update_complementos_y_descuentos_oc(
+        db=db,
+        orden_carga_id=orden_carga_id,
+        nuevo_flete_id=flete_id,
+        modified_by=current_user.username
+    )
 
     return schemas.RecalculoCondicionesResponse(
         condicion_gestor_carga_tarifa_ml=orden_carga.condicion_gestor_carga_tarifa_ml,
@@ -1164,4 +1184,3 @@ def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, curr
         merma_gestor_carga_valor_ml=orden_carga.merma_gestor_carga_valor_ml,
         merma_propietario_valor_ml=orden_carga.merma_propietario_valor_ml,
     )
-

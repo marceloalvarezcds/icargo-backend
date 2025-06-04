@@ -9,6 +9,8 @@ from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+from typing import Optional
+
 
 api = APIRouter()
 
@@ -423,7 +425,7 @@ async def read_orden_carga_list_by_id(
     return services.get_orden_carga_list_detail(db, id, current_user)
 
 
-@api.get("/orden-carga/recalcular-condiciones/{flete_id}/{orden_carga_id}", response_model=schemas.RecalculoCondicionesResponse)
+@api.get("/orden-carga/recalcular-condiciones/{flete_id}/{orden_carga_id}", response_model=Optional[schemas.RecalculoCondicionesResponse])
 async def read_recalculo_condiciones(
     flete_id: int,
     orden_carga_id: int,

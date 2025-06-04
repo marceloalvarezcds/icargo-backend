@@ -139,7 +139,7 @@ def change_anticipo_status(
     if movimiento and movimiento.liquidacion_id is not None:
         raise HTTPException(
             status_code=400,
-            detail=f"No se puede anular el anticipo porque se encuentra en una liquidacion (liquidacion_id = {movimiento.liquidacion_id})."
+            detail=f"No se puede anular el anticipo porque se encuentra en una liquidación"
         )
 
     co = repositories.change_anticipo_status(co, db, status, modified_by)
