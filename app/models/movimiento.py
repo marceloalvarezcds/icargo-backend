@@ -129,6 +129,10 @@ class Movimiento(AuditMixin, Base):
         return self.credito - self.debito
 
     @hybrid_property
+    def saldo_ml(self):
+        return self.credito_ml - self.debito_ml
+
+    @hybrid_property
     def camion_placa(self):
         return self.orden_carga.camion_placa if self.orden_carga else None
 

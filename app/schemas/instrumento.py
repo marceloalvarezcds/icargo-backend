@@ -6,6 +6,7 @@ from app.enums import EstadoEnum, OperacionEstadoEnum
 
 from .date_model import Date
 from .rounded_decimal_model import RoundedDecimal
+from .moneda import Moneda
 
 
 class InstrumentoFormBaseModel(BaseModel):
@@ -25,6 +26,7 @@ class InstrumentoForm(InstrumentoFormBaseModel):
     tipo_instrumento_id: Optional[int]
     liquidacion_id: Optional[int]
     monto: RoundedDecimal
+    monto_ml: Optional[RoundedDecimal]
     saldo_cc: Optional[RoundedDecimal]
     tipo_cambio_moneda: RoundedDecimal
     moneda_id: int
@@ -59,6 +61,9 @@ class Instrumento(InstrumentoSaldoForm):
     tipo_contraparte_descripcion: str
     tipo_instrumento_descripcion: str
     tipo_operacion_descripcion: str
+    moneda: Optional[Moneda]
+    tipo_cambio_moneda: Optional[RoundedDecimal]
+
     url: str
     via_descripcion: str
     # Auditoría

@@ -74,6 +74,7 @@ class Liquidacion(LiquidacionForm):
     moneda: Moneda
     comentarios: Optional[str]
     movimientos: List[Movimiento]
+    movimientos_activos: List[Movimiento]
     instrumentos: List[Instrumento]
     facturas: List[Factura]
     # Campos calculados

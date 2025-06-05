@@ -97,6 +97,7 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
                 literal_column("false").label("documento_fisico"),
                 Moneda.simbolo.label("moneda"),
                 Provision.tipo_cambio_moneda.label("tipo_cambio_moneda"),
+                Provision.monto.label("monto"),
                 case(
                     (
                         Provision.moneda_id == 1,

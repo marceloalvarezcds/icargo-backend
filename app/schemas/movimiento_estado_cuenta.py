@@ -37,6 +37,7 @@ class MovimientoEstadoCuenta(BaseModel):
     documento_fisico: Optional[bool]
     moneda: Optional[str]
     tipo_cambio_moneda: Optional[RoundedDecimal]
+    monto: RoundedDecimal
     provision: Optional[RoundedDecimal]
     pendiente: RoundedDecimal
     en_proceso: RoundedDecimal

@@ -711,6 +711,7 @@ def get_all_movimiento_instrumento_estado_cuenta_list(
 
 def get_cols_estado_cuenta_case_statement(mon_local_id:int) -> tuple:
     return (
+        Movimiento.monto.label("monto"),
         literal_column("0").label("provision"),
         case(
             (
