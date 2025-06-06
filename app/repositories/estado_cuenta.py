@@ -5,7 +5,7 @@ from sqlalchemy.sql.functions import concat  # type: ignore
 from sqlalchemy.engine.row import Row  # type: ignore
 from sqlalchemy.orm import Query, Session, aliased  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
-from app.enums import EstadoEnum, LiquidacionEstadoEnum,TipoContraparteEnum
+from app.enums import EstadoEnum, LiquidacionEstadoEnum,TipoContraparteEnum, OperacionEstadoEnum
 from app.models import (
     Chofer,
     Instrumento,
@@ -896,7 +896,13 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             #    ),
                 #else_= (Instrumento.credito + Instrumento.provision)
              #   else_= (Instrumento.monto_ml)
-            Instrumento.monto_ml.label("finalizado"),
+             case(
+                (
+                    Instrumento.operacion_estado  != OperacionEstadoEnum.RECHAZADO.value,
+                    Instrumento.monto_ml
+                ),
+                else_=literal_column("0")
+            ).label("finalizado"),
         )\
         .join(Instrumento.liquidacion)\
         .join(Instrumento.via)\
