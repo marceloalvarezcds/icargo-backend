@@ -345,6 +345,12 @@ def add_instrumentos(
     modified_by: str,
 ) -> Liquidacion:
     saldo_residual = 0  # TODO: obtener de lo que viene del front
+
+    if len(data.instrumentos) == 0:
+        raise HTTPException(
+            status_code=409, detail="Debe elegir al menos un instrumento"
+        )
+
     if int(saldo_residual) == 0:
         obj = get_liquidacion_by_id(db, id)
         obj = repositories.change_liquidacion_status(
