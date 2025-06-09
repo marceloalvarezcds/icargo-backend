@@ -240,3 +240,5 @@ async def someter(
     _: bool = Depends(Permiso(a.CREAR, m.LIQUIDACION)),  # noqa: B008
 ):
     return services.someter_liquidacion(db, id, data, current_user)
+
+
