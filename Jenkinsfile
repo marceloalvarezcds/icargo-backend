@@ -5,8 +5,8 @@ node('linux-docker') {
     def REGISTRY_IMAGE_URL="registry.gitlab.com/cds.py/icargo/icargo-v1/icargo-backend";
 
     def MAIN_WEBHOOKS_URL="http://51.159.176.45:19988";
-    def TESTING_WEBHOOKS_URL="http://163.172.182.37:19987";
-    def DESARROLLO_WEBHOOKS_URL="http://163.172.182.37:19988";
+    def TESTING_WEBHOOKS_URL="http://163.172.182.37:19988";
+    def DESARROLLO_WEBHOOKS_URL="http://163.172.182.37:19987";
 
     stage('Preparation') {
         checkout scm;
