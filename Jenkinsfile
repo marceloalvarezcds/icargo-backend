@@ -22,7 +22,7 @@ node('linux-docker') {
 
     try {
         stage('Docker build') {
-            if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'testing' || env.BRANCH_NAME == 'desarrollo') {
+            if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'testing' || env.BRANCH_NAME == 'develop') {
                 def imageName = "${REGISTRY_IMAGE_URL}:${env.BRANCH_NAME}";
 
                 docker.withRegistry('https://registry.gitlab.com', 'dante_jenkins') {
@@ -59,14 +59,14 @@ node('linux-docker') {
             case 'testing':
                 sh "curl ${TESTING_WEBHOOKS_URL}/hooks/redeploy-icargo-backend-testing"
                 break;
-            case 'desarrollo':
-                sh "curl ${DESARROLLO_WEBHOOKS_URL}/hooks/redeploy-icargo-backend-desarrollo"
+            case 'develop':
+                sh "curl ${DESARROLLO_WEBHOOKS_URL}/hooks/redeploy-icargo-backend-develop"
                 break;
          }
     }
 
     stage('Final') {
-        if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'testing' || env.BRANCH_NAME == 'desarrollo') {
+        if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'testing' || env.BRANCH_NAME == 'develop') {
             withCredentials([string(credentialsId: 'telegramToken' , variable: 'TOKEN')]) {
                 withCredentials([string(credentialsId: 'telegramChatid' , variable: 'CHAT_ID')]) {
                     sh "curl --location --request POST 'https://api.telegram.org/bot$TOKEN/sendMessage' --form text='$JOB_NAME finished' --form chat_id='$CHAT_ID'"
