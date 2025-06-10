@@ -65,16 +65,16 @@ async def rol_tiene_permiso_cambiar_estado(
     db: Session,
     rol_id: int
 ) -> bool:
-   
+
     gestor_carga_rol = repositories.get_rol_list(db, rol_id)
     if not gestor_carga_rol:
-        return False 
-    
+        return False
+
     for permiso in gestor_carga_rol.permisos:
         if permiso.accion == "cambiar_estado":
             return True
 
-    return False  
+    return False
 
 
 ###################################
@@ -213,7 +213,7 @@ async def create_combinacion(
     combinacion_semi = repositories.get_combinacion_semi_ids(
         db, data.semi_id, gestor_carga_id
         )
-    
+
     if combinacion_tracto_propietario:
         raise HTTPException(
         status_code=409,
@@ -236,50 +236,55 @@ def edit_combinacion(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Combinacion:
-    # Verificar si la combinación existe
     combinacion_to_edit = db.query(Combinacion).filter(Combinacion.id == id).first()
     if not combinacion_to_edit:
         raise HTTPException(status_code=404, detail="Combinación no encontrada")
 
+    # Verificar combinaciones similares
     combinacion_exists = repositories.get_combinacion_by_ids(
         db, data.propietario_id, data.camion_id, data.chofer_id, gestor_carga_id
-        )
+    )
     combinacion_tracto = repositories.get_combinacion_tracto_ids(
         db, data.camion_id, gestor_carga_id
-        )
-    if combinacion_exists and combinacion_exists.estado != EstadoEnum.INACTIVO.value:
-        raise HTTPException(
-            status_code=409,
-            detail="Ya existe una combinación activa con el mismo chofer, semi y propietario."
-        )
-  
-    if (data.propietario_id != combinacion_to_edit.propietario_id or
-        data.camion_id != combinacion_to_edit.camion_id):
-        
-        # Verificar si ya existe otra combinación con el mismo camión y propietario
-        combinacion_tracto_propietario = db.query(Combinacion).filter(
-            Combinacion.camion_id == data.camion_id,
-            Combinacion.propietario_id == data.propietario_id,
-            Combinacion.estado != EstadoEnum.INACTIVO.value
-        ).first()
+    )
 
-        if combinacion_tracto_propietario:
+    # Permitir editar límites sin validar conflictos de combinación
+    solo_limites_modificados = (
+        data.limite_monto_anticipos is not None or
+        data.camion_oc_activa is not None
+    ) and not (
+        data.propietario_id != combinacion_to_edit.propietario_id or
+        data.camion_id != combinacion_to_edit.camion_id or
+        data.chofer_id != combinacion_to_edit.chofer_id or
+        data.semi_id != combinacion_to_edit.semi_id
+    )
+
+    if not solo_limites_modificados:
+        # Validaciones solo si cambian camión, propietario o chofer
+        if (data.propietario_id != combinacion_to_edit.propietario_id or
+            data.camion_id != combinacion_to_edit.camion_id):
+
+            combinacion_tracto_propietario = db.query(Combinacion).filter(
+                Combinacion.camion_id == data.camion_id,
+                Combinacion.propietario_id == data.propietario_id,
+                Combinacion.estado != EstadoEnum.INACTIVO.value
+            ).first()
+
+            if combinacion_tracto_propietario:
+                raise HTTPException(
+                    status_code=409,
+                    detail="El camión ya tiene un beneficiario asociado."
+                )
+
+        if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
             raise HTTPException(
                 status_code=409,
-                detail="El camión ya tiene un beneficiario asociado."
+                detail="La combinación de tracto ya existe para este gestor de carga."
             )
 
-    if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
-         raise HTTPException(
-             status_code=409,
-             detail="La combinación de tracto ya existe para este gestor de carga."
-         )
-    # if combinacion_tracto_propietario:
-    #     raise HTTPException(
-    #     status_code=409,
-    #     detail="El tracto puede tener un solo beneficiario."
-    # )
+    # Llamar al repositorio para editar la combinación
     return repositories.edit_combinacion(combinacion_to_edit, db, data, gestor_carga_id, modified_by)
+
 
 
 def get_combinacion_reports(db: Session) -> str:
@@ -287,7 +292,7 @@ def get_combinacion_reports(db: Session) -> str:
     wb = Workbook()
     # get worksheet
     ws = wb.active
-    
+
 
     title_cell = ws.cell(row=1, column=2)
     title_cell.value = "Estado"

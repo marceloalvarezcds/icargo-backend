@@ -9,7 +9,7 @@ from typing import List, Optional
 
 from app import schemas
 from app.models.gestor_carga import GestorCarga
-from app.schemas.combinacion import CombinacionCreateModel, CombinacionForm
+from app.schemas.combinacion import CombinacionCreateModel, CombinacionForm, CombinacionUpdate
 from app.models.permiso import Permiso
 from app.models.rol import Rol
 from app.models.propietario import Propietario
@@ -382,27 +382,37 @@ def get_combinacion_by(
 def edit_combinacion(
     combinacion: Combinacion,
     db: Session,
-    data,
+    data: CombinacionUpdate,
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Combinacion:
-    # Actualizar campos principales de la combinación
-    combinacion.chofer_id = data.chofer_id
-    combinacion.semi_id = data.semi_id
-    combinacion.propietario_id = data.propietario_id
+    # Actualizar campos principales si cambiaron
+    if data.chofer_id is not None:
+        combinacion.chofer_id = data.chofer_id
+    if data.semi_id is not None:
+        combinacion.semi_id = data.semi_id
+    if data.propietario_id is not None:
+        combinacion.propietario_id = data.propietario_id
+
     combinacion.gestor_carga_id = gestor_carga_id
     combinacion.modified_by = modified_by
 
-    # Actualizar estado de "puede_recibir_anticipos" en propietario
-    if data.propietario_id is not None:
-        db.execute(
-            update(Propietario)
-            .where(Propietario.id == data.propietario_id)
-            .values(puede_recibir_anticipos=data.anticipo_propietario)
-        )
+    # Actualizar limites del camion solo si existen cambios
+    if combinacion.camion_id:
+        update_values = {}
+        if data.camion_oc_activa is not None:
+            update_values['limite_cantidad_oc_activas'] = data.camion_oc_activa
+        if data.limite_monto_anticipos is not None:
+            update_values['limite_monto_anticipos'] = data.limite_monto_anticipos
 
-    # Actualizar estado de "puede_recibir_anticipos" en chofer
-    if data.chofer_id is not None:
+        if update_values:
+            db.execute(
+                update(Camion)
+                .where(Camion.id == combinacion.camion_id)
+                .values(**update_values)
+            )
+
+    if data.chofer_id is not None and hasattr(data, 'puede_recibir_anticipos'):
         db.execute(
             update(Chofer)
             .where(Chofer.id == data.chofer_id)
