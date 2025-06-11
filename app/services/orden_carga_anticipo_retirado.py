@@ -97,6 +97,7 @@ def create_orden_carga_anticipo_retirado(
 #                 data.cantidad_retirada * data.precio_unitario
 #             )
 
+#     # Bloqueo pesimista
 #     saldo_obj = (
 #         db.query(OrdenCargaAnticipoSaldo)
 #         .filter(
@@ -117,12 +118,10 @@ def create_orden_carga_anticipo_retirado(
 #             status_code=400,
 #             detail="Saldo insuficiente para realizar el retiro.",
 #         )
-#     # Actualizamos el saldo, no hace falta hacer db.add porque saldo_obj ya está en la sesión
+
 #     saldo_obj.total_retirado = nuevo_total_retirado
 #     saldo_obj.saldo = nuevo_saldo
 #     saldo_obj.modified_by = modified_by
-
-#     update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
 
 #     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
 #         db, data.flete_anticipo_id, data.orden_carga_id
@@ -130,6 +129,7 @@ def create_orden_carga_anticipo_retirado(
 #     data.orden_carga_anticipo_porcentaje_id = (
 #         porcentaje_anticipo.id if porcentaje_anticipo else None
 #     )
+
 #     anticipo = repositories.create_orden_carga_anticipo_retirado(
 #         db,
 #         data,
@@ -138,8 +138,10 @@ def create_orden_carga_anticipo_retirado(
 #     create_movimiento_by_anticipo(
 #         db, anticipo, anticipo.orden_carga.gestor_carga_id, modified_by
 #     )
+
 #     camion: Camion = anticipo.orden_carga.camion
 #     update_camion_anticipo_retirado(db, camion)
+
 #     return anticipo
 
 
@@ -190,24 +192,27 @@ def change_anticipo_status(
     if not co:
         raise HTTPException(status_code=404, detail="OrdenCargaAnticipoRetirado no encontrada")
 
-    movimiento = repositories.get_movimiento_by_anticipo_id(db, co.id)
+    movimientos = repositories.get_movimiento_by_anticipo_id(db, co.id)
 
-    # No permitir anular si el movimiento tiene liquidacion_id distinto de None
-    if movimiento and movimiento.liquidacion_id is not None:
-        raise HTTPException(
-            status_code=400,
-            detail=f"No se puede anular el anticipo porque se encuentra en una liquidación"
-        )
+    # No permitir anular si algún movimiento tiene liquidacion_id distinto de None
+    if movimientos:
+        for movimiento in movimientos:
+            if movimiento.liquidacion_id is not None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="No se puede anular el anticipo porque se encuentra en una liquidación"
+                )
 
     co = repositories.change_anticipo_status(co, db, status, modified_by)
 
-    if movimiento:
-        movimiento.estado = status.value
-        movimiento.modified_by = modified_by
-        movimiento.modified_at = datetime.now()
+    if movimientos:
+        for movimiento in movimientos:
+            movimiento.estado = status.value
+            movimiento.modified_by = modified_by
+            movimiento.modified_at = datetime.now()
 
-        db.commit()
-        db.refresh(movimiento)
+            db.commit()
+            db.refresh(movimiento)
 
         saldo = repositories.get_saldo_by_flete_anticipo_id_and_orden_carga_id(
             db, co.flete_anticipo_id, co.orden_carga_id
@@ -231,9 +236,6 @@ def change_anticipo_status(
             db.refresh(camion)
 
     return co
-
-
-
 
 
 def get_orden_carga_anticipo_retirado_pdf_by_id(db: Session, id: int) -> str:

@@ -29,7 +29,7 @@ def get_combinacion_list(db: Session) -> List[Combinacion]:
     )
 
 
-def get_combinacion_list_by_gestor_carga_id(
+def get_combinacion_all_list_by_gestor_carga_id(
     db: Session, gestor_carga_id: Optional[int]
 ) -> List[Combinacion]:
     return (
@@ -40,6 +40,23 @@ def get_combinacion_list_by_gestor_carga_id(
                 Combinacion.estado != EstadoEnum.ELIMINADO.value,
             ),
             Combinacion.estado != EstadoEnum.ELIMINADO.value,
+        )
+        .order_by(Combinacion.id.desc())
+        .all()
+    )
+
+def get_combinacion_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[Combinacion]:
+    return (
+        db.query(Combinacion)
+        .filter(
+            and_(
+                Combinacion.gestor_carga_id == gestor_carga_id,
+                Combinacion.estado != EstadoEnum.ELIMINADO.value,
+
+            ),
+            Combinacion.estado != EstadoEnum.NUEVO.value,
         )
         .order_by(Combinacion.id.desc())
         .all()

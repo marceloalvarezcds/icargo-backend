@@ -603,6 +603,7 @@ from .combinacion import(
     get_combinacion_tracto_ids,
     get_combinacion_list_by_camion_id,
     get_combinaciones_relacionadas,
+    get_combinacion_all_list_by_gestor_carga_id,
 )
 
 from .provision import ( # noqa

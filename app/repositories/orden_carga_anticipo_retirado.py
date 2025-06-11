@@ -116,16 +116,12 @@ def change_anticipo_status(
     status: EstadoEnum,
     modified_by: str,
 ) -> OrdenCargaAnticipoRetirado:
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
 
-    movimiento = get_movimiento_by_anticipo_id(db, obj.id)
-    if movimiento:
-
-        movimiento.estado = status.value
-        movimiento.modified_by = modified_by
-        movimiento.modified_at = datetime.now()
-
-        db.commit()
-        db.refresh(movimiento)
+    db.commit()
+    db.refresh(obj)
 
     return obj
 
@@ -143,7 +139,7 @@ def get_anticipo_by_id(db: Session, id: int) -> OrdenCargaAnticipoRetirado:
 
 
 def get_movimiento_by_anticipo_id(db: Session, anticipo_id: int):
-    return db.query(Movimiento).filter(Movimiento.anticipo_id == anticipo_id).first()
+    return db.query(Movimiento).filter(Movimiento.anticipo_id == anticipo_id).all()
 
 
 def get_movimiento_by_anticipo_id_and_id(db: Session, anticipo_id: int, id: int):

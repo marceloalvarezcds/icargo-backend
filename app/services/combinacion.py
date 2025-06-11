@@ -26,6 +26,13 @@ def get_combinacion_list(
         return repositories.get_combinacion_list_by_gestor_carga_id(db, gestor_carga_id)
     return repositories.get_combinacion_list(db)
 
+def get_combinacion_all_list(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[Combinacion]:
+    if gestor_carga_id:
+        return repositories.get_combinacion_all_list_by_gestor_carga_id(db, gestor_carga_id)
+    return repositories.get_combinacion_list(db)
+
 
 def get_combinacion_activa_list(
     db: Session, gestor_carga_id: Optional[int]

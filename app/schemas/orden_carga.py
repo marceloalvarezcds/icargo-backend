@@ -293,6 +293,8 @@ class OrdenCargaList(OrdenCargaForm):
     combinacion_chofer_nombre: Optional[str] = None
     combinacion_chofer_doc: Optional[str] = None
     # Datos de fletes
+    condicion_propietario_moneda_simbolo: Optional[str] = None
+    condicion_gestor_moneda_simbolo: Optional[str] = None
     flete_destino_nombre: Optional[str] = None
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str

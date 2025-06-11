@@ -25,7 +25,6 @@ async def read_combinacion_by_camion_id(
     return repositories.get_combinacion_list_by_camion_id(db, camion_id)
 
 
-
 @api.get("/", response_model=List[schemas.CombinacionesBD])
 async def read_combinacion_list(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -34,6 +33,14 @@ async def read_combinacion_list(
 ):
     return services.get_combinacion_list(db, current_user.gestor_carga_id)
 
+
+@api.get("/all", response_model=List[schemas.CombinacionesBD])
+async def read_combinacion_all_list(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.COMBINACION)),  # noqa: B008
+):
+    return services.get_combinacion_all_list(db, current_user.gestor_carga_id)
 
 @api.get(
     "/camion/{camion_id}/semi/{semi_id}",
