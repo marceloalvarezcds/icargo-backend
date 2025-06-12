@@ -2,6 +2,8 @@ from datetime import datetime
 
 from operator import and_
 
+from fastapi import HTTPException
+
 from app.models.camion import Camion
 from sqlalchemy.sql.expression import update
 
@@ -9,6 +11,7 @@ from typing import List, Optional
 
 from app import schemas
 from app.models.gestor_carga import GestorCarga
+from app.models.semi import Semi
 from app.schemas.combinacion import CombinacionCreateModel, CombinacionForm, CombinacionUpdate
 from app.models.permiso import Permiso
 from app.models.rol import Rol
@@ -357,23 +360,65 @@ def change_combinacion_status(
     status: EstadoEnum,
     modified_by: str,
 ) -> Combinacion:
-    obj.estado = status.value
-    obj.modified_by = modified_by
-    obj.modified_at = datetime.now()
-
     if status == EstadoEnum.ACTIVO:
+        combinacion_tracto_propietario = db.query(Combinacion).filter(
+            Combinacion.id != obj.id,
+            Combinacion.camion_id == obj.camion_id,
+            Combinacion.propietario_id == obj.propietario_id,
+            Combinacion.estado != EstadoEnum.INACTIVO.value
+        ).first()
 
+        if combinacion_tracto_propietario:
+            raise HTTPException(
+                status_code=409,
+                detail="Ya existe una combinación activa con el tracto y beneficiario asociado."
+            )
+
+        camion = db.query(Camion).filter(Camion.id == obj.camion_id).first()
+        propietario = db.query(Propietario).filter(Propietario.id == obj.propietario_id).first()
+        chofer = db.query(Chofer).filter(Chofer.id == obj.chofer_id).first() if obj.chofer_id else None
+        semi = db.query(Semi).filter(Semi.id == obj.semi_id).first() if obj.semi_id else None
+
+        # Validar estados
+        if not camion or camion.estado == EstadoEnum.INACTIVO.value:
+            raise HTTPException(
+                status_code=400,
+                detail="No se puede activar la combinación porque el tracto está inactivo."
+            )
+        if not propietario or propietario.estado == EstadoEnum.INACTIVO.value:
+            raise HTTPException(
+                status_code=400,
+                detail="No se puede activar la combinación porque el propietario está inactivo."
+            )
+        if chofer and chofer.estado == EstadoEnum.INACTIVO.value:
+            raise HTTPException(
+                status_code=400,
+                detail="No se puede activar la combinación porque el chofer está inactivo."
+            )
+        if semi and semi.estado == EstadoEnum.INACTIVO.value:
+            raise HTTPException(
+                status_code=400,
+                detail="No se puede activar la combinación porque el semi está inactivo."
+            )
+
+        # Marcar el camión como en combinación
         db.execute(
             update(Camion)
             .where(Camion.id == obj.camion_id)
             .values(is_in_combinacion=True)
         )
+
     elif status == EstadoEnum.INACTIVO:
+        # Desmarcar el camión
         db.execute(
             update(Camion)
             .where(Camion.id == obj.camion_id)
             .values(is_in_combinacion=False)
         )
+
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
 
     db.commit()
     db.refresh(obj)

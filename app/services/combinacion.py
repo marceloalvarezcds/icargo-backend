@@ -280,14 +280,14 @@ def edit_combinacion(
             if combinacion_tracto_propietario:
                 raise HTTPException(
                     status_code=409,
-                    detail="El camión ya tiene un beneficiario asociado."
+                    detail="El tracto ya tiene un beneficiario asociado."
                 )
 
-        if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
-            raise HTTPException(
-                status_code=409,
-                detail="La combinación de tracto ya existe para este gestor de carga."
-            )
+        # if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
+        #     raise HTTPException(
+        #         status_code=409,
+        #         detail="La combinación de tracto ya existe para este gestor de carga."
+        #     )
 
     # Llamar al repositorio para editar la combinación
     return repositories.edit_combinacion(combinacion_to_edit, db, data, gestor_carga_id, modified_by)

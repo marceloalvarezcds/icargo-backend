@@ -5,6 +5,7 @@ from sqlalchemy import (  # type: ignore
     Integer,
     String,
     Text,
+    Boolean,
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
@@ -59,6 +60,7 @@ class PuntoVenta(AuditMixin, Base):
     ciudad_id = Column(Integer, ForeignKey("ciudad.id"))
     ciudad = relationship(Ciudad, uselist=False)
     numero_sucursal = Column(Integer)
+    puede_recibir_anticipos_efectivo = Column(Boolean, default=True)
     contactos = relationship(
         "PuntoVentaContactoGestorCarga", back_populates="punto_venta"
     )
