@@ -30,8 +30,11 @@ from app.schemas import (
     LiquidacionAddInstrumentosForm,
     LiquidacionAddMovimientosForm,
     LiquidacionForm,
-    LiquidacionCabeceraMovimientosForm
+    LiquidacionCabeceraMovimientosForm,
+    InstrumentoForm,
+    Instrumento
 )
+from app.schemas import Instrumento as InstrumentoSchema
 from app.utils import get_gestor_carga_by_params, number_format
 
 from .camion import update_camion_anticipo_retirado
@@ -336,6 +339,27 @@ def en_revision_liquidacion(
     return change_liquidacion_status(
         db, id, comentario, LiquidacionEstadoEnum.EN_REVISION, current_user
     )
+
+
+def add_instrumento(
+    id: int,
+    db: Session,
+    data: InstrumentoForm,
+    modified_by: str,
+) -> InstrumentoSchema:
+
+    obj = get_liquidacion_by_id(db, id)
+    saldo_residual = obj.saldo_residual - data.monto_ml
+
+    if int(saldo_residual) < 0:
+        raise HTTPException(
+            status_code=409,
+            detail="La suma de los instrumentos ha superado el saldo de la liquidacion",
+        )
+
+    instrumento = create_instrumento(db, id, data, modified_by)
+
+    return instrumento
 
 
 def add_instrumentos(

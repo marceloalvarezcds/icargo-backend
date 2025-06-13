@@ -861,15 +861,16 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
     query = db.query(
             literal_column("2").label("orden"),
             null().label("movimiento_id"),
-            case(
-                (
-                    InstrumentoVia.descripcion == 'Caja',
-                    Instrumento.caja_id,
-                ),
-                else_= Instrumento.banco_id
-            ).label("instrumento_id"),
+            #case(
+            #    (
+            #        InstrumentoVia.descripcion == 'Caja',
+            #        Instrumento.caja_id,
+            #    ),
+            #    else_= Instrumento.banco_id
+            #).label("instrumento_id"),
+            Instrumento.id.label("instrumento_id"),
             Liquidacion.id,
-            literal_column("' '").label("contraparte_alias"),
+            Liquidacion.contraparte.label("contraparte_alias"),
             Liquidacion.created_at,
             concat(InstrumentoVia.descripcion, ' | ', TipoInstrumento.descripcion).label("tipo_cuenta_descripcion"),
             literal_column("'Pago/Cobro'").label("tipo_movimiento_concepto"),
