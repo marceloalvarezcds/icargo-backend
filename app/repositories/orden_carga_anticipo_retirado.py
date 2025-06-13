@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import func  # type: ignore
 from sqlalchemy.orm import Query, Session  # type: ignore
@@ -10,6 +10,34 @@ from app.enums import EstadoEnum
 from app.models import Movimiento, OrdenCarga, OrdenCargaAnticipoRetirado, Camion
 from app.models.orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from app.schemas import OrdenCargaAnticipoRetiradoForm
+from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
+
+
+def get_orden_carga_anticipo_retirado_list(db: Session) -> List[OrdenCargaAnticipoRetirado]:
+    return (
+        db.query(OrdenCargaAnticipoRetirado)
+        .filter(OrdenCargaAnticipoRetirado.estado_movimiento != EstadoEnum.ELIMINADO.value)
+        .order_by(desc(OrdenCargaAnticipoRetirado.id))
+        .all()
+    )
+
+
+def get_orden_carga_anticipo_retirado_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[OrdenCargaAnticipoRetirado]:
+    return (
+        db.query(OrdenCargaAnticipoRetirado)
+        .join(OrdenCarga)  # Esto es necesario
+        .filter(
+            and_(
+                OrdenCarga.gestor_carga_id == gestor_carga_id,
+            )
+        )
+        .options(joinedload(OrdenCargaAnticipoRetirado.orden_carga))
+        .order_by(desc(OrdenCargaAnticipoRetirado.id))
+        .all()
+    )
 
 
 def get_orden_carga_anticipo_retirado_by(

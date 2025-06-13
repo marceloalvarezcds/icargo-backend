@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 from decimal import Decimal
-from typing import cast
+from typing import List, Optional, cast
 
 from app.enums.estado import EstadoEnum
 from fastapi import HTTPException
@@ -26,6 +26,14 @@ from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_for
 from .user import get_user_by_username
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+
+
+def get_orden_carga_anticipo_retirado_list(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[OrdenCargaAnticipoRetirado]:
+    if gestor_carga_id:
+        return repositories.get_orden_carga_anticipo_retirado_list_by_gestor_carga_id(db, gestor_carga_id)
+    return repositories.get_orden_carga_anticipo_retirado_list(db)
 
 
 def get_tipo_anticipo_by_id(db: Session, id: int) -> TipoAnticipo:

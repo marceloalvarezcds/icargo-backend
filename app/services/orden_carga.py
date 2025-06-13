@@ -167,10 +167,10 @@ def create_orden_carga(
     if estado_inicial == EstadoEnum.ACEPTADO:
         cant_oc_aceptadas = repositories.get_orden_carga_aceptada_count_by_camion_id(db, data.camion_id)
         if cant_oc_aceptadas >= camion.limite_cantidad_oc_activas:
-            print(f"Existen {cant_oc_aceptadas} OC aceptadas y el límite es de {camion.limite_cantidad_oc_activas} para el camión con placa {camion.placa}")
+            print(f"Existen {cant_oc_aceptadas} OC aceptadas y el límite es de {camion.limite_cantidad_oc_activas} para el tracto con placa {camion.placa}")
             raise HTTPException(
                 status_code=HTTPStatus.LOCKED,
-                detail=f"El camión con placa {camion.placa} ha alcanzado el límite de órdenes activas permitidas ({camion.limite_cantidad_oc_activas})."
+                detail=f"El tracto con placa {camion.placa} ha alcanzado el límite de órdenes activas permitidas ({camion.limite_cantidad_oc_activas})."
             )
 
     moneda_gestor_carga = get_moneda_by_gestor_carga(db, gestor_carga_id)
@@ -216,7 +216,7 @@ def create_orden_carga(
         raise HTTPException(
             status_code=400,
             detail=(
-                f"La cantidad nominada ({data.cantidad_nominada}) supera el saldo disponible del flete ({flete.saldo})."
+                f"La cantidad nominada ({data.cantidad_nominada}) supera el saldo disponible del pedido ({flete.saldo})."
             )
         )
 
@@ -300,7 +300,6 @@ def edit_orden_carga(
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
-
 def edit_remitir_fecha(
     id: int,
     db: Session,
@@ -313,7 +312,6 @@ def edit_remitir_fecha(
         raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
 
     return repositories.edit_remitir_fecha(db, orden_carga, data, current_user.gestor_carga_id, current_user.username)
-
 
 
 def update_comentarios(
@@ -405,7 +403,6 @@ def validar_habilitacion_para_anticipos(
     return True
 
 
-
 def get_ordenes_carga_by_combinacion_id(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     ordenes_carga = db.query(OrdenCarga).filter(OrdenCarga.combinacion_id == combinacion_id).all()
     if not combinacion_id:
@@ -416,11 +413,9 @@ def get_ordenes_carga_by_combinacion_id(db: Session, combinacion_id: int) -> Lis
 def get_ordenes_carga_by_combinacion_id_and_nuevo(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-
-    # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
-        OrdenCarga.estado == "Nuevo"  # Ajusta este valor si el estado se almacena de manera diferente
+        OrdenCarga.estado == "Nuevo"
     ).all()
 
     return ordenes_carga
@@ -429,11 +424,9 @@ def get_ordenes_carga_by_combinacion_id_and_nuevo(db: Session, combinacion_id: i
 def get_ordenes_carga_by_combinacion_id_and_finalizar(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-
-    # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
-        OrdenCarga.estado == "Finalizado"  # Ajusta este valor si el estado se almacena de manera diferente
+        OrdenCarga.estado == "Finalizado"
     ).all()
 
     return ordenes_carga
@@ -442,13 +435,10 @@ def get_ordenes_carga_by_combinacion_id_and_finalizar(db: Session, combinacion_i
 def get_ordenes_carga_by_combinacion_id_and_aceptado(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-
-    # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
-        OrdenCarga.estado == "Aceptado"  # Ajusta este valor si el estado se almacena de manera diferente
+        OrdenCarga.estado == "Aceptado"
     ).all()
-
     return ordenes_carga
 
 
@@ -461,10 +451,7 @@ def get_orden_carga_list_by_combinacion_id(
     return obj
 
 
-
 def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
-    logger.info('Inicio del proceso de generación de PDF')
-
     obj = repositories.get_orden_carga_by_id(db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Orden de Carga no encontrada")
@@ -527,8 +514,6 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "usuario": obj.created_by,
     }
     source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
-    logger.info(f'LOGO_IMAGE_URL: {LOGO_IMAGE_URL}')
-    logger.info('html generado exitosamente')
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
     from_string(source_html, pdf_filename, {"page-size": "Legal"})
     return OUTPUT_FILENAME
@@ -731,7 +716,6 @@ def recalcular_provisiones(db: Session, id: int, current_user: schemas.AuthUser)
         db, obj, current_user.gestor_carga_id, current_user.username
     )
     return get_orden_carga_with_resultado(db, obj, current_user.id)
-
 
 
 def liquidar_orden_carga(

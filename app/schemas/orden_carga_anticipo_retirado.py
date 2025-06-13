@@ -41,6 +41,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
+    gestor_carga_moneda_simbolo: str
     insumo_descripcion: Optional[str] = None
     insumo_fecha_precio: Optional[Date] = None
     insumo_moneda_nombre: Optional[str] = None
@@ -49,6 +50,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     insumo_unidad_abreviatura: Optional[str] = None
     insumo_unidad_descripcion: Optional[str] = None
     moneda_nombre: str
+    moneda_simbolo: str
     proveedor_nombre: str
     punto_venta_nombre: Optional[str] = None
     punto_venta_alias: Optional[str] = None
@@ -61,6 +63,8 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     estado_movimiento_propietario: Optional[str] = None
     monto_litro: Optional[RoundedDecimal] = None
     estado_movimiento: Optional[str] = None
+    camion_placa: Optional[str] = None
+    chofer_nombre: Optional[str] = None
 
     # Auditoría
     created_by: str

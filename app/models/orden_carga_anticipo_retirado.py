@@ -260,3 +260,11 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         if self.movimientos:
             return self.movimientos[0].estado
         return None
+
+    @hybrid_property
+    def camion_placa(self):
+        return self.orden_carga.camion_placa
+
+    @hybrid_property
+    def chofer_nombre(self):
+        return self.orden_carga.chofer_nombre

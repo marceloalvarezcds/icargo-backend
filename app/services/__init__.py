@@ -259,6 +259,7 @@ from .orden_carga_anticipo_retirado import (  # noqa
     get_orden_carga_anticipo_retirado_by_id,
     get_orden_carga_anticipo_retirado_pdf_by_id,
     change_anticipo_status,
+    get_orden_carga_anticipo_retirado_list,
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id,

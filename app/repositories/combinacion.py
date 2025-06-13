@@ -529,7 +529,7 @@ def create_combinacion(
 ) -> Combinacion:
     rol_id = get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
 
-    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 6 - combinaciones", db)
+    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 6 - Combinaciones", db)
 
     # Determinar el estado inicial según el permiso
     if roles_permisos:
