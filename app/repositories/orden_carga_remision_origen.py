@@ -101,6 +101,14 @@ def edit_orden_carga_remision_origen(
     foto_documento_url: Optional[str],
     modified_by: str,
 ) -> OrdenCargaRemisionOrigen:
+    unidad_anterior = db.query(Unidad).filter(Unidad.id == obj.unidad_id).first()
+    factor_anterior = unidad_anterior.conversion_kg if unidad_anterior else Decimal("1")
+    cantidad_anterior_convertida = Decimal(obj.cantidad) * factor_anterior
+
+    unidad_nueva = db.query(Unidad).filter(Unidad.id == data.unidad_id).first()
+    factor_nuevo = unidad_nueva.conversion_kg if unidad_nueva else Decimal("1")
+    cantidad_nueva_convertida = Decimal(data.cantidad) * factor_nuevo
+
     obj.numero_documento = data.numero_documento
     obj.fecha = data.fecha
     obj.cantidad = data.cantidad
@@ -110,9 +118,34 @@ def edit_orden_carga_remision_origen(
     obj.modified_at = datetime.now()
     if foto_documento_url:
         obj.foto_documento = foto_documento_url
+
     db.commit()
     db.refresh(obj)
+
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == data.orden_carga_id).first()
+    if orden_carga and orden_carga.flete_id:
+        flete = db.query(Flete).filter(Flete.id == orden_carga.flete_id).first()
+
+        if flete:
+            flete.saldo += cantidad_anterior_convertida
+
+            flete.saldo -= cantidad_nueva_convertida
+
+            # 🔄 Recalcular cargado total
+            total_remisionado = (
+                db.query(func.sum(OrdenCargaRemisionOrigen.cantidad * Unidad.conversion_kg))
+                .join(OrdenCarga, OrdenCargaRemisionOrigen.orden_carga_id == OrdenCarga.id)
+                .join(Unidad, OrdenCargaRemisionOrigen.unidad_id == Unidad.id)
+                .filter(OrdenCarga.flete_id == flete.id)
+                .scalar()
+            ) or Decimal("0")
+
+            flete.cargado = total_remisionado
+            db.add(flete)
+            db.commit()
+
     return obj
+
 
 
 def delete_orden_carga_remision_origen(db: Session, id: int, modified_by: str):
