@@ -135,7 +135,7 @@ def create_movimiento(
     modified_by: str,
 ) -> Optional[Movimiento]:
     # Movimiento no puede tener monto 0
-    if int(data.monto) != 0:
+    if data.monto != 0:
         gestor_id = gestor_carga_id if gestor_carga_id else data.gestor_carga_id
         if not gestor_id:
             raise HTTPException(
