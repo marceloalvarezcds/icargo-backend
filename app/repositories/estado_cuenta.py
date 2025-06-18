@@ -611,8 +611,9 @@ def get_estado_cuenta_by_contraparte_tipo_otro(
     contraparte: str,
     contraparte_numero_documento: str,
     tipo_contraparte_id: int,
+    moneda_local_id: int
 ) -> Optional[Row]:
-    subquery = get_estado_cuenta_subquery(db).subquery()
+    subquery = get_estado_cuenta_subquery(db, moneda_local_id).subquery()
     table = (
         db.query(subquery)
         .filter(

@@ -4,10 +4,10 @@ from fastapi import HTTPException, UploadFile  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories
-from app.models import Factura
+from app.models import Factura, TipoIva
 from app.schemas import FacturaForm
 from . import movimiento as service
-from . import liquidacion as liquidacionService
+from app.services import generic_service as generic_service
 from .pictshare import upload_and_get_image_url
 
 
@@ -24,6 +24,14 @@ async def create_factura(
     ):
         raise HTTPException(
             status_code=409, detail=f"La Factura Nº {data.numero_factura} ya existe"
+        )
+
+    tipoIva = generic_service.get_by_id(TipoIva, db, data.iva_id)
+
+    if tipoIva.iva > 0:
+        if data.iva<=0:
+            raise HTTPException(
+            status_code=409, detail=f"El tipo de IVA Nº {data.descripcion} debe cargar un valor"
         )
 
     #foto_url = 'foto' # await upload_and_get_image_url(foto_file) if foto_file else None
@@ -62,7 +70,7 @@ async def edit_factura(
     to_edit_obj = get_factura_by_id(db, id)
 
     foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
-    #foto_url = 'foto url' 
+    #foto_url = 'foto url'
 
     if to_edit_obj.iva_movimiento_id or to_edit_obj.retencion_movimiento_id:
         service.edit_movimiento_by_factura(db, to_edit_obj, data, modified_by)

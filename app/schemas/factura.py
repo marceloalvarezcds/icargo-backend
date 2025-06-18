@@ -17,7 +17,7 @@ class FacturaForm(BaseModel):
     contribuyente: str
     ruc: str
     monto: RoundedDecimal
-    iva: RoundedDecimal
+    iva: Optional[RoundedDecimal]
     retencion: Optional[RoundedDecimal]
     fecha_vencimiento: Date
     fecha_factura: Date
