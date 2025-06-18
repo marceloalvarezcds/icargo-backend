@@ -216,7 +216,7 @@ def create_orden_carga(
         raise HTTPException(
             status_code=400,
             detail=(
-                f"La cantidad nominada ({data.cantidad_nominada}) supera el saldo disponible del pedido ({flete.saldo})."
+                f"La cantidad nominada supera el saldo disponible del pedido)."
             )
         )
 

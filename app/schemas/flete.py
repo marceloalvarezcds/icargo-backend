@@ -155,11 +155,13 @@ class FleteList(FleteFormBaseModel):
     condicion_gestor_carga_moneda_nombre: str
     condicion_gestor_carga_moneda_simbolo: str
     condicion_gestor_carga_unidad_descripcion: str
+    condicion_gestor_carga_unidad_abreviatura: str
     # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda_nombre: str
     condicion_propietario_moneda_simbolo: str
     condicion_propietario_unidad_descripcion: str
+    condicion_propietario_unidad_abreviatura: str
     condicion_propietario_tarifa_unidad: str
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete

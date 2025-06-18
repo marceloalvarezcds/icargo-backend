@@ -52,20 +52,20 @@ async def create_punto_venta(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.PuntoVenta:
-    if repositories.get_punto_venta_by(
-        db, data.tipo_documento_id, data.numero_documento
-    ):
-        raise HTTPException(
-            status_code=409,
-            detail=f"El Punto de Venta con documento {data.numero_documento} ya existe",
-        )
+    punto_existente = db.query(PuntoVenta).filter(
+        PuntoVenta.tipo_documento_id == data.tipo_documento_id,
+        PuntoVenta.numero_documento == data.numero_documento,
+        PuntoVenta.proveedor_id == data.proveedor_id,
+        PuntoVenta.numero_sucursal == data.numero_sucursal
+    ).first()
 
-    if repositories.get_punto_venta_by_proveedor_sucursal(
-        db, data.proveedor_id, data.numero_sucursal
-    ):
+    if punto_existente:
         raise HTTPException(
             status_code=409,
-            detail=f"El Punto de Venta numero {data.numero_sucursal} ya existe",
+            detail=(
+                f"Ya existe un Punto de Venta con documento {data.numero_documento} "
+                f"y sucursal número {data.numero_sucursal} para el proveedor especificado"
+            ),
         )
 
     logo_url = await upload_and_get_image_url(file)
