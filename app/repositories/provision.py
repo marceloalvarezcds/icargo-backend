@@ -44,6 +44,7 @@ def create_provision(
         fecha=data.fecha,
         detalle=data.detalle,
         monto=data.monto,
+        monto_mon_local= data.monto_mon_local if data.monto_mon_local else data.monto*data.tipo_cambio_moneda,
         moneda_id=data.moneda_id,
         tipo_cambio_moneda=data.tipo_cambio_moneda,
         fecha_cambio_moneda=data.fecha_cambio_moneda,
