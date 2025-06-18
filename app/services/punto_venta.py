@@ -53,7 +53,6 @@ async def create_punto_venta(
     modified_by: str,
 ) -> schemas.PuntoVenta:
     punto_existente = db.query(PuntoVenta).filter(
-        PuntoVenta.tipo_documento_id == data.tipo_documento_id,
         PuntoVenta.numero_documento == data.numero_documento,
         PuntoVenta.proveedor_id == data.proveedor_id,
         PuntoVenta.numero_sucursal == data.numero_sucursal
