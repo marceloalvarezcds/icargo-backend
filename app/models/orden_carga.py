@@ -691,13 +691,14 @@ class OrdenCarga(AuditMixin, Base):
             else self.merma_gestor_carga_tolerancia_kg
         )
 
+    # @hybrid_property
+    # def resultado_gestor_carga_total_flete(self):
+    #     return self.resultado_gestor_carga_tarifa_flete * self.cantidad_destino
+
     @hybrid_property
     def resultado_gestor_carga_total_flete(self):
-        if self.flete_tarifa_unidad_conversion_gestor:
-            return (
-                self.resultado_gestor_carga_tarifa_flete_ml * self.cantidad_destino
-            ) / self.flete_tarifa_unidad_conversion_gestor
-        return 0  # o None según cómo manejes valores faltantes
+        return self.resultado_gestor_carga_tarifa_flete_ml * self.cantidad_destino
+
 
     @hybrid_property
     def resultado_gestor_carga_total_flete_oc(self):
@@ -952,13 +953,10 @@ class OrdenCarga(AuditMixin, Base):
             - self.resultado_propietario_total_descuento_a_pagar
         )
 
+    
     @hybrid_property
     def resultado_propietario_total_flete(self):
-        if self.flete_tarifa_unidad_conversion_propietario:
-            return (
-                self.resultado_propietario_tarifa_flete_ml * self.cantidad_destino
-            ) / self.flete_tarifa_unidad_conversion_propietario
-        return 0  # o None si preferís no devolver un número
+        return self.resultado_propietario_tarifa_flete_ml * self.cantidad_destino #anteriormente era resultado_propietario_tarifa_flete
 
 
     @hybrid_property
