@@ -220,7 +220,7 @@ async def en_revision_liquidacion(
 
 
 @api.patch("/{id}/add_instrumento", response_model=schemas.Instrumento)
-async def add_instrumentos(
+async def add_instrumento(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.InstrumentoForm] = Form(...),  # type: ignore  # noqa

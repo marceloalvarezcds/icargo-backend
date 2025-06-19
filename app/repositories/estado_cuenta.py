@@ -879,7 +879,7 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             Liquidacion.id.label("nro_documento_relacionado"),
             Factura.numero_factura,
             Instrumento.operacion_estado,
-            literal_column("''").label("estado_liquidacion"),
+            Liquidacion.estado.label("estado_liquidacion"),
             literal_column("false").label("es_editable"),
             literal_column("false").label("can_edit_oc"),
             literal_column("false").label("documento_fisico"),

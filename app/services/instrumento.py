@@ -141,6 +141,11 @@ def finalizar_liquidacion(db: Session, liquidacion: Liquidacion, modified_by: st
         repositories.change_liquidacion_status(
             liquidacion, db, LiquidacionEstadoEnum.FINALIZADO, modified_by
         )
+    else:
+        if is_saldo_cerrado:
+            repositories.change_liquidacion_status(
+                liquidacion, db, LiquidacionEstadoEnum.SALDO_CERRADO, modified_by
+        )
 
 
 def create_instrumento(
