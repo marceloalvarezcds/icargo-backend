@@ -65,35 +65,6 @@ def get_error_message(db: Session, data: schemas.OrdenCargaAnticipoRetiradoForm)
                 return "Ya existe anticipo de Lubricante para esta OC en este Punto de Venta"
 
 
-# def create_orden_carga_anticipo_retirado(
-#     db: Session,
-#     data: schemas.OrdenCargaAnticipoRetiradoForm,
-#     modified_by: str,
-# ) -> schemas.OrdenCargaAnticipoRetirado:
-#     if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
-#         if data.monto_retirado is None:  # Solo si monto_retirado está vacío
-#             data.monto_retirado = RoundedDecimal(
-#                 data.cantidad_retirada * data.precio_unitario
-#             )
-#     update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
-#     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
-#         db, data.flete_anticipo_id, data.orden_carga_id
-#     )
-#     data.orden_carga_anticipo_porcentaje_id = (
-#         porcentaje_anticipo.id if porcentaje_anticipo else None
-#     )
-#     anticipo = repositories.create_orden_carga_anticipo_retirado(
-#         db,
-#         data,
-#         modified_by,
-#     )
-#     create_movimiento_by_anticipo(
-#         db, anticipo, anticipo.orden_carga.gestor_carga_id, modified_by
-#     )
-#     camion: Camion = anticipo.orden_carga.camion
-#     update_camion_anticipo_retirado(db, camion)
-#     return anticipo
-
 def create_orden_carga_anticipo_retirado(
     db: Session,
     data: schemas.OrdenCargaAnticipoRetiradoForm,
@@ -104,9 +75,8 @@ def create_orden_carga_anticipo_retirado(
             data.monto_retirado = RoundedDecimal(
                 data.cantidad_retirada * data.precio_unitario
             )
-
-    # Bloqueo pesimista
-    saldo_obj = (
+    # Bloqueo pesimista agregado, quitar en caso de error
+    _ = (
         db.query(OrdenCargaAnticipoSaldo)
         .filter(
             OrdenCargaAnticipoSaldo.flete_anticipo_id == data.flete_anticipo_id,
@@ -115,21 +85,8 @@ def create_orden_carga_anticipo_retirado(
         .with_for_update()
         .first()
     )
-    if not saldo_obj:
-        raise HTTPException(status_code=404, detail="Anticipo no encontrado")
 
-    nuevo_total_retirado = (saldo_obj.total_retirado or 0) + data.monto_retirado
-    nuevo_saldo = (saldo_obj.total_disponible or 0) - nuevo_total_retirado
-
-    if nuevo_saldo < 0:
-        raise HTTPException(
-            status_code=400,
-            detail="Saldo insuficiente para realizar el retiro.",
-        )
-
-    saldo_obj.total_retirado = nuevo_total_retirado
-    saldo_obj.saldo = nuevo_saldo
-    saldo_obj.modified_by = modified_by
+    update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
 
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, data.flete_anticipo_id, data.orden_carga_id
@@ -151,6 +108,65 @@ def create_orden_carga_anticipo_retirado(
     update_camion_anticipo_retirado(db, camion)
 
     return anticipo
+
+
+# def create_orden_carga_anticipo_retirado(
+#     db: Session,
+#     data: schemas.OrdenCargaAnticipoRetiradoForm,
+#     modified_by: str,
+# ) -> schemas.OrdenCargaAnticipoRetirado:
+#     if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
+#         if data.monto_retirado is None:
+#             data.monto_retirado = RoundedDecimal(
+#                 data.cantidad_retirada * data.precio_unitario
+#             )
+
+#     # Bloqueo pesimista
+#     saldo_obj = (
+#         db.query(OrdenCargaAnticipoSaldo)
+#         .filter(
+#             OrdenCargaAnticipoSaldo.flete_anticipo_id == data.flete_anticipo_id,
+#             OrdenCargaAnticipoSaldo.orden_carga_id == data.orden_carga_id,
+#         )
+#         .with_for_update()
+#         .first()
+#     )
+#     if not saldo_obj:
+#         raise HTTPException(status_code=404, detail="Anticipo no encontrado")
+
+#     nuevo_total_retirado = (saldo_obj.total_retirado or 0) + data.monto_retirado
+#     nuevo_saldo = (saldo_obj.total_disponible or 0) - nuevo_total_retirado
+
+#     if nuevo_saldo < 0:
+#         raise HTTPException(
+#             status_code=400,
+#             detail="Saldo insuficiente para realizar el retiro.",
+#         )
+
+#     saldo_obj.total_retirado = nuevo_total_retirado
+#     saldo_obj.saldo = nuevo_saldo
+#     saldo_obj.modified_by = modified_by
+
+#     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
+#         db, data.flete_anticipo_id, data.orden_carga_id
+#     )
+#     data.orden_carga_anticipo_porcentaje_id = (
+#         porcentaje_anticipo.id if porcentaje_anticipo else None
+#     )
+
+#     anticipo = repositories.create_orden_carga_anticipo_retirado(
+#         db,
+#         data,
+#         modified_by,
+#     )
+#     create_movimiento_by_anticipo(
+#         db, anticipo, anticipo.orden_carga.gestor_carga_id, modified_by
+#     )
+
+#     camion: Camion = anticipo.orden_carga.camion
+#     update_camion_anticipo_retirado(db, camion)
+
+#     return anticipo
 
 
 def get_orden_carga_anticipo_retirado_by_id(
