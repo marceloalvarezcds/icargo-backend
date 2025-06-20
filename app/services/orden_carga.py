@@ -206,7 +206,7 @@ def create_orden_carga(
         flete.merma_propietario_valor * cotizacion_origen_propietario.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
     )
     condicion_gestor_carga_tarifa_ml = (
-        flete.condicion_gestor_carga_tarifa * cotizacion_condicion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
+        flete.condicion_gestor_carga_tarifa * cotizacion_condicion_origen_gestor_carga.cotizacion_moneda / flete.condicion_gestor_carga_unidad_conversion
     )
     condicion_propietario_tarifa_ml = (
         flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / flete.condicion_propietario_unidad_conversion
