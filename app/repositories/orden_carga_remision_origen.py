@@ -64,21 +64,24 @@ def create_orden_carga_remision_origen(
     orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == data.orden_carga_id).first()
     if orden_carga and orden_carga.flete_id:
         flete = db.query(Flete).filter(Flete.id == orden_carga.flete_id).first()
-
-        # 🔹 1. Obtener la unidad y factor de conversión como Decimal
         unidad = db.query(Unidad).filter(Unidad.id == data.unidad_id).first()
         factor = unidad.conversion_kg if unidad and unidad.conversion_kg else Decimal("1")
-
-        # 🔹 2. Convertir cantidad a kg como Decimal
         cantidad_convertida = Decimal(data.cantidad) * factor
 
         if flete:
-            # 🔹 3. Calcular diferencia con la cantidad nominada (Decimal - Decimal)
-            diferencia = orden_carga.cantidad_nominada - cantidad_convertida
+
+            total_remisionado_oc = (
+                db.query(func.sum(OrdenCargaRemisionOrigen.cantidad * Unidad.conversion_kg))
+                .join(Unidad, OrdenCargaRemisionOrigen.unidad_id == Unidad.id)
+                .filter(OrdenCargaRemisionOrigen.orden_carga_id == orden_carga.id)
+                .scalar()
+            ) or Decimal("0")
+
+            diferencia = orden_carga.cantidad_nominada - total_remisionado_oc
+
             flete.saldo += diferencia
 
-            # 🔹 4. Calcular el total remisionado en kg
-            total_remisionado = (
+            total_remisionado_flete = (
                 db.query(func.sum(OrdenCargaRemisionOrigen.cantidad * Unidad.conversion_kg))
                 .join(OrdenCarga, OrdenCargaRemisionOrigen.orden_carga_id == OrdenCarga.id)
                 .join(Unidad, OrdenCargaRemisionOrigen.unidad_id == Unidad.id)
@@ -86,12 +89,12 @@ def create_orden_carga_remision_origen(
                 .scalar()
             ) or Decimal("0")
 
-            flete.cargado = total_remisionado
+            flete.cargado = total_remisionado_flete
+
             db.add(flete)
             db.commit()
 
     return obj
-
 
 
 def edit_orden_carga_remision_origen(
