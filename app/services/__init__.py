@@ -188,7 +188,8 @@ from .liquidacion import (  # noqa
     someter_liquidacion,
     remove_movimientos,
     refresh_pago_cobro,
-    add_instrumento
+    add_instrumento,
+    forzar_cierre
 )
 from .movimiento import (  # noqa
     create_movimiento,

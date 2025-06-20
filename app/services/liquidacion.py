@@ -222,8 +222,9 @@ def add_movimientos(
     to_edit_obj.modified_by = modified_by
     to_edit_obj.modified_at = datetime.now()
     to_edit_obj.pago_cobro =  sum(
-            x.saldo for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+            x.saldo_ml for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
         )
+    to_edit_obj.es_pago_cobro = "PAGO" if to_edit_obj.pago_cobro > 0 else "COBRO"
     db.commit()
     return to_edit_obj
 
@@ -247,8 +248,9 @@ def remove_movimiento(
     to_edit_obj.modified_by = modified_by
     to_edit_obj.modified_at = datetime.now()
     to_edit_obj.pago_cobro =  sum(
-        x.saldo for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
-    )
+            x.saldo_ml for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+        )
+    to_edit_obj.es_pago_cobro = "PAGO" if to_edit_obj.pago_cobro > 0 else "COBRO"
     db.commit()
     return to_edit_obj
 
@@ -290,8 +292,9 @@ def remove_movimientos(
     to_edit_obj.modified_by = modified_by
     to_edit_obj.modified_at = datetime.now()
     to_edit_obj.pago_cobro =  sum(
-        x.saldo for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
-    )
+            x.saldo_ml for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+        )
+    to_edit_obj.es_pago_cobro = "PAGO" if to_edit_obj.pago_cobro > 0 else "COBRO"
     db.commit()
 
     return to_edit_obj
@@ -320,6 +323,13 @@ def cancelar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
         db, movimientos, LiquidacionEstadoEnum.PENDIENTE, modified_by
     )
     obj.movimientos = []
+    if not obj.comentarios:
+        obj.comentarios = ""
+    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    full_name = f"{modified_by}"
+    obj.comentarios += (
+        f"<strong>{full_name} ({date}): </strong><ul>Liquidacion Cancelada </ul>"
+    )
     return repositories.change_liquidacion_status(
         obj, db, LiquidacionEstadoEnum.CANCELADO, modified_by
     )
@@ -713,3 +723,36 @@ def someter_liquidacion(
     return change_liquidacion_status(
         db, id, data.comentario, LiquidacionEstadoEnum.PENDIENTE, current_user
     )
+
+
+def forzar_cierre(
+    db: Session, id: int, data: schemas.LiquidacionSometer, current_user: schemas.AuthUser
+) -> Liquidacion:
+    to_edit_obj = get_liquidacion_by_id(db, id)
+
+    if ( not (
+            to_edit_obj.estado == LiquidacionEstadoEnum.ACEPTADO.value
+            or to_edit_obj.estado == LiquidacionEstadoEnum.SALDO_ABIERTO.value
+            or to_edit_obj.estado == LiquidacionEstadoEnum.SALDO_CERRADO.value
+            ) ):
+        raise HTTPException(
+            status_code=409, detail=f"No se puede forzar cierre en estado {to_edit_obj.estado}"
+        )
+
+    to_edit_obj.modified_by = current_user.username
+    to_edit_obj.modified_at = datetime.now()
+    to_edit_obj.estado = LiquidacionEstadoEnum.FINALIZADO.value
+
+    if data.comentario:
+        if not to_edit_obj.comentarios:
+            to_edit_obj.comentarios = ""
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        comentarios = "".join([f"<li>{c}</li>" for c in data.comentario.split(".")])
+        full_name = f"{current_user.first_name} {current_user.last_name}"
+        to_edit_obj.comentarios += (
+            f"<strong>{full_name} ({date}): </strong><ul>{comentarios}</ul>"
+        )
+
+    db.commit()
+    db.refresh(to_edit_obj)
+    return to_edit_obj
