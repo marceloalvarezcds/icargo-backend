@@ -20,6 +20,7 @@ from app.enums import (
     TipoMovimientoEnum,
     TipoAnticipoEnum,
     TipoInsumoEnum,
+    EstadoEnum,
 )
 from app.models import (
     Moneda,
@@ -36,6 +37,7 @@ from app.models import (
     Remitente,
     Factura,
     PuntoVenta,
+    Liquidacion
 )
 from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm, FacturaForm
 from app.schemas.date_model import Date
@@ -700,12 +702,20 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
         data.fecha = fecha
     if not data.es_cobro:
         data.monto = data.monto * -1  # type: ignore
-    return create_movimiento(
+    movimiento = create_movimiento(
         db,
         data,
         gestor_carga_id,
         modified_by,
     )
+    if movimiento.liquidacion:
+        to_edit_obj = service.get_by_id(Liquidacion, db, movimiento.liquidacion_id)
+        to_edit_obj.pago_cobro =  sum(
+            x.saldo_ml for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+        )
+        to_edit_obj.es_pago_cobro = "PAGO" if to_edit_obj.pago_cobro > 0 else "COBRO"
+        db.commit()
+    return movimiento
 
 
 def create_movimiento_by_conciliacion_oc(
