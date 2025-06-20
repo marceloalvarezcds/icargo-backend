@@ -79,6 +79,17 @@ async def read_punto_venta_by_id(
     )
 
 
+@api.get("/pdv", response_model=List[schemas.PuntoVentaList])
+async def read_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.PUNTO_VENTA)),  # noqa: B008
+):
+    return repositories.get_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo(
+        db, current_user.gestor_carga_id
+    )
+
+
 @api.post("/", response_model=schemas.PuntoVenta)
 async def add_new_punto_venta(
     db: Session = Depends(get_db_session),  # noqa: B008
