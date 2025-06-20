@@ -180,6 +180,10 @@ class Flete(AuditMixin, Base):
         return self.condicion_gestor_carga_unidad.abreviatura
 
     @hybrid_property
+    def condicion_gestor_carga_unidad_conversion(self):
+        return self.condicion_gestor_carga_unidad.conversion_kg
+
+    @hybrid_property
     def condicion_propietario_moneda_nombre(self):
         return self.condicion_propietario_moneda.nombre
 
