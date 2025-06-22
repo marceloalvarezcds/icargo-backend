@@ -742,6 +742,7 @@ def forzar_cierre(
     to_edit_obj.modified_by = current_user.username
     to_edit_obj.modified_at = datetime.now()
     to_edit_obj.estado = LiquidacionEstadoEnum.FINALIZADO.value
+    to_edit_obj.etapa = LiquidacionEstadoEnum.FINALIZADO.value
 
     if data.comentario:
         if not to_edit_obj.comentarios:
@@ -752,6 +753,10 @@ def forzar_cierre(
         to_edit_obj.comentarios += (
             f"<strong>{full_name} ({date}): </strong><ul>{comentarios}</ul>"
         )
+
+    change_movimiento_list_status(
+        db, to_edit_obj.movimientos, LiquidacionEtapaEnum.FINALIZADO, current_user.username
+    )
 
     db.commit()
     db.refresh(to_edit_obj)

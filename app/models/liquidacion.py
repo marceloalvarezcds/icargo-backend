@@ -110,7 +110,7 @@ class Liquidacion(AuditMixin, Base):
     @hybrid_property
     def instrumentos_saldo(self):
         return abs(sum(
-            x.monto_ml for x in self.instrumentos if x.operacion_estado != EstadoEnum.RECHAZADO.value
+            x.monto_ml for x in self.instrumentos if x.operacion_estado != EstadoEnum.RECHAZADO.value and x.operacion_estado != EstadoEnum.ANULADO.value
         ))
 
     @hybrid_property

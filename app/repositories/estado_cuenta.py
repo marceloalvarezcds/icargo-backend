@@ -198,6 +198,8 @@ def get_estado_cuenta_chofer_liquidacion(db: Session) -> Query:
         .join(Liquidacion.chofer)
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.estado != 'Cancelado')
+        .filter(Instrumento.estado != 'Anulado')
+        .filter(Instrumento.operacion_estado != 'Rechazado')
     )
 
 
@@ -242,6 +244,8 @@ def get_estado_cuenta_propietario_liquidacion(db: Session) -> Query:
         .join(Liquidacion.propietario)
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.estado != 'Cancelado')
+        .filter(Instrumento.estado != 'Anulado')
+        .filter(Instrumento.operacion_estado != 'Rechazado')
     )
 
 
@@ -288,6 +292,8 @@ def get_estado_cuenta_proveedor_liquidacion(db: Session) -> Query:
         #.filter(~exists().where(PuntoVenta.proveedor_id == Proveedor.id))
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.estado != 'Cancelado')
+        .filter(Instrumento.estado != 'Anulado')
+        .filter(Instrumento.operacion_estado != 'Rechazado')
     )
 
 
@@ -332,6 +338,8 @@ def get_estado_cuenta_remitente_liquidacion(db: Session) -> Query:
         .join(Liquidacion.remitente)
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.estado != 'Cancelado')
+        .filter(Instrumento.estado != 'Anulado')
+        .filter(Instrumento.operacion_estado != 'Rechazado')
     )
 
 
@@ -367,6 +375,8 @@ def get_estado_cuenta_otro_liquidacion(db: Session) -> Query:
         .join(Liquidacion.tipo_contraparte)
         .filter(TipoContraparte.descripcion == TipoContraparteEnum.OTRO.value)
         .filter(Liquidacion.estado != 'Cancelado')
+        .filter(Instrumento.estado != 'Anulado')
+        .filter(Instrumento.operacion_estado != 'Rechazado')
     )
 
 
@@ -772,6 +782,7 @@ def get_cols_estado_cuenta_liquidacion_case_statement() -> Tuple:
             (
                 or_(
                     Liquidacion.etapa == LiquidacionEstadoEnum.FINALIZADO.value,
+                    Liquidacion.estado == LiquidacionEstadoEnum.SALDO_ABIERTO.value,
                     Liquidacion.estado == LiquidacionEstadoEnum.SALDO_CERRADO.value
                 ),
                 (Instrumento.monto_ml)
