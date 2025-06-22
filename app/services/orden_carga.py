@@ -1132,7 +1132,7 @@ def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, curr
 
     # Recalcular los valores
     condicion_gestor_carga_tarifa_ml = (
-        flete.condicion_gestor_carga_tarifa * cot_gc_cond.cotizacion_moneda / cot_destino.cotizacion_moneda
+        flete.condicion_gestor_carga_tarifa * cot_gc_cond.cotizacion_moneda / flete.condicion_gestor_carga_unidad_conversion
     )
     condicion_propietario_tarifa_ml = (
         flete.condicion_propietario_tarifa * cot_prop_cond.cotizacion_moneda / flete.condicion_propietario_unidad_conversion
@@ -1168,3 +1168,80 @@ def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, curr
         merma_gestor_carga_valor_ml=orden_carga.merma_gestor_carga_valor_ml,
         merma_propietario_valor_ml=orden_carga.merma_propietario_valor_ml,
     )
+
+
+def update_flete_saldo(db: Session, flete_id: int, orden_carga_id: int, current_user: schemas.AuthUser) -> schemas.RecalculoCondicionesResponse:
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
+    if not orden_carga:
+        return
+
+    # Solo recalcular si el flete es diferente al actual
+    if orden_carga.flete_id == flete_id:
+        return
+
+    flete = repositories.get_flete_by_id(db, flete_id)
+    if not flete:
+        return
+
+    gestor_carga_id = current_user.gestor_carga_id
+    moneda_gc = get_moneda_by_gestor_carga(db, gestor_carga_id)
+    if not moneda_gc:
+        return
+
+    flete_anticipo = flete.anticipos[0] if flete.anticipos else None
+    if not flete_anticipo:
+        return
+
+    # Actualizar flete en la orden de carga
+    flete_anterior_id = orden_carga.flete_id
+    orden_carga.flete_id = flete_id
+        # Actualizar estado is_in_orden_carga de fletes
+    actualizar_estado_y_cantidades_fletes(
+        db=db,
+        nuevo_flete_id=flete_id,
+        flete_anterior_id=flete_anterior_id,
+        orden_carga_id=orden_carga_id,
+        cantidad_nominada=orden_carga.cantidad_nominada
+    )
+
+    db.commit()
+    db.refresh(orden_carga)
+
+
+def actualizar_estado_y_cantidades_fletes(
+    db: Session,
+    nuevo_flete_id: int,
+    flete_anterior_id: Optional[int],
+    orden_carga_id: int,
+    cantidad_nominada: float
+):
+    # Actualizar el nuevo flete
+    nuevo_flete = db.query(Flete).filter(Flete.id == nuevo_flete_id).first()
+    if nuevo_flete:
+        nuevo_flete.is_in_orden_carga = True
+        # Restar la cantidad nominada del saldo del nuevo flete
+        nuevo_flete.saldo = (nuevo_flete.saldo or 0) - cantidad_nominada
+        # Sumar la cantidad nominada al cargado acumulado
+        nuevo_flete.cargado = (nuevo_flete.cargado or 0) + cantidad_nominada
+        db.add(nuevo_flete)
+
+    # Actualizar el flete anterior solo si es distinto al nuevo y no está en otra orden
+    if flete_anterior_id and flete_anterior_id != nuevo_flete_id:
+        otras_oc = (
+            db.query(OrdenCarga)
+            .filter(
+                OrdenCarga.flete_id == flete_anterior_id,
+                OrdenCarga.id != orden_carga_id
+            )
+            .count()
+        )
+        if otras_oc == 0:
+            flete_anterior = db.query(Flete).filter(Flete.id == flete_anterior_id).first()
+            if flete_anterior:
+                flete_anterior.is_in_orden_carga = False
+                # Sumar la cantidad nominada de vuelta al saldo del flete anterior
+                flete_anterior.saldo = (flete_anterior.saldo or 0) + cantidad_nominada
+                # Restar la cantidad nominada del cargado acumulado
+                flete_anterior.cargado = (flete_anterior.cargado or 0) - cantidad_nominada
+                db.add(flete_anterior)
+

@@ -252,7 +252,8 @@ from .orden_carga import (  # noqa
     get_orden_carga_cerradas_list,
     recalcular_condiciones,
     validar_habilitacion_para_anticipos,
-    recalcular_provisiones
+    recalcular_provisiones,
+    update_flete_saldo,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
@@ -268,6 +269,7 @@ from .orden_carga_anticipo_saldo import (  # noqa
     get_saldos_by_orden_carga,
     get_flete_anticipo_by_orden_carga_insumos,
     get_flete_anticipo_id_by_flete_id_and_orden_carga_id,
+    update_total_retirado,
 )
 from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,
@@ -325,6 +327,7 @@ from .proveedor import (  # noqa
     get_proveedor_by_id,
     get_proveedor_by_id_and_gestor_carga_id,
     get_proveedor_reports,
+    change_proveedor_status,
 )
 from .proveedor_contacto import update_proveedor_contacto_list  # noqa
 from .punto_venta import (  # noqa
@@ -343,6 +346,7 @@ from .remitente import (  # noqa
     get_remitente_by_id,
     get_remitente_by_id_and_gestor_carga_id,
     get_remitente_reports,
+    change_remitente_status,
 )
 from .remitente_contacto import update_remitente_contacto_list  # noqa
 from .rentabilidad import get_rentabilidad_list, get_rentabilidad_reports  # noqa

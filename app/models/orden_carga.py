@@ -953,7 +953,7 @@ class OrdenCarga(AuditMixin, Base):
             - self.resultado_propietario_total_descuento_a_pagar
         )
 
-    
+
     @hybrid_property
     def resultado_propietario_total_flete(self):
         return self.resultado_propietario_tarifa_flete_ml * self.cantidad_destino #anteriormente era resultado_propietario_tarifa_flete
@@ -1196,3 +1196,8 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def condicion_propietario_moneda_simbolo(self):
         return self.condicion_propietario_moneda.simbolo
+
+
+    @hybrid_property
+    def flete_cargado(self):
+        return self.flete.cargado

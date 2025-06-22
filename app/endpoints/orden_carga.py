@@ -78,7 +78,6 @@ async def read_orden_carga_list_anticipo(
     return services.get_orden_carga_list(db, current_user.gestor_carga_id)
 
 
-
 @api.post("/aceptar/oc/nuevas", response_model=List[schemas.OrdenCargaList])
 async def read_orden_carga_list_aceptar(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -461,3 +460,15 @@ def recalcular_provisiones(
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.recalcular_provisiones(db, id, current_user)
+
+
+@api.get("/actualizar-saldos/flete/{flete_id}/{orden_carga_id}", response_model=Optional[schemas.RecalculoCondicionesResponse])
+async def actualizar_saldos_oc(
+    orden_carga_id: int,
+    flete_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.update_flete_saldo(db, flete_id, orden_carga_id, current_user)
+

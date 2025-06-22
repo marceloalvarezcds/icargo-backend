@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
+from app.enums.estado import EstadoEnum
 from app.models import GestorCargaProveedor, Proveedor, ProveedorContactoGestorCarga
 
 from .gestor_carga_proveedor import (
@@ -107,6 +108,13 @@ def delete_proveedor(
     co = get_proveedor_by_id(db, id)
     obj = repositories.delete_proveedor(co, db, modified_by)
     return get_proveedor_detail(db, obj, gestor_carga_id)
+
+
+def change_proveedor_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.Proveedor:
+    co = get_proveedor_by_id(db, id)
+    return repositories.change_proveedor_status(co, db, status, modified_by)
 
 
 def get_proveedor_reports(db: Session) -> str:

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
+from app.enums.estado import EstadoEnum
 from app.models import GestorCargaRemitente, Remitente, RemitenteContactoGestorCarga
 
 from .gestor_carga_remitente import (
@@ -70,6 +71,13 @@ def get_remitente_by_id_and_gestor_carga_id(
     if not obj:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
     return get_remitente_detail(obj, gestor_carga_id)
+
+
+def change_remitente_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.RemitenteForm:
+    co = get_remitente_by_id(db, id)
+    return repositories.change_remitente_status(co, db, status, modified_by)
 
 
 async def edit_remitente(

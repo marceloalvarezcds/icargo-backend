@@ -65,6 +65,20 @@ def get_remitente_by_id(db: Session, id: int) -> Optional[Remitente]:
     return db.query(Remitente).filter(Remitente.id == id).first()
 
 
+def change_remitente_status(
+    obj: Remitente,
+    db: Session,
+    status: EstadoEnum,
+    modified_by: str,
+) -> Remitente:
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
 def create_remitente(
     db: Session,
     data: RemitenteForm,

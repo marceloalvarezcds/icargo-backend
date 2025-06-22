@@ -14,6 +14,7 @@ from app.models import (
     OrdenCargaComplemento,
 )
 from app.models.orden_carga_anticipo_porcentaje import OrdenCargaAnticipoPorcentaje
+from app.models.orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 
 from .flete_anticipo import get_flete_anticipo_by_id, get_flete_anticipo_by_flete_and_tipo
 from .orden_carga_anticipo_porcentaje_create import (
@@ -23,6 +24,7 @@ from .orden_carga_anticipo_porcentaje_create import (
 
 from .moneda_cotizacion import get_cotizacion_moneda
 from app.repositories.moneda import get_moneda_by_gestor_carga
+from sqlalchemy import func
 
 
 def create_orden_carga_anticipo_saldo(
@@ -278,12 +280,6 @@ def update_orden_carga_anticipo_saldo(
         else oc_monto_disponible
     )
 
-    # if saldo < 0:
-    #     raise HTTPException(
-    #         status_code=400,
-    #         detail="Saldo insuficiente para realizar el retiro.",
-    #     )
-
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, flete_anticipo_id, orden_carga_id
     )
@@ -391,3 +387,48 @@ def update_orden_carga_anticipo_saldo_by_orden_carga_id(
             db, flete_anticipo, orden_carga, Decimal(0), total_complemento, modified_by
         )
     return None
+
+
+def update_total_retirado(
+    db: Session,
+    orden_carga_id: int,
+    flete_id_actual: int,
+    flete_id_nuevo: int,
+) -> Optional[OrdenCargaAnticipoSaldo]:
+    # Obtener FleteAnticipo actual y nuevo
+    flete_anticipo_actual = db.query(FleteAnticipo).filter(FleteAnticipo.flete_id == flete_id_actual).first()
+    flete_anticipo_nuevo = db.query(FleteAnticipo).filter(FleteAnticipo.flete_id == flete_id_nuevo).first()
+
+    if not flete_anticipo_actual or not flete_anticipo_nuevo:
+        # print(f"[DEBUG] No se encontró flete_anticipo actual o nuevo (actual: {flete_anticipo_actual}, nuevo: {flete_anticipo_nuevo})")
+        return None
+
+    saldo_actual = db.query(OrdenCargaAnticipoSaldo).filter(
+        OrdenCargaAnticipoSaldo.flete_anticipo_id == flete_anticipo_actual.id,
+        OrdenCargaAnticipoSaldo.orden_carga_id == orden_carga_id
+    ).first()
+
+    saldo_nuevo = db.query(OrdenCargaAnticipoSaldo).filter(
+        OrdenCargaAnticipoSaldo.flete_anticipo_id == flete_anticipo_nuevo.id,
+        OrdenCargaAnticipoSaldo.orden_carga_id == orden_carga_id
+    ).first()
+
+    if not saldo_actual or not saldo_nuevo:
+        # print(f"[DEBUG] No se encontró saldo actual o nuevo (actual: {saldo_actual}, nuevo: {saldo_nuevo})")
+        return None
+
+    # print(f"[DEBUG] total_retirado actual: {saldo_actual.total_retirado}")
+
+    # Reemplazar total_retirado del saldo nuevo con el del saldo actual
+    saldo_nuevo.total_retirado = saldo_actual.total_retirado or Decimal(0)
+    # print(f"[DEBUG] total_retirado nuevo actualizado a: {saldo_nuevo.total_retirado}")
+
+    db.add(saldo_nuevo)
+    db.commit()
+    db.refresh(saldo_nuevo)
+
+    # print("[DEBUG] Commit realizado y saldo_nuevo refrescado")
+
+    return saldo_nuevo
+
+

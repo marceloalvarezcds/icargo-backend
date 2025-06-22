@@ -382,6 +382,7 @@ class RecalculoCondicionesResponse(BaseModel):
     condicion_propietario_tarifa_ml: float
     merma_gestor_carga_valor_ml: float
     merma_propietario_valor_ml: float
+    flete_cargado: Optional[float] = None
 
 
 class AnticiposPorOrdenCarga(BaseModel):

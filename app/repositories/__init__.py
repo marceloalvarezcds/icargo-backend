@@ -58,6 +58,7 @@ from .centro_operativo import (  # noqa
     get_centro_operativo_by_id,
     get_centro_operativo_list,
     get_centro_operativo_list_by_gestor_cuenta_id,
+    change_centro_operativo_status,
 )
 from .centro_operativo_clasificacion import (  # noqa
     get_centro_operativo_clasificacion_by_nombre,
@@ -450,6 +451,7 @@ from .proveedor import (  # noqa
     get_proveedor_by_id,
     get_proveedor_list,
     get_proveedor_list_by_gestor_cuenta_id,
+    change_proveedor_status,
 )
 from .proveedor_contacto_gestor_carga import (  # noqa
     create_proveedor_contacto_gestor_carga,
@@ -469,7 +471,7 @@ from .punto_venta import (  # noqa
     get_punto_venta_list_by_gestor_carga_id,
     get_punto_venta_list_with_active_prices_by_gestor_carga_id,
     get_punto_venta_by_proveedor_sucursal,
-    get_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo,
+    get_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo
 )
 from .punto_venta_contacto_gestor_carga import (  # noqa
     create_punto_venta_contacto_gestor_carga,
@@ -487,7 +489,8 @@ from .remitente import (  # noqa
     get_remitente_by_id,
     get_remitente_list,
     get_remitente_list_by_gestor_cuenta_id,
-    get_remitente_list_activo
+    get_remitente_list_activo,
+    change_remitente_status,
 )
 from .remitente_contacto_gestor_carga import (  # noqa
     create_remitente_contacto_gestor_carga,
