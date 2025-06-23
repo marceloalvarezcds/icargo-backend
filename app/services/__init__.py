@@ -137,6 +137,7 @@ from .instrumento import (  # noqa
     get_instrumento_by_id,
     get_instrumento_reports,
     rechazar_instrumento,
+    anular_instrumento
 )
 from .insumo_punto_venta import (  # noqa
     get_insumo_list_by_tipo_insumo_id_and_gestor_carga_id,

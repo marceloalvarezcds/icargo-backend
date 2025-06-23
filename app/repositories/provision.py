@@ -99,13 +99,7 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
                 Moneda.simbolo.label("moneda"),
                 Provision.tipo_cambio_moneda.label("tipo_cambio_moneda"),
                 Provision.monto.label("monto"),
-                case(
-                    (
-                        Provision.moneda_id == 1,
-                        Provision.monto,
-                    ),
-                    else_= Provision.monto*Provision.tipo_cambio_moneda,
-                ).label("provision"),
+                Provision.monto_mon_local.label("provision"),
                 literal_column("0").label("pendiente"),
                 literal_column("0").label("en_proceso"),
                 literal_column("0").label("confirmado"),

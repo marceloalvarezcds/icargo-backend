@@ -46,7 +46,7 @@ class Caja(AuditMixin, Base):
     def credito(self):
         if self.instrumentos:
             return sum(
-                x.credito for x in self.instrumentos if x.estado != EstadoEnum.ELIMINADO.value
+                x.credito for x in self.instrumentos if x.estado != EstadoEnum.ELIMINADO.value and x.estado != EstadoEnum.ANULADO.value
             )
         return None
 
@@ -54,6 +54,6 @@ class Caja(AuditMixin, Base):
     def debito(self):
         if self.instrumentos:
             return sum(
-                x.debito for x in self.instrumentos if x.estado != EstadoEnum.ELIMINADO.value
+                x.debito for x in self.instrumentos if x.estado != EstadoEnum.ELIMINADO.value and x.estado != EstadoEnum.ANULADO.value
             )
         return None

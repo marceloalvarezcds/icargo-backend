@@ -15,6 +15,7 @@ from app.enums import (
     LiquidacionEstadoEnum,
     LiquidacionEtapaEnum,
     OperacionEstadoEnum,
+    EstadoEnum
 )
 from app.models import (
     Instrumento,
@@ -294,6 +295,35 @@ def rechazar_instrumento(db: Session, id: int, modified_by: str) -> Instrumento:
     return repositories.change_instrumento_operacion_estado(
         obj, db, OperacionEstadoEnum.RECHAZADO, modified_by
     )
+
+
+def anular_instrumento(db: Session, id: int, modified_by: str) -> Instrumento:
+    obj = get_instrumento_by_id(db, id)
+    caja = get_caja_by_id(db, obj.caja_id)
+    liquidacion = get_liquidacion_by_id(db, obj.liquidacion_id)
+
+    obj.estado = EstadoEnum.ANULADO.value
+    obj.operacion_estado = OperacionEstadoEnum.ANULADO.value
+
+    saldo_confirmado = caja.saldo_confirmado if caja.saldo_confirmado else 0
+    saldo_confirmado = saldo_confirmado - obj.monto_ml
+    repositories.change_caja_saldos(
+        caja, db, saldo_confirmado, modified_by
+    )
+
+    liquidacion = get_liquidacion_by_id(db, obj.liquidacion_id)
+    liquidacion.etapa = LiquidacionEtapaEnum.CONFIRMADO.value
+    change_movimiento_list_status(
+        db, liquidacion.movimientos, LiquidacionEtapaEnum.CONFIRMADO, modified_by
+    )
+    repositories.change_liquidacion_status(
+        liquidacion, db, LiquidacionEstadoEnum.SALDO_ABIERTO, modified_by
+    )
+
+    db.commit()
+    db.refresh(obj)
+
+    return obj
 
 
 def get_instrumento_reports(db: Session) -> str:

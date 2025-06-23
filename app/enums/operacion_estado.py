@@ -5,3 +5,4 @@ class OperacionEstadoEnum(Enum):
     EMITIDO = "Emitido"
     CONFIRMADO = "Confirmado"
     RECHAZADO = "Rechazado"
+    ANULADO = "Anulado"
