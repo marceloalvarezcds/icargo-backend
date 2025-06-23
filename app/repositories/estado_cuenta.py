@@ -1027,7 +1027,7 @@ def get_estado_cuenta_provision() -> Tuple:
 
 def get_cols_estado_cuenta_provision() -> Tuple:
     return (
-        Provision.monto.label("provision"),
+        Provision.monto_mon_local.label("provision"),
         literal_column("0").label("pendiente"),
         literal_column("0").label("confirmado"),
         literal_column("0").label("finalizado"),
