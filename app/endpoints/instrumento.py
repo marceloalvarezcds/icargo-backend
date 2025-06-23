@@ -27,3 +27,13 @@ async def rechazar_instrumento(
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.INSTRUMENTO)),  # noqa: B008
 ):
     return services.rechazar_instrumento(db, id, current_user.username)
+
+
+@api.get("/{id}/anular", response_model=schemas.Instrumento)
+async def anular_instrumento(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.INSTRUMENTO)),  # noqa: B008
+):
+    return services.anular_instrumento(db, id, current_user.username)
