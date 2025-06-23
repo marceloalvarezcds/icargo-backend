@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_DOWN
 from typing import List, Optional, Tuple
 
 from fastapi import HTTPException  # type: ignore
@@ -15,6 +15,7 @@ from app.enums import (
     LiquidacionEstadoEnum,
     LiquidacionEtapaEnum,
     OperacionEstadoEnum,
+    EstadoEnum
 )
 from app.models import (
     Instrumento,
@@ -57,6 +58,7 @@ def get_saldos_by_monto(
     banco_id: Optional[int],
     liquidacion_id: int,
     monto: Decimal,
+    tipo_cambio_moneda: Decimal,
     modified_by: str,
 ) -> Tuple[Decimal, Decimal, Decimal, Decimal, Decimal]:
     liquidacion = get_liquidacion_by_id(db, liquidacion_id)
@@ -65,6 +67,7 @@ def get_saldos_by_monto(
     provision = Decimal(0)
     saldo_confirmado = Decimal(0)
     saldo_provisional = Decimal(0)
+    monto_ml = Decimal(0)
     if caja_id and via.descripcion == InstrumentoViaEnum.CAJA.value:
         caja = get_caja_by_id(db, caja_id)
         if liquidacion.tipo_operacion_descripcion == "Cobro":
@@ -74,6 +77,7 @@ def get_saldos_by_monto(
         saldo_confirmado = (
             credito - debito + (caja.saldo_confirmado if caja.saldo_confirmado else 0)
         )
+        monto_ml = Decimal( ((credito-debito) * tipo_cambio_moneda) )
         repositories.change_caja_saldos(caja, db, saldo_confirmado, modified_by)
     elif banco_id:
         banco = get_banco_by_id(db, banco_id)
@@ -85,15 +89,18 @@ def get_saldos_by_monto(
         saldo_provisional = provision + (
             banco.saldo_provisional if banco.saldo_provisional else 0
         )
+        monto_ml = Decimal( (provision * tipo_cambio_moneda) )
         repositories.change_banco_saldos(
             banco, db, saldo_confirmado, saldo_provisional, modified_by
         )
+
     return (
         credito,
         debito,
         saldo_confirmado,
         provision,
         saldo_provisional,
+        monto_ml.quantize(Decimal("1"), rounding=ROUND_HALF_DOWN)
     )
 
 
@@ -135,6 +142,11 @@ def finalizar_liquidacion(db: Session, liquidacion: Liquidacion, modified_by: st
         repositories.change_liquidacion_status(
             liquidacion, db, LiquidacionEstadoEnum.FINALIZADO, modified_by
         )
+    else:
+        if is_saldo_cerrado:
+            repositories.change_liquidacion_status(
+                liquidacion, db, LiquidacionEstadoEnum.SALDO_CERRADO, modified_by
+        )
 
 
 def create_instrumento(
@@ -143,18 +155,22 @@ def create_instrumento(
     data: InstrumentoForm,
     modified_by: str,
 ) -> Instrumento:
+
     via = get_instrumento_via_by_id(db, data.via_id)
     operacion_estado = OperacionEstadoEnum.EMITIDO
+
     if via.descripcion == InstrumentoViaEnum.CAJA.value:
         tipo_instrumento = get_tipo_instrumento_by_descripcion(db, "Efectivo")
         data.tipo_instrumento_id = tipo_instrumento.id
         operacion_estado = OperacionEstadoEnum.CONFIRMADO
+
     (
         credito,
         debito,
         saldo_confirmado,
         provision,
         saldo_provisional,
+        monto_ml
     ) = get_saldos_by_monto(
         db,
         via,
@@ -162,9 +178,12 @@ def create_instrumento(
         data.banco_id,
         liquidacion_id,
         data.monto,
+        data.tipo_cambio_moneda,
         modified_by,
     )
     data.liquidacion_id = liquidacion_id
+    data.monto_ml = monto_ml
+
     instrumento = repositories.create_instrumento(
         db,
         InstrumentoSaldoForm(
@@ -174,7 +193,7 @@ def create_instrumento(
             debito=debito,
             saldo_confirmado=saldo_confirmado,
             provision=provision,
-            saldo_provisional=saldo_provisional,
+            saldo_provisional=saldo_provisional
         ),
         modified_by,
     )
@@ -197,6 +216,7 @@ def edit_instrumento(
         saldo_confirmado,
         provision,
         saldo_provisional,
+        monto_ml
     ) = get_saldos_by_monto(
         db,
         via,
@@ -204,8 +224,10 @@ def edit_instrumento(
         data.banco_id,
         liquidacion_id,
         data.monto,
+        data.tipo_cambio_moneda,
         modified_by,
     )
+    data.monto_ml = monto_ml
     return repositories.edit_instrumento(
         to_edit_obj,
         db,
@@ -215,7 +237,7 @@ def edit_instrumento(
             debito=debito,
             saldo_confirmado=saldo_confirmado,
             provision=provision,
-            saldo_provisional=saldo_provisional,
+            saldo_provisional=saldo_provisional
         ),
         modified_by,
     )
@@ -273,6 +295,35 @@ def rechazar_instrumento(db: Session, id: int, modified_by: str) -> Instrumento:
     return repositories.change_instrumento_operacion_estado(
         obj, db, OperacionEstadoEnum.RECHAZADO, modified_by
     )
+
+
+def anular_instrumento(db: Session, id: int, modified_by: str) -> Instrumento:
+    obj = get_instrumento_by_id(db, id)
+    caja = get_caja_by_id(db, obj.caja_id)
+    liquidacion = get_liquidacion_by_id(db, obj.liquidacion_id)
+
+    obj.estado = EstadoEnum.ANULADO.value
+    obj.operacion_estado = OperacionEstadoEnum.ANULADO.value
+
+    saldo_confirmado = caja.saldo_confirmado if caja.saldo_confirmado else 0
+    saldo_confirmado = saldo_confirmado - obj.monto_ml
+    repositories.change_caja_saldos(
+        caja, db, saldo_confirmado, modified_by
+    )
+
+    liquidacion = get_liquidacion_by_id(db, obj.liquidacion_id)
+    liquidacion.etapa = LiquidacionEtapaEnum.CONFIRMADO.value
+    change_movimiento_list_status(
+        db, liquidacion.movimientos, LiquidacionEtapaEnum.CONFIRMADO, modified_by
+    )
+    repositories.change_liquidacion_status(
+        liquidacion, db, LiquidacionEstadoEnum.SALDO_ABIERTO, modified_by
+    )
+
+    db.commit()
+    db.refresh(obj)
+
+    return obj
 
 
 def get_instrumento_reports(db: Session) -> str:

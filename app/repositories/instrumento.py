@@ -43,10 +43,10 @@ def create_instrumento(
     data: InstrumentoSaldoForm,
     modified_by: str,
 ) -> Instrumento:
-    monto_ml = (
-        (data.credito + (data.debito*-1)) * data.tipo_cambio_moneda if (data.caja_id) else
-        (data.provision) * data.tipo_cambio_moneda
-    )
+    #monto_ml = (
+        #(data.credito + (data.debito*-1)) * data.tipo_cambio_moneda if (data.caja_id) else
+        #(data.provision) * data.tipo_cambio_moneda
+    #)
     obj = Instrumento(
         via_id=data.via_id,
         caja_id=data.caja_id,
@@ -71,7 +71,7 @@ def create_instrumento(
         moneda_id=data.moneda_id,
         created_by=modified_by,
         modified_by=modified_by,
-        monto_ml=monto_ml
+        monto_ml=data.monto_ml
     )
     db.add(obj)
     db.commit()

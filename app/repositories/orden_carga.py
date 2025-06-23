@@ -1,7 +1,9 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Optional
 
 from app.models.combinacion import Combinacion
+from app.models.orden_carga_remision_origen import OrdenCargaRemisionOrigen
 from app.models.permiso import Permiso
 from app.models.rol import Rol
 from sqlalchemy.orm import Query, Session  # type: ignore
@@ -11,6 +13,7 @@ from sqlalchemy import desc
 
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
 from app.models import Camion, Flete, OrdenCarga
+from app.models.unidad import Unidad
 from app.schemas import OrdenCargaEditForm, OrdenCargaForm
 from app.schemas.orden_carga import OrdenCargaUpdateFecha
 
@@ -546,18 +549,22 @@ def cancelar_orden_carga(
     modified_by: str,
 ) -> OrdenCarga:
     create_orden_carga_estado_historial(db, obj.id, EstadoEnum.CANCELADO, modified_by)
+
     flete = obj.flete
-    # Revertir el saldo del flete
-    flete.saldo += obj.cantidad_nominada
+
+    remisionado_oc = (
+        db.query(func.sum(OrdenCargaRemisionOrigen.cantidad * Unidad.conversion_kg))
+        .join(Unidad, OrdenCargaRemisionOrigen.unidad_id == Unidad.id)
+        .filter(OrdenCargaRemisionOrigen.orden_carga_id == obj.id)
+        .scalar()
+    ) or Decimal("0")
+
+    cantidad_a_devolver = remisionado_oc if remisionado_oc > 0 else obj.cantidad_nominada
+
+    flete.cargado -= cantidad_a_devolver
+    flete.saldo += cantidad_a_devolver
+
     db.add(flete)
-
-    # Eliminar complementos asociados
-    for complemento in obj.complementos:
-        db.delete(complemento)
-
-    # Eliminar descuentos asociados
-    for descuento in obj.descuentos:
-        db.delete(descuento)
 
     updated_obj = change_orden_carga_status(obj, db, EstadoEnum.CANCELADO, modified_by)
 

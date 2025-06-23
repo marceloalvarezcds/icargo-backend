@@ -62,7 +62,7 @@ def get_merma_detalle(
     diff = f"Dif.: {number_format(oc.diferencia_origen_destino)}Kg ||"
     totl = f"Tol.: {number_format(tolerancia_kg)}Kg ||"
     merm = f"M.: {number_format(resultado_merma)}Kg ||"
-    mval = f"{number_format(valor)}{moneda.simbolo}/Kg ||"
+    mval = f"{number_format(valor)}{get_tarifa_unidad(moneda, unidad)} ||"
     nums = f"Nº Rem: {oc.remisiones} || Tickets: {oc.nro_tickets} ||"
     ubic = f"Ori: {oc.origen_nombre} || Des: {oc.destino_nombre}"
     return f"{remi} {diff} {totl} {merm} {mval} {nums} {ubic}"

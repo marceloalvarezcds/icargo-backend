@@ -97,19 +97,25 @@ def get_estado_cuenta_by_contraparte(
     contraparte_id: int,
     contraparte: str,
     contraparte_numero_documento: str,
+    gestor_carga_id: int,
     punto_venta_id: int = None,
 ) -> Optional[EstadoCuenta]:
     tipo_contraparte = repositories.get_tipo_comprobante_by_id(db, tipo_contraparte_id)
-    # obtenemos la mon local
+
+    moneda_local= repositories.get_moneda_by_gestor_carga(db, gestor_carga_id)
+    moneda_local_id = moneda_local.id if moneda_local else 1
+
     if not tipo_contraparte:
         raise HTTPException(status_code=404, detail="Tipo de Contraparte no encontrado")
+
     if tipo_contraparte.descripcion == TipoContraparteEnum.OTRO.value:
         result = repositories.get_estado_cuenta_by_contraparte_tipo_otro(
-            db, contraparte, contraparte_numero_documento, tipo_contraparte_id
+            db, contraparte, contraparte_numero_documento, tipo_contraparte_id,
+            moneda_local_id
         )
     else:
         result = repositories.get_estado_cuenta_by_contraparte_and_tipo(
-            db, contraparte_id, 1, tipo_contraparte_id, punto_venta_id
+            db, contraparte_id, moneda_local_id, tipo_contraparte_id, punto_venta_id
         )
     if result:
         return EstadoCuenta.from_orm_row(result)

@@ -10,6 +10,7 @@ from app import repositories, schemas
 from app.config import REPORTS_FOLDER
 from app.enums import EstadoEnum
 from app.models import Chofer
+from app.models.combinacion import Combinacion
 from app.utils import get_gestor_carga_by_params
 
 from .camion import get_camion_by_id
@@ -201,33 +202,36 @@ def change_chofer_status(
     if not chofer:
         raise HTTPException(status_code=404, detail="Chofer no encontrado.")
 
-    # Cambiar el estado del chofer
     repositories.change_chofer_status(chofer, db, status, modified_by)
+    combinaciones_relacionadas = repositories.get_combinaciones_by_chofer_id(db, chofer.id)
 
-    # Si el chofer es inactivado, inactivar las combinaciones relacionadas
     if status == EstadoEnum.INACTIVO:
-        # Obtener todas las combinaciones relacionadas con este chofer
-        combinaciones_relacionadas = repositories.get_combinaciones_by_chofer_id(db, chofer.id)
-
         # Inactivar cada combinación asociada
         for combinacion in combinaciones_relacionadas:
             repositories.change_combinacion_status(combinacion, db, EstadoEnum.INACTIVO, modified_by)
 
-    # Si el chofer es activado, activar las combinaciones relacionadas
     elif status == EstadoEnum.ACTIVO:
-        # Obtener todas las combinaciones relacionadas con este chofer
-        combinaciones_relacionadas = repositories.get_combinaciones_by_chofer_id(db, chofer.id)
-
-        # Activar cada combinación asociada
         for combinacion in combinaciones_relacionadas:
-            repositories.change_combinacion_status(combinacion, db, EstadoEnum.ACTIVO, modified_by)
+            # Verificar que todos los elementos estén activos
+            if (
+                combinacion.camion and combinacion.camion.estado == EstadoEnum.ACTIVO.value and
+                combinacion.semi and combinacion.semi.estado == EstadoEnum.ACTIVO.value and
+                combinacion.propietario and combinacion.propietario.estado == EstadoEnum.ACTIVO.value
+            ):
+                # Verificar que no exista otra combinación activa con el mismo camion y propietario
+                conflicto = db.query(Combinacion).filter(
+                    Combinacion.id != combinacion.id,
+                    Combinacion.camion_id == combinacion.camion_id,
+                    Combinacion.propietario_id == combinacion.propietario_id,
+                    Combinacion.estado != EstadoEnum.INACTIVO.value
+                ).first()
 
-    # Confirmar los cambios en la base de datos
+                if not conflicto:
+                    repositories.change_combinacion_status(combinacion, db, EstadoEnum.ACTIVO, modified_by)
+                # Si hay conflicto, no se activa la combinación
     db.commit()
 
     return schemas.Chofer.from_orm(chofer)
-
-
 
 
 def get_chofer_reports(db: Session) -> str:

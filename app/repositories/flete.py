@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
+from decimal import Decimal
 
 from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
@@ -159,20 +160,16 @@ def edit_flete(
         # fin - Condiciones para el Propietario
         # FIN Cantidad y Flete
         # INICIO Mermas de Fletes
-        # inicio - Mermas para el Gestor de Carga
         obj.merma_gestor_cuenta_valor = data.merma_gestor_carga_valor
         obj.merma_gestor_cuenta_moneda_id = data.merma_gestor_carga_moneda_id
         obj.merma_gestor_cuenta_unidad_id = data.merma_gestor_carga_unidad_id
         obj.merma_gestor_cuenta_es_porcentual = data.merma_gestor_carga_es_porcentual
         obj.merma_gestor_cuenta_tolerancia = data.merma_gestor_carga_tolerancia
-        # fin - Mermas para el Gestor de Carga
-        # inicio - Mermas para el Propietario
         obj.merma_propietario_valor = data.merma_propietario_valor
         obj.merma_propietario_moneda_id = data.merma_propietario_moneda_id
         obj.merma_propietario_unidad_id = data.merma_propietario_unidad_id
         obj.merma_propietario_es_porcentual = data.merma_propietario_es_porcentual
         obj.merma_propietario_tolerancia = data.merma_propietario_tolerancia
-        # fin - Mermas para el Propietario
         # FIN Mermas de Fletes
         # INICIO Emisión de Órdenes
         obj.emision_orden_texto_legal = data.emision_orden_texto_legal
@@ -181,6 +178,14 @@ def edit_flete(
         obj.vigencia_anticipos = data.vigencia_anticipos
         obj.modified_by = modified_by
         obj.modified_at = datetime.now()
+
+        #  Actualización de saldo
+        cargado = obj.cargado if obj.cargado is not None else Decimal("0")
+        if obj.condicion_cantidad is not None:
+            obj.saldo = obj.condicion_cantidad - cargado
+        else:
+            obj.saldo = None
+
         db.commit()
         db.refresh(obj)
     return obj

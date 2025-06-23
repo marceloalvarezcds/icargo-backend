@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, Form
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -41,3 +41,17 @@ async def update_orden_carga_anticipo_saldo_by(
     return services.update_orden_carga_anticipo_saldo_by_orden_carga_id(
         db, orden_carga_id, current_user.username
     )
+
+
+@api.get("/actualizar-retiro/{flete_id_anterior}/{flete_id_nuevo}/{orden_carga_id}", response_model=Optional[schemas.OrdenCargaAnticipoSaldo])
+async def actualizar_total_retirado_oc(
+    flete_id_anterior: int,
+    flete_id_nuevo: int,
+    orden_carga_id: int,
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA)),
+):
+    return services.update_total_retirado(db, orden_carga_id, flete_id_anterior, flete_id_nuevo)
+
+

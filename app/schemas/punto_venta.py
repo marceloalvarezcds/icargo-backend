@@ -18,6 +18,7 @@ class PuntoVentaBaseModel(BaseModel):
     nombre: Optional[str] = None
     nombre_corto: Optional[str] = None
     numero_sucursal: int
+    puede_recibir_anticipos_efectivo: Optional[bool] = None
     proveedor_id: int
     tipo_documento_id: int
     numero_documento: str
@@ -39,6 +40,7 @@ class PuntoVentaForm(PuntoVentaBaseModel):
     contactos: List[ContactoForm]
     created_by: Optional[str] = None
     modified_by: Optional[str] = None
+
     class Config:
         orm_mode = True
         use_enum_values = True
@@ -63,6 +65,7 @@ class PuntoVentaList(PuntoVentaBase):
     proveedor_nombre: str
     tipo_documento_descripcion: Optional[str] = None
     modified_by: Optional[str] = None
+    puede_recibir_anticipos_efectivo: bool
 
     class Config:
         orm_mode = True

@@ -137,6 +137,7 @@ from .instrumento import (  # noqa
     get_instrumento_by_id,
     get_instrumento_reports,
     rechazar_instrumento,
+    anular_instrumento
 )
 from .insumo_punto_venta import (  # noqa
     get_insumo_list_by_tipo_insumo_id_and_gestor_carga_id,
@@ -187,7 +188,9 @@ from .liquidacion import (  # noqa
     remove_movimiento,
     someter_liquidacion,
     remove_movimientos,
-    refresh_pago_cobro
+    refresh_pago_cobro,
+    add_instrumento,
+    forzar_cierre
 )
 from .movimiento import (  # noqa
     create_movimiento,
@@ -250,7 +253,8 @@ from .orden_carga import (  # noqa
     get_orden_carga_cerradas_list,
     recalcular_condiciones,
     validar_habilitacion_para_anticipos,
-    recalcular_provisiones
+    recalcular_provisiones,
+    update_flete_saldo,
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
@@ -259,12 +263,14 @@ from .orden_carga_anticipo_retirado import (  # noqa
     get_orden_carga_anticipo_retirado_by_id,
     get_orden_carga_anticipo_retirado_pdf_by_id,
     change_anticipo_status,
+    get_orden_carga_anticipo_retirado_list,
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id,
     get_saldos_by_orden_carga,
     get_flete_anticipo_by_orden_carga_insumos,
     get_flete_anticipo_id_by_flete_id_and_orden_carga_id,
+    update_total_retirado,
 )
 from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,
@@ -322,6 +328,7 @@ from .proveedor import (  # noqa
     get_proveedor_by_id,
     get_proveedor_by_id_and_gestor_carga_id,
     get_proveedor_reports,
+    change_proveedor_status,
 )
 from .proveedor_contacto import update_proveedor_contacto_list  # noqa
 from .punto_venta import (  # noqa
@@ -340,6 +347,7 @@ from .remitente import (  # noqa
     get_remitente_by_id,
     get_remitente_by_id_and_gestor_carga_id,
     get_remitente_reports,
+    change_remitente_status,
 )
 from .remitente_contacto import update_remitente_contacto_list  # noqa
 from .rentabilidad import get_rentabilidad_list, get_rentabilidad_reports  # noqa
@@ -404,6 +412,7 @@ from .combinacion import (
     get_camion_list_combinacion,
     get_semi_list_by_camion_id,
     get_combinacion_by_camion_id_and_semi_id_,
+    get_combinacion_all_list,
 )
 from .contribuyente import (
     get_list,

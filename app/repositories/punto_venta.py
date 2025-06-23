@@ -86,6 +86,25 @@ def get_punto_venta_by(
     )
 
 
+def get_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[PuntoVenta]:
+    return (
+        db.query(PuntoVenta)
+        .join(Proveedor)
+        .join(GestorCargaProveedor)
+        .filter(
+            and_(
+                GestorCargaProveedor.gestor_carga_id == gestor_carga_id,
+                PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
+                PuntoVenta.puede_recibir_anticipos_efectivo.is_(True)
+            )
+        )
+        .order_by(PuntoVenta.id.desc())
+        .all()
+    )
+
+
 def get_punto_venta_by_id(db: Session, id: int) -> Optional[PuntoVenta]:
     return db.query(PuntoVenta).filter(PuntoVenta.id == id).first()
 
@@ -116,6 +135,7 @@ def create_punto_venta(
         ciudad_id=data.ciudad_id,
         modified_by=modified_by,
         numero_sucursal=data.numero_sucursal,
+        puede_recibir_anticipos_efectivo=data.puede_recibir_anticipos_efectivo,
         created_by = modified_by,
     )
     db.add(obj)
@@ -149,6 +169,7 @@ def edit_punto_venta(
     obj.estado = data.estado
     obj.modified_by = modified_by
     obj.numero_sucursal = data.numero_sucursal
+    obj.puede_recibir_anticipos_efectivo = data.puede_recibir_anticipos_efectivo
     obj.modified_at = datetime.now()
     if logo_url:
         obj.logo = logo_url

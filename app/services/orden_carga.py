@@ -167,10 +167,10 @@ def create_orden_carga(
     if estado_inicial == EstadoEnum.ACEPTADO:
         cant_oc_aceptadas = repositories.get_orden_carga_aceptada_count_by_camion_id(db, data.camion_id)
         if cant_oc_aceptadas >= camion.limite_cantidad_oc_activas:
-            print(f"Existen {cant_oc_aceptadas} OC aceptadas y el límite es de {camion.limite_cantidad_oc_activas} para el camión con placa {camion.placa}")
+            print(f"Existen {cant_oc_aceptadas} OC aceptadas y el límite es de {camion.limite_cantidad_oc_activas} para el tracto con placa {camion.placa}")
             raise HTTPException(
                 status_code=HTTPStatus.LOCKED,
-                detail=f"El camión con placa {camion.placa} ha alcanzado el límite de órdenes activas permitidas ({camion.limite_cantidad_oc_activas})."
+                detail=f"El tracto con placa {camion.placa} ha alcanzado el límite de órdenes activas permitidas ({camion.limite_cantidad_oc_activas})."
             )
 
     moneda_gestor_carga = get_moneda_by_gestor_carga(db, gestor_carga_id)
@@ -206,7 +206,7 @@ def create_orden_carga(
         flete.merma_propietario_valor * cotizacion_origen_propietario.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
     )
     condicion_gestor_carga_tarifa_ml = (
-        flete.condicion_gestor_carga_tarifa * cotizacion_condicion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
+        flete.condicion_gestor_carga_tarifa * cotizacion_condicion_origen_gestor_carga.cotizacion_moneda / flete.condicion_gestor_carga_unidad_conversion
     )
     condicion_propietario_tarifa_ml = (
         flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / flete.condicion_propietario_unidad_conversion
@@ -216,7 +216,7 @@ def create_orden_carga(
         raise HTTPException(
             status_code=400,
             detail=(
-                f"La cantidad nominada ({data.cantidad_nominada}) supera el saldo disponible del flete ({flete.saldo})."
+                f"La cantidad nominada supera el saldo disponible del pedido)."
             )
         )
 
@@ -300,7 +300,6 @@ def edit_orden_carga(
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
-
 def edit_remitir_fecha(
     id: int,
     db: Session,
@@ -313,7 +312,6 @@ def edit_remitir_fecha(
         raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
 
     return repositories.edit_remitir_fecha(db, orden_carga, data, current_user.gestor_carga_id, current_user.username)
-
 
 
 def update_comentarios(
@@ -405,7 +403,6 @@ def validar_habilitacion_para_anticipos(
     return True
 
 
-
 def get_ordenes_carga_by_combinacion_id(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     ordenes_carga = db.query(OrdenCarga).filter(OrdenCarga.combinacion_id == combinacion_id).all()
     if not combinacion_id:
@@ -416,11 +413,9 @@ def get_ordenes_carga_by_combinacion_id(db: Session, combinacion_id: int) -> Lis
 def get_ordenes_carga_by_combinacion_id_and_nuevo(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-
-    # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
-        OrdenCarga.estado == "Nuevo"  # Ajusta este valor si el estado se almacena de manera diferente
+        OrdenCarga.estado == "Nuevo"
     ).all()
 
     return ordenes_carga
@@ -429,11 +424,9 @@ def get_ordenes_carga_by_combinacion_id_and_nuevo(db: Session, combinacion_id: i
 def get_ordenes_carga_by_combinacion_id_and_finalizar(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-
-    # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
-        OrdenCarga.estado == "Finalizado"  # Ajusta este valor si el estado se almacena de manera diferente
+        OrdenCarga.estado == "Finalizado"
     ).all()
 
     return ordenes_carga
@@ -442,13 +435,10 @@ def get_ordenes_carga_by_combinacion_id_and_finalizar(db: Session, combinacion_i
 def get_ordenes_carga_by_combinacion_id_and_aceptado(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-
-    # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
-        OrdenCarga.estado == "Aceptado"  # Ajusta este valor si el estado se almacena de manera diferente
+        OrdenCarga.estado == "Aceptado"
     ).all()
-
     return ordenes_carga
 
 
@@ -461,10 +451,7 @@ def get_orden_carga_list_by_combinacion_id(
     return obj
 
 
-
 def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
-    logger.info('Inicio del proceso de generación de PDF')
-
     obj = repositories.get_orden_carga_by_id(db, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Orden de Carga no encontrada")
@@ -527,8 +514,6 @@ def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
         "usuario": obj.created_by,
     }
     source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
-    logger.info(f'LOGO_IMAGE_URL: {LOGO_IMAGE_URL}')
-    logger.info('html generado exitosamente')
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
     from_string(source_html, pdf_filename, {"page-size": "Legal"})
     return OUTPUT_FILENAME
@@ -731,7 +716,6 @@ def recalcular_provisiones(db: Session, id: int, current_user: schemas.AuthUser)
         db, obj, current_user.gestor_carga_id, current_user.username
     )
     return get_orden_carga_with_resultado(db, obj, current_user.id)
-
 
 
 def liquidar_orden_carga(
@@ -1148,7 +1132,7 @@ def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, curr
 
     # Recalcular los valores
     condicion_gestor_carga_tarifa_ml = (
-        flete.condicion_gestor_carga_tarifa * cot_gc_cond.cotizacion_moneda / cot_destino.cotizacion_moneda
+        flete.condicion_gestor_carga_tarifa * cot_gc_cond.cotizacion_moneda / flete.condicion_gestor_carga_unidad_conversion
     )
     condicion_propietario_tarifa_ml = (
         flete.condicion_propietario_tarifa * cot_prop_cond.cotizacion_moneda / flete.condicion_propietario_unidad_conversion
@@ -1184,3 +1168,80 @@ def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, curr
         merma_gestor_carga_valor_ml=orden_carga.merma_gestor_carga_valor_ml,
         merma_propietario_valor_ml=orden_carga.merma_propietario_valor_ml,
     )
+
+
+def update_flete_saldo(db: Session, flete_id: int, orden_carga_id: int, current_user: schemas.AuthUser) -> schemas.RecalculoCondicionesResponse:
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
+    if not orden_carga:
+        return
+
+    # Solo recalcular si el flete es diferente al actual
+    if orden_carga.flete_id == flete_id:
+        return
+
+    flete = repositories.get_flete_by_id(db, flete_id)
+    if not flete:
+        return
+
+    gestor_carga_id = current_user.gestor_carga_id
+    moneda_gc = get_moneda_by_gestor_carga(db, gestor_carga_id)
+    if not moneda_gc:
+        return
+
+    flete_anticipo = flete.anticipos[0] if flete.anticipos else None
+    if not flete_anticipo:
+        return
+
+    # Actualizar flete en la orden de carga
+    flete_anterior_id = orden_carga.flete_id
+    orden_carga.flete_id = flete_id
+        # Actualizar estado is_in_orden_carga de fletes
+    actualizar_estado_y_cantidades_fletes(
+        db=db,
+        nuevo_flete_id=flete_id,
+        flete_anterior_id=flete_anterior_id,
+        orden_carga_id=orden_carga_id,
+        cantidad_nominada=orden_carga.cantidad_nominada
+    )
+
+    db.commit()
+    db.refresh(orden_carga)
+
+
+def actualizar_estado_y_cantidades_fletes(
+    db: Session,
+    nuevo_flete_id: int,
+    flete_anterior_id: Optional[int],
+    orden_carga_id: int,
+    cantidad_nominada: float
+):
+    # Actualizar el nuevo flete
+    nuevo_flete = db.query(Flete).filter(Flete.id == nuevo_flete_id).first()
+    if nuevo_flete:
+        nuevo_flete.is_in_orden_carga = True
+        # Restar la cantidad nominada del saldo del nuevo flete
+        nuevo_flete.saldo = (nuevo_flete.saldo or 0) - cantidad_nominada
+        # Sumar la cantidad nominada al cargado acumulado
+        nuevo_flete.cargado = (nuevo_flete.cargado or 0) + cantidad_nominada
+        db.add(nuevo_flete)
+
+    # Actualizar el flete anterior solo si es distinto al nuevo y no está en otra orden
+    if flete_anterior_id and flete_anterior_id != nuevo_flete_id:
+        otras_oc = (
+            db.query(OrdenCarga)
+            .filter(
+                OrdenCarga.flete_id == flete_anterior_id,
+                OrdenCarga.id != orden_carga_id
+            )
+            .count()
+        )
+        if otras_oc == 0:
+            flete_anterior = db.query(Flete).filter(Flete.id == flete_anterior_id).first()
+            if flete_anterior:
+                flete_anterior.is_in_orden_carga = False
+                # Sumar la cantidad nominada de vuelta al saldo del flete anterior
+                flete_anterior.saldo = (flete_anterior.saldo or 0) + cantidad_nominada
+                # Restar la cantidad nominada del cargado acumulado
+                flete_anterior.cargado = (flete_anterior.cargado or 0) - cantidad_nominada
+                db.add(flete_anterior)
+

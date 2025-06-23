@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import func  # type: ignore
 from sqlalchemy.orm import Query, Session  # type: ignore
@@ -10,6 +10,34 @@ from app.enums import EstadoEnum
 from app.models import Movimiento, OrdenCarga, OrdenCargaAnticipoRetirado, Camion
 from app.models.orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from app.schemas import OrdenCargaAnticipoRetiradoForm
+from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
+
+
+def get_orden_carga_anticipo_retirado_list(db: Session) -> List[OrdenCargaAnticipoRetirado]:
+    return (
+        db.query(OrdenCargaAnticipoRetirado)
+        .filter(OrdenCargaAnticipoRetirado.estado_movimiento != EstadoEnum.ELIMINADO.value)
+        .order_by(desc(OrdenCargaAnticipoRetirado.id))
+        .all()
+    )
+
+
+def get_orden_carga_anticipo_retirado_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[OrdenCargaAnticipoRetirado]:
+    return (
+        db.query(OrdenCargaAnticipoRetirado)
+        .join(OrdenCarga)  # Esto es necesario
+        .filter(
+            and_(
+                OrdenCarga.gestor_carga_id == gestor_carga_id,
+            )
+        )
+        .options(joinedload(OrdenCargaAnticipoRetirado.orden_carga))
+        .order_by(desc(OrdenCargaAnticipoRetirado.id))
+        .all()
+    )
 
 
 def get_orden_carga_anticipo_retirado_by(
@@ -116,16 +144,12 @@ def change_anticipo_status(
     status: EstadoEnum,
     modified_by: str,
 ) -> OrdenCargaAnticipoRetirado:
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
 
-    movimiento = get_movimiento_by_anticipo_id(db, obj.id)
-    if movimiento:
-
-        movimiento.estado = status.value
-        movimiento.modified_by = modified_by
-        movimiento.modified_at = datetime.now()
-
-        db.commit()
-        db.refresh(movimiento)
+    db.commit()
+    db.refresh(obj)
 
     return obj
 
@@ -143,7 +167,7 @@ def get_anticipo_by_id(db: Session, id: int) -> OrdenCargaAnticipoRetirado:
 
 
 def get_movimiento_by_anticipo_id(db: Session, anticipo_id: int):
-    return db.query(Movimiento).filter(Movimiento.anticipo_id == anticipo_id).first()
+    return db.query(Movimiento).filter(Movimiento.anticipo_id == anticipo_id).all()
 
 
 def get_movimiento_by_anticipo_id_and_id(db: Session, anticipo_id: int, id: int):

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
+from app.enums.estado import EstadoEnum
 from app.models import (
     CentroOperativo,
     CentroOperativoContactoGestorCarga,
@@ -115,6 +116,13 @@ def delete_centro_operativo(
     co = get_centro_operativo_by_id(db, id)
     obj = repositories.delete_centro_operativo(co, db, modified_by)
     return get_centro_operativo_detail(obj, gestor_carga_id)
+
+
+def change_centro_operativo_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.CentroOperativo:
+    co = get_centro_operativo_by_id(db, id)
+    return repositories.change_centro_operativo_status(co, db, status, modified_by)
 
 
 def get_centro_operativo_reports(db: Session) -> str:

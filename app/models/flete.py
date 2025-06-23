@@ -176,6 +176,14 @@ class Flete(AuditMixin, Base):
         return self.condicion_gestor_carga_unidad.descripcion
 
     @hybrid_property
+    def condicion_gestor_carga_unidad_abreviatura(self):
+        return self.condicion_gestor_carga_unidad.abreviatura
+
+    @hybrid_property
+    def condicion_gestor_carga_unidad_conversion(self):
+        return self.condicion_gestor_carga_unidad.conversion_kg
+
+    @hybrid_property
     def condicion_propietario_moneda_nombre(self):
         return self.condicion_propietario_moneda.nombre
 
@@ -190,6 +198,10 @@ class Flete(AuditMixin, Base):
     @hybrid_property
     def condicion_propietario_unidad_descripcion(self):
         return self.condicion_propietario_unidad.descripcion
+
+    @hybrid_property
+    def condicion_propietario_unidad_abreviatura(self):
+        return self.condicion_propietario_unidad.abreviatura
 
     @hybrid_property
     def condicion_propietario_unidad_conversion(self):

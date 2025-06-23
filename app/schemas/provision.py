@@ -28,6 +28,7 @@ class ProvisionBaseModel(BaseModel):
     fecha: Optional[Date]
     detalle: Optional[str]
     monto: RoundedDecimal
+    monto_mon_local: Optional[RoundedDecimal]
     moneda_id: int
     tipo_cambio_moneda: Optional[RoundedDecimal]
     fecha_cambio_moneda: Optional[Date]

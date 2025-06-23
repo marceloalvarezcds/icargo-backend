@@ -243,17 +243,6 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     def unidad_descripcion(self):
         return self.unidad.descripcion if self.unidad else None
 
-    @hybrid_property
-    def estados_movimientos(self):
-        # Obtener todos los movimientos relacionados con la orden de carga
-        movimientos: List[Movimiento] = self.orden_carga.movimientos if self.orden_carga else []
-        movimientos_filtrados = [
-            movimiento for movimiento in movimientos
-            if movimiento.anticipo_id == self.id
-        ]
-        primer_estado = next((movimiento.estado for movimiento in movimientos_filtrados), None)
-
-        return primer_estado
 
     @hybrid_property
     def estado_movimiento_propietario(self):
@@ -266,4 +255,16 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
             return self.cantidad_retirada * self.precio_unitario
         return 0
 
+    @hybrid_property
+    def estado_movimiento(self):
+        if self.movimientos:
+            return self.movimientos[0].estado
+        return None
 
+    @hybrid_property
+    def camion_placa(self):
+        return self.orden_carga.camion_placa
+
+    @hybrid_property
+    def chofer_nombre(self):
+        return self.orden_carga.chofer_nombre

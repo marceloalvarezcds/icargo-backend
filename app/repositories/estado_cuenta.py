@@ -198,6 +198,8 @@ def get_estado_cuenta_chofer_liquidacion(db: Session) -> Query:
         .join(Liquidacion.chofer)
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.estado != 'Cancelado')
+        .filter(Instrumento.estado != 'Anulado')
+        .filter(Instrumento.operacion_estado != 'Rechazado')
     )
 
 
@@ -242,6 +244,8 @@ def get_estado_cuenta_propietario_liquidacion(db: Session) -> Query:
         .join(Liquidacion.propietario)
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.estado != 'Cancelado')
+        .filter(Instrumento.estado != 'Anulado')
+        .filter(Instrumento.operacion_estado != 'Rechazado')
     )
 
 
@@ -288,6 +292,8 @@ def get_estado_cuenta_proveedor_liquidacion(db: Session) -> Query:
         #.filter(~exists().where(PuntoVenta.proveedor_id == Proveedor.id))
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.estado != 'Cancelado')
+        .filter(Instrumento.estado != 'Anulado')
+        .filter(Instrumento.operacion_estado != 'Rechazado')
     )
 
 
@@ -332,6 +338,8 @@ def get_estado_cuenta_remitente_liquidacion(db: Session) -> Query:
         .join(Liquidacion.remitente)
         .join(Liquidacion.tipo_contraparte)
         .filter(Liquidacion.estado != 'Cancelado')
+        .filter(Instrumento.estado != 'Anulado')
+        .filter(Instrumento.operacion_estado != 'Rechazado')
     )
 
 
@@ -367,6 +375,8 @@ def get_estado_cuenta_otro_liquidacion(db: Session) -> Query:
         .join(Liquidacion.tipo_contraparte)
         .filter(TipoContraparte.descripcion == TipoContraparteEnum.OTRO.value)
         .filter(Liquidacion.estado != 'Cancelado')
+        .filter(Instrumento.estado != 'Anulado')
+        .filter(Instrumento.operacion_estado != 'Rechazado')
     )
 
 
@@ -611,8 +621,9 @@ def get_estado_cuenta_by_contraparte_tipo_otro(
     contraparte: str,
     contraparte_numero_documento: str,
     tipo_contraparte_id: int,
+    moneda_local_id: int
 ) -> Optional[Row]:
-    subquery = get_estado_cuenta_subquery(db).subquery()
+    subquery = get_estado_cuenta_subquery(db, moneda_local_id).subquery()
     table = (
         db.query(subquery)
         .filter(
@@ -771,6 +782,7 @@ def get_cols_estado_cuenta_liquidacion_case_statement() -> Tuple:
             (
                 or_(
                     Liquidacion.etapa == LiquidacionEstadoEnum.FINALIZADO.value,
+                    Liquidacion.estado == LiquidacionEstadoEnum.SALDO_ABIERTO.value,
                     Liquidacion.estado == LiquidacionEstadoEnum.SALDO_CERRADO.value
                 ),
                 (Instrumento.monto_ml)
@@ -861,15 +873,16 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
     query = db.query(
             literal_column("2").label("orden"),
             null().label("movimiento_id"),
-            case(
-                (
-                    InstrumentoVia.descripcion == 'Caja',
-                    Instrumento.caja_id,
-                ),
-                else_= Instrumento.banco_id
-            ).label("instrumento_id"),
+            #case(
+            #    (
+            #        InstrumentoVia.descripcion == 'Caja',
+            #        Instrumento.caja_id,
+            #    ),
+            #    else_= Instrumento.banco_id
+            #).label("instrumento_id"),
+            Instrumento.id.label("instrumento_id"),
             Liquidacion.id,
-            literal_column("' '").label("contraparte_alias"),
+            Liquidacion.contraparte.label("contraparte_alias"),
             Liquidacion.created_at,
             concat(InstrumentoVia.descripcion, ' | ', TipoInstrumento.descripcion).label("tipo_cuenta_descripcion"),
             literal_column("'Pago/Cobro'").label("tipo_movimiento_concepto"),
@@ -877,7 +890,7 @@ def get_query_instrumentos_by_contraparte_and_gestor_carga_id(
             Liquidacion.id.label("nro_documento_relacionado"),
             Factura.numero_factura,
             Instrumento.operacion_estado,
-            literal_column("''").label("estado_liquidacion"),
+            Liquidacion.estado.label("estado_liquidacion"),
             literal_column("false").label("es_editable"),
             literal_column("false").label("can_edit_oc"),
             literal_column("false").label("documento_fisico"),
@@ -1014,7 +1027,7 @@ def get_estado_cuenta_provision() -> Tuple:
 
 def get_cols_estado_cuenta_provision() -> Tuple:
     return (
-        Provision.monto.label("provision"),
+        Provision.monto_mon_local.label("provision"),
         literal_column("0").label("pendiente"),
         literal_column("0").label("confirmado"),
         literal_column("0").label("finalizado"),

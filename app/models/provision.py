@@ -56,6 +56,7 @@ class Provision(AuditMixin, Base):
     detalle = Column(Text)
     tipo_movimiento_info = Column(Text)
     monto = Column(Numeric(38, 10))
+    monto_mon_local = Column(Numeric(38, 10))
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
     moneda = relationship(Moneda, uselist=False)
     tipo_cambio_moneda = Column(Numeric(38, 10))

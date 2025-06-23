@@ -2,6 +2,8 @@ from datetime import datetime
 
 from operator import and_
 
+from fastapi import HTTPException
+
 from app.models.camion import Camion
 from sqlalchemy.sql.expression import update
 
@@ -9,7 +11,8 @@ from typing import List, Optional
 
 from app import schemas
 from app.models.gestor_carga import GestorCarga
-from app.schemas.combinacion import CombinacionCreateModel, CombinacionForm
+from app.models.semi import Semi
+from app.schemas.combinacion import CombinacionCreateModel, CombinacionForm, CombinacionUpdate
 from app.models.permiso import Permiso
 from app.models.rol import Rol
 from app.models.propietario import Propietario
@@ -29,7 +32,7 @@ def get_combinacion_list(db: Session) -> List[Combinacion]:
     )
 
 
-def get_combinacion_list_by_gestor_carga_id(
+def get_combinacion_all_list_by_gestor_carga_id(
     db: Session, gestor_carga_id: Optional[int]
 ) -> List[Combinacion]:
     return (
@@ -40,6 +43,23 @@ def get_combinacion_list_by_gestor_carga_id(
                 Combinacion.estado != EstadoEnum.ELIMINADO.value,
             ),
             Combinacion.estado != EstadoEnum.ELIMINADO.value,
+        )
+        .order_by(Combinacion.id.desc())
+        .all()
+    )
+
+def get_combinacion_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[Combinacion]:
+    return (
+        db.query(Combinacion)
+        .filter(
+            and_(
+                Combinacion.gestor_carga_id == gestor_carga_id,
+                Combinacion.estado != EstadoEnum.ELIMINADO.value,
+
+            ),
+            Combinacion.estado != EstadoEnum.NUEVO.value,
         )
         .order_by(Combinacion.id.desc())
         .all()
@@ -340,23 +360,65 @@ def change_combinacion_status(
     status: EstadoEnum,
     modified_by: str,
 ) -> Combinacion:
-    obj.estado = status.value
-    obj.modified_by = modified_by
-    obj.modified_at = datetime.now()
-
     if status == EstadoEnum.ACTIVO:
+        combinacion_tracto_propietario = db.query(Combinacion).filter(
+            Combinacion.id != obj.id,
+            Combinacion.camion_id == obj.camion_id,
+            Combinacion.propietario_id == obj.propietario_id,
+            Combinacion.estado != EstadoEnum.INACTIVO.value
+        ).first()
 
+        if combinacion_tracto_propietario:
+            raise HTTPException(
+                status_code=409,
+                detail="Ya existe una combinación activa con el tracto y beneficiario asociado."
+            )
+
+        camion = db.query(Camion).filter(Camion.id == obj.camion_id).first()
+        propietario = db.query(Propietario).filter(Propietario.id == obj.propietario_id).first()
+        chofer = db.query(Chofer).filter(Chofer.id == obj.chofer_id).first() if obj.chofer_id else None
+        semi = db.query(Semi).filter(Semi.id == obj.semi_id).first() if obj.semi_id else None
+
+        # Validar estados
+        if not camion or camion.estado == EstadoEnum.INACTIVO.value:
+            raise HTTPException(
+                status_code=400,
+                detail="No se puede activar la combinación porque el tracto está inactivo."
+            )
+        if not propietario or propietario.estado == EstadoEnum.INACTIVO.value:
+            raise HTTPException(
+                status_code=400,
+                detail="No se puede activar la combinación porque el propietario está inactivo."
+            )
+        if chofer and chofer.estado == EstadoEnum.INACTIVO.value:
+            raise HTTPException(
+                status_code=400,
+                detail="No se puede activar la combinación porque el chofer está inactivo."
+            )
+        if semi and semi.estado == EstadoEnum.INACTIVO.value:
+            raise HTTPException(
+                status_code=400,
+                detail="No se puede activar la combinación porque el semi está inactivo."
+            )
+
+        # Marcar el camión como en combinación
         db.execute(
             update(Camion)
             .where(Camion.id == obj.camion_id)
             .values(is_in_combinacion=True)
         )
+
     elif status == EstadoEnum.INACTIVO:
+        # Desmarcar el camión
         db.execute(
             update(Camion)
             .where(Camion.id == obj.camion_id)
             .values(is_in_combinacion=False)
         )
+
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
 
     db.commit()
     db.refresh(obj)
@@ -382,27 +444,37 @@ def get_combinacion_by(
 def edit_combinacion(
     combinacion: Combinacion,
     db: Session,
-    data,
+    data: CombinacionUpdate,
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> Combinacion:
-    # Actualizar campos principales de la combinación
-    combinacion.chofer_id = data.chofer_id
-    combinacion.semi_id = data.semi_id
-    combinacion.propietario_id = data.propietario_id
+    # Actualizar campos principales si cambiaron
+    if data.chofer_id is not None:
+        combinacion.chofer_id = data.chofer_id
+    if data.semi_id is not None:
+        combinacion.semi_id = data.semi_id
+    if data.propietario_id is not None:
+        combinacion.propietario_id = data.propietario_id
+
     combinacion.gestor_carga_id = gestor_carga_id
     combinacion.modified_by = modified_by
 
-    # Actualizar estado de "puede_recibir_anticipos" en propietario
-    if data.propietario_id is not None:
-        db.execute(
-            update(Propietario)
-            .where(Propietario.id == data.propietario_id)
-            .values(puede_recibir_anticipos=data.anticipo_propietario)
-        )
+    # Actualizar limites del camion solo si existen cambios
+    if combinacion.camion_id:
+        update_values = {}
+        if data.camion_oc_activa is not None:
+            update_values['limite_cantidad_oc_activas'] = data.camion_oc_activa
+        if data.limite_monto_anticipos is not None:
+            update_values['limite_monto_anticipos'] = data.limite_monto_anticipos
 
-    # Actualizar estado de "puede_recibir_anticipos" en chofer
-    if data.chofer_id is not None:
+        if update_values:
+            db.execute(
+                update(Camion)
+                .where(Camion.id == combinacion.camion_id)
+                .values(**update_values)
+            )
+
+    if data.chofer_id is not None and hasattr(data, 'puede_recibir_anticipos'):
         db.execute(
             update(Chofer)
             .where(Chofer.id == data.chofer_id)
@@ -457,7 +529,7 @@ def create_combinacion(
 ) -> Combinacion:
     rol_id = get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
 
-    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 6 - combinaciones", db)
+    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 6 - Combinaciones", db)
 
     # Determinar el estado inicial según el permiso
     if roles_permisos:

@@ -122,3 +122,16 @@ def delete_centro_operativo(
     db.commit()
     db.refresh(obj)
     return obj
+
+def change_centro_operativo_status(
+    obj: CentroOperativo,
+    db: Session,
+    status: EstadoEnum,
+    modified_by: str,
+) -> CentroOperativo:
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
