@@ -8,6 +8,7 @@ from sqlalchemy.sql.elements import and_, or_  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Movimiento, OrdenCarga, OrdenCargaAnticipoRetirado, Camion
+from app.models.flete_anticipo import FleteAnticipo
 from app.models.orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from app.schemas import OrdenCargaAnticipoRetiradoForm
 from sqlalchemy import desc
@@ -217,3 +218,27 @@ def get_total_anticipo_retirado_by_camion_id(
     return db.query(
         func.sum(subquery.c.monto_mon_local).label("monto_mon_local")
     ).first()[0]
+
+
+def get_flete_anticipo_anterior_con_retiro(
+    db: Session,
+    orden_carga_id: int,
+    exclude_flete_anticipo_id: Optional[int] = None,
+) -> Optional[FleteAnticipo]:
+    """
+    Busca un flete anticipo anterior que haya tenido retiros en esta orden de carga.
+    Opcionalmente excluye un ID.
+    """
+    subquery = (
+        db.query(OrdenCargaAnticipoRetirado.flete_anticipo_id)
+        .filter(OrdenCargaAnticipoRetirado.orden_carga_id == orden_carga_id)
+        .group_by(OrdenCargaAnticipoRetirado.flete_anticipo_id)
+        .having(func.sum(OrdenCargaAnticipoRetirado.monto_retirado) > 0)
+        .subquery()
+    )
+
+    query = db.query(FleteAnticipo).filter(FleteAnticipo.id.in_(subquery))
+    if exclude_flete_anticipo_id:
+        query = query.filter(FleteAnticipo.id != exclude_flete_anticipo_id)
+
+    return query.first()

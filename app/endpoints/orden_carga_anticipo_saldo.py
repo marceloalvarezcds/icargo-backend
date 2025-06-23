@@ -55,3 +55,17 @@ async def actualizar_total_retirado_oc(
     return services.update_total_retirado(db, orden_carga_id, flete_id_anterior, flete_id_nuevo)
 
 
+@api.get(
+    "/crear-saldo-desde-flete-anterior/{flete_anticipo_id}/{orden_carga_id}",
+    response_model=RoundedDecimal,
+)
+async def crear_saldo_desde_flete_anterior(
+    flete_anticipo_id: int,
+    orden_carga_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA_ANTICIPO_SALDO)),  # noqa: B008
+):
+    return services.get_saldo_anticipo_desde_flete_anterior(
+      db, flete_anticipo_id, orden_carga_id, current_user.username
+    )

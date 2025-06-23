@@ -137,7 +137,7 @@ from .instrumento import (  # noqa
     get_instrumento_by_id,
     get_instrumento_reports,
     rechazar_instrumento,
-    anular_instrumento
+    anular_instrumento,
 )
 from .insumo_punto_venta import (  # noqa
     get_insumo_list_by_tipo_insumo_id_and_gestor_carga_id,
@@ -271,6 +271,7 @@ from .orden_carga_anticipo_saldo import (  # noqa
     get_flete_anticipo_by_orden_carga_insumos,
     get_flete_anticipo_id_by_flete_id_and_orden_carga_id,
     update_total_retirado,
+    get_saldo_anticipo_desde_flete_anterior,
 )
 from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,
