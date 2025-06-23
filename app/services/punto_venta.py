@@ -52,38 +52,28 @@ async def create_punto_venta(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.PuntoVenta:
-
-    punto_existente = db.query(PuntoVenta).filter(
-        PuntoVenta.numero_documento == data.numero_documento,
-        PuntoVenta.proveedor_id == data.proveedor_id,
-        PuntoVenta.numero_sucursal == data.numero_sucursal
-    ).first()
-    if punto_existente:
+    if repositories.get_punto_venta_by(
+        db, data.tipo_documento_id, data.numero_documento
+    ):
         raise HTTPException(
             status_code=409,
-            detail=(
-                f"Ya existe un Punto de Venta con documento {data.numero_documento} "
-                f"y sucursal número {data.numero_sucursal} para el proveedor especificado"
-            ),
+            detail=f"El Punto de Venta con documento {data.numero_documento} ya existe",
         )
-    sucursal_existente = db.query(PuntoVenta).filter(
-        PuntoVenta.proveedor_id == data.proveedor_id,
-        PuntoVenta.numero_sucursal == data.numero_sucursal
-    ).first()
-    if sucursal_existente:
+
+    if repositories.get_punto_venta_by_proveedor_sucursal(
+        db, data.proveedor_id, data.numero_sucursal
+    ):
         raise HTTPException(
             status_code=409,
-            detail=f"El número de sucursal {data.numero_sucursal} ya existe para este proveedor.",
+            detail=f"El Punto de Venta numero {data.numero_sucursal} ya existe",
         )
 
     logo_url = await upload_and_get_image_url(file)
     obj = repositories.create_punto_venta(db, data, logo_url, modified_by)
-
     update_punto_venta_contacto_list(
         db, data.contactos, obj, gestor_carga_id, modified_by
     )
     create_gestor_carga_punto_venta(db, obj, gestor_carga_id, data.alias, modified_by)
-
     return get_punto_venta_detail(db, obj, gestor_carga_id)
 
 
@@ -111,41 +101,32 @@ async def edit_punto_venta(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.PuntoVenta:
-    punto_existente = db.query(PuntoVenta).filter(
-        PuntoVenta.numero_documento == data.numero_documento,
-        PuntoVenta.numero_sucursal == data.numero_sucursal,
-        PuntoVenta.proveedor_id == data.proveedor_id,
-        PuntoVenta.id != id
-    ).first()
-    if punto_existente:
+    exists = repositories.get_punto_venta_by(
+        db, data.tipo_documento_id, data.numero_documento
+    )
+    if exists and exists.id != id:
         raise HTTPException(
             status_code=409,
-            detail=(
-                f"Ya existe un Punto de Venta con documento {data.numero_documento} "
-                f"y sucursal número {data.numero_sucursal} para el proveedor especificado"
-            ),
+            detail=f"El Punto de Venta con documento {data.numero_documento} ya existe",
         )
 
-    sucursal_existente = db.query(PuntoVenta).filter(
-        PuntoVenta.proveedor_id == data.proveedor_id,
-        PuntoVenta.numero_sucursal == data.numero_sucursal,
-        PuntoVenta.id != id
-    ).first()
-    if sucursal_existente:
+    existsSucursal = repositories.get_punto_venta_by_proveedor_sucursal(
+        db, data.proveedor_id, data.numero_sucursal
+    )
+    if existsSucursal and existsSucursal.id != id:
         raise HTTPException(
             status_code=409,
-            detail=f"El número de sucursal {data.numero_sucursal} ya existe para este proveedor.",
+            detail=f"El Punto de Venta numero {data.numero_sucursal} ya existe",
         )
+
 
     logo_url = await upload_and_get_image_url(file) if file else None
     to_edit_obj = get_punto_venta_by_id(db, id)
     obj = repositories.edit_punto_venta(to_edit_obj, db, data, logo_url, modified_by)
-
     update_punto_venta_contacto_list(
         db, data.contactos, obj, gestor_carga_id, modified_by
     )
     edit_gestor_carga_punto_venta(db, obj, gestor_carga_id, data.alias, modified_by)
-
     return get_punto_venta_detail(db, obj, gestor_carga_id)
 
 
