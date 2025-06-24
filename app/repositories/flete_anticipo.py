@@ -87,3 +87,6 @@ def delete_flete_anticipo(db: Session, id: int, modified_by: str):
         db.commit()
         db.delete(obj)
         db.commit()
+
+def get_flete_anticipo_by_flete_id(db: Session, flete_id: int) -> Optional[FleteAnticipo]:
+    return db.query(FleteAnticipo).filter(FleteAnticipo.flete_id == flete_id).first()
