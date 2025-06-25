@@ -242,3 +242,11 @@ def get_flete_anticipo_anterior_con_retiro(
         query = query.filter(FleteAnticipo.id != exclude_flete_anticipo_id)
 
     return query.first()
+
+def get_total_anticipo_retirado_by_orden_carga_id(db: Session, orden_carga_id: int) -> Decimal:
+    total_retirado = (
+        db.query(func.coalesce(func.sum(OrdenCargaAnticipoRetirado.monto_retirado), 0))
+        .filter(OrdenCargaAnticipoRetirado.orden_carga_id == orden_carga_id)
+        .scalar()
+    )
+    return total_retirado if total_retirado is not None else Decimal(0)

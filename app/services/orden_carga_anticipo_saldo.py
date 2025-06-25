@@ -1,6 +1,7 @@
 from decimal import Decimal
 from typing import List, Optional
 
+from app.enums.estado import EstadoEnum
 from app.models.combinacion import Combinacion
 from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
@@ -13,6 +14,7 @@ from app.models import (
     OrdenCargaAnticipoSaldo,
     OrdenCargaComplemento,
 )
+from app.models.movimiento import Movimiento
 from app.models.orden_carga_anticipo_porcentaje import OrdenCargaAnticipoPorcentaje
 from app.models.orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 
@@ -25,7 +27,9 @@ from .orden_carga_anticipo_porcentaje_create import (
 from .moneda_cotizacion import get_cotizacion_moneda
 from app.repositories.moneda import get_moneda_by_gestor_carga
 from sqlalchemy import func
-
+from sqlalchemy.orm import aliased
+from sqlalchemy import and_
+from sqlalchemy.orm import aliased
 
 def create_orden_carga_anticipo_saldo(
     db: Session,
@@ -175,7 +179,7 @@ def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
                 total_complemento,
                 modified_by,
             )
-    oc_monto_disponible: Decimal = exists.saldo if exists else Decimal(0)
+    oc_monto_disponible: Decimal = exists.total_disponible if exists else Decimal(0)
     camion_monto_disponible: Optional[
         Decimal
     ] = orden_carga.camion_monto_anticipo_disponible
@@ -388,34 +392,43 @@ def update_orden_carga_anticipo_saldo_by_orden_carga_id(
         )
     return None
 
+from sqlalchemy import desc
 
 def update_total_retirado(
     db: Session,
     orden_carga_id: int,
     flete_anterior_id: int,
-    flete_nuevo_id: int
+    flete_nuevo_id: int,
+    modified_by: str,
 ) -> Optional[OrdenCargaAnticipoSaldo]:
-    print(f"Orden carga: {orden_carga_id}, Flete anterior: {flete_anterior_id}, Flete nuevo: {flete_nuevo_id}")
+    print(f"🔁 Cambio de anticipo OC:{orden_carga_id}, de Flete:{flete_anterior_id} ➝ Flete:{flete_nuevo_id}")
 
+    # Obtener anticipos de ambos fletes
     flete_anticipo_anterior = db.query(FleteAnticipo).filter(FleteAnticipo.flete_id == flete_anterior_id).first()
     flete_anticipo_nuevo = db.query(FleteAnticipo).filter(FleteAnticipo.flete_id == flete_nuevo_id).first()
 
     if not flete_anticipo_nuevo:
-        print("No se encontró flete_anticipo_nuevo")
+        print("❌ No se encontró flete_anticipo_nuevo")
         return None
 
-    total_retirado_anterior = Decimal(0)
-    if flete_anticipo_anterior:
-        total_retirado_anterior = (
-            db.query(func.sum(OrdenCargaAnticipoRetirado.monto_retirado))
-            .filter(
-                OrdenCargaAnticipoRetirado.flete_anticipo_id == flete_anticipo_anterior.id,
-                OrdenCargaAnticipoRetirado.orden_carga_id == orden_carga_id
-            )
-            .scalar() or Decimal(0)
-        )
-        print(f"Total retirado anterior: {total_retirado_anterior}")
+    orden_carga = get_orden_carga_by_id(db, orden_carga_id)
 
+    # Total retirado válido SOLO para el anticipo anterior y esta orden de carga
+    total_retirado_anterior = (
+        db.query(func.sum(OrdenCargaAnticipoRetirado.monto_retirado))
+        .join(OrdenCargaAnticipoRetirado.movimientos)
+        .filter(
+            OrdenCargaAnticipoRetirado.flete_anticipo_id == flete_anticipo_anterior.id,
+            OrdenCargaAnticipoRetirado.orden_carga_id == orden_carga_id,
+            Movimiento.estado != EstadoEnum.ANULADO.value,
+            Movimiento.punto_venta_id.isnot(None)  # <-- aquí filtras que no sea null
+        )
+        .scalar() or Decimal(0)
+    )
+
+    print(f"🔎 Total retirado en el anticipo anterior: {total_retirado_anterior}")
+
+    # Buscar saldo actual para el nuevo anticipo
     saldo_nuevo = (
         db.query(OrdenCargaAnticipoSaldo)
         .filter(
@@ -425,23 +438,41 @@ def update_total_retirado(
         .first()
     )
 
-    if saldo_nuevo:
-        saldo_nuevo.total_retirado = (saldo_nuevo.total_retirado or Decimal(0)) + total_retirado_anterior
+    if saldo_nuevo is None:
+        # Crear saldo nuevo con total retirado inicial igual al total retirado anterior
+        saldo_nuevo = update_orden_carga_anticipo_saldo(
+            db,
+            flete_anticipo_nuevo,
+            orden_carga,
+            total_retirado_anterior,
+            get_total_complemento(
+                orden_carga.complementos,
+                flete_anticipo_nuevo.tipo_descripcion == enums.TipoAnticipoEnum.EFECTIVO.value,
+            ),
+            modified_by,
+        )
+        print(f"✅ Saldo nuevo creado con total_retirado = {total_retirado_anterior}")
+        return saldo_nuevo
+
+    # Diferencia entre lo que tiene el saldo nuevo y lo que debería tener
+    total_ya_tiene = saldo_nuevo.total_retirado or Decimal(0)
+    diferencia = total_retirado_anterior - total_ya_tiene
+
+    if diferencia > 0:
+        saldo_nuevo.total_retirado += diferencia
         saldo_nuevo.saldo = (
-            (saldo_nuevo.total_anticipo or Decimal(0))
-            + (saldo_nuevo.total_complemento or Decimal(0))
-            - saldo_nuevo.total_retirado
+            (saldo_nuevo.total_anticipo or Decimal(0)) +
+            (saldo_nuevo.total_complemento or Decimal(0)) -
+            saldo_nuevo.total_retirado
         )
         db.add(saldo_nuevo)
         db.commit()
         db.refresh(saldo_nuevo)
-        print(f"Nuevo total retirado acumulado: {saldo_nuevo.total_retirado}")
-        print(f"Nuevo saldo: {saldo_nuevo.saldo}")
-        return saldo_nuevo
+        print(f"🟢 Saldo actualizado con diferencia: {diferencia}")
     else:
-        print("No se encontró saldo del flete nuevo")
-        return None
+        print("🔸 No hay diferencia para sumar, saldo no modificado")
 
+    return saldo_nuevo
 
 
 def get_saldo_anticipo_desde_flete_anterior(
@@ -456,59 +487,59 @@ def get_saldo_anticipo_desde_flete_anterior(
         db, flete_anticipo_id, orden_carga_id
     )
     orden_carga = get_orden_carga_by_id(db, orden_carga_id)
+    flete_anticipo_nuevo = repositories.get_flete_anticipo_by_id(db, flete_anticipo_id)
+    if flete_anticipo_nuevo is None:
+        flete_anticipo_nuevo = get_flete_anticipo_by_orden_carga(orden_carga)
+    if not flete_anticipo_nuevo:
+        raise ValueError("Flete anticipo no encontrado")
 
-    if not exists:
-        flete_anticipo_nuevo = repositories.get_flete_anticipo_by_id(db, flete_anticipo_id)
-        if flete_anticipo_nuevo is None:
-            flete_anticipo_nuevo = get_flete_anticipo_by_orden_carga(orden_carga)
-        if not flete_anticipo_nuevo:
-            raise ValueError("Flete anticipo no encontrado")
+    porcentaje_nuevo = flete_anticipo_nuevo.porcentaje or Decimal(0)
+    total_anticipo_nuevo = (
+        orden_carga.flete_proyectado_ml * (porcentaje_nuevo / Decimal(100))
+        if porcentaje_nuevo else Decimal(0)
+    )
+    print(f"🟠 Total anticipo nuevo calculado: {total_anticipo_nuevo}")
 
-        # Calcular total anticipo nuevo
-        porcentaje_nuevo = flete_anticipo_nuevo.porcentaje or Decimal(0)
-        total_anticipo_nuevo = (
-            orden_carga.flete_proyectado_ml * (porcentaje_nuevo / Decimal(100))
-            if porcentaje_nuevo
-            else Decimal(0)
+    MovimientoAlias = aliased(Movimiento)
+    subquery = (
+        db.query(OrdenCargaAnticipoRetirado.id)
+        .join(MovimientoAlias, MovimientoAlias.anticipo_id == OrdenCargaAnticipoRetirado.id)
+        .filter(
+            OrdenCargaAnticipoRetirado.orden_carga_id == orden_carga_id,
+            OrdenCargaAnticipoRetirado.flete_anticipo_id != flete_anticipo_nuevo.id,
+            MovimientoAlias.estado != 'ANULADO'
         )
-        print(f"🟠 Total anticipo nuevo calculado: {total_anticipo_nuevo}")
+        .distinct()
+        .subquery()
+    )
 
-        # Sumar todos los retiros anteriores para esta orden de carga (excepto el flete actual)
-        total_retirado_anterior = (
-            db.query(func.sum(OrdenCargaAnticipoRetirado.monto_retirado))
-            .filter(
-                OrdenCargaAnticipoRetirado.orden_carga_id == orden_carga_id,
-                OrdenCargaAnticipoRetirado.flete_anticipo_id != flete_anticipo_nuevo.id,
-            )
-            .scalar()
-        ) or Decimal(0)
+    monto_retirado_calculado = (
+        db.query(func.sum(OrdenCargaAnticipoRetirado.monto_retirado))
+        .filter(OrdenCargaAnticipoRetirado.id.in_(subquery))
+        .scalar()
+    ) or Decimal(0)
 
-        print(f"🟢 Total retirado anterior detectado: {total_retirado_anterior}")
+    print(f"🔍 Total retirado válido (no anulados, sin duplicar): {monto_retirado_calculado}")
 
-        # Calcular monto retirado a registrar
-        monto_retirado_calculado = total_retirado_anterior - total_anticipo_nuevo
-        if monto_retirado_calculado < 0:
-            monto_retirado_calculado = Decimal(0)
-        print(f"🔵 Monto retirado calculado para pasar a update: {monto_retirado_calculado}")
+    total_complemento = get_total_complemento(
+        orden_carga.complementos,
+        flete_anticipo_nuevo.tipo_descripcion == enums.TipoAnticipoEnum.EFECTIVO.value,
+    )
 
-        total_complemento = get_total_complemento(
-            orden_carga.complementos,
-            flete_anticipo_nuevo.tipo_descripcion == enums.TipoAnticipoEnum.EFECTIVO.value,
-        )
+    print(f"💡 Antes de actualizar saldo: monto_retirado={monto_retirado_calculado}, total_complemento={total_complemento}")
 
-        print(f"💡 Antes de actualizar saldo: monto_retirado={monto_retirado_calculado}, total_complemento={total_complemento}")
+    # 🔄 Siempre actualizamos el saldo, aunque ya exista
+    exists = update_orden_carga_anticipo_saldo_by_form(
+        db=db,
+        flete_anticipo=flete_anticipo_nuevo,
+        orden_carga=orden_carga,
+        monto_retirado=monto_retirado_calculado,
+        total_complemento=total_complemento,
+        modified_by=modified_by,
+    )
 
-        exists = update_orden_carga_anticipo_saldo(
-            db=db,
-            flete_anticipo=flete_anticipo_nuevo,
-            orden_carga=orden_carga,
-            monto_retirado=monto_retirado_calculado,
-            total_complemento=total_complemento,
-            modified_by=modified_by,
-        )
-
-        print(f"✅ Saldo actualizado: {exists}")
-        print(f"🔢 Saldo calculado: {exists.saldo if exists else 'No existe saldo'}")
+    print(f"✅ Saldo actualizado: {exists}")
+    print(f"🔢 Saldo calculado: {exists.saldo if exists else 'No existe saldo'}")
 
     oc_monto_disponible: Decimal = exists.saldo if exists else Decimal(0)
     camion_monto_disponible: Optional[Decimal] = orden_carga.camion_monto_anticipo_disponible
@@ -523,6 +554,7 @@ def get_saldo_anticipo_desde_flete_anterior(
     print(f"📊 Resultado final saldo disponible: {resultado}")
 
     return resultado
+
 
 
 
