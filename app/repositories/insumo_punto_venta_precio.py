@@ -16,6 +16,8 @@ from app.models import (
     PuntoVenta,
 )
 from app.schemas import InsumoPuntoVentaPrecioForm, InsumoPuntoVentaPrecioUpdate
+from sqlalchemy import text
+
 
 
 
@@ -218,40 +220,43 @@ def create_new_insumo_punto_venta_precio_by_insumo_punto_venta(
 
 
 
-def create_insumo_punto_venta_precio_by_insumo_punto_venta(
+
+def crear_precio_insumo_punto_venta(
     db: Session,
     data: InsumoPuntoVentaPrecioForm,
     modified_by: str,
 ) -> InsumoPuntoVentaPrecio:
-    try:
-        db.query(InsumoPuntoVentaPrecio).filter(
-            InsumoPuntoVentaPrecio.insumo_punto_venta_id == data.insumo_punto_venta_id,
-            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
-        ).update({"estado": EstadoEnum.INACTIVO.value}, synchronize_session=False)
-
-        new_price = InsumoPuntoVentaPrecio(
-            insumo_punto_venta_id=data.insumo_punto_venta_id,
-            precio=data.precio,
-            fecha_inicio=data.fecha_inicio,
-            # fecha_fin=data.fecha_fin,
-            hora_inicio=data.hora_inicio,
-            observacion=data.observacion,
-            estado=EstadoEnum.ACTIVO.value,
-            created_by=modified_by,
-            modified_by=modified_by,
+    # 1. Asegurar que la secuencia esté sincronizada con el ID actual
+    db.execute(text("""
+        SELECT setval(
+            'insumo_punto_venta_precio_id_seq',
+            (SELECT COALESCE(MAX(id), 1) FROM insumo_punto_venta_precio)
         )
+    """))
 
-        db.add(new_price)
-        db.commit()
-        db.refresh(new_price)
-        return new_price
+    # 2. Inactivar el precio activo anterior
+    db.query(InsumoPuntoVentaPrecio).filter(
+        InsumoPuntoVentaPrecio.insumo_punto_venta_id == data.insumo_punto_venta_id,
+        InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
+    ).update({"estado": EstadoEnum.INACTIVO.value}, synchronize_session=False)
 
-    except IntegrityError as e:
-        print(f"Error de integridad: {e}")
-        if "Key (insumo_punto_venta_id, precio)" in str(e.orig):
-            raise ValueError(f"Ya existe un precio activo para el insumo {data.insumo_id} en el punto de venta {data.punto_venta_id} con el precio {data.precio}. No se puede insertar un precio duplicado.")
-        else:
-            raise e
+    # 3. Crear el nuevo precio
+    new_price = InsumoPuntoVentaPrecio(
+        insumo_punto_venta_id=data.insumo_punto_venta_id,
+        precio=data.precio,
+        fecha_inicio=data.fecha_inicio,
+        hora_inicio=data.hora_inicio,
+        observacion=data.observacion,
+        estado=EstadoEnum.ACTIVO.value,
+        created_by=modified_by,
+        modified_by=modified_by,
+    )
+
+    db.add(new_price)
+    db.commit()
+    db.refresh(new_price)
+    return new_price
+
 
 
 def edit_insumo_punto_venta_precio(
