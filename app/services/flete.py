@@ -19,6 +19,9 @@ from .flete_destinatario import (
     update_flete_destinatario_list,
 )
 
+from sqlalchemy import text
+
+
 
 def get_flete_datail_by_id(db: Session, id: int) -> Flete:
     obj = repositories.get_flete_by_id(db, id)
@@ -39,6 +42,11 @@ def create_flete(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Flete:
+    db.execute(text("SELECT setval('flete_id_seq', COALESCE((SELECT MAX(id) FROM flete), 1))"))
+    db.execute(text("SELECT setval('flete_anticipo_id_seq', COALESCE((SELECT MAX(id) FROM flete_anticipo), 1))"))
+    db.execute(text("SELECT setval('flete_complemento_id_seq', COALESCE((SELECT MAX(id) FROM flete_complemento), 1))"))
+    db.execute(text("SELECT setval('flete_descuento_id_seq', COALESCE((SELECT MAX(id) FROM flete_descuento), 1))"))
+
     obj = repositories.create_flete(
         db,
         data,
