@@ -181,14 +181,16 @@ def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
                 modified_by,
             )
     oc_monto_disponible: Decimal = exists.total_disponible if exists else Decimal(0)
+    total_retirado: Decimal = exists.total_retirado if exists else Decimal(0)
     camion_monto_disponible: Optional[
         Decimal
     ] = orden_carga.camion_monto_anticipo_disponible
     return (
         camion_monto_disponible
-        if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible
+        if camion_monto_disponible and camion_monto_disponible < (total_retirado - oc_monto_disponible)
         else oc_monto_disponible
     )
+
 
 
 def get_total_complemento(complementos: List[OrdenCargaComplemento], es_efectivo: bool):
