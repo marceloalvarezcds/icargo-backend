@@ -10,7 +10,9 @@ from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
 from app.models import (
     TipoCuenta,
     Provision,
-    Moneda
+    Moneda,
+    OrdenCarga,
+    Camion
 )
 from app.schemas import ProvisionForm
 
@@ -98,6 +100,7 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
                 literal_column("false").label("documento_fisico"),
                 Moneda.simbolo.label("moneda"),
                 Provision.tipo_cambio_moneda.label("tipo_cambio_moneda"),
+                Camion.placa.label("camion_placa"),
                 Provision.monto.label("monto"),
                 Provision.monto_mon_local.label("provision"),
                 literal_column("0").label("pendiente"),
@@ -108,6 +111,9 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
                 .join(Provision.tipo_movimiento)\
                 .join(Provision.cuenta)\
                 .join(Provision.moneda)\
+                .outerjoin(Provision.orden_carga)\
+                .outerjoin(OrdenCarga.camion)\
+
 
     query = query.filter(
             and_(

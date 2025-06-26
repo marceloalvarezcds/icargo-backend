@@ -30,6 +30,7 @@ class MovimientoEstadoCuenta(BaseModel):
     nro_documento_relacionado: Optional[int]
     detalle: Optional[str]
     info: Optional[str]
+    camion_placa: Optional[str]
     estado: str
     estado_liquidacion: Optional[str]
     es_editable: bool
