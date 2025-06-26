@@ -15,7 +15,7 @@ from app import models
 from app.enums.estado import EstadoEnum
 from app.models import InsumoPuntoVentaPrecio, InsumoPuntoVenta
 from app.repositories import (
-    create_insumo_punto_venta_precio_by_insumo_punto_venta,
+    crear_precio_insumo_punto_venta,
     get_insumo_punto_venta_by_insumo_id_and_moneda_id_and_punto_venta_id,
     get_last_insumo_punto_venta_precio_by_insumo_punto_venta_id,
 )
@@ -247,7 +247,7 @@ def create_or_update_insumo_punto_venta_precio(
             db, existing_insumo, data, modified_by
         )
     else:
-        return create_insumo_punto_venta_precio_by_insumo_punto_venta(
+        return crear_precio_insumo_punto_venta(
             db, data, modified_by
         )
 
