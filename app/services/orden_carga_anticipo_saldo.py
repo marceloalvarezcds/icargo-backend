@@ -56,22 +56,15 @@ def create_orden_carga_anticipo_saldo(
 
     saldo_actualizado = data.saldo
     # saldo_actualizado_ml = data.saldo_ml
-    print(f"Saldo inicial (data.saldo): {data.saldo}")
-    print(f"Tipo insumo actual: {tipo_insumo_actual}")
     for anticipo in sorted_anticipos:
         if anticipo.flete_anticipo_id != data.flete_anticipo_id:
             tipo_insumo_id = anticipo.flete_anticipo.tipo_insumo_id if anticipo.flete_anticipo else None
-            print(f" - Anticipo ID {anticipo.flete_anticipo_id} tipo_insumo {tipo_insumo_id}, total_retirado {anticipo.total_retirado}")
             if tipo_insumo_id is None and tipo_insumo_actual is None:
                 saldo_actualizado -= anticipo.total_retirado
-                print(f"   -> Resta efectivo, saldo ahora: {saldo_actualizado}")
             elif tipo_insumo_id == 1 and tipo_insumo_actual == 1:
                 saldo_actualizado -= anticipo.total_retirado
-                print(f"   -> Resta combustible, saldo ahora: {saldo_actualizado}")
             elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:
                 saldo_actualizado -= anticipo.total_retirado
-                print(f"   -> Resta lubricantes, saldo ahora: {saldo_actualizado}")
-
 
     return repositories.create_orden_carga_anticipo_saldo(
         db,
