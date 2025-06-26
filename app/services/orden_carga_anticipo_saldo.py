@@ -56,22 +56,22 @@ def create_orden_carga_anticipo_saldo(
 
     saldo_actualizado = data.saldo
     # saldo_actualizado_ml = data.saldo_ml
+    print(f"Saldo inicial (data.saldo): {data.saldo}")
+    print(f"Tipo insumo actual: {tipo_insumo_actual}")
     for anticipo in sorted_anticipos:
-
         if anticipo.flete_anticipo_id != data.flete_anticipo_id:
-            # Recuperar tipo_insumo_id del FleteAnticipo relacionado al anticipo
-            tipo_insumo_id = (
-                anticipo.flete_anticipo.tipo_insumo_id
-                if anticipo.flete_anticipo
-                else None
-            )
-            # Restar según el tipo de insumo
-            if tipo_insumo_id is None and tipo_insumo_actual is None:  # Efectivo
+            tipo_insumo_id = anticipo.flete_anticipo.tipo_insumo_id if anticipo.flete_anticipo else None
+            print(f" - Anticipo ID {anticipo.flete_anticipo_id} tipo_insumo {tipo_insumo_id}, total_retirado {anticipo.total_retirado}")
+            if tipo_insumo_id is None and tipo_insumo_actual is None:
                 saldo_actualizado -= anticipo.total_retirado
-            elif tipo_insumo_id == 1 and tipo_insumo_actual == 1:  # Combustible
+                print(f"   -> Resta efectivo, saldo ahora: {saldo_actualizado}")
+            elif tipo_insumo_id == 1 and tipo_insumo_actual == 1:
                 saldo_actualizado -= anticipo.total_retirado
-            elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:  # Lubricantes
+                print(f"   -> Resta combustible, saldo ahora: {saldo_actualizado}")
+            elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:
                 saldo_actualizado -= anticipo.total_retirado
+                print(f"   -> Resta lubricantes, saldo ahora: {saldo_actualizado}")
+
 
     return repositories.create_orden_carga_anticipo_saldo(
         db,
@@ -563,11 +563,10 @@ def get_saldo_anticipo_por_flete_y_oc(db, flete_id, orden_carga_id, modified_by)
         raise HTTPException(status_code=404, detail="Flete no encontrado")
 
     saldo_total = 0
-    # Iteramos anticipos, pero sólo sumamos si tipo_insumo_id == 1 (combustible)
+
     anticipos_combustible = [a for a in flete.anticipos if a.tipo_insumo_id == 1]
 
     if not anticipos_combustible:
-        # No hay anticipos combustible, devolvemos 0 sin error
         return 0
 
     for anticipo in anticipos_combustible:
