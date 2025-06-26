@@ -299,11 +299,52 @@ def rechazar_instrumento(db: Session, id: int, modified_by: str) -> Instrumento:
 
 def anular_instrumento(db: Session, id: int, modified_by: str) -> Instrumento:
     obj = get_instrumento_by_id(db, id)
+
+    if obj.caja_id:
+        return anular_instrumento_caja(db, obj, id, modified_by)
+    if obj.banco_id:
+        return anular_instrumento_banco(db, obj, id, modified_by)
+
+
+def anular_instrumento_banco(db: Session, obj: Instrumento, id: int, modified_by: str) -> Instrumento:
+    obj = get_instrumento_by_id(db, id)
+    banco = get_banco_by_id(db, obj.banco_id)
+    liquidacion = get_liquidacion_by_id(db, obj.liquidacion_id)
+
+    saldo_confirmado = Decimal(0.0)
+    saldo_provisional = Decimal(0.0)
+    saldo_provisional = banco.saldo_provisional if banco.saldo_provisional else 0
+    saldo_confirmado = banco.saldo_confirmado if banco.saldo_confirmado else 0
+    saldo_confirmado = saldo_confirmado - obj.monto_ml
+
+    repositories.change_banco_saldos(
+        banco, db, saldo_confirmado, saldo_provisional, modified_by
+    )
+    change_movimiento_list_status(
+        db, liquidacion.movimientos, LiquidacionEtapaEnum.CONFIRMADO, modified_by
+    )
+    liquidacion.etapa = LiquidacionEtapaEnum.CONFIRMADO.value
+    repositories.change_liquidacion_status(
+        liquidacion, db, LiquidacionEstadoEnum.SALDO_ABIERTO, modified_by
+    )
+
+    obj.estado = EstadoEnum.ANULADO.value
+    obj.operacion_estado = OperacionEstadoEnum.ANULADO.value
+
+    db.commit()
+    db.refresh(obj)
+
+    return obj
+
+# saldo confirmado instrumento no sirve, se debe calcular al momento de mostrar
+def anular_instrumento_caja(db: Session, obj: Instrumento, id: int, modified_by: str) -> Instrumento:
+    obj = get_instrumento_by_id(db, id)
     caja = get_caja_by_id(db, obj.caja_id)
     liquidacion = get_liquidacion_by_id(db, obj.liquidacion_id)
 
     obj.estado = EstadoEnum.ANULADO.value
     obj.operacion_estado = OperacionEstadoEnum.ANULADO.value
+    obj.saldo_confirmado = 0
 
     saldo_confirmado = caja.saldo_confirmado if caja.saldo_confirmado else 0
     saldo_confirmado = saldo_confirmado - obj.monto_ml
@@ -311,7 +352,6 @@ def anular_instrumento(db: Session, id: int, modified_by: str) -> Instrumento:
         caja, db, saldo_confirmado, modified_by
     )
 
-    liquidacion = get_liquidacion_by_id(db, obj.liquidacion_id)
     liquidacion.etapa = LiquidacionEtapaEnum.CONFIRMADO.value
     change_movimiento_list_status(
         db, liquidacion.movimientos, LiquidacionEtapaEnum.CONFIRMADO, modified_by
