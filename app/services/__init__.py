@@ -44,6 +44,7 @@ from .centro_operativo import (  # noqa
     get_centro_operativo_by_id,
     get_centro_operativo_by_id_and_gestor_carga_id,
     get_centro_operativo_reports,
+    change_centro_operativo_status,
 )
 from .centro_operativo_contacto import update_centro_operativo_contacto_list  # noqa
 from .chofer import (  # noqa
