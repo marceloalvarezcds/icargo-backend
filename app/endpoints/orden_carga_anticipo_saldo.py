@@ -1,8 +1,10 @@
+from decimal import Decimal
 from typing import List, Optional
-from fastapi import APIRouter, Depends, Form
+from fastapi import APIRouter, Depends, Form, HTTPException
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas, services
+from app import enums
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
@@ -52,7 +54,13 @@ async def actualizar_total_retirado_oc(
     current_user: schemas.AuthUser = Depends(get_current_user),
     _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA)),
 ):
-    return services.update_total_retirado(db, orden_carga_id, flete_id_anterior, flete_id_nuevo)
+    return services.update_total_retirado(
+        db,
+        orden_carga_id,
+        flete_id_anterior,
+        flete_id_nuevo,
+        current_user.username
+    )
 
 
 @api.get(
@@ -62,10 +70,65 @@ async def actualizar_total_retirado_oc(
 async def crear_saldo_desde_flete_anterior(
     flete_anticipo_id: int,
     orden_carga_id: int,
-    db: Session = Depends(get_db_session),  # noqa: B008
-    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA_ANTICIPO_SALDO)),  # noqa: B008
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA_ANTICIPO_SALDO)),
 ):
     return services.get_saldo_anticipo_desde_flete_anterior(
-      db, flete_anticipo_id, orden_carga_id, current_user.username
+        db=db,
+        flete_anticipo_id=flete_anticipo_id,
+        orden_carga_id=orden_carga_id,
+        modified_by=current_user.username
+    )
+
+
+@api.get(
+    "/actualizar-saldo-anticipo/{flete_anticipo_id}/{orden_carga_id}/{monto_retirado}",
+    response_model=schemas.OrdenCargaAnticipoSaldo,
+)
+async def actualizar_saldo_anticipo(
+    flete_anticipo_id: int,
+    orden_carga_id: int,
+    monto_retirado: Decimal,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA_ANTICIPO_SALDO)),  # noqa: B008
+):
+    flete_anticipo = repositories.get_flete_anticipo_by_id(db, flete_anticipo_id)
+    orden_carga = repositories.get_orden_carga_by_id(db, orden_carga_id)
+
+    if not flete_anticipo or not orden_carga:
+        raise HTTPException(status_code=404, detail="Flete anticipo u orden de carga no encontrados")
+
+    total_complemento = services.get_total_complemento(
+        orden_carga.complementos,
+        flete_anticipo.tipo_descripcion == enums.TipoAnticipoEnum.EFECTIVO.value,
+    )
+
+    return services.update_orden_carga_anticipo_saldo(
+        db=db,
+        flete_anticipo=flete_anticipo,
+        orden_carga=orden_carga,
+        monto_retirado=monto_retirado,
+        total_complemento=total_complemento,
+        modified_by=current_user.username,
+    )
+
+
+@api.get(
+    "/orden-carga/{orden_carga_id}/flete/{flete_id}/saldo-combustible",
+    response_model=RoundedDecimal,
+)
+async def get_saldo_combustible_orden_carga(
+    orden_carga_id: int,
+    flete_id: int,
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA_ANTICIPO_SALDO)),
+):
+    return services.get_saldo_anticipo_por_flete_y_oc(
+        db=db,
+        orden_carga_id=orden_carga_id,
+        flete_id=flete_id,
+        modified_by=current_user.username
     )

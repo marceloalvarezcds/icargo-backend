@@ -255,6 +255,7 @@ from .orden_carga import (  # noqa
     validar_habilitacion_para_anticipos,
     recalcular_provisiones,
     update_flete_saldo,
+
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
@@ -272,6 +273,9 @@ from .orden_carga_anticipo_saldo import (  # noqa
     get_flete_anticipo_id_by_flete_id_and_orden_carga_id,
     update_total_retirado,
     get_saldo_anticipo_desde_flete_anterior,
+    update_orden_carga_anticipo_saldo,
+    get_total_complemento,
+    get_saldo_anticipo_por_flete_y_oc,
 )
 from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,

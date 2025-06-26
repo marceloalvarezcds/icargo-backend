@@ -175,6 +175,7 @@ class FleteList(FleteFormBaseModel):
     merma_propietario_moneda_nombre: str
     merma_propietario_unidad_descripcion: str
     merma_propietario_es_porcentual_descripcion: str
+    complementos: List[FleteComplemento]
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
     condicion_cantidad: RoundedDecimal

@@ -1047,20 +1047,25 @@ def update_complementos_y_descuentos_oc(
     db: Session,
     orden_carga_id: int,
     nuevo_flete_id: int,
-    modified_by: str
+    modified_by: str,
+    flete_viejo_id: int = None  # parámetro opcional para pasar el flete viejo
 ):
+    print(f"Inicio update_complementos_y_descuentos_oc para OC={orden_carga_id} con nuevo flete={nuevo_flete_id}")
+
     orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
     if not orden_carga:
         raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
 
-    flete_viejo_id = orden_carga.flete_id
+    # Usar el flete_viejo_id pasado, o si no, el actual de la orden
+    if flete_viejo_id is None:
+        flete_viejo_id = orden_carga.flete_id
+
+    print(f"Flete viejo: {flete_viejo_id}, Flete nuevo: {nuevo_flete_id}")
 
     if flete_viejo_id == nuevo_flete_id:
-        # No hay cambio de flete, no hacer nada
-        # print("Flete no cambió. No se actualizan complementos ni descuentos.")
+        print("Flete no cambió. No se actualizan complementos ni descuentos.")
         return
 
-    # Eliminar complementos y descuentos SOLO si el viejo tenía alguno
     tiene_complementos_viejos = db.query(OrdenCargaComplemento).filter(
         OrdenCargaComplemento.orden_carga_id == orden_carga_id,
         OrdenCargaComplemento.flete_id == flete_viejo_id
@@ -1071,13 +1076,18 @@ def update_complementos_y_descuentos_oc(
         OrdenCargaDescuento.flete_id == flete_viejo_id
     ).count() > 0
 
+    print(f"Tiene complementos viejos? {tiene_complementos_viejos}")
+    print(f"Tiene descuentos viejos? {tiene_descuentos_viejos}")
+
     if tiene_complementos_viejos:
+        print(f"Eliminando complementos viejos del flete {flete_viejo_id} para la OC {orden_carga_id}")
         db.query(OrdenCargaComplemento).filter(
             OrdenCargaComplemento.orden_carga_id == orden_carga_id,
             OrdenCargaComplemento.flete_id == flete_viejo_id
         ).delete(synchronize_session=False)
 
     if tiene_descuentos_viejos:
+        print(f"Eliminando descuentos viejos del flete {flete_viejo_id} para la OC {orden_carga_id}")
         db.query(OrdenCargaDescuento).filter(
             OrdenCargaDescuento.orden_carga_id == orden_carga_id,
             OrdenCargaDescuento.flete_id == flete_viejo_id
@@ -1089,17 +1099,21 @@ def update_complementos_y_descuentos_oc(
     if not nuevo_flete:
         raise HTTPException(status_code=404, detail="Nuevo flete no encontrado")
 
+    print(f"Nuevo flete tiene {len(nuevo_flete.anticipos)} anticipos")
+
     for anticipo in nuevo_flete.anticipos:
-        if anticipo.tipo_insumo_id in [1, 2]:
+        if anticipo.tipo_insumo_id == 1:  # Solo combustible
             saldo_anticipo = get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
                 db, anticipo.id, orden_carga_id, modified_by
             )
-            # print(f"Saldo del anticipo: {saldo_anticipo}")
+            print(f"Saldo del anticipo {anticipo.id}: {saldo_anticipo}")
+
 
     # Crear complementos y descuentos del nuevo flete
     change_flete_create_complementos_and_descuentos(db, orden_carga, nuevo_flete, modified_by)
 
     db.commit()
+    print("Complementos y descuentos actualizados correctamente.")
 
 
 def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, current_user: schemas.AuthUser) -> schemas.RecalculoCondicionesResponse:
@@ -1107,8 +1121,10 @@ def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, curr
     if not orden_carga:
         return
 
+    flete_viejo_id = orden_carga.flete_id  # Guardar flete viejo antes de actualizar
+
     # Solo recalcular si el flete es diferente al actual
-    if orden_carga.flete_id == flete_id:
+    if flete_viejo_id == flete_id:
         return
 
     flete = repositories.get_flete_by_id(db, flete_id)
@@ -1154,12 +1170,13 @@ def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, curr
     db.commit()
     db.refresh(orden_carga)
 
-    # Actualizar complementos y descuentos según el nuevo flete
+    # Pasar flete_viejo_id para que update tome bien los ids
     update_complementos_y_descuentos_oc(
         db=db,
         orden_carga_id=orden_carga_id,
         nuevo_flete_id=flete_id,
-        modified_by=current_user.username
+        modified_by=current_user.username,
+        flete_viejo_id=flete_viejo_id
     )
 
     return schemas.RecalculoCondicionesResponse(
