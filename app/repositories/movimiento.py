@@ -8,7 +8,8 @@ from app.enums import MovimientoEstadoEnum, EstadoEnum, TipoAnticipoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
 from app.models import (
     Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta, TipoMovimiento,
-    OrdenCargaAnticipoRetirado, Moneda, OrdenCarga, Proveedor, PuntoVenta, MonedaCotizacion
+    OrdenCargaAnticipoRetirado, Moneda, OrdenCarga, Proveedor, PuntoVenta, MonedaCotizacion,
+    Camion
 )
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
@@ -566,11 +567,14 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                 OrdenCarga.documento_fisico.label("documento_fisico"),
                 Moneda.simbolo.label("moneda"),
                 Movimiento.tipo_cambio_moneda.label("tipo_cambio_moneda"),
+                Camion.placa.label("camion_placa"),
                 *get_cols_estado_cuenta_case_statement(mon_local_id),
                 )\
                 .join(Movimiento.tipo_movimiento)\
                 .join(Movimiento.cuenta)\
                 .join(Movimiento.moneda)\
+                .outerjoin(Movimiento.orden_carga)\
+                .outerjoin(OrdenCarga.camion)\
                 .outerjoin(Movimiento.orden_carga)\
                 .outerjoin(Movimiento.liquidacion)\
                 .outerjoin(Movimiento.anticipo)\
