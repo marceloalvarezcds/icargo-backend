@@ -275,6 +275,7 @@ from .orden_carga_anticipo_saldo import (  # noqa
     get_saldo_anticipo_desde_flete_anterior,
     update_orden_carga_anticipo_saldo,
     get_total_complemento,
+    get_saldo_anticipo_por_flete_y_oc,
 )
 from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,

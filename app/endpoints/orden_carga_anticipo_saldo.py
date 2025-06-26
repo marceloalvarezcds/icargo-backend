@@ -113,3 +113,22 @@ async def actualizar_saldo_anticipo(
         total_complemento=total_complemento,
         modified_by=current_user.username,
     )
+
+
+@api.get(
+    "/orden-carga/{orden_carga_id}/flete/{flete_id}/saldo-combustible",
+    response_model=RoundedDecimal,
+)
+async def get_saldo_combustible_orden_carga(
+    orden_carga_id: int,
+    flete_id: int,
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA_ANTICIPO_SALDO)),
+):
+    return services.get_saldo_anticipo_por_flete_y_oc(
+        db=db,
+        orden_carga_id=orden_carga_id,
+        flete_id=flete_id,
+        modified_by=current_user.username
+    )

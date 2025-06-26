@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from app.enums.estado import EstadoEnum
 from app.models.combinacion import Combinacion
+from app.models.flete import Flete
 from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -556,7 +557,26 @@ def get_saldo_anticipo_desde_flete_anterior(
     return resultado
 
 
+def get_saldo_anticipo_por_flete_y_oc(db, flete_id, orden_carga_id, modified_by):
+    flete = db.query(Flete).filter(Flete.id == flete_id).first()
+    if not flete:
+        raise HTTPException(status_code=404, detail="Flete no encontrado")
 
+    saldo_total = 0
+    # Iteramos anticipos, pero sólo sumamos si tipo_insumo_id == 1 (combustible)
+    anticipos_combustible = [a for a in flete.anticipos if a.tipo_insumo_id == 1]
+
+    if not anticipos_combustible:
+        # No hay anticipos combustible, devolvemos 0 sin error
+        return 0
+
+    for anticipo in anticipos_combustible:
+        saldo = get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
+            db, anticipo.id, orden_carga_id, modified_by
+        )
+        saldo_total += saldo
+
+    return saldo_total
 
 
 
