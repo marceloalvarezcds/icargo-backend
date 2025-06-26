@@ -223,6 +223,7 @@ def create_insumo_punto_venta_precio(
     )
 
 
+
 def create_or_update_insumo_punto_venta_precio(
     db: Session,
     data: InsumoPuntoVentaPrecioForm,
