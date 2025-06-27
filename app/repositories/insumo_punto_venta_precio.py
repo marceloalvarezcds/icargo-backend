@@ -19,8 +19,6 @@ from app.schemas import InsumoPuntoVentaPrecioForm, InsumoPuntoVentaPrecioUpdate
 from sqlalchemy import text
 
 
-
-
 def get_insumo_venta_precio_by_id(db: Session, id: int):
     return db.query(InsumoPuntoVentaPrecio).filter(InsumoPuntoVentaPrecio.id == id).first()
 
@@ -37,7 +35,6 @@ def change_insumo_venta_precio_status(
     db.commit()
     db.refresh(obj)
     return obj
-
 
 
 def get_insumo_venta_precio_list(db: Session) -> List[InsumoPuntoVentaPrecio]:
@@ -174,7 +171,6 @@ def get_insumo_punto_venta_precio_list_by_gestor_carga_id(
 
 
 
-
 def get_insumo_punto_venta_precio_list_by_id_and_gestor_carga_id(
     db: Session, id: int, gestor_carga_id: Optional[int]
 ) -> List[InsumoPuntoVentaPrecio]:
@@ -191,7 +187,6 @@ def get_insumo_punto_venta_precio_list_by_id_and_gestor_carga_id(
     )
 
     return query.all()
-
 
 
 def get_insumo_punto_venta_precio_by_id(db: Session, id: int) -> Optional[InsumoPuntoVentaPrecio]:
@@ -219,43 +214,56 @@ def create_new_insumo_punto_venta_precio_by_insumo_punto_venta(
     return obj
 
 
-
-
-def crear_precio_insumo_punto_venta(
+def create_insumo_punto_venta_precio_by_insumo_punto_venta(
     db: Session,
     data: InsumoPuntoVentaPrecioForm,
     modified_by: str,
 ) -> InsumoPuntoVentaPrecio:
-    # 1. Asegurar que la secuencia esté sincronizada con el ID actual
-    db.execute(text("""
-        SELECT setval(
-            'insumo_punto_venta_precio_id_seq',
-            (SELECT COALESCE(MAX(id), 1) FROM insumo_punto_venta_precio)
+    # Validación de existencia previa (opcional pero recomendable)
+    insumo_pdv = db.query(InsumoPuntoVenta).filter_by(id=data.insumo_punto_venta_id).first()
+    if not insumo_pdv:
+        raise ValueError(f"No existe un insumo punto de venta con ID {data.insumo_punto_venta_id}")
+
+    try:
+        # Sincronizar secuencia de ID
+        db.execute(text("""
+            SELECT setval(
+                'insumo_punto_venta_precio_id_seq',
+                (SELECT COALESCE(MAX(id), 1) FROM insumo_punto_venta_precio)
+            )
+        """))
+
+        # Inactivar anteriores
+        db.query(InsumoPuntoVentaPrecio).filter(
+            InsumoPuntoVentaPrecio.insumo_punto_venta_id == data.insumo_punto_venta_id,
+            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
+        ).update({"estado": EstadoEnum.INACTIVO.value}, synchronize_session=False)
+
+        # Insertar nuevo
+        new_price = InsumoPuntoVentaPrecio(
+            insumo_punto_venta_id=data.insumo_punto_venta_id,
+            precio=data.precio,
+            fecha_inicio=data.fecha_inicio,
+            hora_inicio=data.hora_inicio,
+            observacion=data.observacion,
+            estado=EstadoEnum.ACTIVO.value,
+            created_by=modified_by,
+            modified_by=modified_by,
         )
-    """))
 
-    # 2. Inactivar el precio activo anterior
-    db.query(InsumoPuntoVentaPrecio).filter(
-        InsumoPuntoVentaPrecio.insumo_punto_venta_id == data.insumo_punto_venta_id,
-        InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
-    ).update({"estado": EstadoEnum.INACTIVO.value}, synchronize_session=False)
+        db.add(new_price)
+        db.commit()
+        db.refresh(new_price)
+        return new_price
 
-    # 3. Crear el nuevo precio
-    new_price = InsumoPuntoVentaPrecio(
-        insumo_punto_venta_id=data.insumo_punto_venta_id,
-        precio=data.precio,
-        fecha_inicio=data.fecha_inicio,
-        hora_inicio=data.hora_inicio,
-        observacion=data.observacion,
-        estado=EstadoEnum.ACTIVO.value,
-        created_by=modified_by,
-        modified_by=modified_by,
-    )
-
-    db.add(new_price)
-    db.commit()
-    db.refresh(new_price)
-    return new_price
+    except IntegrityError as e:
+        print(f"Error de integridad: {e}")
+        if "Key (insumo_punto_venta_id, precio)" in str(e.orig):
+            raise ValueError(
+                f"Ya existe un precio activo para el punto de venta con ID {data.insumo_punto_venta_id} y el precio {data.precio}. No se puede insertar un duplicado."
+            )
+        else:
+            raise e
 
 
 
