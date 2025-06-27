@@ -199,19 +199,50 @@ def create_new_insumo_punto_venta_precio_by_insumo_punto_venta(
     data: InsumoPuntoVentaPrecioForm,
     modified_by: str,
 ) -> InsumoPuntoVentaPrecio:
-    obj = InsumoPuntoVentaPrecio(
-        insumo_punto_venta_id=obj.id,
-        precio=data.precio,
-        fecha_inicio=data.fecha_inicio,
-        hora_inicio=data.hora_inicio,
-        estado=EstadoEnum.ACTIVO.value,
-        created_by=modified_by,
-        modified_by=modified_by,
-    )
-    db.add(obj)
-    db.commit()
-    db.refresh(obj)
-    return obj
+    # Validar obj no sea None (opcional)
+    if not obj:
+        raise ValueError("El objeto InsumoPuntoVenta no puede ser None")
+
+    try:
+        # Sincronizar secuencia
+        db.execute(text("""
+            SELECT setval(
+                'insumo_punto_venta_precio_id_seq',
+                (SELECT COALESCE(MAX(id), 1) FROM insumo_punto_venta_precio)
+            )
+        """))
+
+        # Inactivar anteriores precios activos para este insumo punto venta
+        db.query(InsumoPuntoVentaPrecio).filter(
+            InsumoPuntoVentaPrecio.insumo_punto_venta_id == obj.id,
+            InsumoPuntoVentaPrecio.estado == EstadoEnum.ACTIVO.value
+        ).update({"estado": EstadoEnum.INACTIVO.value}, synchronize_session=False)
+
+        # Crear nuevo precio
+        new_price = InsumoPuntoVentaPrecio(
+            insumo_punto_venta_id=obj.id,
+            precio=data.precio,
+            fecha_inicio=data.fecha_inicio,
+            hora_inicio=data.hora_inicio,
+            observacion=data.observacion,
+            estado=EstadoEnum.ACTIVO.value,
+            created_by=modified_by,
+            modified_by=modified_by,
+        )
+        db.add(new_price)
+        db.commit()
+        db.refresh(new_price)
+        return new_price
+
+    except IntegrityError as e:
+        print(f"Error de integridad: {e}")
+        if "Key (insumo_punto_venta_id, precio)" in str(e.orig):
+            raise ValueError(
+                f"Ya existe un precio activo para el punto de venta con ID {obj.id} y el precio {data.precio}. No se puede insertar un duplicado."
+            )
+        else:
+            raise e
+
 
 
 def create_insumo_punto_venta_precio_by_insumo_punto_venta(

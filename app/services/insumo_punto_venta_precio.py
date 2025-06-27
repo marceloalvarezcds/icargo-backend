@@ -252,8 +252,6 @@ def create_or_update_insumo_punto_venta_precio(
         )
 
 
-
-
 def update_insumo_punto_venta_precio_by_insumo_punto_venta(
     db: Session,
     existing_insumo: InsumoPuntoVenta,

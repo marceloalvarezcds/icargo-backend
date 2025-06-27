@@ -272,9 +272,6 @@ from .orden_carga_anticipo_saldo import (  # noqa
     get_saldos_by_orden_carga,
     get_flete_anticipo_by_orden_carga_insumos,
     get_flete_anticipo_id_by_flete_id_and_orden_carga_id,
-    update_total_retirado,
-    get_saldo_anticipo_desde_flete_anterior,
-    update_orden_carga_anticipo_saldo,
     get_total_complemento,
     get_saldo_anticipo_por_flete_y_oc,
 )
