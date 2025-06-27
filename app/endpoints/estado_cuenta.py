@@ -92,6 +92,7 @@ async def read_estado_cuenta_by_contraparte(
     )
 
 
+
 @api.get(
     "/tipo_contraparte/{tipo_contraparte_id}/id/{contraparte_id}/contraparte/{contraparte}/numero_documento/{contraparte_numero_documento}/punto_venta_id/{punto_venta_id}",  # noqa
     response_model=Optional[schemas.EstadoCuenta],
