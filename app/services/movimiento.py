@@ -1066,6 +1066,18 @@ def generate_movimiento_reports(
         title_cell.value = "Monto"
         title_cell.font = Font(bold=True)
 
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Moneda"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Tipo de Cambio"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Monto (ML)"
+        title_cell.font = Font(bold=True)
+
     title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Detalle"
     title_cell.font = Font(bold=True)
@@ -1142,6 +1154,16 @@ def generate_movimiento_reports(
         if not is_with_saldos:
             value_cell = ws.cell(row=row + 2, column=(i := i + 1))
             value_cell.value = item.monto
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.moneda.simbolo
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.tipo_cambio_moneda
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.monto_mon_local
+
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.detalle
