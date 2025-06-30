@@ -36,16 +36,24 @@ def get_flete_detail(model: Flete) -> schemas.Flete:
     return obj
 
 
+def reset_sequence(db, seq_name: str, table_name: str):
+    max_id = db.execute(text(f"SELECT MAX(id) FROM {table_name}")).scalar()
+    if max_id is None:
+        db.execute(text(f"SELECT setval('{seq_name}', 1, false)"))
+    else:
+        db.execute(text(f"SELECT setval('{seq_name}', {max_id}, true)"))
+
+
 def create_flete(
     db: Session,
     data: schemas.FleteForm,
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.Flete:
-    db.execute(text("SELECT setval('flete_id_seq', COALESCE((SELECT MAX(id) FROM flete), 1))"))
-    db.execute(text("SELECT setval('flete_anticipo_id_seq', COALESCE((SELECT MAX(id) FROM flete_anticipo), 1))"))
-    db.execute(text("SELECT setval('flete_complemento_id_seq', COALESCE((SELECT MAX(id) FROM flete_complemento), 1))"))
-    db.execute(text("SELECT setval('flete_descuento_id_seq', COALESCE((SELECT MAX(id) FROM flete_descuento), 1))"))
+    reset_sequence(db, 'flete_id_seq', 'flete')
+    reset_sequence(db, 'flete_anticipo_id_seq', 'flete_anticipo')
+    reset_sequence(db, 'flete_complemento_id_seq', 'flete_complemento')
+    reset_sequence(db, 'flete_descuento_id_seq', 'flete_descuento')
 
     obj = repositories.create_flete(
         db,
@@ -58,6 +66,7 @@ def create_flete(
     update_flete_descuento_list(db, data.descuentos, obj, modified_by)
     update_flete_destinatario_list(db, data.destinatarios, obj, modified_by)
     return get_flete_detail(obj)
+
 
 
 def get_flete_by_id(db: Session, id: int) -> Flete:

@@ -193,6 +193,14 @@ def get_insumo_punto_venta_precio_by_id(db: Session, id: int) -> Optional[Insumo
     return db.query(InsumoPuntoVentaPrecio).get(id)
 
 
+def reset_sequence(db, seq_name: str, table_name: str):
+    max_id = db.execute(text(f"SELECT MAX(id) FROM {table_name}")).scalar()
+    if max_id is None:
+        db.execute(text(f"SELECT setval('{seq_name}', 1, false)"))
+    else:
+        db.execute(text(f"SELECT setval('{seq_name}', {max_id}, true)"))
+
+
 def create_new_insumo_punto_venta_precio_by_insumo_punto_venta(
     db: Session,
     obj: InsumoPuntoVenta,
@@ -205,12 +213,7 @@ def create_new_insumo_punto_venta_precio_by_insumo_punto_venta(
 
     try:
         # Sincronizar secuencia
-        db.execute(text("""
-            SELECT setval(
-                'insumo_punto_venta_precio_id_seq',
-                (SELECT COALESCE(MAX(id), 1) FROM insumo_punto_venta_precio)
-            )
-        """))
+        reset_sequence(db, 'insumo_punto_venta_precio_id_seq', 'insumo_punto_venta_precio')
 
         # Inactivar anteriores precios activos para este insumo punto venta
         db.query(InsumoPuntoVentaPrecio).filter(
@@ -257,12 +260,7 @@ def create_insumo_punto_venta_precio_by_insumo_punto_venta(
 
     try:
         # Sincronizar secuencia de ID
-        db.execute(text("""
-            SELECT setval(
-                'insumo_punto_venta_precio_id_seq',
-                (SELECT COALESCE(MAX(id), 1) FROM insumo_punto_venta_precio)
-            )
-        """))
+        reset_sequence(db, 'insumo_punto_venta_precio_id_seq', 'insumo_punto_venta_precio')
 
         # Inactivar anteriores
         db.query(InsumoPuntoVentaPrecio).filter(

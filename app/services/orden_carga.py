@@ -1069,19 +1069,16 @@ def update_complementos_y_descuentos_oc(
     for complemento in nuevo_flete.complementos:
         repositories.update_or_create_orden_carga_complemento_by_flete(db, orden_carga, complemento, modified_by)
 
-    # Similar para descuentos, implementá su update_or_create si querés lo mismo ahí
-
     # Recalcular anticipos si corresponde
-    for anticipo in nuevo_flete.anticipos:
-        if anticipo.tipo_insumo_id == 1:  # Solo combustible
-            saldo_anticipo = get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
-                db, anticipo.id, orden_carga_id, modified_by
-            )
-            print(f"💵 Saldo del anticipo {anticipo.id}: {saldo_anticipo}")
+    # for anticipo in nuevo_flete.anticipos:
+    #     if anticipo.tipo_insumo_id == 1:  # Solo combustible
+    #         saldo_anticipo = get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
+    #             db, anticipo.id, orden_carga_id, modified_by
+    #         )
+    #         print(f"💵 Saldo del anticipo {anticipo.id}: {saldo_anticipo}")
 
     db.commit()
     print("✅ Complementos y descuentos actualizados correctamente.")
-
 
 
 def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, current_user: schemas.AuthUser) -> schemas.RecalculoCondicionesResponse:
