@@ -14,6 +14,12 @@ def get_by_descripcion(
     return repository.get_by_descripcion(ModelType, db, descripcion)
 
 
+def get_by_title(
+    ModelType: type, db: Session, title: str
+) -> Optional[Model]:
+    return repository.get_by_column_title(ModelType, db, title)
+
+
 def get_by_id(ModelType: type, db: Session, id: int) -> Model:
     obj: Optional[Model] = repository.get_by_id(ModelType, db, id)
     if not obj:

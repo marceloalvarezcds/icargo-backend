@@ -17,6 +17,12 @@ def get_by_descripcion(
     return repository.get_by_unique_columns(ModelType, db, descripcion=descripcion)
 
 
+def get_by_column_title(
+    ModelType: type, db: Session, title:str
+) -> Optional[Model]:
+    return repository.get_by_unique_columns(ModelType, db, titulo=title)
+
+
 def get_by_id(ModelType: type, db: Session, id: int) -> Optional[Model]:
     return repository.get_by_id(ModelType, db, id)
 
