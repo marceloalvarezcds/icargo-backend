@@ -696,7 +696,7 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
     data.tipo_movimiento_id = tipo_movimiento.id
     data.es_editable = True
    # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
-    data.tipo_cambio_moneda = RoundedDecimal(data.tipo_cambio_moneda)
+    data.tipo_cambio_moneda = RoundedDecimal(data.tipo_cambio_moneda if data.tipo_cambio_moneda else 1)
     data.fecha_cambio_moneda = fecha
     if not data.fecha:
         data.fecha = fecha
