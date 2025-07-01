@@ -31,11 +31,11 @@ async def create_factura(
     if tipoIva.iva > 0:
         if data.iva<=0:
             raise HTTPException(
-            status_code=409, detail=f"El tipo de IVA Nº {data.descripcion} debe cargar un valor"
+            status_code=409, detail=f"Para el de tipo de IVA {tipoIva.descripcion} debe cargar un valor IVA"
         )
 
-    #foto_url = 'foto' # await upload_and_get_image_url(foto_file) if foto_file else None
-    foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
+    foto_url = 'foto' # await upload_and_get_image_url(foto_file) if foto_file else None
+    #foto_url = await upload_and_get_image_url(foto_file) if foto_file else None
     factura = repositories.create_factura(db, data, foto_url, modified_by)
 
     if data.sentido_mov_iva or data.sentido_mov_retencion:

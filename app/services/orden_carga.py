@@ -53,6 +53,8 @@ from .orden_carga_anticipo_saldo import (
 
 from .moneda_cotizacion import get_cotizacion_moneda
 from app.repositories.moneda import get_moneda_by_gestor_carga
+from fastapi.responses import HTMLResponse
+from .user import get_user_by_username
 
 
 def get_orden_carga_list(
@@ -527,6 +529,9 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
     if not gestor_carga:
         raise HTTPException(status_code=404, detail="Gestor no encontrado")
     marca_agua_url = f"{STATICS_URL}/marca-de-agua.png"
+     # Obtención del usuario
+    usuario = get_user_by_username(db, obj.created_by)
+    usuario_nombre = f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
     OUTPUT_FILENAME = f"resumen_{id}.pdf"
     TEMPLATE_FILENAME = "pdf_resumen.html"
     template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
@@ -539,8 +544,12 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
         "gestor_carga_numero_documento": gestor_carga.numero_documento,
         "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
         "propietario_nombre": obj.camion_propietario_nombre,
+        "usuario_nombre": usuario_nombre,
         "chofer_nombre": obj.chofer_nombre,
+        "chofer_documento": obj.chofer_documento,
         "camion_placa": obj.camion_placa,
+        "camion_marca": obj.camion_marca,
+        "camion_color": obj.camion_color,
         "semi_placa": obj.semi_placa,
         "origen": obj.origen_nombre,
         "origen_direccion": obj.origen.direccion if obj.origen.direccion else "-",
@@ -568,11 +577,14 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
         "class_name": "marca-agua" if obj.estado == EstadoEnum.FINALIZADO.value else "",
     }
     source_html = template.render(logo=LOGO_IMAGE_URL, **data)
+    logger.info(f'html: {source_html}')
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
     from_string(
         source_html, pdf_filename, {"page-size": "Legal", "orientation": "Landscape"}
     )
+
     return OUTPUT_FILENAME
+    #return HTMLResponse(content=source_html, status_code=200)
 
 
 def change_orden_carga_anticipos_liberados(
