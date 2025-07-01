@@ -781,7 +781,6 @@ class OrdenCarga(AuditMixin, Base):
           self.resultado_propietario_total_descuento
       )
 
-
     @hybrid_property
     def resultado_propietario_saldo_bruto(self):
       return (
@@ -794,7 +793,6 @@ class OrdenCarga(AuditMixin, Base):
               - self.resultado_propietario_total_descuento
           )
       )
-
 
     @hybrid_property
     def resultado_propietario_saldo_total(self):
@@ -837,6 +835,11 @@ class OrdenCarga(AuditMixin, Base):
                     total_lubricantes += anticipo.monto_mon_local
         return total_lubricantes
 
+    @hybrid_property
+    def resultado_propietario_total_anticipos_retirados_ml(self):
+        efectivo = self.resultado_propietario_total_anticipos_retirados_efectivo or 0
+        combustible = self.resultado_propietario_total_anticipos_retirados_combustible or 0
+        return efectivo + combustible
 
     @hybrid_property
     def resultado_propietario_tarifa_flete(self):

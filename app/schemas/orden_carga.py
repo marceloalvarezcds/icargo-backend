@@ -326,6 +326,7 @@ class OrdenCargaList(OrdenCargaForm):
     resultado_propietario_total_anticipos_retirados_efectivo: Optional[int] = None
     resultado_propietario_total_anticipos_retirados_combustible: Optional[int] = None
     resultado_propietario_total_anticipos_retirados_lubricantes: Optional[int] = None
+    resultado_propietario_total_anticipos_retirados_ml: Optional[int] = None
     is_anulado: bool
     resultado_saldo_combustible: Optional[int] = None
     saldo_combustible: Optional[int] = None
