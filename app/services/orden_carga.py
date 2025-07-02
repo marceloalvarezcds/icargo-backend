@@ -544,9 +544,10 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
         "gestor_carga_numero_documento": gestor_carga.numero_documento,
         "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
         "propietario_nombre": obj.camion_propietario_nombre,
+        "propietario_documento": obj.camion_propietario_documento,
         "usuario_nombre": usuario_nombre,
         "chofer_nombre": obj.chofer_nombre,
-        "chofer_documento": obj.chofer_documento,
+        "chofer_documento": obj.combinacion_chofer_doc,
         "camion_placa": obj.camion_placa,
         "camion_marca": obj.camion_marca,
         "camion_color": obj.camion_color,
@@ -580,7 +581,7 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
     logger.info(f'html: {source_html}')
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
     from_string(
-        source_html, pdf_filename, {"page-size": "Legal", "orientation": "Landscape"}
+        source_html, pdf_filename, {"page-size": "Legal"}
     )
 
     return OUTPUT_FILENAME
