@@ -43,6 +43,14 @@
         flex: 1;
       }
 
+      .flex2 {
+        flex: 2;
+      }
+
+      .flex3 {
+        flex: 3;
+      }
+
       .firma-container {
         display: flex;
         margin-top: 100px;
@@ -354,42 +362,52 @@
 
       <div class="table">
 
-        <div class="flex1 td">
+        <div class="flex3">
 
-          <div class="table">
-            <div class="half">
-              <p class="fs4 lh3 end">
-                <span class="bold">Importe Flete (GS): </span>
-              </p>
-              <p class="fs4 lh3 end">
-                <span class="bold">Flete ({{tasa}})</span>: {{tarifa_flete}}
-              </p>
-            </div>
+          <p class="fs4 lh3 end">
+            <span class="bold">Importe Flete (GS): </span>
+          </p>
+          <p class="fs4 lh3 end">
+            <span class="bold">Flete ({{tasa}})</span>: {{tarifa_flete}}
+          </p>
 
-            <div>
-              <p class="fs4 lh3 end"><span>{{total_flete}}</span></p>
-            </div>
-          </div>
+        </div>
 
-          <div class="table" >
-            <div class="half">
-              <p class="fs4 lh3 end">
-                <span class="bold">Importe Merma (GS): </span>
-              </p>
-              <p class="fs4 lh3 end">
-                <span class="bold">Diferencia (KG): </span>{{diferencia}}
-                <span class="bold">Tolerancia (KG): </span>{{tolerancia}}
-                <span class="bold">Merma (KG): </span>{{merma}}
-                <span class="bold">Precio (Gs/Kg): </span> 000.000
-              </p>
-            </div>
+        <div class="flex1">
+          <p class="fs4 lh3 end">
+            <span>{{total_flete}}</span>
+          </p>
+        </div>
 
-            <div>
-              <p class="fs4 lh3 end"><span>{{merma_total}}</span></p>
-            </div>
-          </div>
+      </div>
 
-          <div class="table">
+      <div class="table">
+
+        <div class="flex3">
+
+          <p class="fs4 lh3 end">
+            <span class="bold">Importe Merma (GS): </span>
+          </p>
+          <p class="fs4 lh3 end">
+            <span class="bold">Diferencia (KG): </span>{{diferencia}}
+            <span class="bold">Tolerancia (KG): </span>{{tolerancia}}
+            <span class="bold">Merma (KG): </span>{{merma}}
+            <span class="bold">Precio (Gs/Kg): </span> 000.000
+          </p>
+
+        </div>
+
+        <div class="flex1">
+          <p class="fs4 lh3 end">
+            <span>{{merma_total}}</span>
+          </p>
+        </div>
+
+      </div>
+
+      <div>
+      <div>
+        <div class="table">
             <div class="td half">
               <p class="fs4 lh3 end">
                 <span class="bold">Importe Anticipo (GS): </span>
