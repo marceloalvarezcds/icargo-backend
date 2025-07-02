@@ -93,9 +93,13 @@
         font-size: 11px;
       }
 
+      .fs7 {
+        font-size: 9px;
+      }
+
       .gestor-logo {
-        width: 186px;
-        height: 186px;
+        width: 150px;
+        height: 90px;
       }
 
       .gestor-logo div {
@@ -236,6 +240,19 @@
         text-align: end;
       }
 
+      .back-color-gray {
+        background:#cfd4d5;
+      }
+
+      .color-gray {
+        color:#cfd4d5;
+      }
+
+      .sub-item {
+        font-style: italic;
+        color:#939598;
+      }
+
     </style>
   </head>
 
@@ -318,17 +335,13 @@
 
       </div>
 
-      <hr>
-
-      <div class="flex1 td">
+      <div class="flex1 td back-color-gray">
         <p class="fs4 lh3">
           <span  class="bold fs5 lh3">DATOS DEL FLETE</span>
         </p>
       </div>
 
-      <hr>
-
-      <div class="table box">
+      <div class="table">
         <div class="flex1 td">
           <p class="fs5 lh3">
             <span class="bold">Origen: </span>{{origen}}
@@ -358,137 +371,134 @@
 
       </div>
 
-      <hr>
-
-      <div class="table">
-
-        <div class="flex3">
-
-          <p class="fs4 lh3 end">
-            <span class="bold">Importe Flete (GS): </span>
-          </p>
-          <p class="fs4 lh3 end">
-            <span class="bold">Flete ({{tasa}})</span>: {{tarifa_flete}}
-          </p>
-
-        </div>
-
-        <div class="flex1">
-          <p class="fs4 lh3 end">
-            <span>{{total_flete}}</span>
-          </p>
-        </div>
-
-      </div>
-
-      <div class="table">
-
-        <div class="flex3">
-
-          <p class="fs4 lh3 end">
-            <span class="bold">Importe Merma (GS): </span>
-          </p>
-          <p class="fs4 lh3 end">
-            <span class="bold">Diferencia (KG): </span>{{diferencia}}
-            <span class="bold">Tolerancia (KG): </span>{{tolerancia}}
-            <span class="bold">Merma (KG): </span>{{merma}}
-            <span class="bold">Precio (Gs/Kg): </span> 000.000
-          </p>
-
-        </div>
-
-        <div class="flex1">
-          <p class="fs4 lh3 end">
-            <span>{{merma_total}}</span>
-          </p>
-        </div>
-
-      </div>
-
       <div>
-      <div>
+
         <div class="table">
-            <div class="td half">
-              <p class="fs4 lh3 end">
-                <span class="bold">Importe Anticipo (GS): </span>
-              </p>
-              <p class="fs4 lh3 end">
-                <span class="bold">Efectivo (Gs): </span>{{tasa}}: Efectivo
-                <span class="bold">Insumos (Gs): </span>{{tasa}}: Insumos
-              </p>
-            </div>
+          <div class="flex3">
+            <p class="fs4 lh3 end">
+              <span class="bold">Importe Flete (GS): </span>
+            </p>
+            <p class="fs7 lh3 sub-item end">
+              <span class="bold">Flete ({{tasa}})</span>: {{tarifa_flete}}
+            </p>
+          </div>
 
-            <div>
-              <p class="fs4 lh3 end"><span>{{anticipo}}</span></p>
-            </div>
+          <div class="flex1">
+            <p class="fs4 lh3 end">
+              <span>{{total_flete}}</span>
+            </p>
+          </div>
         </div>
 
-          <div class="table">
-            <div class="td half">
-              <p class="fs4 lh3 end">
-                <span class="bold">Importe Descuento (GS): </span>
-              </p>
-              <p class="fs4 lh3 end">
-                <span class="bold">Descuentos (ver con ruben) (Gs): </span> 000
-              </p>
-            </div>
-
-            <div>
-              <p class="fs4 lh3 end"><span>{{descuentos}}</span></p>
-            </div>
+        <div class="table">
+          <div class="flex3">
+            <p class="fs4 lh3 end">
+              <span class="bold">Importe Merma (GS): </span>
+            </p>
+            <p class="fs7 lh3 sub-item end">
+              <span class="bold">Diferencia (KG): </span>{{diferencia}}
+              <span class="bold">Tolerancia (KG): </span>{{tolerancia}}
+              <span class="bold">Merma (KG): </span>{{merma}}
+              <span class="bold">Precio (Gs/Kg): </span> 000.000
+            </p>
           </div>
 
-          <div class="table">
-            <div class="td half">
-              <p class="fs4 lh3 end">
-                <span class="bold">Importe Complemento (GS): </span>
-              </p>
-              <p class="fs4 lh3 end">
-                <span class="bold">Complementos (ver con ruben) (Gs): </span>000
-              </p>
-            </div>
+          <div class="flex1">
+            <p class="fs4 lh3 end">
+              <span>{{merma_total}}</span>
+            </p>
+          </div>
+        </div>
 
-            <div>
-              <p class="fs4 lh3 end"><span>{{complementos}}</span></p>
-            </div>
+        <div class="table">
+          <div class="flex3">
+            <p class="fs4 lh3 end">
+              <span class="bold">Importe Anticipo (GS): </span>
+            </p>
+            <p class="fs7 lh3 sub-item end">
+              <span class="bold">Efectivo (Gs): </span>{{tasa}}: Efectivo
+              <span class="bold">Insumos (Gs): </span>{{tasa}}: Insumos
+            </p>
           </div>
 
-          <div class="table">
-            <div class="td half">
-              <p class="fs4 lh3 end">
-                <span class="bold">SALDO DEL FLETE (Gs): </span>
-              </p>
-            </div>
+          <div class="flex1">
+            <p class="fs4 lh3 end">
+              <span>{{anticipo}}</span>
+            </p>
+          </div>
+        </div>
 
-            <div class="td">
-              <p class="fs4 lh3 end"><span>{{saldo}}</span></p>
-            </div>
+        <div class="table">
+          <div class="flex3">
+            <p class="fs4 lh3 end">
+              <span class="bold">Importe Descuento (GS): </span>
+            </p>
+            <p class="fs7 lh3 sub-item end">
+              <span class="bold">Descuentos (ver con ruben) (Gs): </span> 000
+            </p>
           </div>
 
-          <p class="fs4 lh3 end">
-            <span class="bold">En letras: </span> importe en letras
-          </p>
+          <div class="flex1">
+            <p class="fs4 lh3 end">
+              <span>{{descuentos}}</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="table">
+          <div class="flex3">
+            <p class="fs4 lh3 end">
+              <span class="bold">Importe Complemento (GS): </span>
+            </p>
+            <p class="fs7 lh3 sub-item end">
+              <span class="bold">Complementos (ver con ruben) (Gs): </span>000
+            </p>
+          </div>
+
+          <div class="flex1">
+            <p class="fs4 lh3 end">
+              <span>{{complementos}}</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="table">
+          <div class="flex3">
+            <p class="fs4 lh3 end">
+              <span class="bold">SALDO DEL FLETE (Gs): </span>
+            </p>
+          </div>
+
+          <div class="flex1">
+            <p class="fs4 lh3 end">
+              <span>{{saldo}}</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="table">
+          <div class="flex1">
+            <p class="fs4 lh3 sub-item end">
+              <span class="bold">En letras: </span> importe en letras
+            </p>
+          </div>
+        </div>
+
+        <div class="table">
+
+          <div class="flex1 td">
+            <p class="fs4 lh3">
+              <span class="bold">Observación: </span> ...observaciones
+            </p>
+          </div>
 
         </div>
 
       </div>
 
-      <div class="table">
-
-        <div class="flex1 td">
-          <p class="fs4 lh3">
-            <span class="bold">Observación: </span> ...observaciones
-          </p>
-        </div>
-
-      </div>
-
-      <hr>
-      <hr>
       <hr>
 
-
-      <div class="table box mt10">
+      <!--div class="table box mt10">
         <div class="flex1 td">
           <p class="fs4 lh3">
             <span class="bold">Producto: </span>{{producto}}
@@ -546,7 +556,7 @@
           </p>
           <p class="fs4 lh1"><span class="bold">Saldo: </span>{{saldo}}</p>
         </div>
-      </div>
+      </div-->
 
       <!--div class="box mt10 py10">
         <p class="fs6 lh4">
