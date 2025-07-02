@@ -89,7 +89,6 @@ def delete_orden_carga_complemento(db: Session, id: int, modified_by: str):
         db.commit()
 
 
-
 def update_or_create_orden_carga_complemento_by_flete(
     db: Session,
     orden_carga: OrdenCarga,

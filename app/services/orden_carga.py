@@ -1081,13 +1081,21 @@ def update_complementos_y_descuentos_oc(
     for complemento in nuevo_flete.complementos:
         repositories.update_or_create_orden_carga_complemento_by_flete(db, orden_carga, complemento, modified_by)
 
-    # Recalcular anticipos si corresponde
-    # for anticipo in nuevo_flete.anticipos:
-    #     if anticipo.tipo_insumo_id == 1:  # Solo combustible
-    #         saldo_anticipo = get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
-    #             db, anticipo.id, orden_carga_id, modified_by
-    #         )
-    #         print(f"💵 Saldo del anticipo {anticipo.id}: {saldo_anticipo}")
+    # Eliminar complementos del flete viejo que no existen en el nuevo
+    nuevos_conceptos_complemento = {c.concepto_id for c in nuevo_flete.complementos}
+    complementos_a_eliminar = db.query(OrdenCargaComplemento).filter(
+        OrdenCargaComplemento.orden_carga_id == orden_carga_id,
+        OrdenCargaComplemento.flete_id == flete_viejo_id,
+        ~OrdenCargaComplemento.concepto_id.in_(nuevos_conceptos_complemento)
+    ).all()
+
+    for comp in complementos_a_eliminar:
+        print(f"🗑️ Eliminando complemento con concepto_id={comp.concepto_id}")
+        db.delete(comp)
+
+    # Actualizar o crear descuentos
+    for descuento in nuevo_flete.descuentos:
+        repositories.update_or_create_orden_carga_descuento_by_flete(db, orden_carga, descuento, modified_by)
 
     db.commit()
     print("✅ Complementos y descuentos actualizados correctamente.")
@@ -1104,13 +1112,6 @@ def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, curr
     flete_viejo_id = orden_carga.flete_id  # Guardar flete viejo antes de actualizar
     print(f"🔄 Llamando a update_complementos_y_descuentos_oc con flete viejo {flete_viejo_id} y nuevo {flete_id}")
 
-    update_complementos_y_descuentos_oc(
-        db=db,
-        orden_carga_id=orden_carga_id,
-        nuevo_flete_id=flete_id,
-        modified_by=current_user.username,
-        flete_viejo_id=flete_viejo_id
-    )
 
     print(f"🧾 Flete viejo actual: {flete_viejo_id}")
 
@@ -1176,6 +1177,13 @@ def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, curr
     db.commit()
     db.refresh(orden_carga)
 
+    update_complementos_y_descuentos_oc(
+        db=db,
+        orden_carga_id=orden_carga_id,
+        nuevo_flete_id=flete_id,
+        modified_by=current_user.username,
+        flete_viejo_id=flete_viejo_id
+    )
 
     print("✅ recalcular_condiciones finalizada correctamente")
 
