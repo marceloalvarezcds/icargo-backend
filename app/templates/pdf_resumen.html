@@ -261,6 +261,7 @@
   </head>
 
   <body>
+    {% for x in times %}
     <div class="{{class_name}}">
 
       <div class="table table0 fs2">
@@ -501,66 +502,6 @@
 
       <hr>
 
-      <!--div class="table box mt10">
-        <div class="flex1 td">
-          <p class="fs4 lh3">
-            <span class="bold">Producto: </span>{{producto}}
-          </p>
-          <p class="fs4 lh3">
-            <span class="bold">Tarifa flete: </span>{{tarifa_flete}}
-          </p>
-          <p class="fs4 lh3"><span class="bold">Tasa: </span>{{tasa}}</p>
-          <p class="fs4 lh3">
-            <span class="bold">Docs. Carga: </span>{{docs_origen}}
-          </p>
-          <p class="fs4 lh3 mb10">
-            <span class="bold">Docs. Descarga: </span>{{docs_destino}}
-          </p>
-          <p class="fs4 lh3">
-            <span class="bold">Orden de carga Nro: </span>{{id}}
-          </p>
-          <p class="fs4 lh3">
-            <span class="bold">Flete Nro: </span>{{flete_id}}
-          </p>
-          <p class="fs4 lh3 mb10">
-            <span class="bold">Placa Semirremolque: </span>{{semi_placa}}
-          </p>
-        </div>
-        <div class="flex1 td">
-          <p class="fs4 lh3">
-            <span class="bold">Cant. Origen (KG): </span>{{cantidad_origen}}
-          </p>
-          <p class="fs4 lh3">
-            <span class="bold">Cant. Destino (KG): </span>{{cantidad_destino}}
-          </p>
-          <p class="fs4 lh3">
-            <span class="bold">Diferencia (KG): </span>{{diferencia}}
-          </p>
-          <p class="fs4 lh3">
-            <span class="bold">Tolerancia (KG): </span>{{tolerancia}}
-          </p>
-          <p class="fs4 lh3"><span class="bold">Merma (KG): </span>{{merma}}</p>
-        </div>
-        <div class="flex1 td">
-          <p class="fs4 lh3">
-            <span class="bold">Total Flete: </span>{{total_flete}}
-          </p>
-          <p class="fs4 lh3">
-            <span class="bold">Complementos: </span>{{complementos}}
-          </p>
-          <p class="fs4 lh3">
-            <span class="bold">Descuentos: </span>{{descuentos}}
-          </p>
-          <p class="fs4 lh3 mb10">
-            <span class="bold">Merma: </span>{{merma_total}}
-          </p>
-          <p class="fs4 lh1 mb10">
-            <span class="bold">Anticipo: </span>{{anticipo}}
-          </p>
-          <p class="fs4 lh1"><span class="bold">Saldo: </span>{{saldo}}</p>
-        </div>
-      </div-->
-
       <!--div class="box mt10 py10">
         <p class="fs6 lh4">
           Los datos consignados en el presente Documento son emitidos a manera
@@ -579,7 +520,9 @@
         </div>
       </div>
 
-      <div class="logo-container table box align-center mt10">
+      <hr>
+
+      <div class="logo-container table align-center mt10">
         <div class="logo">
           <img src="{{logo}}" alt="iCargo" style="width: 150px; height: 60px"/>
         </div>
@@ -596,6 +539,11 @@
         </p>
       </div>
 
+      {% if x == 0 %}
+      <div class="dashed"></div>
+      {% endif %}
+
     </div>
+    {% endfor %}
   </body>
 </html>

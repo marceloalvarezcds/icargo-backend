@@ -602,7 +602,7 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
         "marca_agua_url": marca_agua_url,
         "class_name": "marca-agua" if obj.estado == EstadoEnum.FINALIZADO.value else "",
     }
-    source_html = template.render(logo=LOGO_IMAGE_URL, **data)
+    source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
     logger.info(f'html: {source_html}')
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
     from_string(
