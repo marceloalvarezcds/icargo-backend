@@ -542,13 +542,13 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
     complementos = obj.complementos_list
     if descuentos:
         descuentos_desc = " ".join([
-            x.detalle + " (" + x.propietario_moneda_simbolo + ") : "
+            x.concepto_descripcion + " (" + x.propietario_moneda_simbolo + ") : "
             + number_format(x.propietario_monto_ml)
                             if x.propietario_monto_ml is not None else '' for x in descuentos])
 
     if complementos:
         complementos_desc = " ".join([
-            x.detalle + " (" + x.propietario_moneda_simbolo + ") : "
+            x.concepto_descripcion + " (" + x.propietario_moneda_simbolo + ") : "
             + number_format(x.propietario_monto_ml)
                             if x.propietario_monto_ml is not None else '' for x in complementos])
 
