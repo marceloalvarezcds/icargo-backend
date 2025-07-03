@@ -305,6 +305,7 @@ class OrdenCargaList(OrdenCargaForm):
     flete_remitente_numero_documento: str
     flete_tipo: Optional[TipoFleteEnum] = None
     flete_tarifa_unidad_abreviatura: Optional[str] = None
+    flete_tarifa_unidad_propietario: Optional[str] = None
     monto_anticipo_retirado:  Optional[RoundedDecimal] = None
     flete_saldo: Optional[int] = None
     resultado_flete_gestor_carga_merma_valor: Optional[int] = None

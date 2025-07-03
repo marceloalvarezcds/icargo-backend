@@ -250,6 +250,11 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         return movimiento_propietario.estado if movimiento_propietario else None
 
     @hybrid_property
+    def estado_movimiento_remitente(self):
+        movimiento_remitente = next((x for x in self.movimientos if x.remitente_id != None), None)
+        return movimiento_remitente.estado if movimiento_remitente else None
+
+    @hybrid_property
     def monto_litro(self):
         if self.cantidad_retirada and self.precio_unitario:
             return self.cantidad_retirada * self.precio_unitario
