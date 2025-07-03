@@ -535,6 +535,23 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
     OUTPUT_FILENAME = f"resumen_{id}.pdf"
     TEMPLATE_FILENAME = "pdf_resumen.html"
     template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
+
+    descuentos_desc = ''
+    complementos_desc = ''
+    descuentos = obj.descuentos_list
+    complementos = obj.complementos_list
+    if descuentos:
+        descuentos_desc = " ".join([
+            x.detalle + " (" + x.propietario_moneda_simbolo + ") : "
+            + number_format(x.propietario_monto_ml)
+                            if x.propietario_monto_ml is not None else '' for x in descuentos])
+
+    if complementos:
+        complementos_desc = " ".join([
+            x.detalle + " (" + x.propietario_moneda_simbolo + ") : "
+            + number_format(x.propietario_monto_ml)
+                            if x.propietario_monto_ml is not None else '' for x in complementos])
+
     data = {
         "id": id,
         "flete_id": obj.flete_id,
@@ -559,7 +576,10 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
         "producto": obj.flete_producto_descripcion,
         "tarifa_flete": number_format(obj.flete_tarifa),
         "tasa": obj.flete_tarifa_unidad,  # noqa
+        "merma_valor": number_format(obj.resultado_propietario_merma_valor_total),
         "docs_origen": obj.remisiones,
+        "descuentos_desc": descuentos_desc,
+        "complementos_desc": complementos_desc,
         "cantidad_origen": number_format(obj.cantidad_origen),
         "docs_destino": obj.nro_tickets,
         "cantidad_destino": number_format(obj.cantidad_destino),
@@ -573,6 +593,11 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
             obj.resultado_propietario_merma_valor_total_moneda_local
         ),
         "anticipo": number_format(obj.resultado_propietario_total_anticipos_retirados),
+        "anticipo_efectivo": number_format(obj.resultado_propietario_total_anticipos_retirados_efectivo),
+        "anticipo_insumo": number_format(
+            obj.resultado_propietario_total_anticipos_retirados_combustible +
+                obj.resultado_propietario_total_anticipos_retirados_lubricantes
+            ),
         "saldo": number_format(obj.resultado_propietario_saldo),
         "marca_agua_url": marca_agua_url,
         "class_name": "marca-agua" if obj.estado == EstadoEnum.FINALIZADO.value else "",

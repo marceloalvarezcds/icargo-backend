@@ -94,7 +94,7 @@
       }
 
       .fs7 {
-        font-size: 9px;
+        font-size: 10px;
       }
 
       .gestor-logo {
@@ -240,6 +240,10 @@
         text-align: end;
       }
 
+      .text-right{
+        text-align: right;
+      }
+
       .back-color-gray {
         background:#cfd4d5;
       }
@@ -299,25 +303,25 @@
 
       <div class="gap table">
 
-        <div class="flex1 td">
+        <div class="flex2 td">
           <p class="fs4 lh3">
-            <span  class="bold fs5 lh3">CONTRAPARTE:</span> {{propietario_nombre}}
+            <span  class="bold fs5 lh3">Contraparte:</span> {{propietario_nombre}}
           </p>
           <p class="fs4 lh3">
             <span  class="bold fs5 lh3">Chofer:</span> {{chofer_nombre}}
           </p>
           <p class="fs4 lh3">
-            <span  class="bold fs5 lh3">TRACTO:</span> {{camion_placa}}
+            <span  class="bold fs5 lh3">Tracto:</span> {{camion_placa}}
           </p>
         </div>
 
         <div class="flex1 td">
           <p class="fs4 lh3">
-            <span  class="bold fs5 lh3">TIPO:</span> Propietario
+            <span  class="bold fs5 lh3">Tipo:</span> Propietario
           </p>
           <div class="flex1 td align-down"></div>
           <p class="fs4 lh3">
-            <span  class="bold fs5 lh3">MARCA:</span> {{camion_marca}}
+            <span  class="bold fs5 lh3">Marca:</span> {{camion_marca}}
           </p>
         </div>
 
@@ -329,7 +333,7 @@
             <span  class="bold fs5 lh3">Doc. N°:</span> {{chofer_documento}}
           </p>
           <p class="fs4 lh3">
-            <span  class="bold fs5 lh3">COLOR:</span> {{camion_color}}
+            <span  class="bold fs5 lh3">Color:</span> {{camion_color}}
           </p>
         </div>
 
@@ -337,12 +341,12 @@
 
       <div class="flex1 td back-color-gray">
         <p class="fs4 lh3">
-          <span  class="bold fs5 lh3">DATOS DEL FLETE</span>
+          <span  class="bold fs5 lh3">Datos del Flete</span>
         </p>
       </div>
 
       <div class="table">
-        <div class="flex1 td">
+        <div class="flex2 td">
           <p class="fs5 lh3">
             <span class="bold">Origen: </span>{{origen}}
           </p>
@@ -368,7 +372,6 @@
             <span class="bold">Cantidad (kg): </span> {{cantidad_destino}}
           </p>
         </div>
-
       </div>
 
       <div>
@@ -396,10 +399,10 @@
               <span class="bold">Importe Merma (GS): </span>
             </p>
             <p class="fs7 lh3 sub-item end">
-              <span class="bold">Diferencia (KG): </span>{{diferencia}}
-              <span class="bold">Tolerancia (KG): </span>{{tolerancia}}
-              <span class="bold">Merma (KG): </span>{{merma}}
-              <span class="bold">Precio (Gs/Kg): </span> 000.000
+              <span class="bold">Diferencia (KG): </span> {{diferencia}}
+              <span class="bold">Tolerancia (KG): </span> {{tolerancia}}
+              <span class="bold">Merma (KG): </span> {{merma}}
+              <span class="bold">Precio (Gs/Kg): </span> {{merma_valor}}
             </p>
           </div>
 
@@ -416,8 +419,8 @@
               <span class="bold">Importe Anticipo (GS): </span>
             </p>
             <p class="fs7 lh3 sub-item end">
-              <span class="bold">Efectivo (Gs): </span>{{tasa}}: Efectivo
-              <span class="bold">Insumos (Gs): </span>{{tasa}}: Insumos
+              <span class="bold">Efectivo (Gs): </span> {{anticipo_efectivo}}
+              <span class="bold">Insumos (Gs): </span> {{anticipo_insumo}}
             </p>
           </div>
 
@@ -434,7 +437,7 @@
               <span class="bold">Importe Descuento (GS): </span>
             </p>
             <p class="fs7 lh3 sub-item end">
-              <span class="bold">Descuentos (ver con ruben) (Gs): </span> 000
+              <span class="bold"> {{descuentos_desc}} </span>
             </p>
           </div>
 
@@ -451,7 +454,7 @@
               <span class="bold">Importe Complemento (GS): </span>
             </p>
             <p class="fs7 lh3 sub-item end">
-              <span class="bold">Complementos (ver con ruben) (Gs): </span>000
+              <span class="bold"> {{complementos_desc}} </span>
             </p>
           </div>
 

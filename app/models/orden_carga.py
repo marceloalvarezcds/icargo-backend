@@ -124,8 +124,10 @@ class OrdenCarga(AuditMixin, Base):
     evaluaciones_historial = relationship("OrdenCargaEvaluacionesHistorial", back_populates="orden_carga")
     anticipos = relationship("OrdenCargaAnticipoRetirado", back_populates="orden_carga")
     movimientos = relationship("Movimiento", back_populates="orden_carga")
-    complementos = relationship("OrdenCargaComplemento", back_populates="orden_carga")
-    descuentos = relationship("OrdenCargaDescuento", back_populates="orden_carga")
+    complementos = relationship(
+        "OrdenCargaComplemento", back_populates="orden_carga", order_by="OrdenCargaComplemento.id")
+    descuentos = relationship(
+        "OrdenCargaDescuento", back_populates="orden_carga", order_by="OrdenCargaDescuento.id")
     saldos = relationship("OrdenCargaAnticipoSaldo", back_populates="orden_carga")
     porcentaje_anticipos = relationship(
         "OrdenCargaAnticipoPorcentaje", back_populates="orden_carga"
@@ -934,10 +936,23 @@ class OrdenCarga(AuditMixin, Base):
             - self.resultado_propietario_total_complemento
         )
 
+
     @hybrid_property
     def resultado_propietario_total_descuento(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
         return sum(x.propietario_monto_ml if x.propietario_monto_ml is not None else 0 for x in lista)
+
+    @hybrid_property
+    def descuentos_list(self):
+        lista: List[OrdenCargaDescuento] = self.descuentos
+        return lista
+
+
+    @hybrid_property
+    def complementos_list(self):
+        lista: List[OrdenCargaComplemento] = self.complementos
+        return lista
+
 
     @hybrid_property
     def resultado_gestor_carga_total_descuento(self):
