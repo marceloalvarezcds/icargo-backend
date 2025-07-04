@@ -36,7 +36,7 @@
 
       .dashed {
         border: 1px dashed;
-        margin: 20px 0;
+        margin: 10px 0;
       }
 
       .flex1 {
@@ -59,14 +59,13 @@
       }
 
       .firma {
-
         border-top: 2px solid #444;
         width: 400px;
       }
 
       .firma p {
         text-align: center;
-        line-height: 35px;
+        line-height: 20px;
       }
 
       .fs1 {
@@ -95,6 +94,10 @@
 
       .fs7 {
         font-size: 10px;
+      }
+
+      .fs8 {
+        font-size: 8px;
       }
 
       .gestor-logo {
@@ -128,11 +131,23 @@
       }
 
       .lh3 {
-        line-height: 25px;
+        line-height: 24px;
       }
 
       .lh4 {
+        line-height: 22px;
+      }
+
+      .lh5 {
+        line-height: 20px;
+      }
+
+      .lh6 {
         line-height: 16px;
+      }
+
+      .lh7 {
+        line-height: 14px;
       }
 
       .logo-container .logo {
@@ -209,7 +224,7 @@
       }
 
       .table .td {
-        padding: 8px 0 7px 0;
+        padding: 6px 0 2px 0;
       }
 
       .table.gap .box {
@@ -264,38 +279,38 @@
     {% for x in times %}
     <div class="{{class_name}}">
 
-      <div class="table table0 fs2">
+      <div class="table table0 fs4">
         <div class="td gestor-logo">
           {% if gestor_carga_logo %}
           <img src="{{gestor_carga_logo}}" style="width: 150px; height: 60px" />
           {% else %}
-          <div class="center fs3 lh3 bold gray">
+          <div class="center fs4 lh4 bold gray">
             LOGO
             <div class="fs4">Gestora Carga</div>
           </div>
           {% endif %}
         </div>
         <div class="td flex1">
-          <p class="bold fs3 lh3">{{gestor_carga_nombre}}</p>
-          <p class="fs5 lh3">
-            <span class="bold fs5 lh3">{{gestor_carga_numero_documento}}</span>
+          <p class="bold fs4 lh3">{{gestor_carga_nombre}}</p>
+          <p class="fs6 lh7">
+            <span class="bold">{{gestor_carga_numero_documento}}</span>
           </p>
-          <p class="fs5 lh3">
-            <span class="bold fs5 lh3">Dirección: </span>
+          <p class="fs8 lh7">
+            <span class="bold">Dirección: </span>
             {{gestor_carga_direccion}}
           </p>
         </div>
         <div class="td flex1">
-          <p class="bold fs3 lh3 text-right">COMPROBANTE DE FLETE N°: {{id}}</p>
+          <p class="bold fs4 lh4 text-right">COMPROBANTE DE FLETE N°: {{id}}</p>
 
-          <p class="fs5 lh3 text-right">
-            <span class="bold fs5 lh3">Fecha: </span>{{fecha}}
+          <p class="fs5 lh5 text-right">
+            <span class="bold">Fecha: </span>{{fecha}}
           </p>
-          <p class="fs5 lh3 text-right">
-            <span class="bold fs5 lh3">Usuario: </span>{{usuario_nombre}}
+          <p class="fs5 lh5 text-right">
+            <span class="bold">Usuario: </span>{{usuario_nombre}}
           </p>
-          <p class="fs5 lh3 text-right">
-            <span class="bold fs5 lh3">O.C.: </span>{{id}}
+          <p class="fs5 lh5 text-right">
+            <span class="bold">O.C.: </span>{{id}}
           </p>
         </div>
       </div>
@@ -305,35 +320,35 @@
       <div class="gap table">
 
         <div class="flex2 td">
-          <p class="fs4 lh3">
-            <span  class="bold fs5 lh3">Contraparte:</span> {{propietario_nombre}}
+          <p class="fs4 lh4">
+            <span  class="bold fs5">Contraparte:</span> {{propietario_nombre}}
           </p>
-          <p class="fs4 lh3">
-            <span  class="bold fs5 lh3">Chofer:</span> {{chofer_nombre}}
+          <p class="fs4 lh4">
+            <span  class="bold fs5">Chofer:</span> {{chofer_nombre}}
           </p>
-          <p class="fs4 lh3">
-            <span  class="bold fs5 lh3">Tracto:</span> {{camion_placa}}
-          </p>
-        </div>
-
-        <div class="flex1 td">
-          <p class="fs4 lh3">
-            <span  class="bold fs5 lh3">Tipo:</span> Propietario
-          </p>
-          <div class="flex1 td align-down"></div>
-          <p class="fs4 lh3">
-            <span  class="bold fs5 lh3">Marca:</span> {{camion_marca}}
+          <p class="fs4 lh4">
+            <span  class="bold fs5">Tracto:</span> {{camion_placa}}
           </p>
         </div>
 
         <div class="flex1 td">
-          <p class="fs4 lh3">
+          <p class="fs4 lh4">
+            <span  class="bold fs5">Tipo:</span> Propietario
+          </p>
+          <div class="flex1 td align-down"> <p class="fs4 lh4"> </p></div>
+          <p class="fs4 lh4">
+            <span  class="bold fs5">Marca:</span> {{camion_marca}}
+          </p>
+        </div>
+
+        <div class="flex1 td">
+          <p class="fs4 lh4">
             <span  class="bold fs5 lh3">Doc. N°:</span> {{propietario_documento}}
           </p>
-          <p class="fs4 lh3">
+          <p class="fs4 lh4">
             <span  class="bold fs5 lh3">Doc. N°:</span> {{chofer_documento}}
           </p>
-          <p class="fs4 lh3">
+          <p class="fs4 lh4">
             <span  class="bold fs5 lh3">Color:</span> {{camion_color}}
           </p>
         </div>
@@ -341,35 +356,35 @@
       </div>
 
       <div class="flex1 td back-color-gray">
-        <p class="fs4 lh3">
-          <span  class="bold fs5 lh3">Datos del Flete</span>
+        <p class="fs4 lh4">
+          <span  class="bold fs5">Datos del Flete</span>
         </p>
       </div>
 
       <div class="table">
         <div class="flex2 td">
-          <p class="fs5 lh3">
+          <p class="fs5 lh5">
             <span class="bold">Origen: </span>{{origen}}
           </p>
-          <p class="fs5 lh3">
+          <p class="fs5 lh5">
             <span class="bold">Destino: </span>{{destino}}
           </p>
         </div>
 
         <div class="flex1 td">
-          <p class="fs5 lh3">
+          <p class="fs5 lh5">
             <span class="bold">Remito: </span> {{docs_origen}}
           </p>
-          <p class="fs5 lh3">
+          <p class="fs5 lh5">
             <span class="bold">Recepción: </span> {{docs_destino}}
           </p>
         </div>
 
         <div class="flex1 td">
-          <p class="fs5 lh3">
+          <p class="fs5 lh5">
             <span class="bold">Cantidad (kg): </span> {{cantidad_origen}}
           </p>
-          <p class="fs5 lh3">
+          <p class="fs5 lh5">
             <span class="bold">Cantidad (kg): </span> {{cantidad_destino}}
           </p>
         </div>
@@ -379,16 +394,16 @@
 
         <div class="table">
           <div class="flex3">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span class="bold">Importe Flete (GS): </span>
             </p>
-            <p class="fs7 lh3 sub-item end">
+            <p class="fs6 lh6 sub-item end">
               <span class="bold">Flete ({{tasa}})</span>: {{tarifa_flete}}
             </p>
           </div>
 
           <div class="flex1">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span>{{total_flete}}</span>
             </p>
           </div>
@@ -396,10 +411,10 @@
 
         <div class="table">
           <div class="flex3">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span class="bold">Importe Merma (GS): </span>
             </p>
-            <p class="fs7 lh3 sub-item end">
+            <p class="fs6 lh6 sub-item end">
               <span class="bold">Diferencia (KG): </span> {{diferencia}}
               <span class="bold">Tolerancia (KG): </span> {{tolerancia}}
               <span class="bold">Merma (KG): </span> {{merma}}
@@ -408,7 +423,7 @@
           </div>
 
           <div class="flex1">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span>{{merma_total}}</span>
             </p>
           </div>
@@ -416,17 +431,17 @@
 
         <div class="table">
           <div class="flex3">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span class="bold">Importe Anticipo (GS): </span>
             </p>
-            <p class="fs7 lh3 sub-item end">
+            <p class="fs6 fs6 sub-item end">
               <span class="bold">Efectivo (Gs): </span> {{anticipo_efectivo}}
               <span class="bold">Insumos (Gs): </span> {{anticipo_insumo}}
             </p>
           </div>
 
           <div class="flex1">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span>{{anticipo}}</span>
             </p>
           </div>
@@ -434,16 +449,16 @@
 
         <div class="table">
           <div class="flex3">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span class="bold">Importe Descuento (GS): </span>
             </p>
-            <p class="fs7 lh3 sub-item end">
+            <p class="fs6 lh6 sub-item end">
               <span class="bold"> {{descuentos_desc}} </span>
             </p>
           </div>
 
           <div class="flex1">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span>{{descuentos}}</span>
             </p>
           </div>
@@ -451,16 +466,16 @@
 
         <div class="table">
           <div class="flex3">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span class="bold">Importe Complemento (GS): </span>
             </p>
-            <p class="fs7 lh3 sub-item end">
+            <p class="fs6 lh6 sub-item end">
               <span class="bold"> {{complementos_desc}} </span>
             </p>
           </div>
 
           <div class="flex1">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span>{{complementos}}</span>
             </p>
           </div>
@@ -468,13 +483,13 @@
 
         <div class="table">
           <div class="flex3">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span class="bold">SALDO DEL FLETE (Gs): </span>
             </p>
           </div>
 
           <div class="flex1">
-            <p class="fs4 lh3 end">
+            <p class="fs5 lh5 end">
               <span>{{saldo}}</span>
             </p>
           </div>
@@ -482,7 +497,7 @@
 
         <div class="table">
           <div class="flex1">
-            <p class="fs4 lh3 sub-item end">
+            <p class="fs5 lh5 sub-item end">
               <span class="bold">En letras: </span> importe en letras
             </p>
           </div>
@@ -491,7 +506,7 @@
         <div class="table">
 
           <div class="flex1 td">
-            <p class="fs4 lh3">
+            <p class="fs5 lh5">
               <span class="bold">Observación: </span> ...observaciones
             </p>
           </div>
@@ -526,7 +541,7 @@
         <div class="logo">
           <img src="{{logo}}" alt="iCargo" style="width: 150px; height: 60px"/>
         </div>
-        <p class="fs6 lh4 flex1">
+        <p class="fs6 lh6 flex1">
           iCargo es solo una Herramienta de Gestión y no constituye parte alguna
           en la Cadena de Operaciones, limitándose su aporte solo al Registro,
           Gestión y Publicación de la información que por ella se administra.
