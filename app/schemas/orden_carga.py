@@ -251,6 +251,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     resultado_propietario_total_anticipos_retirados_combustible:  Optional[RoundedDecimal] = None
     resultado_propietario_total_anticipos_retirados_efectivo:  Optional[RoundedDecimal] = None
     resultado_propietario_total_anticipos_retirados_lubricantes:  Optional[RoundedDecimal] = None
+    resultado_propietario_tarifa_flete_ml:  Optional[RoundedDecimal] = None
     tipo_evaluacion_id: Optional[int] = None
     total_anticipo_efectivo:  Optional[int] = None
     total_anticipo_combustible:  Optional[int] = None
