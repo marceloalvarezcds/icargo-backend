@@ -31,6 +31,7 @@ class PropietarioBaseModel(BaseModel):
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
     es_chofer: Optional[bool] = False
+    is_propietario_condicionado: Optional[bool] = False
     puede_recibir_anticipos: bool
     tipo_documento_propietario_id: Optional[int] = None
     # INICIO Datos del Chofer
@@ -76,6 +77,7 @@ class PropietarioEditForm(BaseModel):
     foto_documento_reverso: Optional[str] = None
     foto_perfil: Optional[str] = None
     es_chofer: Optional[bool] = False
+    is_propietario_condicionado: Optional[bool] = False
     puede_recibir_anticipos: bool
     anticipos_bloqueados: Optional[bool] = False
     tipo_documento_propietario_id: Optional[int] = None

@@ -2,9 +2,11 @@ from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 
+from app.models.chofer import Chofer
 from app.models.combinacion import Combinacion
 from app.models.orden_carga_remision_origen import OrdenCargaRemisionOrigen
 from app.models.permiso import Permiso
+from app.models.propietario import Propietario
 from app.models.rol import Rol
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
@@ -385,7 +387,16 @@ def create_orden_carga(
     )
 
     if estado_inicial == EstadoEnum.ACEPTADO:
-        obj.anticipos_liberados = True
+        chofer = db.query(Chofer).filter(Chofer.id == data.chofer_id).first()
+        propietario = db.query(Propietario).filter(Propietario.id == data.propietario_id).first()
+
+        if not chofer or not propietario:
+            raise ValueError("Chofer o Propietario no encontrados")
+
+        if not chofer.is_chofer_condicionado and not propietario.is_propietario_condicionado:
+            obj.anticipos_liberados = True
+        else:
+            obj.anticipos_liberados = False
 
     db.add(obj)
     db.commit()
@@ -394,7 +405,7 @@ def create_orden_carga(
 
     # Solo crear el historial de comentarios si hay un comentario
     comentario = data.comentarios
-    if comentario:  # Si el comentario no es vacío ni None
+    if comentario:
         create_orden_carga_comentarios_historial(
             db=db,
             orden_carga_id=obj.id,
@@ -404,7 +415,6 @@ def create_orden_carga(
         )
 
     return change_orden_carga_status(obj, db, estado_inicial, modified_by)
-
 
 
 def edit_remitir_fecha(

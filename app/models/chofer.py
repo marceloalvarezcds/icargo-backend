@@ -73,6 +73,7 @@ class Chofer(AuditMixin, Base):
     ciudad_id = Column(Integer, ForeignKey("ciudad.id"))
     ciudad = relationship(Ciudad, uselist=False, foreign_keys=[ciudad_id])
     puede_recibir_anticipos = Column(Boolean, server_default=text("true"))
+    is_chofer_condicionado = Column(Boolean, nullable=False, server_default=text("false"))
     gestores = relationship("GestorCargaChofer", back_populates="chofer")
 
     promedio_chofer_gestor = Column(Numeric(38, 1), nullable=True)

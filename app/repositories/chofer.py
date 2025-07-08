@@ -145,6 +145,7 @@ def create_chofer(
         oficial_cuenta_id=data.oficial_cuenta_id,
         es_propietario=data.es_propietario,
         puede_recibir_anticipos=data.puede_recibir_anticipos,
+        is_chofer_condicionado=data.is_chofer_condicionado,
         foto_documento_frente=foto_documento_frente_url,
         foto_documento_reverso=foto_documento_reverso_url,
         foto_perfil=foto_perfil_url,
@@ -194,6 +195,7 @@ def edit_chofer(
         obj.fecha_nacimiento = data.fecha_nacimiento
         obj.es_propietario = data.es_propietario
         obj.puede_recibir_anticipos = data.puede_recibir_anticipos
+        obj.is_chofer_condicionado=data.is_chofer_condicionado
         obj.email = data.email
         obj.direccion = data.direccion
         obj.ciudad_id = data.ciudad_id

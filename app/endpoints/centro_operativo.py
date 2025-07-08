@@ -32,6 +32,15 @@ async def read_centro_operativo_list_by_gestor_cuenta_id(
     )
 
 
+@api.get("/origen-ambos", response_model=List[schemas.CentroOperativoList])
+async def read_centro_operativo_origen_ambos(
+    db: Session = Depends(get_db_session),
+    _: bool = Depends(Permiso(a.LISTAR, m.CENTRO_OPERATIVO)),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+):
+    return repositories.get_centro_operativo_list_origen_ambos(db, current_user.gestor_carga_id)
+
+
 @api.get("/reports")
 async def centro_operativo_reports(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -39,6 +48,13 @@ async def centro_operativo_reports(
 ):
     return services.get_centro_operativo_reports(db)
 
+@api.get("/gestor_cuenta_id/destino-ambos", response_model=List[schemas.CentroOperativoList])
+async def read_centro_operativo_destino_ambos(
+    db: Session = Depends(get_db_session),
+    _: bool = Depends(Permiso(a.LISTAR, m.CENTRO_OPERATIVO)),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+):
+    return repositories.get_centro_operativo_list_destino_ambos(db, current_user.gestor_carga_id)
 
 @api.get("/{id}", response_model=schemas.CentroOperativo)
 async def read_centro_operativo_by_id(

@@ -59,6 +59,8 @@ from .centro_operativo import (  # noqa
     get_centro_operativo_list,
     get_centro_operativo_list_by_gestor_cuenta_id,
     change_centro_operativo_status,
+    get_centro_operativo_list_origen_ambos,
+    get_centro_operativo_list_destino_ambos,
 )
 from .centro_operativo_clasificacion import (  # noqa
     get_centro_operativo_clasificacion_by_nombre,

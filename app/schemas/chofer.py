@@ -29,6 +29,7 @@ class ChoferBaseModel(BaseModel):
     foto_perfil: Optional[str] = None
     es_propietario: Optional[bool] = False
     puede_recibir_anticipos: bool
+    is_chofer_condicionado: bool
     # Datos del Propietario
     pais_origen_id: Optional[int] = None
     foto_documento_frente_propietario: Optional[str] = None
@@ -67,6 +68,7 @@ class ChoferEditForm(BaseModel):
     foto_perfil: Optional[str] = None
     es_propietario: Optional[bool] = False
     puede_recibir_anticipos: bool
+    is_chofer_condicionado: bool
     anticipos_bloqueados: Optional[bool] = False
     # Datos del Propietario
     pais_origen_id: Optional[int] = None

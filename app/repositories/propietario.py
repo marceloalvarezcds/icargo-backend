@@ -105,6 +105,7 @@ def create_propietario(
         gestor_cuenta_id=gestor_cuenta_id,
         oficial_cuenta_id=data.oficial_cuenta_id,
         es_chofer=data.es_chofer,
+        is_propietario_condicionado=data.is_propietario_condicionado,
         puede_recibir_anticipos=data.puede_recibir_anticipos,
         foto_documento_frente=foto_documento_frente_url,
         foto_documento_reverso=foto_documento_reverso_url,
@@ -141,6 +142,7 @@ def edit_propietario(
         obj.digito_verificador = data.digito_verificador
         obj.fecha_nacimiento = data.fecha_nacimiento
         obj.es_chofer = data.es_chofer
+        obj.is_propietario_condicionado=data.is_propietario_condicionado
         obj.puede_recibir_anticipos = data.puede_recibir_anticipos
         obj.email = data.email
         obj.direccion = data.direccion
