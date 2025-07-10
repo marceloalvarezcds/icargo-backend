@@ -4,12 +4,12 @@ from typing import List, Optional
 from sqlalchemy.orm import Query, Session, aliased # type: ignore
 from sqlalchemy import case, null, desc, func
 from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
-from app.enums import MovimientoEstadoEnum, EstadoEnum, TipoAnticipoEnum
+from app.enums import MovimientoEstadoEnum, EstadoEnum, TipoAnticipoEnum, TipoDocumentoRelacionadoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
 from app.models import (
     Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta, TipoMovimiento,
     OrdenCargaAnticipoRetirado, Moneda, OrdenCarga, Proveedor, PuntoVenta, MonedaCotizacion,
-    Camion
+    Camion, TipoDocumentoRelacionado
 )
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
@@ -164,17 +164,19 @@ def get_movimiento_list_for_flete_pdf_reports_by_liquidacion_id(
     return (
         db.query(Movimiento)
         .join(Movimiento.tipo_movimiento)
+        .join(Movimiento.tipo_documento_relacionado)
         .filter(
             and_(
-                Movimiento.estado == estado,
+                #Movimiento.estado == estado,
                 Movimiento.liquidacion_id == liquidacion_id,
-                TipoMovimiento.descripcion != TipoMovimientoEnum.OTRO.value,
+                TipoDocumentoRelacionado.descripcion == TipoDocumentoRelacionadoEnum.OC.value,
             )
         )
         .order_by(
             Movimiento.numero_documento_relacionado,
             Movimiento.contraparte,
             Movimiento.liquidacion_id,
+            Movimiento.id,
         )
         .all()
     )
@@ -188,11 +190,12 @@ def get_movimiento_list_for_otro_pdf_reports_by_liquidacion_id(
     return (
         db.query(Movimiento)
         .join(Movimiento.tipo_movimiento)
+        .join(Movimiento.tipo_documento_relacionado)
         .filter(
             and_(
-                Movimiento.estado == estado,
+                #Movimiento.estado == estado,
                 Movimiento.liquidacion_id == liquidacion_id,
-                TipoMovimiento.descripcion == TipoMovimientoEnum.OTRO.value,
+                TipoDocumentoRelacionado.descripcion == TipoDocumentoRelacionadoEnum.OTRO.value,
             )
         )
         .order_by(
