@@ -26,6 +26,8 @@ def get_instrumento_list_by_liquidacion_id(
         .filter(
             and_(
                 Instrumento.estado != EstadoEnum.ELIMINADO.value,
+                Instrumento.estado != EstadoEnum.ANULADO.value,
+                Instrumento.operacion_estado == OperacionEstadoEnum.CONFIRMADO.value,
                 Instrumento.liquidacion_id == liquidacion_id,
             )
         )
