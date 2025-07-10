@@ -169,6 +169,7 @@ def get_movimiento_list_for_flete_pdf_reports_by_liquidacion_id(
             and_(
                 #Movimiento.estado == estado,
                 Movimiento.liquidacion_id == liquidacion_id,
+                TipoMovimiento.descripcion != TipoMovimientoEnum.FISCAL.value,
                 TipoDocumentoRelacionado.descripcion == TipoDocumentoRelacionadoEnum.OC.value,
             )
         )
@@ -195,7 +196,14 @@ def get_movimiento_list_for_otro_pdf_reports_by_liquidacion_id(
             and_(
                 #Movimiento.estado == estado,
                 Movimiento.liquidacion_id == liquidacion_id,
-                TipoDocumentoRelacionado.descripcion == TipoDocumentoRelacionadoEnum.OTRO.value,
+                or_(
+                    TipoDocumentoRelacionado.descripcion == TipoDocumentoRelacionadoEnum.OTRO.value,
+                    and_(
+                        TipoDocumentoRelacionado.descripcion == TipoDocumentoRelacionadoEnum.OC.value,
+                        TipoMovimiento.descripcion == TipoMovimientoEnum.FISCAL.value
+                    ),
+                )
+
             )
         )
         .order_by(

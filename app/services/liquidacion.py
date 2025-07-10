@@ -501,6 +501,7 @@ def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
 
     for mov in otro_movimientos:
         total_otros += mov.monto_mon_local
+        total_contraparte += mov.monto_mon_local
 
     # FIN Obtención de totales
     data = {
@@ -526,7 +527,7 @@ def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
         "total_instrumentos": f"{number_format(obj.instrumentos_saldo)}",
     }
     #source_html = template.render(logo=LOGO_IMAGE_URL, **data)
-    source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
+    source_html = template.render(logo=LOGO_IMAGE_URL, times=range(1), **data)
     #logger.info(f'html: {source_html}')
 
     for o in liquidacionList:
