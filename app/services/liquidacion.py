@@ -9,6 +9,7 @@ from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
 from pdfkit import from_string  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
+from fastapi.responses import HTMLResponse
 
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
@@ -32,13 +33,15 @@ from app.schemas import (
     LiquidacionForm,
     LiquidacionCabeceraMovimientosForm,
     InstrumentoForm,
-    Instrumento
+    Instrumento,
+    LiquidacionReport
 )
 from app.schemas import Instrumento as InstrumentoSchema
 from app.utils import get_gestor_carga_by_params, number_format
 
 from .camion import update_camion_anticipo_retirado
 from .instrumento import create_instrumento
+from .user import get_user_by_username
 from app.logger import logger
 
 
@@ -416,6 +419,9 @@ def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
     gestor_carga = repositories.get_gestor_carga_by_id(db, obj.gestor_carga_id)
     if not gestor_carga:
         raise HTTPException(status_code=404, detail="Gestor no encontrado")
+    # Obtención del usuario
+    usuario = get_user_by_username(db, obj.created_by)
+    usuario_nombre = f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
     OUTPUT_FILENAME = f"resumen_liquidacion_{id}.pdf"
     TEMPLATE_FILENAME = "pdf_liquidacion_resumen.html"
     templateEnv.filters["number_format"] = number_format
@@ -441,32 +447,74 @@ def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
     total_anticipo_combustible = Decimal(0)
     total_anticipo_otro = Decimal(0)
     total_otros = Decimal(0)
+
+# totalizar por OC
+# agregar a LiquidacionReport
+# LiquidacionReport va ser una lista
+
+    liquidacionList: List[LiquidacionReport] = []
+    oc_liquidacion=LiquidacionReport(
+        orden_carga_id=0,  total_orden_carga=0, movimientos=[]
+    )
+    oc_id: int = 0
+
+    logger.info('******************************************************************: ')
+    logger.info('******************************************************************: ')
+    logger.info(f'flete_movimientos {len(flete_movimientos)}')
+
     for mov in flete_movimientos:
-        total_contraparte += mov.monto
+
+        logger.info('flete_movimientos:')
+        logger.info(f'oc: {oc_id}')
+        logger.info(f'mov.orden_carga_id: {mov.orden_carga_id}')
+
+        if oc_id == 0:
+            oc_liquidacion = LiquidacionReport(
+                orden_carga_id=mov.orden_carga_id, total_orden_carga=0, movimientos=[]
+            )
+            oc_id= mov.orden_carga_id
+
+        if oc_id != mov.orden_carga_id:
+            #oc_liquidacion.total_orden_carga += total_contraparte
+            liquidacionList.append(oc_liquidacion)
+            oc_liquidacion = LiquidacionReport(
+                orden_carga_id=mov.orden_carga_id, total_orden_carga=0, movimientos=[]
+            )
+            oc_id= mov.orden_carga_id
+
+        oc_liquidacion.movimientos.append(mov)
+        total_contraparte += mov.monto_mon_local
+        oc_liquidacion.total_orden_carga += mov.monto_mon_local
         total_flete += (
-            mov.monto
+            mov.monto_mon_local
             if (mov.es_flete or mov.es_complemento or mov.es_descuento or mov.es_merma)
             else Decimal(0)
         )
-        total_anticipo_efectivo += mov.monto if mov.es_anticipo_efectivo else Decimal(0)
+        total_anticipo_efectivo += mov.monto_mon_local if mov.es_anticipo_efectivo else Decimal(0)
         total_anticipo_combustible += (
-            mov.monto if mov.es_anticipo_combustible else Decimal(0)
+            mov.monto_mon_local if mov.es_anticipo_combustible else Decimal(0)
         )
-        total_anticipo_otro += mov.monto if mov.es_anticipo_otro else Decimal(0)
+        total_anticipo_otro += mov.monto_mon_local if mov.es_anticipo_otro else Decimal(0)
+
+    #oc_liquidacion.total_orden_carga += total_contraparte
+    liquidacionList.append(oc_liquidacion)
 
     for mov in otro_movimientos:
-        total_otros += mov.monto
+        total_otros += mov.monto_mon_local
 
     # FIN Obtención de totales
     data = {
         "id": id,
         "gestor_carga_direccion": gestor_carga.direccion,
         "gestor_carga_logo": gestor_carga.logo,
-        "gestor_carga_nombre": f"{gestor_carga.nombre} - {gestor_carga.numero_documento}",
+        "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_numero_documento": gestor_carga.numero_documento,
         "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "usuario_nombre": usuario_nombre,
         "contraparte": obj.contraparte,
+        "documento_contraparte": obj.contraparte_numero_documento,
         "tipo_contraparte": obj.tipo_contraparte_descripcion,
-        "flete_movimientos": flete_movimientos,
+        "flete_movimientos": liquidacionList,
         "otro_movimientos": otro_movimientos,
         "instrumentos": instrumentos,
         "total_contraparte": f"{number_format(total_contraparte)}",
@@ -477,10 +525,21 @@ def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
         "total_otros": f"{number_format(total_otros)}",
         "total_instrumentos": f"{number_format(obj.instrumentos_saldo)}",
     }
-    source_html = template.render(logo=LOGO_IMAGE_URL, **data)
-    pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
-    from_string(source_html, pdf_filename, {"page-size": "Legal"})
-    return OUTPUT_FILENAME
+    #source_html = template.render(logo=LOGO_IMAGE_URL, **data)
+    source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
+    #logger.info(f'html: {source_html}')
+
+    for o in liquidacionList:
+        logger.info(f'orden_carga_id: {o.orden_carga_id}')
+        logger.info(f'movimientos: {len(o.movimientos)}')
+    #pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
+    #from_string(source_html, pdf_filename, {"page-size": "Legal"})
+
+    logger.info('******************************************************************: ')
+    logger.info('******************************************************************: ')
+
+    #return OUTPUT_FILENAME
+    return HTMLResponse(content=source_html, status_code=200)
 
 
 def get_reports(datalist: List[Liquidacion]) -> str:

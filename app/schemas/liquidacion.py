@@ -113,3 +113,10 @@ class Liquidacion(LiquidacionForm):
 class LiquidacionSometer(BaseModel):
     comentario: Optional[str]
     monto: Optional[RoundedDecimal]
+
+
+
+class LiquidacionReport(BaseModel):
+    movimientos: List[Movimiento]
+    orden_carga_id: int
+    total_orden_carga: RoundedDecimal
