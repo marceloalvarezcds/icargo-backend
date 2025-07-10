@@ -179,3 +179,14 @@ async def update_flete_cantidad(
     _: bool = Depends(Permiso(a.EDITAR, m.FLETE)),
 ):
     return services.update_flete_cantidad(id, data.condicion_cantidad, db, current_user.username)
+
+
+@api.put("/{id}/edit-mode", response_model=schemas.Flete)
+async def update_flete_edit_mode(
+    id: int,
+    data: schemas.FleteEditModeUpdate,
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.EDITAR, m.FLETE)),
+):
+    return services.update_flete_edit_mode(id, data.is_edit, db)

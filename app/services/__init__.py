@@ -90,7 +90,8 @@ from .flete import (  # noqa
     get_flete_detail_by_id,
     get_flete_reports,
     get_flete_datail_by_id,
-    update_flete_cantidad
+    update_flete_cantidad,
+    update_flete_edit_mode
 )
 from .flete_anticipo import (  # noqa
     get_tipo_anticipo_insumo_list,
@@ -341,6 +342,7 @@ from .punto_venta import (  # noqa
     get_punto_venta_by_id,
     get_punto_venta_by_id_and_gestor_carga_id,
     get_punto_venta_reports,
+    change_punto_venta_status,
 )
 from .punto_venta_contacto import update_punto_venta_contacto_list  # noqa
 from .remitente import (  # noqa

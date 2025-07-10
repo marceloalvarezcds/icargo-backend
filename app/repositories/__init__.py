@@ -478,7 +478,8 @@ from .punto_venta import (  # noqa
     get_punto_venta_list_by_gestor_carga_id,
     get_punto_venta_list_with_active_prices_by_gestor_carga_id,
     get_punto_venta_by_proveedor_sucursal,
-    get_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo
+    get_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo,
+    change_punto_venta_status
 )
 from .punto_venta_contacto_gestor_carga import (  # noqa
     create_punto_venta_contacto_gestor_carga,

@@ -193,3 +193,7 @@ class FleteList(FleteFormBaseModel):
 
 class FleteCantidadUpdate(BaseModel):
     condicion_cantidad: RoundedDecimal
+
+class FleteEditModeUpdate(BaseModel):
+    is_edit: Optional[bool] = None
+

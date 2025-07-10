@@ -144,6 +144,50 @@ def change_flete_create_complementos_and_descuentos(
             create_orden_carga_descuento_by_flete(db, obj, d, modified_by)
 
 
+def validar_flete(flete: Flete):
+    if flete.estado == EstadoEnum.INACTIVO.value:
+        raise HTTPException(
+            status_code=400,
+            detail="No es posible crear la orden de carga porque el Pedido se encuentra INACTIVO."
+        )
+
+
+def validar_combinacion(
+    db: Session,
+    chofer_id: int,
+    propietario_id: int,
+    camion_id: int,
+    semi_id: int,
+    gestor_carga_id: int
+):
+    combinacion_inactiva = (
+        db.query(Combinacion)
+        .filter(
+            Combinacion.chofer_id == chofer_id,
+            Combinacion.propietario_id == propietario_id,
+            Combinacion.camion_id == camion_id,
+            Combinacion.semi_id == semi_id,
+            Combinacion.gestor_carga_id == gestor_carga_id,
+            Combinacion.estado == EstadoEnum.INACTIVO.value
+        )
+        .first()
+    )
+
+    if combinacion_inactiva:
+        raise HTTPException(
+            status_code=400,
+            detail="No es posible crear la orden de carga porque la Combinación se encuentra INACTIVO."
+        )
+
+
+def validar_cotizacion(cotizacion, moneda_origen_id: int, descripcion: str):
+        if not cotizacion or cotizacion.cotizacion_moneda is None:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Falta la cotización para {descripcion} (moneda_id={moneda_origen_id})."
+            )
+
+
 def create_orden_carga(
     db: Session,
     data: schemas.OrdenCargaForm,
@@ -179,12 +223,6 @@ def create_orden_carga(
     if not moneda_gestor_carga:
         raise HTTPException(status_code=404, detail="Moneda del gestor de carga no encontrada.")
 
-    def validar_cotizacion(cotizacion, moneda_origen_id: int, descripcion: str):
-        if not cotizacion or cotizacion.cotizacion_moneda is None:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Falta la cotización para {descripcion} (moneda_id={moneda_origen_id})."
-            )
 
     cotizacion_condicion_origen_gestor_carga = get_cotizacion_moneda(db, flete.condicion_gestor_carga_moneda_id, gestor_carga_id)
     validar_cotizacion(cotizacion_condicion_origen_gestor_carga, flete.condicion_gestor_carga_moneda_id, "condición gestor de carga")
@@ -213,7 +251,7 @@ def create_orden_carga(
     condicion_propietario_tarifa_ml = (
         flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / flete.condicion_propietario_unidad_conversion
     )
-    # Validar que la cantidad nominada no supere el saldo del flete
+
     if data.cantidad_nominada > flete.saldo:
         raise HTTPException(
             status_code=400,
@@ -221,6 +259,23 @@ def create_orden_carga(
                 f"La cantidad nominada supera el saldo disponible del pedido)."
             )
         )
+
+    if flete.is_edit:
+        raise HTTPException(
+            status_code=400,
+            detail="No se puede crear una orden de carga con un pedido que está en modo edición."
+    )
+
+    validar_combinacion(
+        db=db,
+        chofer_id=data.chofer_id,
+        propietario_id=data.propietario_id,
+        camion_id=data.camion_id,
+        semi_id=data.semi_id,
+        gestor_carga_id=gestor_carga_id
+    )
+
+    validar_flete(flete)
 
     obj = repositories.create_orden_carga(
         db,
@@ -1226,7 +1281,6 @@ def update_flete_saldo(db: Session, flete_id: int, orden_carga_id: int, current_
     if not orden_carga:
         return
 
-    # Solo recalcular si el flete es diferente al actual
     if orden_carga.flete_id == flete_id:
         return
 

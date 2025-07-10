@@ -17,7 +17,8 @@ from sqlalchemy.orm import Session  # type: ignore
 from app.models import Combinacion
 from app import repositories, schemas
 from .semi import get_semi_by_id
-
+from http import HTTPStatus
+from fastapi import HTTPException
 
 def get_combinacion_list(
     db: Session, gestor_carga_id: Optional[int]
@@ -25,6 +26,7 @@ def get_combinacion_list(
     if gestor_carga_id:
         return repositories.get_combinacion_list_by_gestor_carga_id(db, gestor_carga_id)
     return repositories.get_combinacion_list(db)
+
 
 def get_combinacion_all_list(
     db: Session, gestor_carga_id: Optional[int]
@@ -67,7 +69,6 @@ def change_combinacion_status(
     return repositories.change_combinacion_status(co, db, status, modified_by)
 
 
-
 async def rol_tiene_permiso_cambiar_estado(
     db: Session,
     rol_id: int
@@ -84,17 +85,12 @@ async def rol_tiene_permiso_cambiar_estado(
     return False
 
 
-###################################
-
 def get_camion_by_combinacion_id(
     db: Session, gestor_carga_id: Optional[int]
 ) -> List[Combinacion]:
     camion_semi_neto_list = repositories.get_camion_list_by_combinacion_id(
         db,  gestor_carga_id
     )
-    # camion_semi_neto_list.extend(
-    #     repositories.get_camion_combinacion_id_null(db, gestor_carga_id)
-    # )
     return camion_semi_neto_list
 
 
@@ -120,7 +116,6 @@ def get_camion_list_combinacion(
     return filtered_list
 
 
-
 def get_combinacion_semi_list_by_camion_id(
     db: Session, camion_id: int, gestor_carga_id: int
 ) -> List[Combinacion]:
@@ -129,18 +124,12 @@ def get_combinacion_semi_list_by_camion_id(
             db, camion_id, gestor_carga_id
         )
     )
-    # camion_semi_neto_list.extend(
-    #     repositories.get_semi_list_by_camion_id_null(
-    #         db, camion_id, gestor_carga_id
-    #     )
-    # )
     return camion_semi_neto_list
 
 
 def get_semi_list_by_camion_id(
     db: Session, camion_id: int, gestor_carga_id: Optional[int]
 ) -> List[Semi]:
-    # Obtener las combinaciones activas que corresponden al camion_id y gestor_carga_id
     combinaciones = (
         db.query(Combinacion)
         .filter(
@@ -151,11 +140,9 @@ def get_semi_list_by_camion_id(
         .all()
     )
 
-    # Obtener los semis asociados a las combinaciones activas encontradas
     semi_list: List[Semi] = [combinacion.semi for combinacion in combinaciones]
 
     return semi_list
-
 
 
 def get_combinacion_by_camion_id_and_semi_id_(
@@ -176,63 +163,75 @@ def get_combinacion_by_camion_id_and_semi_id_(
         )
     return obj
 
-######################################
+
 async def create_combinacion(
     db: Session,
     data: schemas.CombinacionCreateModel,
     modified_by: str,
     gestor_carga_id: Optional[int],
 ) -> schemas.Combinacion:
-    propietario_exists = repositories.get_propietario_by_id(db, data.propietario_id)
-    camion_exists = repositories.get_camion_by_id(db, data.camion_id)
-    chofer_exists = repositories.get_chofer_by_id(db, data.chofer_id)
-    semi_exists = repositories.get_semi_by_id(db, data.semi_id)
-    if not propietario_exists:
+    propietario = repositories.get_propietario_by_id(db, data.propietario_id)
+    camion = repositories.get_camion_by_id(db, data.camion_id)
+    chofer = repositories.get_chofer_by_id(db, data.chofer_id)
+    semi = repositories.get_semi_by_id(db, data.semi_id)
+
+    if not propietario:
         raise HTTPException(
             status_code=404,
             detail="El propietario especificado no existe."
         )
-    if not camion_exists:
+    if not camion:
         raise HTTPException(
             status_code=404,
             detail="El camión especificado no existe."
         )
-    if not chofer_exists:
+    if not chofer:
         raise HTTPException(
             status_code=404,
             detail="El chofer especificado no existe."
         )
-    combinacion_exists = repositories.get_combinacion_by_ids(
-        db, data.propietario_id, data.camion_id, data.chofer_id, gestor_carga_id
-        )
-    combinacion_tracto_chofer = repositories.get_combinacion_tracto_chofer_by_ids(
-        db, data.chofer_id, gestor_carga_id
-        )
-    combinacion_tracto_propietario = repositories.get_combinacion_tracto_propietario_ids(
-        db, data.camion_id, data.propietario_id, gestor_carga_id
-        )
-    combinacion_tracto_semi_chofer_propietario = repositories.get_combinacion_tracto_semi_chofer_propietario_ids(
-        db, data.camion_id, data.semi_id, data.chofer_id, gestor_carga_id
-        )
-    combinacion_tracto = repositories.get_combinacion_tracto_ids(
-        db, data.camion_id, gestor_carga_id
-        )
-    combinacion_semi = repositories.get_combinacion_semi_ids(
-        db, data.semi_id, gestor_carga_id
+    if not semi:
+        raise HTTPException(
+            status_code=404,
+            detail="El semi especificado no existe."
         )
 
+    if propietario.estado != EstadoEnum.ACTIVO.value:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=f"El Propietario '{propietario.nombre}' está INACTIVO. No se puede crear la Combinación."
+        )
+    if camion.estado != EstadoEnum.ACTIVO.value:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=f"El Tracto con placa '{camion.placa}' está INACTIVO. No se puede crear la Combinación."
+        )
+    if chofer.estado != EstadoEnum.ACTIVO.value:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=f"El Chofer '{chofer.nombre}' está INACTIVO. No se puede crear la Combinación."
+        )
+    if semi.estado != EstadoEnum.ACTIVO.value:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=f"El Semi con placa '{semi.placa}' está INACTIVO. No se puede crear la Combinación."
+        )
+
+    combinacion_tracto_propietario = repositories.get_combinacion_tracto_propietario_ids(
+        db, data.camion_id, data.propietario_id, gestor_carga_id
+    )
     if combinacion_tracto_propietario:
         raise HTTPException(
-        status_code=409,
-        detail="El tracto puede tener un solo beneficiario."
-    )
+            status_code=409,
+            detail="El tracto puede tener un solo beneficiario."
+        )
 
     combinacion = repositories.create_combinacion(
         db,
         data,
         gestor_carga_id,
         modified_by,
-        )
+    )
     return combinacion
 
 
@@ -282,16 +281,7 @@ def edit_combinacion(
                     status_code=409,
                     detail="El tracto ya tiene un beneficiario asociado."
                 )
-
-        # if combinacion_tracto and combinacion_tracto.estado != EstadoEnum.INACTIVO.value:
-        #     raise HTTPException(
-        #         status_code=409,
-        #         detail="La combinación de tracto ya existe para este gestor de carga."
-        #     )
-
-    # Llamar al repositorio para editar la combinación
     return repositories.edit_combinacion(combinacion_to_edit, db, data, gestor_carga_id, modified_by)
-
 
 
 def get_combinacion_reports(db: Session) -> str:
