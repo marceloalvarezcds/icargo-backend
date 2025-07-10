@@ -532,14 +532,15 @@ def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
     for o in liquidacionList:
         logger.info(f'orden_carga_id: {o.orden_carga_id}')
         logger.info(f'movimientos: {len(o.movimientos)}')
-    #pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
-    #from_string(source_html, pdf_filename, {"page-size": "Legal"})
+
+    pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
+    from_string(source_html, pdf_filename, {"page-size": "Legal"})
 
     logger.info('******************************************************************: ')
     logger.info('******************************************************************: ')
 
-    #return OUTPUT_FILENAME
-    return HTMLResponse(content=source_html, status_code=200)
+    return OUTPUT_FILENAME
+    #return HTMLResponse(content=source_html, status_code=200)
 
 
 def get_reports(datalist: List[Liquidacion]) -> str:
