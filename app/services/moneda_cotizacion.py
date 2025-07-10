@@ -79,7 +79,7 @@ def update_moneda_cotizacion_by_gestor_moneda_fecha(
     for cot in cotizaciones_activas:
         cot.estado = EstadoEnum.INACTIVO.value
         cot.modified_by = modified_by
-
+    db.flush()
     # Crear nueva cotización activa
     nueva_cotizacion = MonedaCotizacion(
         gestor_carga_id=data.gestor_carga_id,
