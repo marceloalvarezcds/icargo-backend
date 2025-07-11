@@ -184,6 +184,7 @@ from .gestor_carga import (  # noqa
     get_gestor_carga_by,
     get_gestor_carga_by_id,
     get_gestor_carga_list,
+    change_gestor_carga_status,
 )
 from .gestor_carga_centro_operativo import (  # noqa
     create_gestor_carga_centro_operativo,
