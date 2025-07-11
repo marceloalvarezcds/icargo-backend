@@ -277,7 +277,7 @@
 
       table td,
       table th {
-        padding: 5px 2px;
+        padding: 2.5px 2px;
         text-align: left;
       }
 
@@ -305,6 +305,19 @@
       .table-instrumentos th {
         width: 60px;
       }*/
+
+      .table-fletes th,
+      .table-otros th,
+      .table-instrumentos th {
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .table-fletes td,
+      .table-otros td,
+      .table-instrumentos td {
+        font-size: 12px;
+      }
 
       .table-fletes .concepto,
       .table-otros .concepto {
@@ -414,13 +427,13 @@
       <hr>
 
       <div class="gap table">
-        <div class="flex2 td">
+        <div class="flex2 fs5 td">
           <span  class="bold fs5 lh4">Contraparte:</span> {{contraparte}}
         </div>
-        <div class="flex1 td">
+        <div class="flex1 fs5 td">
           <span  class="bold fs5 lh4">Tipo:</span> {{tipo_contraparte}}
         </div>
-        <div class="flex1 td">
+        <div class="flex1 fs5 td">
           <span  class="bold fs5 lh4">Doc. N°:</span> {{documento_contraparte}}
         </div>
       </div>
@@ -433,7 +446,7 @@
         <table class="table-fletes">
           <thead>
             <tr class="box-gray">
-              <th class="id">OC Nº</th>
+              <th class="id">OC</th>
               <th class="placa">Placa</th>
               <th class="fecha">Fecha</th>
               <th class="id">ID</th>
@@ -548,44 +561,46 @@
         </div>
       </div>
 
-      <div class="table gap mt10">
-        <div class="box td flex1">
-          <div class="table">
-            <div class="flex1 td">
-              <p class="fs5 lh3">
-                <span class="bold"> Total {{tipo_contraparte}}: </span>
-                {{total_contraparte}}
-              </p>
-            </div>
-          </div>
-          <div class="table gray text-right">
-            <div class="flex1 td">
-              <p class="fs6 lh3">
-                <span class="bold">
-                  Total Flete (Precio Flete + Compl/Desc - Merma):
-                </span>
-                {{total_flete}}
-              </p>
-            </div>
-          </div>
-          <div class="table gray fs6 text-right">
-            <div class="flex1 td">
-              <p class="lh3">
-                <span class="bold"> Total Anticipo Efectivo: </span>
-                {{total_anticipo_efectivo}}
-              </p>
-            </div>
-            <div class="flex1 td">
-              <p class="lh3">
-                <span class="bold"> Total Anticipo Combustible: </span>
-                {{total_anticipo_combustible}}
-              </p>
-            </div>
-            <div class="flex1 td">
-              <p class="lh3">
-                <span class="bold"> Otros Insumos: </span>
-                {{total_anticipo_otro}}
-              </p>
+      <div class="table left-align">
+        <div class="table-otros-layout box mt10 ml10">
+          <div class="table gap mt10">
+            <div class="box td flex1">
+              <div class="table">
+                <div class="flex1 td">
+                  <p class="fs5 lh3">
+                    <span class="bold"> Total {{tipo_contraparte}}: </span>
+                    {{total_contraparte}}
+                  </p>
+                </div>
+                <div class="flex1 td">
+                  <p class="fs5 lh3">
+                    <span class="bold">
+                      Total Flete (Precio Flete + Compl/Desc - Merma):
+                    </span>
+                    {{total_flete}}
+                  </p>
+                </div>
+              </div>
+              <div class="table gray fs6 text-right">
+                <div class="flex1 td">
+                  <p class="lh3">
+                    <span class="bold"> Total Anticipo Efectivo: </span>
+                    {{total_anticipo_efectivo}}
+                  </p>
+                </div>
+                <div class="flex1 td">
+                  <p class="lh3">
+                    <span class="bold"> Total Anticipo Combustible: </span>
+                    {{total_anticipo_combustible}}
+                  </p>
+                </div>
+                <div class="flex1 td">
+                  <p class="lh3">
+                    <span class="bold"> Otros Insumos: </span>
+                    {{total_anticipo_otro}}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -605,7 +620,7 @@
       </div-->
 
       <div class="table left-align">
-        <div class="table-instrumento-layout box mt10 ml10">
+        <div class="table-otros-layout box mt10 ml10">
 
           <div class="table-title bold mt10">Pagos/ Cobros</div>
 
@@ -638,14 +653,18 @@
         </div>
       </div>
 
-      <div class="table gap mt10">
-        <div class="box td flex1">
-          <div class="table">
-            <div class="flex1 td">
-              <p class="fs5 lh3">
-                <span class="bold"> Total Pagos/ Cobros: </span>
-                {{total_instrumentos}}
-              </p>
+      <div class="table left-align">
+        <div class="table-otros-layout box mt10 ml10">
+          <div class="table gap mt10">
+            <div class="box td flex1">
+              <div class="table">
+                <div class="flex1 td">
+                  <p class="fs5 lh3">
+                    <span class="bold"> Total Pagos/ Cobros: </span>
+                    {{total_instrumentos}}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
