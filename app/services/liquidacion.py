@@ -169,7 +169,8 @@ def create_liquidacion_pendiente(
             es_pago_cobro=data.es_pago_cobro,
             monto=data.monto,
             tipo_mov_liquidacion=data.tipo_mov_liquidacion,
-            es_orden_pago=data.es_orden_pago
+            es_orden_pago=data.es_orden_pago,
+            observacion=data.observacion
         ),
         gestor_id,
         modified_by,
