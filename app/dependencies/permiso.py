@@ -7,7 +7,7 @@ from app.cache import check_permiso_in_cache, get_permiso_in_cache, set_permiso_
 from app.dependencies import get_current_user, get_db_session
 from app.enums import PermisoAccionEnum, PermisoModeloEnum, permisoModeloTitulo
 from app.repositories import exists_permiso_for_user
-
+import time
 
 class Permiso:
     """
@@ -50,8 +50,9 @@ class Permiso:
             # En caso de no encontrar permiso en cache o base de datos mostrar mensaje de error al usuario  # noqa: B950
             modelt = permisoModeloTitulo[modelo.value]
             action = " ".join(str(accion.value).split("_")).capitalize()
+            time.sleep(3)
             raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
+                status_code=HTTPStatus.BAD_REQUEST, #mejorar en algun momento
                 # status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"No tiene permiso para {action} {modelt}",
             )
