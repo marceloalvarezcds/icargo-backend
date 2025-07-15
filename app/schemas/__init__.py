@@ -20,6 +20,7 @@ from .color import Color  # noqa
 from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
 from .contraparte import Contraparte  # noqa
+from .comentarios_flota import ComentarioFlotaForm, ComentarioFlota, ComentarioFlotaList  # noqa
 from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa
 from .ente_emisor_transporte import EnteEmisorTransporte  # noqa
 from .estado_cuenta import ( # noqa

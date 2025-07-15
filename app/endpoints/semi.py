@@ -50,7 +50,6 @@ async def read_semi_list_by_combinacion_camion_id(
     )
 
 
-
 @api.get("/propietario/{propietario_id}", response_model=List[schemas.SemiList])
 async def read_semi_list_by_propietario_id(
     propietario_id: int,

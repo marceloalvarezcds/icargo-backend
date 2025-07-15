@@ -113,6 +113,10 @@ from .contraparte import (  # noqa
     get_contraparte_by_contraparte_and_tipo_contraparte_id,
     get_contraparte_list_by_tipo_contraparte_id,
 )
+
+from .comentarios_flota import (  # noqa
+    create_comentario_flota, get_comentarios_flota_by_entidad
+)
 from .ente_emisor_automotor import (  # noqa
     get_ente_emisor_automotor_by_descripcion,
     get_ente_emisor_automotor_list,
