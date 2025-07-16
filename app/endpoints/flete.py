@@ -40,8 +40,8 @@ async def flete_reports(
     return services.get_flete_reports(db)
 
 
-@api.get("/gestor_carga/orden-carga", response_model=List[schemas.FleteList])
-async def read_flete_list_by_gestor_carga(
+@api.get("/orden_carga/list", response_model=List[schemas.FleteList])
+async def read_flete_list_by_gestor_carga_and_oc(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
