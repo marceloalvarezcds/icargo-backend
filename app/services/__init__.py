@@ -60,7 +60,7 @@ from .chofer import (  # noqa
 from .ciudad import get_ciudad_list  # noqa
 from .contacto import get_contacto_by  # noqa
 from .contraparte import get_contraparte_list_by_tipo_contraparte_id  # noqa
-from .comentarios_flota import create_comentario_flota  # noqa
+from .comentarios_flota import create_comentario_flota, get_comentarios_flota_by_entidad  # noqa
 from .estado_cuenta import (  # noqa
     get_estado_cuenta_by_contraparte,
     get_estado_cuenta_list,

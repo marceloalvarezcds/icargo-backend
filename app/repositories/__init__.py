@@ -115,7 +115,7 @@ from .contraparte import (  # noqa
 )
 
 from .comentarios_flota import (  # noqa
-    create_comentario_flota, get_comentarios_flota_by_entidad
+    create_comentario_flota, get_comentarios_flota_by_entidad_and_gestor, get_comentarios_flota_by_entidad
 )
 from .ente_emisor_automotor import (  # noqa
     get_ente_emisor_automotor_by_descripcion,

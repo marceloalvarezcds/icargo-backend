@@ -8,6 +8,11 @@ class PermisoAccionEnum(Enum):
     CAMBIAR_ESTADO = "cambiar_estado"
     CANCELAR = "cancelar"
     CONCILIAR = "conciliar"
+    FINALIZAR = "finalizar"
+    ANTICIPO = "anticipo"
+    RECEPCIONAR = "recepcionar"
+    CREAR_EFECTIVO = 'crear_efectivo'
+    CREAR_INSUMO = 'crear_insumo'
     CREAR = "crear"
     EDITAR = "editar"
     ELIMINAR = "eliminar"

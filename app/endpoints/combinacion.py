@@ -57,6 +57,14 @@ async def read_combinacion_by_camion_id_and_semi_id(
         db, camion_id, semi_id, current_user.gestor_carga_id
     )
 
+@api.get("/combinacion/orden-carga", response_model=List[schemas.CombinacionesBD])
+async def read_combinacion_list(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.get_combinacion_list(db, current_user.gestor_carga_id)
+
 
 @api.get("/reports")
 async def combinacion_reports(

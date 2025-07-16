@@ -13,6 +13,7 @@ from app.schemas.user import AuthUser
 
 api = APIRouter()
 
+
 @api.post("/", response_model=schemas.ComentarioFlota)
 async def add_comentario_flota(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -21,9 +22,10 @@ async def add_comentario_flota(
     _: bool = Depends(Permiso(a.CREAR, m.COMBINACION)),  # noqa: B008
 ):
     return await services.create_comentario_flota(
-        db=db,
-        data=data,  # type: ignore
-        modified_by=current_user.username,
+        db,
+        data,  # type: ignore
+        current_user.gestor_carga_id,
+        current_user.username,
     )
 
 
@@ -31,7 +33,10 @@ async def add_comentario_flota(
 async def read_comentarios_flota_by_entidad(
     comentable_type: str,
     comentable_id: int,
+    gestor_carga_id: Optional[int] = None,
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.CAMION)),  # podés ajustar esto según el módulo
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
-    return repositories.get_comentarios_flota_by_entidad(db, comentable_type, comentable_id)
+     return services.get_comentarios_flota_by_entidad(
+        db, comentable_type, comentable_id, current_user.gestor_carga_id
+    )
