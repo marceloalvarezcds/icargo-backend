@@ -33,7 +33,7 @@ def get_flete_list(db: Session) -> List[Flete]:
 
 
 def get_flete_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: Optional[int], flete_id: Optional[int],
+    db: Session, gestor_carga_id: Optional[int], flete_id: Optional[int] = None,
 ) -> List[Flete]:
 
     if flete_id:
