@@ -202,7 +202,7 @@ def create_orden_carga(
     modified_by = current_user.username
 
     rol_id = repositories.get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
-    roles_permisos = repositories.rol_tiene_permiso(rol_id, "Cambiar_estado 1 - orden de carga", db)
+    roles_permisos = repositories.rol_tiene_permiso(rol_id, "Crear 1 - orden de carga", db)
 
     estado_inicial = EstadoEnum.ACEPTADO if roles_permisos else EstadoEnum.NUEVO
 
