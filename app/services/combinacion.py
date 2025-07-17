@@ -21,10 +21,10 @@ from http import HTTPStatus
 from fastapi import HTTPException
 
 def get_combinacion_list(
-    db: Session, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int], chapa: Optional[str],
 ) -> List[Combinacion]:
     if gestor_carga_id:
-        return repositories.get_combinacion_list_by_gestor_carga_id(db, gestor_carga_id)
+        return repositories.get_combinacion_list_by_gestor_carga_id(db, gestor_carga_id, chapa)
     return repositories.get_combinacion_list(db)
 
 

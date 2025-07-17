@@ -1,9 +1,7 @@
-from typing import List
-
+from typing import List, Optional
 from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
-
 from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
@@ -41,13 +39,15 @@ async def flete_reports(
 
 
 @api.get("/orden_carga/list", response_model=List[schemas.FleteList])
+@api.get("/orden_carga/list/{id}", response_model=List[schemas.FleteList])
 async def read_flete_list_by_gestor_carga_and_oc(
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
-    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008,
+    id: Optional[int] = None,
 ):
     return repositories.get_flete_list_by_gestor_carga_id(
-        db, current_user.gestor_carga_id
+        db, current_user.gestor_carga_id, id
     )
 
 
