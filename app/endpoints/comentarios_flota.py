@@ -19,7 +19,6 @@ async def add_comentario_flota(
     db: Session = Depends(get_db_session),  # noqa: B008
     data: Json[schemas.ComentarioFlotaForm] = Form(...),  # type: ignore  # noqa: B008
     current_user: AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.CREAR, m.COMBINACION)),  # noqa: B008
 ):
     return await services.create_comentario_flota(
         db,

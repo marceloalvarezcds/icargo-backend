@@ -125,7 +125,7 @@ def create_orden_carga_anticipo_retirado(
     if data.monto_retirado > saldo_actual.saldo:
         raise HTTPException(
             status_code=http_status.HTTP_400_BAD_REQUEST,
-            detail="Ya se retiró el monto del anticipo. Actualice la página para ver el saldo actualizado."
+            detail="Ya se retiró el monto del anticipo. Recargue la página (CTRL+R) y busque nuevamente la oc para darle el anticipo."
         )
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, data.flete_anticipo_id, data.orden_carga_id

@@ -8,6 +8,7 @@ from sqlalchemy import (  # type: ignore
     Integer,
     String,
 )
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 class ComentarioFlota(AuditMixin, Base):
     __tablename__ = "comentarios_flota"
 
@@ -20,3 +21,7 @@ class ComentarioFlota(AuditMixin, Base):
     gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
     gestor_carga = relationship(GestorCarga, uselist=False)
 
+
+    @hybrid_property
+    def gestor_carga_nombre(self):
+        return self.gestor_carga.nombre

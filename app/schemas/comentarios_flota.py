@@ -29,6 +29,7 @@ class ComentarioFlota(ComentarioFlotaForm):
 
 class ComentarioFlotaList(BaseModel):
     id: int
+    gestor_carga_nombre: str
     comentable_type: str
     comentable_id: int
     comentario: str
