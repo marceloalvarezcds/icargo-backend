@@ -122,7 +122,7 @@ def create_orden_carga_anticipo_retirado(
 
     nuevo_total_retirado = saldo_actual.total_retirado + data.monto_retirado
 
-    if nuevo_total_retirado > saldo_actual.total_anticipo:
+    if data.monto_retirado > saldo_actual.saldo:
         raise HTTPException(
             status_code=http_status.HTTP_400_BAD_REQUEST,
             detail="Ya se retiró el monto del anticipo. Actualice la página para ver el saldo actualizado."
@@ -135,7 +135,7 @@ def create_orden_carga_anticipo_retirado(
         porcentaje_anticipo.id if porcentaje_anticipo else None
     )
 
-    anticipo = repositories.create_orden_carga_anticipo_retirado(
+    anticipo = repositories.create_orden_cyarga_anticipo_retirado(
         db,
         data,
         modified_by,
