@@ -127,7 +127,6 @@ def create_orden_carga_anticipo_retirado(
             status_code=http_status.HTTP_400_BAD_REQUEST,
             detail="Ya se retiró el monto del anticipo. Actualice la página para ver el saldo actualizado."
         )
-
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, data.flete_anticipo_id, data.orden_carga_id
     )
@@ -135,7 +134,7 @@ def create_orden_carga_anticipo_retirado(
         porcentaje_anticipo.id if porcentaje_anticipo else None
     )
 
-    anticipo = repositories.create_orden_cyarga_anticipo_retirado(
+    anticipo = repositories.create_orden_carga_anticipo_retirado(
         db,
         data,
         modified_by,
