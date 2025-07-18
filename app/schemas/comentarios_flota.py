@@ -16,6 +16,7 @@ class ComentarioFlota(ComentarioFlotaForm):
     comentable_id: int
     comentario: str
     tipo_evento: Optional[str]
+    archivo: Optional[str]
 
     created_by: str
     created_at: datetime
@@ -31,6 +32,7 @@ class ComentarioFlotaList(BaseModel):
     comentable_type: str
     comentable_id: int
     comentario: str
+    archivo: Optional[str]
     tipo_evento: Optional[str]
     created_by: Optional [str] = None
     created_at: datetime

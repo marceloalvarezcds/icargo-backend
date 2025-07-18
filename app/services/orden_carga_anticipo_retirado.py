@@ -13,6 +13,7 @@ from app import repositories, schemas, logger
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv, STATICS_FOLDER, dir_path
 from app.enums import TipoAnticipoEnum, TipoInsumoEnum
 from app.models import Camion, OrdenCargaAnticipoRetirado, TipoAnticipo, TipoInsumo
+from app.models.orden_carga import OrdenCarga
 from app.models.orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from app.schemas.rounded_decimal_model import RoundedDecimal
 from app.utils import number_format
@@ -23,9 +24,11 @@ from .orden_carga_anticipo_porcentaje_create import (
     get_orden_carga_anticipo_porcentaje_by,
 )
 from .orden_carga_anticipo_saldo import update_orden_carga_anticipo_saldo_by_form
+from .orden_carga import validar_habilitacion_para_anticipos
 from .user import get_user_by_username
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from fastapi import HTTPException, status as http_status
 
 
 def get_orden_carga_anticipo_retirado_list(
@@ -70,13 +73,23 @@ def create_orden_carga_anticipo_retirado(
     data: schemas.OrdenCargaAnticipoRetiradoForm,
     modified_by: str,
 ) -> schemas.OrdenCargaAnticipoRetirado:
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == data.orden_carga_id).first()
+    if not orden_carga:
+        raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
+
+    chofer_id = orden_carga.chofer_id
+    propietario_id = orden_carga.propietario_id
+    combinacion_id = orden_carga.combinacion_id
+
+    validar_habilitacion_para_anticipos(db, chofer_id, propietario_id, combinacion_id)
+
     if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
         if data.monto_retirado is None:
             data.monto_retirado = RoundedDecimal(
                 data.cantidad_retirada * data.precio_unitario
             )
-    # Bloqueo pesimista agregado, quitar en caso de error
-    _ = (
+
+    saldo_actual = (
         db.query(OrdenCargaAnticipoSaldo)
         .filter(
             OrdenCargaAnticipoSaldo.flete_anticipo_id == data.flete_anticipo_id,
@@ -85,6 +98,20 @@ def create_orden_carga_anticipo_retirado(
         .with_for_update()
         .first()
     )
+
+    if saldo_actual is None:
+        raise HTTPException(
+            status_code=404,
+            detail="No se encontró saldo para el anticipo especificado."
+        )
+
+    nuevo_total_retirado = saldo_actual.total_retirado + data.monto_retirado
+
+    if nuevo_total_retirado > saldo_actual.total_anticipo:
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail="Ya se retiró el monto del anticipo. Actualice la página para ver el saldo actualizado."
+        )
 
     update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
 
@@ -184,16 +211,32 @@ def edit_orden_carga_anticipo_retirado(
     data: schemas.OrdenCargaAnticipoRetiradoForm,
     modified_by: str,
 ) -> schemas.OrdenCargaAnticipoRetirado:
+    # Obtener la instancia actual
+    to_edit_obj = get_orden_carga_anticipo_retirado_by_id(db, id)
+
+    # Validar habilitación para anticipos
+    orden_carga = to_edit_obj.orden_carga
+    validar_habilitacion_para_anticipos(
+        db,
+        chofer_id=orden_carga.chofer_id,
+        propietario_id=orden_carga.propietario_id,
+        combinacion_id=orden_carga.combinacion_id,
+    )
+
+    # Calcular monto si es con litro
     if data.es_con_litro and data.cantidad_retirada and data.precio_unitario:
         data.monto_retirado = RoundedDecimal(
             data.cantidad_retirada * data.precio_unitario
         )
-    to_edit_obj = get_orden_carga_anticipo_retirado_by_id(db, id)
+
+    # Actualizar saldo y camion
     update_orden_carga_anticipo_saldo_by_form(
         db, data, to_edit_obj.monto_retirado, modified_by
     )
-    camion: Camion = to_edit_obj.orden_carga.camion
+    camion: Camion = orden_carga.camion
     update_camion_anticipo_retirado(db, camion)
+
+    # Editar y retornar
     return repositories.edit_orden_carga_anticipo_retirado(
         to_edit_obj,
         db,
