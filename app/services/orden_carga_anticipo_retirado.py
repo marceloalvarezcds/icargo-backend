@@ -68,6 +68,27 @@ def get_error_message(db: Session, data: schemas.OrdenCargaAnticipoRetiradoForm)
                 return "Ya existe anticipo de Lubricante para esta OC en este Punto de Venta"
 
 
+def get_orden_carga_anticipo_saldo_actual(
+    db: Session,
+    flete_anticipo_id: int,
+    orden_carga_id: int,
+) -> OrdenCargaAnticipoSaldo:
+    saldo = (
+        db.query(OrdenCargaAnticipoSaldo)
+        .filter(
+            OrdenCargaAnticipoSaldo.flete_anticipo_id == flete_anticipo_id,
+            OrdenCargaAnticipoSaldo.orden_carga_id == orden_carga_id,
+        )
+        .first()
+    )
+    if saldo is None:
+        raise HTTPException(
+            status_code=404,
+            detail="No se encontró saldo para el anticipo especificado."
+        )
+    return saldo
+
+
 def create_orden_carga_anticipo_retirado(
     db: Session,
     data: schemas.OrdenCargaAnticipoRetiradoForm,
@@ -89,14 +110,8 @@ def create_orden_carga_anticipo_retirado(
                 data.cantidad_retirada * data.precio_unitario
             )
 
-    saldo_actual = (
-        db.query(OrdenCargaAnticipoSaldo)
-        .filter(
-            OrdenCargaAnticipoSaldo.flete_anticipo_id == data.flete_anticipo_id,
-            OrdenCargaAnticipoSaldo.orden_carga_id == data.orden_carga_id,
-        )
-        .with_for_update()
-        .first()
+    saldo_actual = get_orden_carga_anticipo_saldo_actual(
+        db, data.flete_anticipo_id, data.orden_carga_id
     )
 
     if saldo_actual is None:
