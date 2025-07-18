@@ -82,10 +82,10 @@ def get_orden_carga_cerradas_list(
 
 
 def get_orden_carga_aceptadas_list(
-    db: Session, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int], oc_id: Optional[str]
 ) -> List[OrdenCarga]:
     if gestor_carga_id:
-        return repositories.get_orden_carga_aceptadas_list_by_gestor_carga_id(db, gestor_carga_id)
+        return repositories.get_orden_carga_aceptadas_list_by_gestor_carga_id(db, gestor_carga_id, oc_id)
     return repositories.get_orden_carga_aceptadas_list(db)
 
 
@@ -584,7 +584,7 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
     if not gestor_carga:
         raise HTTPException(status_code=404, detail="Gestor no encontrado")
     marca_agua_url = f"{STATICS_URL}/marca-de-agua.png"
-     # Obtención del usuario
+    # Obtención del usuario
     usuario = get_user_by_username(db, obj.created_by)
     usuario_nombre = f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
     OUTPUT_FILENAME = f"resumen_{id}.pdf"

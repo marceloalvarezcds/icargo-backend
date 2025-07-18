@@ -10,15 +10,13 @@ from app.models.propietario import Propietario
 from app.models.rol import Rol
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
-from sqlalchemy.sql.expression import true  # type: ignore
-from sqlalchemy import desc
-
+from sqlalchemy.sql.expression import true, cast  # type: ignore
+from sqlalchemy import desc, String
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
 from app.models import Camion, Flete, OrdenCarga
 from app.models.unidad import Unidad
 from app.schemas import OrdenCargaEditForm, OrdenCargaForm
 from app.schemas.orden_carga import OrdenCargaUpdateFecha
-
 from .orden_carga_estado_historial import create_orden_carga_estado_historial
 from .orden_carga_comentarios_historial import create_orden_carga_comentarios_historial
 from sqlalchemy import func
@@ -179,8 +177,25 @@ def get_orden_carga_cerradas_list_by_gestor_carga_id(
 
 
 def get_orden_carga_aceptadas_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int], oc_id: Optional[str]
 ) -> List[OrdenCarga]:
+
+    if oc_id:
+        oc_filter = f'%{oc_id}%'
+        return (
+            db.query(OrdenCarga)
+            .filter(
+                and_(
+                    OrdenCarga.gestor_carga_id == gestor_carga_id,
+                    OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
+                    OrdenCarga.estado == EstadoEnum.ACEPTADO.value,  # Filtro agregado
+                    cast(OrdenCarga.id, String).ilike(oc_filter)
+                )
+            )
+            .order_by(desc(OrdenCarga.id))
+            .all()
+        )
+
     return (
         db.query(OrdenCarga)
         .filter(
