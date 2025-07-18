@@ -113,8 +113,6 @@ def create_orden_carga_anticipo_retirado(
             detail="Ya se retiró el monto del anticipo. Actualice la página para ver el saldo actualizado."
         )
 
-    update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
-
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, data.flete_anticipo_id, data.orden_carga_id
     )
@@ -127,6 +125,9 @@ def create_orden_carga_anticipo_retirado(
         data,
         modified_by,
     )
+
+    update_orden_carga_anticipo_saldo_by_form(db, data, Decimal(0), modified_by)
+
     create_movimiento_by_anticipo(
         db, anticipo, anticipo.orden_carga.gestor_carga_id, modified_by
     )
