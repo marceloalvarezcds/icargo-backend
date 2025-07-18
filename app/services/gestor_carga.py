@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
+from app.enums.estado import EstadoEnum
 from app.models import GestorCarga
 
 from .pictshare import upload_and_get_image_url
@@ -60,6 +61,13 @@ async def edit_gestor_carga(
 def delete_gestor_carga(db: Session, id: int, modified_by: str) -> schemas.GestorCarga:
     co = get_gestor_carga_by_id(db, id)
     return repositories.delete_gestor_carga(co, db, modified_by)
+
+
+def change_gestor_carga_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.CentroOperativo:
+    co = get_gestor_carga_by_id(db, id)
+    return repositories.change_gestor_carga_status(co, db, status, modified_by)
 
 
 def get_gestor_carga_reports(db: Session) -> str:

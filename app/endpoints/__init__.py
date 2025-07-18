@@ -14,6 +14,7 @@ from app.endpoints import (
     composicion_juridica,
     contacto,
     contraparte,
+    comentarios_flota,
     ente_emisor_automotor,
     ente_emisor_transporte,
     estado_cuenta,
@@ -106,6 +107,7 @@ api.include_router(
 )
 api.include_router(contacto.api, prefix="/contacto", tags=["contacto"])
 api.include_router(contraparte.api, prefix="/contraparte", tags=["contraparte"])
+api.include_router(comentarios_flota.api, prefix="/comentarios_flota", tags=["comentarios_flota"])
 api.include_router(
     ente_emisor_automotor.api,
     prefix="/ente_emisor_automotor",

@@ -10,7 +10,7 @@ from app.models import GestorCargaProveedor, Proveedor, PuntoVenta
 from app.models.insumo_punto_venta import InsumoPuntoVenta
 from app.models.insumo_punto_venta_precio import InsumoPuntoVentaPrecio
 from app.schemas import PuntoVentaForm
-
+from fastapi import HTTPException, status as http_status
 
 def get_punto_venta_list(db: Session, proveedor_id: int) -> List[PuntoVenta]:
     return (
@@ -206,3 +206,26 @@ def get_punto_venta_by_proveedor_sucursal(
         )
         .first()
     )
+
+
+def change_punto_venta_status(
+    obj: PuntoVenta,
+    db: Session,
+    status: EstadoEnum,
+    modified_by: str,
+) -> PuntoVenta:
+    if status == EstadoEnum.ACTIVO:
+        proveedor = obj.proveedor
+        if proveedor.estado != EstadoEnum.ACTIVO.value:
+            raise HTTPException(
+                status_code=http_status.HTTP_400_BAD_REQUEST,
+                detail="No se puede activar el Punto de Venta porque el Proveedor relacionado está inactivo."
+            )
+
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
+

@@ -60,6 +60,7 @@ from .chofer import (  # noqa
 from .ciudad import get_ciudad_list  # noqa
 from .contacto import get_contacto_by  # noqa
 from .contraparte import get_contraparte_list_by_tipo_contraparte_id  # noqa
+from .comentarios_flota import create_comentario_flota, get_comentarios_flota_by_entidad  # noqa
 from .estado_cuenta import (  # noqa
     get_estado_cuenta_by_contraparte,
     get_estado_cuenta_list,
@@ -90,7 +91,8 @@ from .flete import (  # noqa
     get_flete_detail_by_id,
     get_flete_reports,
     get_flete_datail_by_id,
-    update_flete_cantidad
+    update_flete_cantidad,
+    update_flete_edit_mode
 )
 from .flete_anticipo import (  # noqa
     get_tipo_anticipo_insumo_list,
@@ -105,6 +107,7 @@ from .gestor_carga import (  # noqa
     edit_gestor_carga,
     get_gestor_carga_by_id,
     get_gestor_carga_reports,
+    change_gestor_carga_status,
 )
 from .gestor_carga_centro_operativo import (  # noqa
     create_gestor_carga_centro_operativo,
@@ -341,6 +344,7 @@ from .punto_venta import (  # noqa
     get_punto_venta_by_id,
     get_punto_venta_by_id_and_gestor_carga_id,
     get_punto_venta_reports,
+    change_punto_venta_status,
 )
 from .punto_venta_contacto import update_punto_venta_contacto_list  # noqa
 from .remitente import (  # noqa

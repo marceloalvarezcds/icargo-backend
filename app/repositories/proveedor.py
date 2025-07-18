@@ -6,6 +6,7 @@ from sqlalchemy.sql.elements import and_  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import GestorCargaProveedor, Proveedor
+from app.models.punto_venta import PuntoVenta
 from app.schemas import ProveedorForm
 
 
@@ -141,6 +142,17 @@ def change_proveedor_status(
     obj.estado = status.value
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
+
+    # Buscar puntos de venta relacionados y actualizarlos
+    if status == EstadoEnum.INACTIVO:
+        puntos_venta = db.query(PuntoVenta).filter(PuntoVenta.proveedor_id == obj.id).all()
+        for pv in puntos_venta:
+            pv.estado = EstadoEnum.INACTIVO.value
+            pv.modified_by = modified_by
+            pv.modified_at = datetime.now()
+
+
     db.commit()
     db.refresh(obj)
     return obj
+

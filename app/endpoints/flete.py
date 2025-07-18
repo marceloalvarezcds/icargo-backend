@@ -1,9 +1,7 @@
-from typing import List
-
+from typing import List, Optional
 from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
-
 from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
@@ -38,6 +36,19 @@ async def flete_reports(
     _: bool = Depends(Permiso(a.REPORTE, m.FLETE)),  # noqa: B008
 ):
     return services.get_flete_reports(db)
+
+
+@api.get("/orden_carga/list", response_model=List[schemas.FleteList])
+@api.get("/orden_carga/list/{id}", response_model=List[schemas.FleteList])
+async def read_flete_list_by_gestor_carga_and_oc(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008,
+    id: Optional[int] = None,
+):
+    return repositories.get_flete_list_by_gestor_carga_id(
+        db, current_user.gestor_carga_id, id
+    )
 
 
 @api.get("/{id}", response_model=schemas.Flete)
@@ -179,3 +190,14 @@ async def update_flete_cantidad(
     _: bool = Depends(Permiso(a.EDITAR, m.FLETE)),
 ):
     return services.update_flete_cantidad(id, data.condicion_cantidad, db, current_user.username)
+
+
+@api.put("/{id}/edit-mode", response_model=schemas.Flete)
+async def update_flete_edit_mode(
+    id: int,
+    data: schemas.FleteEditModeUpdate,
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.EDITAR, m.FLETE)),
+):
+    return services.update_flete_edit_mode(id, data.is_edit, db)

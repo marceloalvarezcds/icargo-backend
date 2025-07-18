@@ -10,6 +10,8 @@ from app import repositories, schemas
 from app.config import REPORTS_FOLDER
 from app.enums import EstadoEnum
 from app.models import Flete
+from app.models.centro_operativo import CentroOperativo
+from app.models.remitente import Remitente
 
 from .flete_anticipo import update_flete_anticipo_list
 from .flete_complemento import update_flete_complemento_list
@@ -20,8 +22,8 @@ from .flete_destinatario import (
 )
 
 from sqlalchemy import text
-
-
+from fastapi import HTTPException
+from http import HTTPStatus
 
 def get_flete_datail_by_id(db: Session, id: int) -> Flete:
     obj = repositories.get_flete_by_id(db, id)
@@ -44,6 +46,38 @@ def reset_sequence(db, seq_name: str, table_name: str):
         db.execute(text(f"SELECT setval('{seq_name}', {max_id}, true)"))
 
 
+def validar_remitente(db: Session, remitente_id: int):
+    remitente = db.query(Remitente).filter(Remitente.id == remitente_id).first()
+
+    if not remitente:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=f"Remitente no encontrado (ID: {remitente_id})"
+        )
+
+    if remitente.estado != EstadoEnum.ACTIVO.value:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=f"El Cliente '{remitente.nombre}' está INACTIVO. No se puede crear el Pedido."
+        )
+
+
+def validar_centro_operativo(db: Session, centro_operativo_id: int):
+    centro = db.query(CentroOperativo).filter(CentroOperativo.id == centro_operativo_id).first()
+
+    if not centro:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=f"Centro operativo no encontrado (ID: {centro_operativo_id})"
+        )
+
+    if centro.estado != EstadoEnum.ACTIVO.value:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=f"El Centro Operativo '{centro.nombre}' está INACTIVO. No se puede crear el Pedido."
+        )
+
+
 def create_flete(
     db: Session,
     data: schemas.FleteForm,
@@ -54,6 +88,10 @@ def create_flete(
     reset_sequence(db, 'flete_anticipo_id_seq', 'flete_anticipo')
     reset_sequence(db, 'flete_complemento_id_seq', 'flete_complemento')
     reset_sequence(db, 'flete_descuento_id_seq', 'flete_descuento')
+
+    validar_remitente(db, data.remitente_id)
+    validar_centro_operativo(db, data.origen_id)
+    validar_centro_operativo(db, data.destino_id)
 
     obj = repositories.create_flete(
         db,
@@ -66,7 +104,6 @@ def create_flete(
     update_flete_descuento_list(db, data.descuentos, obj, modified_by)
     update_flete_destinatario_list(db, data.destinatarios, obj, modified_by)
     return get_flete_detail(obj)
-
 
 
 def get_flete_by_id(db: Session, id: int) -> Flete:
@@ -102,6 +139,22 @@ def update_flete_cantidad(
     db.refresh(obj)
     return get_flete_detail(obj)
 
+
+def update_flete_edit_mode(
+    id: int,
+    is_edit: bool,
+    db: Session
+) -> Flete:
+    flete = db.query(Flete).filter(Flete.id == id).first()
+    if not flete:
+        raise HTTPException(status_code=404, detail="Flete no encontrado")
+
+    flete.is_edit = is_edit
+
+    db.add(flete)
+    db.commit()
+    db.refresh(flete)
+    return flete
 
 
 def edit_flete(

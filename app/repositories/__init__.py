@@ -113,6 +113,10 @@ from .contraparte import (  # noqa
     get_contraparte_by_contraparte_and_tipo_contraparte_id,
     get_contraparte_list_by_tipo_contraparte_id,
 )
+
+from .comentarios_flota import (  # noqa
+    create_comentario_flota, get_comentarios_flota_by_entidad_and_gestor, get_comentarios_flota_by_entidad
+)
 from .ente_emisor_automotor import (  # noqa
     get_ente_emisor_automotor_by_descripcion,
     get_ente_emisor_automotor_list,
@@ -184,6 +188,7 @@ from .gestor_carga import (  # noqa
     get_gestor_carga_by,
     get_gestor_carga_by_id,
     get_gestor_carga_list,
+    change_gestor_carga_status,
 )
 from .gestor_carga_centro_operativo import (  # noqa
     create_gestor_carga_centro_operativo,
@@ -478,7 +483,8 @@ from .punto_venta import (  # noqa
     get_punto_venta_list_by_gestor_carga_id,
     get_punto_venta_list_with_active_prices_by_gestor_carga_id,
     get_punto_venta_by_proveedor_sucursal,
-    get_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo
+    get_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo,
+    change_punto_venta_status
 )
 from .punto_venta_contacto_gestor_carga import (  # noqa
     create_punto_venta_contacto_gestor_carga,

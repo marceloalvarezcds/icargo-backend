@@ -54,7 +54,7 @@ async def read_insumo_punto_venta_precio_list(
     fleteId: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.INSUMO_PUNTO_VENTA_PRECIO)),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR_EFECTIVO, m.ORDEN_CARGA_ANTICIPO_RETIRADO)),  # noqa: B008
 ):
     return repositories.get_insumo_punto_venta_precio_list_by_gestor_carga_id(
         db, fleteId, current_user.gestor_carga_id

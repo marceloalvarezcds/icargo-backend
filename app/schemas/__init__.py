@@ -20,6 +20,7 @@ from .color import Color  # noqa
 from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
 from .contraparte import Contraparte  # noqa
+from .comentarios_flota import ComentarioFlotaForm, ComentarioFlota, ComentarioFlotaList  # noqa
 from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa
 from .ente_emisor_transporte import EnteEmisorTransporte  # noqa
 from .estado_cuenta import ( # noqa
@@ -27,7 +28,7 @@ from .estado_cuenta import ( # noqa
     ContraparteEstadoCuenta
 )
 from .factura import Factura, FacturaForm  # noqa
-from .flete import Flete, FleteForm, FleteList, FleteCantidadUpdate  # noqa
+from .flete import Flete, FleteForm, FleteList, FleteCantidadUpdate, FleteEditModeUpdate  # noqa
 from .flete_anticipo import FleteAnticipo, FleteAnticipoForm  # noqa
 from .flete_complemento import FleteComplemento, FleteComplementoForm  # noqa
 from .flete_descuento import FleteDescuento, FleteDescuentoForm  # noqa
@@ -56,7 +57,8 @@ from .liquidacion import (  # noqa
     LiquidacionAddMovimientosForm,
     LiquidacionForm,
     LiquidacionSometer,
-    LiquidacionCabeceraMovimientosForm
+    LiquidacionCabeceraMovimientosForm,
+    LiquidacionReport
 )
 from .localidad import Localidad  # noqa
 from .marca_camion import MarcaCamion  # noqa

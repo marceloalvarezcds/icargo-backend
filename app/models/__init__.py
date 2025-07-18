@@ -15,6 +15,7 @@ from .centro_operativo_contacto_gestor_carga import (  # noqa
 from .chofer import Chofer  # noqa
 from .ciudad import Ciudad  # noqa
 from .color import Color  # noqa
+from .comentarios_flota import ComentarioFlota  # noqa
 from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto  # noqa
 from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa

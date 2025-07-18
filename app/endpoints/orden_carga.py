@@ -196,7 +196,6 @@ async def add_comentario_orden_carga(
     return comentario_historial
 
 
-
 @api.put("/{id}", response_model=schemas.OrdenCarga)
 async def edit_orden_carga(
     id: int,

@@ -51,6 +51,7 @@ class Flete(AuditMixin, Base):
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     saldo = Column(Numeric(38, 10))
     cargado = Column(Numeric(38, 10), nullable=True)
+    is_edit = Column(Boolean, nullable=False, server_default=text("false"))
     # INICIO Tramo de Fletes
     origen_id = Column(Integer, ForeignKey("centro_operativo.id"))
     origen = relationship(CentroOperativo, uselist=False, foreign_keys=[origen_id])

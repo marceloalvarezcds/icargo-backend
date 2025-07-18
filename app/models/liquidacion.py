@@ -66,6 +66,7 @@ class Liquidacion(AuditMixin, Base):
     saldo_cc = Column(Numeric(38, 10))
     tipo_mov_liquidacion = Column(String(20))
     es_orden_pago = Column(Boolean, server_default=text("false"))
+    observacion = Column(Text)
 
     # Listas
     movimientos = relationship(

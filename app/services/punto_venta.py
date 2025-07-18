@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
+from app.enums.estado import EstadoEnum
 from app.models import (
     GestorCargaPuntoVenta,
     InsumoPuntoVenta,
@@ -136,6 +137,13 @@ def delete_punto_venta(
     co = get_punto_venta_by_id(db, id)
     obj = repositories.delete_punto_venta(co, db, modified_by)
     return get_punto_venta_detail(db, obj, gestor_carga_id)
+
+
+def change_punto_venta_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.Proveedor:
+    co = get_punto_venta_by_id(db, id)
+    return repositories.change_punto_venta_status(co, db, status, modified_by)
 
 
 def get_punto_venta_reports(db: Session, proveedor_id: int) -> str:

@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import List, Optional
 from decimal import Decimal
-
+from sqlalchemy import Integer, String, DateTime
 from sqlalchemy.orm import Session  # type: ignore
 from sqlalchemy.sql.elements import and_  # type: ignore
-from sqlalchemy.sql.expression import false, true  # type: ignore
+from sqlalchemy.sql.expression import false, true, cast  # type: ignore
 
 from app.enums import EstadoEnum
 from app.models import Flete
@@ -33,8 +33,27 @@ def get_flete_list(db: Session) -> List[Flete]:
 
 
 def get_flete_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int], flete_id: Optional[int] = None,
 ) -> List[Flete]:
+
+    if flete_id:
+        filter_id = f"%{flete_id}%"
+        return (
+            db.query(Flete)
+                .filter(
+                    and_(
+                        Flete.gestor_carga_id == gestor_carga_id,
+                        Flete.estado != EstadoEnum.ELIMINADO.value,
+                        # Flete.estado != EstadoEnum.INACTIVO.value,
+                        # Flete.publicado == true(),
+                        # Flete.es_subasta == false(),
+                        cast(Flete.id, String).ilike(filter_id)
+                    )
+                )
+                .order_by(Flete.id.desc())
+                .all()
+        )
+
     return (
         db.query(Flete)
         .filter(

@@ -11,7 +11,7 @@ class OrdenCargaRemisionMixin(AuditMixin):
     """
 
     id = Column(Integer, primary_key=True)
-    numero_documento = Column(String(255), unique=True)
+    numero_documento = Column(String(255))
     fecha = Column(DateTime)
     cantidad = Column(Numeric(38, 10))
     foto_documento = Column(String(255))

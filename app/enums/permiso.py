@@ -8,6 +8,12 @@ class PermisoAccionEnum(Enum):
     CAMBIAR_ESTADO = "cambiar_estado"
     CANCELAR = "cancelar"
     CONCILIAR = "conciliar"
+    FINALIZAR = "finalizar"
+    ANTICIPO = "anticipo"
+    RECEPCIONAR = "recepcionar"
+    REMISIONAR = "remisionar"
+    CREAR_EFECTIVO = 'crear_efectivo'
+    CREAR_INSUMO = 'crear_insumo'
     CREAR = "crear"
     EDITAR = "editar"
     ELIMINAR = "eliminar"
@@ -68,6 +74,8 @@ class PermisoModeloEnum(Enum):
     ORDEN_CARGA_REMISION_ORIGEN = "orden_carga_remision_origen"
     ORDEN_CARGA_REMISION_RESULTADO = "orden_carga_remision_resultado"
     ORDEN_CARGA_REMISION_RESULTADO_GESTOR = "orden_carga_remision_resultado_gestor"
+    ORDEN_CARGA_REMISION_RESULTADO_PROPIETARIO = "orden_carga_remision_resultado_propietario"
+    GESTION_DE_LINEA = 'gestion_de_linea'
     PAIS = "pais"
     PERMISO = "permiso"
     PRODUCTO = "producto"

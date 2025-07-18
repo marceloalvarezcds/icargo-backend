@@ -114,7 +114,8 @@ class CombinacionList(CombinacionBase):
     chofer: Chofer
     camion_semi_neto: Optional[CamionSemiNeto] = None
     comentario: str
-
+    is_chofer_condicionado: bool
+    is_propietario_condicionado: bool
     created_by: str
     created_at: datetime
     modified_by: str

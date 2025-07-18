@@ -17,8 +17,8 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
     db: Session, orden_carga: OrdenCarga, user_id: int
 ) -> List[OrdenCargaRemisionResultado]:
     lista: List[OrdenCargaRemisionResultado] = []
-    if check_permiso(db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO, a.LISTAR, u.OC):
-        if check_permiso(
+    # if check_permiso(db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO, a.LISTAR, u.OC):
+    if check_permiso(
             db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO_GESTOR, a.VER, u.OC
         ):
             lista.append(
@@ -41,6 +41,7 @@ def get_orden_carga_remision_resultado_list_by_orden_carga(
                     # resultado_gestor_carga_saldo (calculo anterior),
                 )
             )
+    if check_permiso(db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO_PROPIETARIO, a.VER, u.OC):
         lista.append(
             OrdenCargaRemisionResultado(
                 responsable="Propietario",
@@ -71,8 +72,8 @@ def get_orden_carga_remision_resultado_list_by_flete(
     db: Session, orden_carga: OrdenCarga, user_id: int
 ) -> List[OrdenCargaRemisionResultado]:
     lista: List[OrdenCargaRemisionResultado] = []
-    if check_permiso(db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO, a.LISTAR, u.OC):
-        if check_permiso(
+    # if check_permiso(db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO, a.LISTAR, u.OC):
+    if check_permiso(
             db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO_GESTOR, a.VER, u.OC
         ):
             lista.append(
@@ -96,6 +97,7 @@ def get_orden_carga_remision_resultado_list_by_flete(
                     # resultado_flete_gestor_carga_saldo (calculo anterior),
                 )
             )
+    if check_permiso(db, user_id, m.ORDEN_CARGA_REMISION_RESULTADO_PROPIETARIO, a.VER, u.OC):
         lista.append(
             OrdenCargaRemisionResultado(
                 responsable="Propietario",

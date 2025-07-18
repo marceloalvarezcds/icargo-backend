@@ -24,7 +24,7 @@ async def read_remitente_list(
 @api.get("/remitente_activos", response_model=List[schemas.RemitenteList])
 async def read_remitente_list_activo(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.PROPIETARIO)),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.REMITENTE)),  # noqa: B008
 ):
     return repositories.get_remitente_list_activo(db)
 

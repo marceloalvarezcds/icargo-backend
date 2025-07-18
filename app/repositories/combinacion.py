@@ -49,8 +49,27 @@ def get_combinacion_all_list_by_gestor_carga_id(
     )
 
 def get_combinacion_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int], chapa: Optional[str],
 ) -> List[Combinacion]:
+
+    if chapa:
+        filter_chapa = f"%{chapa}%"
+        return (
+            db.query(Combinacion)
+            .join(Combinacion.camion)
+            .filter(
+                and_(
+                    Combinacion.gestor_carga_id == gestor_carga_id,
+                    Combinacion.estado != EstadoEnum.ELIMINADO.value,
+
+                ),
+                Combinacion.estado != EstadoEnum.NUEVO.value,
+                Camion.placa.ilike(filter_chapa)
+            )
+            .order_by(Combinacion.id.desc())
+            .all()
+        )
+
     return (
         db.query(Combinacion)
         .filter(

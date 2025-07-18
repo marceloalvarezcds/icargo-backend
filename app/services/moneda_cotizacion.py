@@ -47,40 +47,29 @@ def update_moneda_cotizacion_by_gestor_moneda_fecha(
 
     fecha = data.fecha.date() if isinstance(data.fecha, datetime) else data.fecha
 
-    # Buscar si ya existe una cotización para esa fecha + gestor + monedas
-    existing = db.query(MonedaCotizacion).filter(
-        MonedaCotizacion.gestor_carga_id == data.gestor_carga_id,
-        MonedaCotizacion.moneda_origen_id == data.moneda_origen_id,
-        MonedaCotizacion.moneda_destino_id == data.moneda_destino_id,
-        MonedaCotizacion.fecha == fecha,
-    ).first()
-
-    if existing:
-        if existing.cotizacion_moneda == data.cotizacion_moneda:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Ya existe una cotización con la misma fecha, monedas y valor."
-            )
-        # Solo actualiza si la fecha es la misma pero cambia el valor
-        existing.cotizacion_moneda = data.cotizacion_moneda
-        existing.modified_by = modified_by
-        db.commit()
-        db.refresh(existing)
-        return existing
-
-    # Si la fecha cambió, inactivar cotizaciones activas previas con misma combinación
-    cotizaciones_activas = db.query(MonedaCotizacion).filter(
+    # Buscar cotización ACTIVA para esa combinación (sin importar fecha)
+    existing_active = db.query(MonedaCotizacion).filter(
         MonedaCotizacion.gestor_carga_id == data.gestor_carga_id,
         MonedaCotizacion.moneda_origen_id == data.moneda_origen_id,
         MonedaCotizacion.moneda_destino_id == data.moneda_destino_id,
         MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
-    ).all()
+    ).first()
 
-    for cot in cotizaciones_activas:
-        cot.estado = EstadoEnum.INACTIVO.value
-        cot.modified_by = modified_by
+    if existing_active:
+        if existing_active.cotizacion_moneda == data.cotizacion_moneda and existing_active.fecha == fecha:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Ya existe una cotización activa con la misma combinación, fecha y valor."
+            )
+        # Actualizar el registro activo con nuevo valor y fecha
+        existing_active.cotizacion_moneda = data.cotizacion_moneda
+        existing_active.fecha = fecha
+        existing_active.modified_by = modified_by
+        db.commit()
+        db.refresh(existing_active)
+        return existing_active
 
-    # Crear nueva cotización activa
+    # No existe cotización activa, crear una nueva
     nueva_cotizacion = MonedaCotizacion(
         gestor_carga_id=data.gestor_carga_id,
         moneda_origen_id=data.moneda_origen_id,
@@ -91,7 +80,6 @@ def update_moneda_cotizacion_by_gestor_moneda_fecha(
         created_by=modified_by,
         modified_by=modified_by,
     )
-
     db.add(nueva_cotizacion)
     db.commit()
     db.refresh(nueva_cotizacion)

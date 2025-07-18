@@ -105,8 +105,6 @@ def create_orden_carga_evaluacion(
     db.commit()
     db.refresh(obj)
 
-    print(f"[INFO] Evaluación creada con ID: {obj.id}")
-
     # Calcular promedios generales
     promedios_generales = calcular_promedios_generales(db)
 

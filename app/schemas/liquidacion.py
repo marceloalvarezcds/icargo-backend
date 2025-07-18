@@ -21,6 +21,7 @@ class LiquidacionNewMovimientosForm(BaseModel):
     tipo_mov_liquidacion: Optional[str] = "EFECTIVO"
     moneda: Moneda
     es_orden_pago: bool
+    observacion: Optional[str]
 
 
 class LiquidacionCabeceraMovimientosForm(BaseModel):
@@ -31,6 +32,7 @@ class LiquidacionCabeceraMovimientosForm(BaseModel):
     tipo_mov_liquidacion: Optional[str]
     moneda: Moneda
     es_orden_pago: bool
+    observacion: Optional[str]
 
 
 class LiquidacionAddMovimientosForm(BaseModel):
@@ -63,6 +65,7 @@ class LiquidacionForm(BaseModel):
     tipo_mov_liquidacion: str
     es_orden_pago: bool
     tipo_cambio_moneda: Optional[RoundedDecimal]
+    observacion: Optional[str]
 
 
 class Liquidacion(LiquidacionForm):
@@ -113,3 +116,10 @@ class Liquidacion(LiquidacionForm):
 class LiquidacionSometer(BaseModel):
     comentario: Optional[str]
     monto: Optional[RoundedDecimal]
+
+
+
+class LiquidacionReport(BaseModel):
+    movimientos: List[Movimiento]
+    orden_carga_id: int
+    total_orden_carga: RoundedDecimal
