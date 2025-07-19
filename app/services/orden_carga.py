@@ -90,10 +90,10 @@ def get_orden_carga_aceptadas_list(
 
 
 def get_orden_carga_finalizadas_list(
-    db: Session, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int], oc_id: Optional[str]
 ) -> List[OrdenCarga]:
     if gestor_carga_id:
-        return repositories.get_orden_carga_finalizadas_list_by_gestor_carga_id(db, gestor_carga_id)
+        return repositories.get_orden_carga_finalizadas_list_by_gestor_carga_id(db, gestor_carga_id, oc_id)
     return repositories.get_orden_carga_finalizadas_list(db)
 
 

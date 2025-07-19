@@ -210,8 +210,26 @@ def get_orden_carga_aceptadas_list_by_gestor_carga_id(
     )
 
 def get_orden_carga_finalizadas_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int], oc_id: Optional[str]
 ) -> List[OrdenCarga]:
+
+    if oc_id:
+        oc_filter = f'%{oc_id}%'
+        return (
+            db.query(OrdenCarga)
+            .filter(
+                and_(
+                    OrdenCarga.gestor_carga_id == gestor_carga_id,
+                    OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
+                    OrdenCarga.estado == EstadoEnum.FINALIZADO.value,  # Filtro agregado
+                    cast(OrdenCarga.id, String).ilike(oc_filter)
+                )
+            )
+            .order_by(desc(OrdenCarga.id))
+            .all()
+        )
+
+
     return (
         db.query(OrdenCarga)
         .filter(

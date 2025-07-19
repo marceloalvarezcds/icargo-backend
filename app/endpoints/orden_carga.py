@@ -54,12 +54,14 @@ async def read_orden_carga_aceptadas(
 
 
 @api.get("/finalizadas", response_model=List[schemas.OrdenCargaList])
+@api.get("/finalizadas/{oc_id}", response_model=List[schemas.OrdenCargaList])
 async def read_orden_carga_finalizadas(
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
+    oc_id: Optional[str]=None
 ):
-    return services.get_orden_carga_finalizadas_list(db, current_user.gestor_carga_id)
+    return services.get_orden_carga_finalizadas_list(db, current_user.gestor_carga_id, oc_id)
 
 
 @api.post("/recepcion", response_model=List[schemas.OrdenCargaList])
