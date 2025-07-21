@@ -101,6 +101,7 @@ async def add_new_combinacion(
         data,
         current_user.username,
         current_user.gestor_carga_id,
+        current_user.id
     )
 
 

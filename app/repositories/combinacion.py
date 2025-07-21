@@ -12,6 +12,7 @@ from typing import List, Optional
 from app import schemas
 from app.models.gestor_carga import GestorCarga
 from app.models.semi import Semi
+from app.models.user import User
 from app.schemas.combinacion import CombinacionCreateModel, CombinacionForm, CombinacionUpdate
 from app.models.permiso import Permiso
 from app.models.rol import Rol
@@ -519,7 +520,6 @@ def gestor_carga_tiene_permiso(gestor_carga_id: int, permiso_descripcion: str, d
     return False
 
 
-
 def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> bool:
     rol = db.query(Rol).filter_by(id=rol_id).first()
 
@@ -540,13 +540,25 @@ def get_rol_id_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> Optional
     return rol.id if rol else None
 
 
+def get_rol_id_by_usuario_id(db: Session, usuario_id: int) -> int:
+    usuario = db.query(User).filter(User.id == usuario_id).first()
+    if not usuario:
+        raise ValueError(f"No se encontró usuario con id {usuario_id}")
+
+    if not usuario.user_roles or len(usuario.user_roles) == 0:
+        raise ValueError(f"El usuario con id {usuario_id} no tiene roles asignados")
+
+    return usuario.user_roles[0].rol_id
+
+
 def create_combinacion(
     db: Session,
     data: CombinacionCreateModel,
     gestor_carga_id: Optional[int],
     modified_by: str,
+    usuario_id: int,
 ) -> Combinacion:
-    rol_id = get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
+    rol_id = get_rol_id_by_usuario_id(db, usuario_id)
 
     roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 6 - Combinaciones", db)
 

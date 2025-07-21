@@ -169,6 +169,7 @@ async def create_combinacion(
     data: schemas.CombinacionCreateModel,
     modified_by: str,
     gestor_carga_id: Optional[int],
+    usuario_id: int,
 ) -> schemas.Combinacion:
     propietario = repositories.get_propietario_by_id(db, data.propietario_id)
     camion = repositories.get_camion_by_id(db, data.camion_id)
@@ -231,6 +232,7 @@ async def create_combinacion(
         data,
         gestor_carga_id,
         modified_by,
+        usuario_id
     )
     return combinacion
 

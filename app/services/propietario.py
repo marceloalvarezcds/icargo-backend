@@ -41,6 +41,7 @@ async def create_propietario(
     foto_registro_reverso_file: Optional[UploadFile],
     gestor_cuenta_id: Optional[int],
     modified_by: str,
+    usuario_id: int,
 ) -> schemas.Propietario:
     if repositories.get_propietario_by(db, data.composicion_juridica_id, data.ruc):
         raise HTTPException(
@@ -78,6 +79,7 @@ async def create_propietario(
         foto_perfil_url,
         chofer,
         modified_by,
+        usuario_id
     )
     update_propietario_contacto_list(
         db, data.contactos, obj, gestor_cuenta_id, modified_by

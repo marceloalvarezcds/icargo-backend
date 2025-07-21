@@ -7,6 +7,9 @@ from sqlalchemy.sql.elements import and_  # type: ignore
 from app.enums import EstadoEnum
 from app.models import Propietario
 from app.models.combinacion import Combinacion
+from app.models.permiso import Permiso
+from app.models.rol import Rol
+from app.models.user import User
 from app.schemas import Chofer, PropietarioEditForm, PropietarioForm
 
 
@@ -73,14 +76,36 @@ def get_propietario_by(
 def get_propietario_by_id(db: Session, id: int) -> Optional[Propietario]:
     return db.query(Propietario).filter(Propietario.id == id).first()
 
-# def get_propietario_list_by_tipo_persona_id(
-#     db: Session, tipo_persona_id: int
-# ) -> List[Propietario]:
-#     return (
-#         db.query(Propietario)
-#         .filter_by(tipo_persona_id=tipo_persona_id)
-#         .all()
-#     )
+
+def rol_tiene_permiso(rol_id: int, permiso_descripcion: str, db: Session) -> bool:
+    rol = db.query(Rol).filter_by(id=rol_id).first()
+
+    if not rol:
+        return False
+
+    permiso = db.query(Permiso).filter_by(descripcion=permiso_descripcion).first()
+
+    if permiso and permiso in rol.permisos:
+        return True
+
+    return False
+
+
+def get_rol_id_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> Optional[int]:
+    rol = db.query(Rol).filter_by(gestor_carga_id=gestor_carga_id).first()
+
+    return rol.id if rol else None
+
+
+def get_rol_id_by_usuario_id(db: Session, usuario_id: int) -> int:
+    usuario = db.query(User).filter(User.id == usuario_id).first()
+    if not usuario:
+        raise ValueError(f"No se encontró usuario con id {usuario_id}")
+
+    if not usuario.user_roles or len(usuario.user_roles) == 0:
+        raise ValueError(f"El usuario con id {usuario_id} no tiene roles asignados")
+
+    return usuario.user_roles[0].rol_id
 
 
 def create_propietario(
@@ -92,7 +117,18 @@ def create_propietario(
     foto_perfil_url: Optional[str],
     chofer: Optional[Chofer],
     modified_by: str,
+    usuario_id: int,
 ) -> Propietario:
+
+    rol_id = get_rol_id_by_usuario_id(db, usuario_id)
+
+    roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 1 - propietario", db)
+
+    # Determinar el estado inicial según el permiso
+    if roles_permisos:
+        estado_inicial = EstadoEnum.ACTIVO.value
+    else:
+        estado_inicial = EstadoEnum.NUEVO.value
     obj = Propietario(
         nombre=data.nombre,
         nombre_corto=data.nombre_corto,
@@ -110,7 +146,7 @@ def create_propietario(
         foto_documento_frente=foto_documento_frente_url,
         foto_documento_reverso=foto_documento_reverso_url,
         foto_perfil=foto_perfil_url,
-        estado=EstadoEnum.ACTIVO.value,
+        estado=estado_inicial,
         telefono=data.telefono,
         email=data.email,
         direccion=data.direccion,
