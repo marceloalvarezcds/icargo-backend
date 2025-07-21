@@ -5,7 +5,7 @@ from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas, services
-from app.dependencies import Permiso, get_current_user, get_db_session
+from app.dependencies import Permiso, get_current_user, get_db_session,Permisos
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums.estado import EstadoEnum
@@ -35,7 +35,7 @@ async def read_centro_operativo_list_by_gestor_cuenta_id(
 @api.get("/origen-ambos", response_model=List[schemas.CentroOperativoList])
 async def read_centro_operativo_origen_ambos(
     db: Session = Depends(get_db_session),
-    _: bool = Depends(Permiso(a.LISTAR, m.CENTRO_OPERATIVO)),
+    _: bool = Depends(Permisos(a.LISTAR, [m.CENTRO_OPERATIVO, m.FLETE])),
     current_user: schemas.AuthUser = Depends(get_current_user),
 ):
     return repositories.get_centro_operativo_list_origen_ambos(db, current_user.gestor_carga_id)
@@ -51,7 +51,7 @@ async def centro_operativo_reports(
 @api.get("/gestor_cuenta_id/destino-ambos", response_model=List[schemas.CentroOperativoList])
 async def read_centro_operativo_destino_ambos(
     db: Session = Depends(get_db_session),
-    _: bool = Depends(Permiso(a.LISTAR, m.CENTRO_OPERATIVO)),
+    _: bool = Depends(Permisos(a.LISTAR, [m.CENTRO_OPERATIVO, m.FLETE])),
     current_user: schemas.AuthUser = Depends(get_current_user),
 ):
     return repositories.get_centro_operativo_list_destino_ambos(db, current_user.gestor_carga_id)

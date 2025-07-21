@@ -5,7 +5,7 @@ from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas, services
-from app.dependencies import Permiso, get_current_user, get_db_session
+from app.dependencies import Permiso, get_current_user, get_db_session, Permisos
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums.estado import EstadoEnum
@@ -24,7 +24,7 @@ async def read_remitente_list(
 @api.get("/remitente_activos", response_model=List[schemas.RemitenteList])
 async def read_remitente_list_activo(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.REMITENTE)),  # noqa: B008
+    _: bool = Depends(Permisos(a.LISTAR, [m.REMITENTE, m.FLETE])),  # noqa: B008
 ):
     return repositories.get_remitente_list_activo(db)
 

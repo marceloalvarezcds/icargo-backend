@@ -5,7 +5,7 @@ from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import schemas, services
-from app.dependencies import Permiso, get_current_user, get_db_session
+from app.dependencies import Permiso, get_current_user, get_db_session, Permisos
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums.estado import EstadoEnum
@@ -17,7 +17,7 @@ api = APIRouter()
 @api.get("/gestor_carga_id", response_model=List[schemas.User])
 async def read_user_list_by_gestor_carga_id(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.USER)),  # noqa: B008
+    _: bool = Depends(Permisos(a.LISTAR, [m.USER, m.CAMION])),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_user_list_with_rol_list_by_gestor_carga_id(

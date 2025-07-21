@@ -238,6 +238,6 @@ def inactive_camion_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.CAMION)),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.CAMION)),  # noqa: B008
 ):
     return services.get_camion_by_id(db, id)

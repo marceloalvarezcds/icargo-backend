@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 from app import repositories, schemas, services
-from app.dependencies import Permiso, get_current_user, get_db_session
+from app.dependencies import Permiso, get_current_user, get_db_session, Permisos
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums.estado import EstadoEnum
@@ -198,6 +198,6 @@ async def update_flete_edit_mode(
     data: schemas.FleteEditModeUpdate,
     db: Session = Depends(get_db_session),
     current_user: schemas.AuthUser = Depends(get_current_user),
-    _: bool = Depends(Permiso(a.EDITAR, m.FLETE)),
+    _: bool = Depends(Permisos(a.EDITAR, [m.FLETE, m.ORDEN_CARGA])),
 ):
     return services.update_flete_edit_mode(id, data.is_edit, db)
