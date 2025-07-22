@@ -31,6 +31,7 @@ class PuntoVenta(AuditMixin, Base):
             "proveedor_id",
             "tipo_documento_id",
             "numero_documento",
+            "numero_sucursal",
         ),
         UniqueConstraint(
             "proveedor_id",

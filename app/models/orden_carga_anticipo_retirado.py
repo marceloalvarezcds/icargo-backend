@@ -85,7 +85,7 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
             moneda = self.moneda_simbolo
 
         concepto = f"{self.concepto}: {number_format(self.monto_retirado)}{moneda}"
-        punto_venta_producto = f"{producto_info} || {self.punto_venta_nombre}"
+        punto_venta_producto = f"{producto_info} || {self.punto_venta_alias}"
         return f"{concepto} {punto_venta_producto}"
 
 
