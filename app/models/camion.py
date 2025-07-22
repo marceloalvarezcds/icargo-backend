@@ -252,6 +252,10 @@ class Camion(AuditMixin, Base):
         return self.propietario.ruc
 
     @hybrid_property
+    def is_propietario_condicionado(self):
+        return self.propietario.is_propietario_condicionado
+
+    @hybrid_property
     def propietario_puede_recibir_anticipos(self):
         return self.propietario.puede_recibir_anticipos
 

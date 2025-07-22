@@ -493,12 +493,27 @@ def edit_combinacion(
                 .where(Camion.id == combinacion.camion_id)
                 .values(**update_values)
             )
+    if data.chofer_id is not None:
+        if hasattr(data, 'puede_recibir_anticipos'):
+            db.execute(
+                update(Chofer)
+                .where(Chofer.id == data.chofer_id)
+                .values(puede_recibir_anticipos=data.puede_recibir_anticipos)
+            )
 
-    if data.chofer_id is not None and hasattr(data, 'puede_recibir_anticipos'):
+        if hasattr(data, 'is_chofer_condicionado'):
+            db.execute(
+                update(Chofer)
+                .where(Chofer.id == data.chofer_id)
+                .values(is_chofer_condicionado=data.is_chofer_condicionado)
+            )
+
+    # Actualizar el campo is_condicionado_propietario si viene en el payload
+    if data.is_propietario_condicionado is not None and combinacion.propietario_id:
         db.execute(
-            update(Chofer)
-            .where(Chofer.id == data.chofer_id)
-            .values(puede_recibir_anticipos=data.puede_recibir_anticipos)
+            update(Propietario)
+            .where(Propietario.id == combinacion.propietario_id)
+            .values(is_propietario_condicionado=data.is_propietario_condicionado)
         )
 
     db.commit()

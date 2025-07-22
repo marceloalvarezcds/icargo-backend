@@ -75,6 +75,7 @@ class Camion(CamionForm):
     propietario_estado: EstadoEnum
     propietario_foto: Optional[str] = None
     propietario_puede_recibir_anticipos: Optional[bool] = None
+    is_propietario_condicionado: bool
     propietario_camion_id: int
     chofer: Optional[Chofer]
     chofer_estado: Optional[EstadoEnum] = None
@@ -128,6 +129,7 @@ class CamionList(BaseModel):
     propietario_foto: Optional[str] = None
     propietario_estado: EstadoEnum
     propietario_puede_recibir_anticipos: Optional[bool] = None
+    is_propietario_condicionado: bool
     propietario_camion_id: int
     chofer_nombre: Optional[str] = None
     chofer_numero_documento: Optional[str] = None

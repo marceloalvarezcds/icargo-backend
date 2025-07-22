@@ -144,4 +144,6 @@ class CombinacionUpdate(BaseModel):
     puede_recibir_anticipos: bool
     camion_oc_activa: Optional[int] = None
     limite_monto_anticipos: Optional[RoundedDecimal] = None
+    is_propietario_condicionado: bool
+    is_chofer_condicionado: bool
 

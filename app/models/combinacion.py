@@ -105,6 +105,9 @@ class Combinacion(AuditMixin, Base):
     @hybrid_property
     def propietario_ruc(self):
         return self.propietario.ruc
+    @hybrid_property
+    def is_propietario_condicionado(self):
+        return self.propietario.is_propietario_condicionado
 
     @hybrid_property
     def anticipo_propietario(self):
