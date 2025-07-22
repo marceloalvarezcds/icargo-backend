@@ -198,6 +198,6 @@ async def update_flete_edit_mode(
     data: schemas.FleteEditModeUpdate,
     db: Session = Depends(get_db_session),
     current_user: schemas.AuthUser = Depends(get_current_user),
-    _: bool = Depends(Permisos(a.EDITAR, [m.FLETE, m.ORDEN_CARGA])),
+    _: bool = Depends(Permisos(a.VER, [m.FLETE, m.ORDEN_CARGA])),
 ):
     return services.update_flete_edit_mode(id, data.is_edit, db)
