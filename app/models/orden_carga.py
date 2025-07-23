@@ -263,12 +263,20 @@ class OrdenCarga(AuditMixin, Base):
         return self.combinacion.propietario_id
 
     @hybrid_property
+    def is_propietario_condicionado(self):
+        return self.propietario.is_propietario_condicionado
+
+    @hybrid_property
     def combinacion_chofer_id(self):
         return self.combinacion.combinacion_chofer_id
 
     @hybrid_property
     def combinacion_chofer_nombre(self):
         return self.combinacion.chofer_nombre
+
+    @hybrid_property
+    def is_chofer_condicionado(self):
+        return self.chofer.is_chofer_condicionado
 
     @hybrid_property
     def neto(self):

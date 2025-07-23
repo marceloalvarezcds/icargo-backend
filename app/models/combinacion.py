@@ -118,10 +118,6 @@ class Combinacion(AuditMixin, Base):
         return self.propietario.telefono
 
     @hybrid_property
-    def is_propietario_condicionado(self):
-        return self.propietario.is_propietario_condicionado
-
-    @hybrid_property
     def tipo_descripcion(self):
         return self.tipo.descripcion
 

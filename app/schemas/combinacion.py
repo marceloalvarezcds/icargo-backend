@@ -72,6 +72,8 @@ class CombinacionCreateModel(CombinacionBaseModel):
     oc_activa: Optional[int]
     limite_anticipos: Optional[int]
     puede_recibir_anticipos: bool
+    is_propietario_condicionado: bool
+    is_chofer_condicionado: bool
     anticipo_propietario: bool
 
 
@@ -90,6 +92,8 @@ class Combinaciones(CombinacionGet):
     color_camion: Optional[str] = None
     chofer_numero_documento: Optional[str] = None
     puede_recibir_anticipos: bool
+    is_propietario_condicionado: bool
+    is_chofer_condicionado: bool
     anticipo_propietario: bool
     composicion_juridica_id: Optional[int] = None
     class Config:

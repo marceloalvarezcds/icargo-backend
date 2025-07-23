@@ -107,6 +107,8 @@ class OrdenCarga(OrdenCargaBaseModel):
     propietario_documento: Optional[str] = None
     camion_chofer_numero_documento: Optional[str] = None
     camion_chofer_puede_recibir_anticipos: bool
+    is_chofer_condicionado: Optional[bool] = None
+    is_propietario_condicionado: Optional[bool] = None
     camion_limite_cantidad_oc_activas: int
     camion_estado: Optional[str] = None
     camion_limite_monto_anticipos: Optional[RoundedDecimal] = None
