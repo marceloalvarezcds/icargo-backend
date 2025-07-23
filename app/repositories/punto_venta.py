@@ -73,6 +73,7 @@ def get_punto_venta_by(
     db: Session,
     tipo_documento_id: int,
     numero_documento: str,
+    numero_sucursal: str,
 ) -> Optional[PuntoVenta]:
     return (
         db.query(PuntoVenta)
@@ -80,6 +81,7 @@ def get_punto_venta_by(
             and_(
                 PuntoVenta.numero_documento == numero_documento,
                 PuntoVenta.tipo_documento_id == tipo_documento_id,
+                PuntoVenta.numero_sucursal == numero_sucursal,
             )
         )
         .first()

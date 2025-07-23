@@ -53,12 +53,14 @@ async def create_punto_venta(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.PuntoVenta:
+
     if repositories.get_punto_venta_by(
-        db, data.tipo_documento_id, data.numero_documento
+        db, data.tipo_documento_id, data.numero_documento, data.numero_sucursal
     ):
         raise HTTPException(
             status_code=409,
-            detail=f"El Punto de Venta con documento {data.numero_documento} ya existe",
+            detail=f"""El Punto de Venta con documento {data.numero_documento} y
+            sucursal {data.numero_sucursal} ya existe""",
         )
 
     if repositories.get_punto_venta_by_proveedor_sucursal(
@@ -102,8 +104,9 @@ async def edit_punto_venta(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.PuntoVenta:
+
     exists = repositories.get_punto_venta_by(
-        db, data.tipo_documento_id, data.numero_documento
+        db, data.tipo_documento_id, data.numero_documento, data.numero_sucursal
     )
     if exists and exists.id != id:
         raise HTTPException(
@@ -119,7 +122,6 @@ async def edit_punto_venta(
             status_code=409,
             detail=f"El Punto de Venta numero {data.numero_sucursal} ya existe",
         )
-
 
     logo_url = await upload_and_get_image_url(file) if file else None
     to_edit_obj = get_punto_venta_by_id(db, id)
