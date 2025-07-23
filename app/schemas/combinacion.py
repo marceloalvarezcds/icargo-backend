@@ -72,8 +72,8 @@ class CombinacionCreateModel(CombinacionBaseModel):
     oc_activa: Optional[int]
     limite_anticipos: Optional[int]
     puede_recibir_anticipos: bool
-    is_propietario_condicionado: bool
-    is_chofer_condicionado: bool
+    is_propietario_condicionado: Optional[bool] = None
+    is_chofer_condicionado: Optional[bool] = None
     anticipo_propietario: bool
 
 
