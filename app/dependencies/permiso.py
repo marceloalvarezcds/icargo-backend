@@ -8,6 +8,7 @@ from app.dependencies import get_current_user, get_db_session
 from app.enums import PermisoAccionEnum, PermisoModeloEnum, permisoModeloTitulo
 from app.repositories import exists_permiso_for_user
 
+
 class Permiso:
     """
     Clase para controlar los permisos para en cada endpoint
