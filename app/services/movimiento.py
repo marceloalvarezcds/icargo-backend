@@ -1401,16 +1401,27 @@ def edit_movimiento_by_factura(
 ) :
     mov_iva = None
     mov_retencion = None
+    iva=RoundedDecimal(0)
+    retencion=RoundedDecimal(0)
 
     if (facturaModel.iva_movimiento_id):
         mov_iva = get_movimiento_by_id(db, facturaModel.iva_movimiento_id)
-        mov_iva.monto= factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else factura.iva,
-        mov_iva.moneda_id= factura.moneda_id
+        iva=(factura.iva*-1) if factura.sentido_mov_iva == 'COBRAR' else factura.iva
+        cambio=factura.tipo_cambio_moneda if factura.tipo_cambio_moneda else 1
+        mov_iva.monto=iva
+        mov_iva.moneda_id=factura.moneda_id
+        mov_iva.tipo_cambio_moneda=cambio
+        mov_iva.monto_mon_local=iva*cambio
 
     if (facturaModel.retencion_movimiento_id):
         mov_retencion = get_movimiento_by_id(db, facturaModel.retencion_movimiento_id)
-        mov_retencion.monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
-        mov_retencion.moneda_id= factura.moneda_id
+        retencion=factura.retencion*-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion
+        cambio=factura.tipo_cambio_moneda if factura.tipo_cambio_moneda else 1
+        mov_retencion.monto= retencion
+        mov_retencion.moneda_id=factura.moneda_id
+        mov_retencion.tipo_cambio_moneda=cambio
+        mov_retencion.monto_mon_local=retencion*cambio
+
 
     db.commit()
     if (mov_iva):
