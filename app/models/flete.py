@@ -217,6 +217,10 @@ class Flete(AuditMixin, Base):
         return self.gestor_carga.nombre
 
     @hybrid_property
+    def gestor_carga_moneda_simbolo(self):
+        return self.gestor_carga.moneda_simbolo
+
+    @hybrid_property
     def merma_gestor_carga_valor(self):
         return self.merma_gestor_cuenta_valor
 

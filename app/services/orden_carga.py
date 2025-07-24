@@ -22,6 +22,7 @@ from app.enums import EstadoEnum
 from app.models import Camion, Flete, GestorCarga, OrdenCarga, OrdenCargaComentariosHistorial
 from app.models.orden_carga_complemento import OrdenCargaComplemento
 from app.models.orden_carga_descuento import OrdenCargaDescuento
+from app.models.orden_carga_remision_origen import OrdenCargaRemisionOrigen
 from app.models.propietario import Propietario
 from app.schemas.audit_database import AuditDatabase as A
 from app.utils import number_format, send_email_with_template_by_thread
@@ -46,9 +47,6 @@ from .orden_carga_remision_resultado import (
 from .provision import (
     create_provision_by_finalizar_oc,
     borrar_provisiones_by_conciliacion_oc
-)
-from .orden_carga_anticipo_saldo import (
-    update_orden_carga_anticipo_saldo_by_orden_carga_id,
 )
 
 from .moneda_cotizacion import get_cotizacion_moneda
@@ -1320,33 +1318,38 @@ def actualizar_estado_y_cantidades_fletes(
     orden_carga_id: int,
     cantidad_nominada: float
 ):
-    # Actualizar el nuevo flete
+    oc = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
+    remision_origen = None
+    if oc:
+        remision_origen = db.query(OrdenCargaRemisionOrigen).filter(
+            OrdenCargaRemisionOrigen.orden_carga_id == oc.id
+        ).first()
+
+    # Si hay remisión de origen, usamos su cantidad, sino cantidad nominada
+    cantidad_real = remision_origen.cantidad if remision_origen else cantidad_nominada
+
+    # --- ACTUALIZAR NUEVO FLETE ---
     nuevo_flete = db.query(Flete).filter(Flete.id == nuevo_flete_id).first()
     if nuevo_flete:
         nuevo_flete.is_in_orden_carga = True
-        # Restar la cantidad nominada del saldo del nuevo flete
-        nuevo_flete.saldo = (nuevo_flete.saldo or 0) - cantidad_nominada
-        # Sumar la cantidad nominada al cargado acumulado
-        nuevo_flete.cargado = (nuevo_flete.cargado or 0) + cantidad_nominada
+        nuevo_flete.saldo = (nuevo_flete.saldo or 0) - cantidad_real
+        nuevo_flete.cargado = (nuevo_flete.cargado or 0) + cantidad_real
         db.add(nuevo_flete)
 
-    # Actualizar el flete anterior solo si es distinto al nuevo y no está en otra orden
+    # --- ACTUALIZAR FLETE ANTERIOR SI ES DISTINTO ---
     if flete_anterior_id and flete_anterior_id != nuevo_flete_id:
-        otras_oc = (
-            db.query(OrdenCarga)
-            .filter(
-                OrdenCarga.flete_id == flete_anterior_id,
-                OrdenCarga.id != orden_carga_id
-            )
-            .count()
-        )
+        otras_oc = db.query(OrdenCarga).filter(
+            OrdenCarga.flete_id == flete_anterior_id,
+            OrdenCarga.id != orden_carga_id,
+            OrdenCarga.estado != EstadoEnum.CANCELADO.value
+        ).count()
+
         if otras_oc == 0:
             flete_anterior = db.query(Flete).filter(Flete.id == flete_anterior_id).first()
             if flete_anterior:
                 flete_anterior.is_in_orden_carga = False
-                # Sumar la cantidad nominada de vuelta al saldo del flete anterior
-                flete_anterior.saldo = (flete_anterior.saldo or 0) + cantidad_nominada
-                # Restar la cantidad nominada del cargado acumulado
-                flete_anterior.cargado = (flete_anterior.cargado or 0) - cantidad_nominada
+                flete_anterior.saldo = (flete_anterior.saldo or 0) + cantidad_real
+                flete_anterior.cargado = (flete_anterior.cargado or 0) - cantidad_real
                 db.add(flete_anterior)
+
 

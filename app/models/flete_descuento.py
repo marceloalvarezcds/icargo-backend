@@ -71,9 +71,21 @@ class FleteDescuento(AuditMixin, Base):
         return self.propietario_moneda.nombre
 
     @hybrid_property
+    def propietario_moneda_simbolo(self):
+        return self.propietario_moneda.simbolo
+
+    @hybrid_property
     def proveedor_moneda_nombre(self):
         return self.proveedor_moneda.nombre
 
     @hybrid_property
+    def proveedor_moneda_simbolo(self):
+        return self.proveedor_moneda.simbolo
+
+    @hybrid_property
     def proveedor_nombre(self):
         return self.proveedor.nombre
+
+    @hybrid_property
+    def gestor_carga_moneda_simbolo(self):
+        return self.flete.gestor_carga_moneda_simbolo

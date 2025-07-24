@@ -85,16 +85,17 @@ def delete_orden_carga_remision_origen(db: Session, id: int, modified_by: str) -
     if not obj:
         raise HTTPException(status_code=404, detail="OrdenCargaRemisionOrigen not found")
 
-    # Actualizar los campos de auditoría
+    # Actualizar auditoría
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()
 
-    # Serializar los datos antes de eliminar
-    result = schemas.OrdenCargaRemisionOrigen.from_orm(obj)
+    # Convertimos a schema ANTES de eliminar
+    schema_data = schemas.OrdenCargaRemisionOrigen.from_orm(obj)
 
-    # Eliminar el objeto
-    db.delete(obj)
-    db.commit()
+    # Lógica de eliminación y recalculo
+    repositories.delete_orden_carga_remision_origen(db, id, modified_by)
 
-    return result
+    return schema_data
+
+

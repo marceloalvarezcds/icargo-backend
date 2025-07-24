@@ -70,3 +70,15 @@ class FleteComplemento(AuditMixin, Base):
     @hybrid_property
     def remitente_moneda_nombre(self):
         return self.remitente_moneda.nombre
+
+    @hybrid_property
+    def propietario_moneda_simbolo(self):
+        return self.propietario_moneda.simbolo
+
+    @hybrid_property
+    def remitente_moneda_simbolo(self):
+        return self.remitente_moneda.simbolo
+
+    @hybrid_property
+    def gestor_carga_moneda_simbolo(self):
+        return self.flete.gestor_carga_moneda_simbolo

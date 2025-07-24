@@ -32,12 +32,15 @@ class FleteComplemento(FleteComplementoForm):
     # INICIO Monto a pagar al Propietario
     propietario_moneda: Moneda
     propietario_moneda_nombre: str
+    propietario_moneda_simbolo: str
     # FIN Monto a pagar al Propietario
     # INICIO Monto a cobrar al Remitente
     remitente_moneda: Optional[Moneda] = None
     remitente_moneda_nombre: Optional[str] = None
+    remitente_moneda_simbolo: Optional[str] = None
     # FIN Monto a cobrar al Remitente
     flete_id: int
+    gestor_carga_moneda_simbolo: str
 
     class Config:
         orm_mode = True
