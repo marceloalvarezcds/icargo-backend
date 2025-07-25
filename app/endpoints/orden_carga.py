@@ -301,7 +301,7 @@ def conciliar_orden_carga_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
+    _: bool = Depends(Permiso(a.CONCILIAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.conciliar_orden_carga(db, id, current_user)
 
@@ -361,7 +361,7 @@ def finalizar_orden_carga_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
+    _: bool = Depends(Permiso(a.FINALIZAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.finalizar_orden_carga(db, id, current_user)
 
