@@ -24,7 +24,7 @@ async def read_proveedor_list(
 @api.get("/gestor_cuenta_id", response_model=List[schemas.ProveedorList])
 async def read_proveedor_list_by_gestor_cuenta_id(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permisos(a.LISTAR, [m.PROVEEDOR, m.FLETE])),  # noqa: B008
+    _: bool = Depends(Permisos(a.LISTAR, [m.PROVEEDOR, m.FLETE, m.ORDEN_CARGA])),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return repositories.get_proveedor_list_by_gestor_cuenta_id(
