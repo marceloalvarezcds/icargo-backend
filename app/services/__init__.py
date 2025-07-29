@@ -366,6 +366,7 @@ from .rol import (  # noqa
     get_rol_active_list,
     get_rol_by_id,
     get_rol_list,
+    get_roles_by_user_id,
 )
 from .security import create_access_token  # noqa
 from .semi import (  # noqa

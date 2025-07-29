@@ -35,7 +35,7 @@ class RolInDBBase(RolBase):
 
     class Config:
         orm_mode = True
-       
+
 
 
 # Additional properties to return via API
@@ -49,3 +49,11 @@ class RolChecked(RolInDBBase):
     @validator("checked")
     def set_checked(cls, _):
         return True
+
+
+class RolSimple(BaseModel):
+    id: int
+    descripcion: str
+
+    class Config:
+        orm_mode = True

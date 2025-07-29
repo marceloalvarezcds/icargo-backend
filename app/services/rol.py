@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session  # type: ignore
 from app.cache.permiso import reset_permiso_in_cache_by_user_id
 from app.enums.estado import EstadoEnum
 from app.models import Rol, RolPermiso
+from app.models.user import User
 from app.repositories import exists_user_for_rol_id, get_user_id_by_rol_id
 from app.schemas import PermisoChecked, RolCreate, RolUpdate
 from app.services import generic_service as service
@@ -121,3 +122,10 @@ def save_permisos(
         if user_id_tuple:
             user_id: int = user_id_tuple[0]
             reset_permiso_in_cache_by_user_id(user_id)
+
+
+def get_roles_by_user_id(db: Session, user_id: int) -> List[Rol]:
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return [user_rol.rol for user_rol in user.user_roles]
