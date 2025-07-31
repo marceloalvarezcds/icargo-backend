@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 30px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .logo {
+      width: 120px;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .field {
+      flex: 1 1 25%;
+      padding: 4px 8px;
+      box-sizing: border-box;
+    }
+    .label {
+      font-weight: bold;
+    }
+    .value {
+      margin-top: 2px;
+    }
+    .field-full {
+      flex: 1 1 50%;
+    }
+  </style>
+</head>
+<body>
+  <div style="text-align: center;">
+    <img src="{{ logo }}" alt="Logo" class="logo" />
+    <h1>Factura</h1>
+  </div>
+
+  <div class="section">
+    <div class="row">
+      <div class="field">
+        <div class="label">Monto</div>
+        <div class="value">{{ monto }}</div>
+      </div>
+      <div class="field">
+        <div class="label">Moneda</div>
+        <div class="value">{{ moneda_id }}</div>
+      </div>
+      <div class="field">
+        <div class="label">IVA</div>
+        <div class="value">{{ iva }}</div>
+      </div>
+      <div class="field">
+        <div class="label">IVA Incluido</div>
+        <div class="value">{{ "Sí" if iva_incluido else "No" }}</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <div class="label">Valor IVA</div>
+        <div class="value">{{ iva }}</div>
+      </div>
+      <div class="field">
+        <div class="label">Movimiento IVA</div>
+        <div class="value">{{ sentido_mov_iva }}</div>
+      </div>
+      <div class="field">
+        <div class="label">Valor Retención</div>
+        <div class="value">{{ retencion }}</div>
+      </div>
+      <div class="field">
+        <div class="label">Movimiento Retención</div>
+        <div class="value">{{ sentido_mov_retencion }}</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field-full">
+        <div class="label">Contribuyente</div>
+        <div class="value">{{ contribuyente }}</div>
+      </div>
+      <div class="field-full">
+        <div class="label">RUC</div>
+        <div class="value">{{ ruc }}</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <div class="label">Número de Factura</div>
+        <div class="value">{{ numero_factura }}</div>
+      </div>
+      <div class="field">
+        <div class="label">Timbrado</div>
+        <div class="value">{{ timbrado }}</div>
+      </div>
+      <div class="field">
+        <div class="label">Fecha Factura</div>
+        <div class="value">{{ fecha_factura }}</div>
+      </div>
+      <div class="field">
+        <div class="label">Fecha Vencimiento</div>
+        <div class="value">{{ fecha_vencimiento }}</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

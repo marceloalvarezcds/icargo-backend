@@ -81,6 +81,7 @@ from .factura import (  # noqa
     delete_factura,
     edit_factura,
     get_factura_by_id,
+    get_factura_pdf_by_id,
 )
 from .flete import (  # noqa
     change_flete_public_status,

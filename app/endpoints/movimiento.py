@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
+from app.dependencies.permisos import Permisos
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums import MovimientoEstadoEnum
@@ -139,7 +140,7 @@ async def read_movimiento_list_by_liquidacion(
     liquidacion_id: int,
     etapa: str,
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.MOVIMIENTO)),  # noqa: B008
+    _: bool = Depends(Permisos(a.LISTAR, [m.MOVIMIENTO, m.CAJA])),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_movimiento_list_by_liquidacion(

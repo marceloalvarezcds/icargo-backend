@@ -9,7 +9,10 @@ from app.schemas import FacturaForm
 from . import movimiento as service
 from app.services import generic_service as generic_service
 from .pictshare import upload_and_get_image_url
-
+from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv, STATICS_FOLDER, dir_path
+import os
+from jinja2 import Template
+from pdfkit import from_string  # type: ignore
 
 async def create_factura(
     db: Session,
@@ -89,3 +92,36 @@ def delete_factura(db: Session, id: int, modified_by: str) -> Factura:
     factura = repositories.delete_factura(co, db, modified_by)
 
     return factura
+
+
+def get_factura_pdf_by_id(db: Session, id: int) -> str:
+
+    # Simulación de datos
+    data = {
+        "moneda_id": 1,
+        "numero_factura": "001-001-0001234",
+        "fecha_vencimiento": "2025-08-30",
+        "monto": "500.000",
+        "iva_id": 3,
+        "contribuyente": "Distribuidora Argel S.A.",
+        "iva": "50.000",
+        "iva_incluido": False,
+        "sentido_mov_iva": "PAGAR",
+        "sentido_mov_retencion": "COBRAR",
+        "retencion": "10.000",
+        "timbrado": "12568974",
+        "ruc": "80012345-6",
+        "fecha_factura": "2025-07-30",
+    }
+    OUTPUT_FILENAME = f"anticipo_{id}.pdf"
+
+    template: Template = templateEnv.get_template("factura.html")
+    STATICS_FOLDER_lOGO = os.path.join(dir_path, "statics/logo-icargo.png")
+    source_html = template.render(logo=STATICS_FOLDER_lOGO, times=range(2), **data)
+
+    # Generación del PDF
+    pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
+    from_string(source_html, pdf_filename, {"enable-local-file-access": "", "page-size": "Legal"})
+
+    #return HTMLResponse(content=source_html, status_code=200)
+    return OUTPUT_FILENAME

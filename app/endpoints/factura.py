@@ -65,3 +65,12 @@ async def delete_factura(
     _: bool = Depends(Permiso(a.ELIMINAR, m.FACTURA)),  # noqa: B008
 ):
     return services.delete_factura(db, id, current_user.username)
+
+
+@api.get("/factura/{id}/pdf")
+async def generar_pdf_factura(
+    id: int,
+    db: Session = Depends(get_db_session),
+    _: bool = Depends(Permiso(a.VER, m.FACTURA)),
+):
+    return services.get_factura_pdf_by_id(db, id)
