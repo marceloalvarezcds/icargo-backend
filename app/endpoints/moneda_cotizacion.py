@@ -10,7 +10,6 @@ from app.enums import PermisoModeloEnum as m
 
 api = APIRouter()
 
-
 @api.get("/gestor_carga", response_model=List[schemas.MonedaCotizacion])
 async def read_moneda_cotizacion_list_by_gestor_carga(
     db: Session = Depends(get_db_session),  # noqa: B008
