@@ -89,6 +89,12 @@ class Liquidacion(LiquidacionForm):
     moneda_nombre: str
     moneda_simbolo: str
     movimientos_saldo: RoundedDecimal
+    saldo_anticipos_combustible: Optional[RoundedDecimal] = None
+    saldo_anticipos_efectivo: Optional[RoundedDecimal] = None
+    saldo_anticipos_complemento_descuento: Optional[RoundedDecimal] = None
+    saldo_anticipos_flete: Optional[RoundedDecimal] = None
+    saldo_anticipos_merma: Optional[RoundedDecimal] = None
+    saldo_anticipos_otro: Optional[RoundedDecimal] = None
     saldo: RoundedDecimal
     saldo_residual: Optional[RoundedDecimal] = None
     tipo_contraparte_descripcion: str

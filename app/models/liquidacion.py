@@ -101,6 +101,64 @@ class Liquidacion(AuditMixin, Base):
         )
 
     @hybrid_property
+    def saldo_anticipos_combustible(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion == 'Anticipo'
+            and x.tipo_insumo_descripcion == 'COMBUSTIBLE'
+        )
+
+    @hybrid_property
+    def saldo_anticipos_efectivo(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion == 'Anticipo'
+            and x.tipo_insumo_descripcion != 'COMBUSTIBLE'
+        )
+
+
+    @hybrid_property
+    def saldo_anticipos_complemento_descuento(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion in ['Complemento', 'Descuento']
+        )
+
+    @hybrid_property
+    def saldo_anticipos_flete(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion == 'Flete'
+        )
+
+    @hybrid_property
+    def saldo_anticipos_merma(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion == 'Merma'
+        )
+
+    @hybrid_property
+    def saldo_anticipos_otro(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion == 'Otro'
+        )
+
+
+    @hybrid_property
     def credito(self):
         return self.movimientos_saldo if self.movimientos_saldo > 0 else 0
 

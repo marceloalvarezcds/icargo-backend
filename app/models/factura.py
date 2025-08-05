@@ -54,8 +54,9 @@ class Factura(AuditMixin, Base):
     ruc = Column(String(255))
     fecha_factura = Column(DateTime)
     iva = Column(Numeric(38,10))
+    tipo_retencion = Column(String(255))
     retencion = Column(Numeric(38,10))
-    iva_incluido = Column(Boolean, unique=False, default=False)
+    iva_incluido = Column(String(255))
     sentido_mov_iva = Column( String(10) )
     sentido_mov_retencion = Column( String(10) )
 

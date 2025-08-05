@@ -4,113 +4,274 @@
   <meta charset="UTF-8" />
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
       margin: 30px;
     }
-    h1 {
+    .header, .section {
+      border: 1px solid #000;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .header-title {
       text-align: center;
-    }
-    .logo {
-      width: 120px;
-    }
-    .section {
-      margin-bottom: 20px;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
     }
     .row {
       display: flex;
       flex-wrap: wrap;
-      margin-bottom: 10px;
     }
-    .field {
-      flex: 1 1 25%;
+    .col {
+      flex: 1;
       padding: 4px 8px;
-      box-sizing: border-box;
     }
     .label {
       font-weight: bold;
     }
-    .value {
-      margin-top: 2px;
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
     }
-    .field-full {
-      flex: 1 1 50%;
+    .table th, .table td {
+      border: 1px solid #000;
+      padding: 6px;
+      text-align: left;
     }
+    .right {
+      text-align: right;
+    }
+    .logo {
+      width: 100px;
+    }
+    .factura-info {
+      width: fit-content;
+      margin: 0 auto;
+      font-size: 12px;
+      text-align: left;
+    }
+    .factura-info .header-title {
+      text-align: center;
+      font-weight: bold;
+    }
+    .box {
+      display: flex;
+      flex-wrap: wrap;
+      border: 1px solid #000;
+      margin-top: 10px;
+    }
+
+    .cell {
+      padding: 6px;
+      border: 1px solid #000;
+      text-align: center;
+      font-weight: bold;
+      flex: 1;
+      min-width: 100px;
+    }
+
+    .totals {
+      margin-top: 15px;
+      border: 1px solid #000;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .total-row {
+      border: 1px solid #000;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 6px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .total-row:last-child {
+      margin-bottom: 0;
+    }
+    .cell-empty {
+      height: 450px;
+      margin-top: 8px;
+    }
+    .iva-row {
+      border: 1px solid #000;
+      padding: 10px;
+      margin-top: 15px;
+      display: flex;
+      gap: 40px;
+      font-weight: bold;
+      justify-content: start;
+    }
+    .iva-row span {
+      white-space: nowrap;
+      margin-right: 250px;
+    }
+
   </style>
 </head>
 <body>
-  <div style="text-align: center;">
-    <img src="{{ logo }}" alt="Logo" class="logo" />
-    <h1>Factura</h1>
+
+  <div class="header">
+    <div class="row" style="display: flex; align-items: start; justify-content: space-between;">
+      <!-- Logo -->
+      <div style="flex: 0 0 auto;">
+        <img src="{{ logo }}" alt="Logo" class="logo" />
+      </div>
+
+      <!-- Datos de TRD -->
+      <div style="flex: 1; padding-left: 20px; font-size: 12px; line-height: 1.4;">
+        <div style="display: flex; align-items: baseline;">
+          <strong style="font-size: 16px; margin-right: 10px;">TRD</strong>
+        </div>
+        <div style="margin-top: 2px;">
+          <div><strong>DIRECCIÓN:</strong></div>
+          <div><strong>TELEF./FAX:</strong></div>
+          <div><strong>CASILLA DE CORREO:</strong></div>
+          <div><strong>WEB:</strong></div>
+        </div>
+      </div>
+
+      <!-- Datos de la factura -->
+      <div class="factura-info" style="flex: 0 0 auto; text-align: right; font-size: 12px;">
+        <div class="header-title">FACTURA</div>
+        <div><span class="label">N° Factura:</span> {{ numero_factura }}</div>
+        <div><span class="label">Timbrado:</span> {{ timbrado }}</div>
+        <div><span class="label">Fecha Factura:</span> {{ fecha_factura }}</div>
+        <div><span class="label">Fecha Vencimiento:</span> {{ fecha_vencimiento }}</div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="section">
+    <div class="row">
+      <div class="col"><span class="label">Fecha de emisión:</span> {{ fecha_emision }}</div>
+      <div class="col"><span class="label">Condición de venta:</span> {{ condicion_venta }}</div>
+    </div>
+
+    <!-- Contribuyente y RUC -->
+    <div class="row">
+      <div class="col"><span class="label">Contribuyente:</span> {{ contribuyente }}</div>
+      <div class="col"><span class="label">RUC:</span> {{ ruc }}</div>
+    </div>
+
+    <!-- Contraparte, Tipo, Documento -->
+    <div class="row">
+      <div class="col"><span class="label">Contraparte:</span> {{ contraparte }}</div>
+      <div class="col"><span class="label">Tipo:</span> {{ tipo_contraparte }}</div>
+      <div class="col"><span class="label">N° Documento:</span> {{ contraparte_numero_documento }}</div>
+    </div>
+
+    <!-- Dirección y Teléfono -->
+    <div class="row">
+      <div class="col"><span class="label">Dirección:</span> {{ direccion_contraparte }}</div>
+      <div class="col"><span class="label">Tel:</span> {{ telefono_contraparte }}</div>
+    </div>
+
+    <!-- Referencia -->
+    <div class="row">
+      <div class="col"><span class="label">Referencia:</span> {{ referencia }}</div>
+    </div>
+
+    <div class="row">
+      <div class="col"><span class="label">Contraparte:</span> {{ contraparte }}</div>
+      <div class="col"><span class="label">Tipo:</span> {{ tipo_contraparte }}</div>
+      <div class="col"><span class="label">N° Documento:</span> {{ contraparte_numero_documento }}</div>
+    </div>
+        <!-- Observaciones -->
+    <div class="row">
+      <div class="col"><span class="label">Observaciones:</span> {{ observaciones }}</div>
+    </div>
   </div>
 
   <div class="section">
     <div class="row">
-      <div class="field">
-        <div class="label">Monto</div>
-        <div class="value">{{ monto }}</div>
-      </div>
-      <div class="field">
-        <div class="label">Moneda</div>
-        <div class="value">{{ moneda_id }}</div>
-      </div>
-      <div class="field">
-        <div class="label">IVA</div>
-        <div class="value">{{ iva }}</div>
-      </div>
-      <div class="field">
-        <div class="label">IVA Incluido</div>
-        <div class="value">{{ "Sí" if iva_incluido else "No" }}</div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="field">
-        <div class="label">Valor IVA</div>
-        <div class="value">{{ iva }}</div>
-      </div>
-      <div class="field">
-        <div class="label">Movimiento IVA</div>
-        <div class="value">{{ sentido_mov_iva }}</div>
-      </div>
-      <div class="field">
-        <div class="label">Valor Retención</div>
-        <div class="value">{{ retencion }}</div>
-      </div>
-      <div class="field">
-        <div class="label">Movimiento Retención</div>
-        <div class="value">{{ sentido_mov_retencion }}</div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="field-full">
-        <div class="label">Contribuyente</div>
-        <div class="value">{{ contribuyente }}</div>
-      </div>
-      <div class="field-full">
-        <div class="label">RUC</div>
-        <div class="value">{{ ruc }}</div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="field">
-        <div class="label">Número de Factura</div>
-        <div class="value">{{ numero_factura }}</div>
-      </div>
-      <div class="field">
-        <div class="label">Timbrado</div>
-        <div class="value">{{ timbrado }}</div>
-      </div>
-      <div class="field">
-        <div class="label">Fecha Factura</div>
-        <div class="value">{{ fecha_factura }}</div>
-      </div>
-      <div class="field">
-        <div class="label">Fecha Vencimiento</div>
-        <div class="value">{{ fecha_vencimiento }}</div>
-      </div>
+      <div class="col"><span class="label">Tipo de Operación:</span> {{ tipo_operacion }}</div>
+      <div class="col"><span class="label">Moneda:</span> {{ moneda }} ({{ moneda_simbolo }})</div>
     </div>
   </div>
+  <div class="box">
+    <div class="cell">
+      ITEM
+      <div class="cell-empty"></div>
+    </div>
+    <div class="cell">
+      CANT.
+      <div class="cell-empty"></div>
+    </div>
+    <div class="cell">
+      CONCEPTOS
+      <div class="cell-empty"></div>
+    </div>
+    <div class="cell">
+      PRECIO UNITARIO
+      <div class="cell-empty"></div>
+    </div>
+    <div class="cell">
+      EXENTAS
+      <div class="cell-empty"></div>
+    </div>
+    <div class="cell">
+      10%
+      <div class="cell-empty"></div>
+    </div>
+    <div class="cell">
+      5%
+      <div class="cell-empty"></div>
+    </div>
+  </div>
+
+
+  <div class="totals">
+    <div class="total-row">
+      <span class="label">SUB TOTAL:</span>
+      <span class="value">{{ subtotal or "" }}</span>
+    </div>
+    <div class="total-row">
+      <span class="label">TOTAL A PAGAR:</span>
+      <span class="value">{{ total_a_pagar or "" }}</span>
+    </div>
+    <div class="total-row">
+      <span class="label">TOTAL A PAGAR (En letras):</span>
+      <span class="value">{{ total_a_pagar_letras or "" }}</span>
+    </div>
+    <div class="iva-row">
+      <span>LIQUIDACIÓN DEL IVA: (5%)</span>
+      <span>(10%)</span>
+      <span>TOTAL:</span>
+    </div>
+
+  </div>
+
+
+  <div class="section">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>%IVA</th>
+          <th class="right">Monto</th>
+          <th class="right">IVA</th>
+          <th class="right">IVA Incluido</th>
+          <th class="right">Retención</th>
+          <th class="right">% Retención</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ iva_descripcion }}</td>
+          <td class="right">{{ monto }}</td>
+          <td class="right">{{ iva }}</td>
+          <td class="right">{{ iva_incluido }}</td>
+          <td class="right">{{ retencion }}</td>
+          <td class="right">{{ porcentaje_retencion }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
 </body>
 </html>

@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import HTTPException, UploadFile  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
 
-from app import repositories
+from app import repositories, logger
 from app.models import Factura, TipoIva
 from app.schemas import FacturaForm
 from . import movimiento as service
@@ -13,6 +13,7 @@ from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv, STATICS_FOLD
 import os
 from jinja2 import Template
 from pdfkit import from_string  # type: ignore
+from app.utils import number_format
 
 async def create_factura(
     db: Session,
@@ -95,33 +96,46 @@ def delete_factura(db: Session, id: int, modified_by: str) -> Factura:
 
 
 def get_factura_pdf_by_id(db: Session, id: int) -> str:
+    logger.info('Inicio del proceso de generación de PDF de factura')
 
-    # Simulación de datos
+    factura = repositories.get_factura_by_id(db, id)
+    if not factura:
+        raise HTTPException(status_code=404, detail="Factura no encontrada")
+
     data = {
-        "moneda_id": 1,
-        "numero_factura": "001-001-0001234",
-        "fecha_vencimiento": "2025-08-30",
-        "monto": "500.000",
-        "iva_id": 3,
-        "contribuyente": "Distribuidora Argel S.A.",
-        "iva": "50.000",
-        "iva_incluido": False,
-        "sentido_mov_iva": "PAGAR",
-        "sentido_mov_retencion": "COBRAR",
-        "retencion": "10.000",
-        "timbrado": "12568974",
-        "ruc": "80012345-6",
-        "fecha_factura": "2025-07-30",
+        "numero_factura": factura.numero_factura or "",
+        "fecha_factura": factura.fecha_factura.strftime("%Y-%m-%d") if factura.fecha_factura else "",
+        "fecha_vencimiento": factura.fecha_vencimiento.strftime("%Y-%m-%d") if factura.fecha_vencimiento else "",
+        "monto": number_format(factura.monto),
+        "iva": number_format(factura.iva),
+        "iva_id": factura.iva_id,
+        "iva_incluido": factura.iva_incluido,
+        "retencion": number_format(factura.retencion),
+        "porcentaje_retencion": f"{factura.tipo_retencion}%" if factura.tipo_retencion and factura.tipo_retencion not in ["NO", "NO APLICA"] else "No aplica",
+        "timbrado": factura.timbrado or "",
+        "ruc": factura.ruc,
+        "contribuyente": factura.contribuyente,
+        "sentido_mov_iva": factura.sentido_mov_iva,
+        "sentido_mov_retencion": factura.sentido_mov_retencion,
+        "moneda": factura.moneda_nombre,
+        "moneda_simbolo": factura.moneda_simbolo,
+        "iva_descripcion": factura.iva_descripcion,
+        "contraparte": factura.contraparte,
+        "contraparte_numero_documento": factura.contraparte_numero_documento,
+        "tipo_contraparte": factura.tipo_contraparte_descripcion,
+        "tipo_operacion": factura.tipo_operacion_descripcion,
     }
-    OUTPUT_FILENAME = f"anticipo_{id}.pdf"
+
+    OUTPUT_FILENAME = f"factura_{id}.pdf"
 
     template: Template = templateEnv.get_template("factura.html")
-    STATICS_FOLDER_lOGO = os.path.join(dir_path, "statics/logo-icargo.png")
-    source_html = template.render(logo=STATICS_FOLDER_lOGO, times=range(2), **data)
+    STATICS_FOLDER_LOGO = os.path.join(dir_path, "statics/logo-icargo.png")
+    source_html = template.render(logo=STATICS_FOLDER_LOGO, **data)
 
-    # Generación del PDF
+    logger.info('Template HTML generado correctamente')
+
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
     from_string(source_html, pdf_filename, {"enable-local-file-access": "", "page-size": "Legal"})
 
-    #return HTMLResponse(content=source_html, status_code=200)
+    logger.info(f'PDF generado correctamente en: {pdf_filename}')
     return OUTPUT_FILENAME

@@ -67,6 +67,7 @@ def create_factura(
         ruc=data.ruc,
         fecha_factura=data.fecha_factura,
         iva=data.iva,
+        tipo_retencion=data.tipo_retencion,
         retencion=data.retencion,
         contribuyente=data.contribuyente,
         iva_incluido=data.iva_incluido,
@@ -96,6 +97,7 @@ def edit_factura(
     obj.ruc=data.ruc
     obj.fecha_factura=data.fecha_factura,
     obj.iva=data.iva
+    obj.tipo_retencion=data.tipo_retencion
     obj.retencion=data.retencion,
     obj.contribuyente=data.contribuyente
     obj.modified_by = modified_by
