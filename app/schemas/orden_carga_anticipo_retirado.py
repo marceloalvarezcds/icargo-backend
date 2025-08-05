@@ -16,6 +16,7 @@ class OrdenCargaAnticipoRetiradoBaseModel(BaseModel):
     numero_comprobante: Optional[str] = None
     moneda_id: int
     monto_retirado: RoundedDecimal
+    monto_mon_local: Optional[RoundedDecimal] = None
     monto_litro: Optional[RoundedDecimal] = None
     observacion: Optional[str] = None
     insumo_punto_venta_precio_id: Optional[int] = None
@@ -40,6 +41,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     gestor_carga_id: int
     gestor_carga_nombre: str
     gestor_carga_moneda_nombre: str
+    gestor_carga_moneda_simbolo: str
     insumo_descripcion: Optional[str] = None
     insumo_fecha_precio: Optional[Date] = None
     insumo_moneda_nombre: Optional[str] = None
@@ -48,6 +50,7 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     insumo_unidad_abreviatura: Optional[str] = None
     insumo_unidad_descripcion: Optional[str] = None
     moneda_nombre: str
+    moneda_simbolo: str
     proveedor_nombre: str
     punto_venta_nombre: Optional[str] = None
     punto_venta_alias: Optional[str] = None
@@ -57,8 +60,12 @@ class OrdenCargaAnticipoRetirado(OrdenCargaAnticipoRetiradoBaseModel):
     tipo_insumo_descripcion: Optional[str] = None
     unidad_abreviatura: Optional[str] = None
     unidad_descripcion: Optional[str] = None
-    estados_movimientos: Optional[str] = None
+    estado_movimiento_propietario: Optional[str] = None
+    estado_movimiento_remitente: Optional[str] = None
     monto_litro: Optional[RoundedDecimal] = None
+    estado_movimiento: Optional[str] = None
+    camion_placa: Optional[str] = None
+    chofer_nombre: Optional[str] = None
 
     # Auditoría
     created_by: str

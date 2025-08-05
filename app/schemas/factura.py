@@ -17,18 +17,20 @@ class FacturaForm(BaseModel):
     contribuyente: str
     ruc: str
     monto: RoundedDecimal
-    iva: RoundedDecimal
+    iva: Optional[RoundedDecimal]
     retencion: Optional[RoundedDecimal]
     fecha_vencimiento: Date
     fecha_factura: Date
     tipo_contraparte_id: int
     contraparte_id: Optional[int]
-    iva_incluido: bool
+    iva_incluido: str
     sentido_mov_iva: Optional[str]
     sentido_mov_retencion: Optional[str]
     iva_movimiento_id: Optional[int]
+    tipo_retencion: Optional[str]
     retencion_movimiento_id: Optional[int]
     punto_venta_id: Optional[int]
+    tipo_cambio_moneda: Optional[int]
 
 class FacturaResponse(BaseModel):
     liquidacion_id: int
@@ -45,7 +47,7 @@ class FacturaResponse(BaseModel):
     fecha_factura: Optional[Date]
     tipo_contraparte_id: int
     contraparte_id: int
-    iva_incluido: Optional[bool]
+    iva_incluido: Optional[str]
     sentido_mov_iva: Optional[str]
     sentido_mov_retencion: Optional[str]
     iva_movimiento_id: Optional[int]
@@ -62,6 +64,7 @@ class Factura(FacturaResponse):
     iva_descripcion: str
     moneda_nombre: str
     moneda_simbolo: str
+    tipo_retencion: Optional[str]
     tipo_contraparte_descripcion: str
     tipo_operacion_descripcion: str
     # Auditoría

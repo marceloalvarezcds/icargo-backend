@@ -19,6 +19,9 @@ class LiquidacionNewMovimientosForm(BaseModel):
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
     tipo_mov_liquidacion: Optional[str] = "EFECTIVO"
+    moneda: Moneda
+    es_orden_pago: bool
+    observacion: Optional[str]
 
 
 class LiquidacionCabeceraMovimientosForm(BaseModel):
@@ -27,6 +30,9 @@ class LiquidacionCabeceraMovimientosForm(BaseModel):
     monto: Optional[RoundedDecimal]
     es_pago_cobro: Optional[str]
     tipo_mov_liquidacion: Optional[str]
+    moneda: Moneda
+    es_orden_pago: bool
+    observacion: Optional[str]
 
 
 class LiquidacionAddMovimientosForm(BaseModel):
@@ -57,6 +63,9 @@ class LiquidacionForm(BaseModel):
     es_pago_cobro: Optional[str]
     saldo_cc: Optional[RoundedDecimal]
     tipo_mov_liquidacion: str
+    es_orden_pago: bool
+    tipo_cambio_moneda: Optional[RoundedDecimal]
+    observacion: Optional[str]
 
 
 class Liquidacion(LiquidacionForm):
@@ -68,6 +77,7 @@ class Liquidacion(LiquidacionForm):
     moneda: Moneda
     comentarios: Optional[str]
     movimientos: List[Movimiento]
+    movimientos_activos: List[Movimiento]
     instrumentos: List[Instrumento]
     facturas: List[Factura]
     # Campos calculados
@@ -79,6 +89,12 @@ class Liquidacion(LiquidacionForm):
     moneda_nombre: str
     moneda_simbolo: str
     movimientos_saldo: RoundedDecimal
+    saldo_anticipos_combustible: Optional[RoundedDecimal] = None
+    saldo_anticipos_efectivo: Optional[RoundedDecimal] = None
+    saldo_anticipos_complemento_descuento: Optional[RoundedDecimal] = None
+    saldo_anticipos_flete: Optional[RoundedDecimal] = None
+    saldo_anticipos_merma: Optional[RoundedDecimal] = None
+    saldo_anticipos_otro: Optional[RoundedDecimal] = None
     saldo: RoundedDecimal
     saldo_residual: Optional[RoundedDecimal] = None
     tipo_contraparte_descripcion: str
@@ -106,3 +122,10 @@ class Liquidacion(LiquidacionForm):
 class LiquidacionSometer(BaseModel):
     comentario: Optional[str]
     monto: Optional[RoundedDecimal]
+
+
+
+class LiquidacionReport(BaseModel):
+    movimientos: List[Movimiento]
+    orden_carga_id: int
+    total_orden_carga: RoundedDecimal

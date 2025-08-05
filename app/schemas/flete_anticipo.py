@@ -16,7 +16,7 @@ class FleteAnticipoForm(BaseModel):
     tipo_insumo_descripcion: Optional[str] = None
     porcentaje: Optional[RoundedDecimal] = None
     concepto: Optional[str] = None
-
+    tipo_insumo_moneda_id: Optional[str] = None
 
 class FleteAnticipo(FleteAnticipoForm):
     id: int

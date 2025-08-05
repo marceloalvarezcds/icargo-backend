@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, TIMESTAMP  # type: ignore
+from sqlalchemy import Column, ForeignKey, Integer, String, Numeric  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 
@@ -22,11 +22,11 @@ class OrdenCargaEvaluacionesHistorial(AuditMixin, Base):
     comentario = Column(String(255))
     tipo_incidente_id = Column(Integer, ForeignKey("tipo_incidente.id"))
     tipo_incidente = relationship("TipoIncidente", uselist=False)
-    
+
     comentarios = Column(String(255))
     gestor_carga_id = Column(Integer)
     camion_id = Column(Integer)
-    semi_id = Column(Integer) 
+    semi_id = Column(Integer)
     propietario_id = Column(Integer)
     chofer_id = Column(Integer)
     concepto = Column(String(255))
@@ -41,11 +41,26 @@ class OrdenCargaEvaluacionesHistorial(AuditMixin, Base):
     carga_rating = Column(Integer, nullable=True)
     descarga_rating = Column(Integer, nullable=True)
 
+    promedio_tracto_gestor = Column(Numeric(38, 1), nullable=True)
+    promedio_semi_gestor = Column(Numeric(38, 1), nullable=True)
+    promedio_chofer_gestor = Column(Numeric(38, 1), nullable=True)
+    promedio_propietario_gestor = Column(Numeric(38, 1), nullable=True)
+    promedio_carga_gestor = Column(Numeric(38, 1), nullable=True)
+    promedio_descarga_gestor = Column(Numeric(38, 1), nullable=True)
+
+    promedio_tracto_general = Column(Numeric(38, 1), nullable=True)
+    promedio_semi_general = Column(Numeric(38, 1), nullable=True)
+    promedio_chofer_general = Column(Numeric(38, 1), nullable=True)
+    promedio_propietario_general = Column(Numeric(38, 1), nullable=True)
+    promedio_carga_general = Column(Numeric(38, 1), nullable=True)
+    promedio_descarga_general = Column(Numeric(38, 1), nullable=True)
+
+
     # Hybrid properties for accessing related data
     @hybrid_property
     def tipo_incidente_nombre(self):
         return self.tipo_incidente.descripcion
-    
+
     @hybrid_property
     def oc_camion_placa(self):
         return self.orden_carga.camion_placa
@@ -53,14 +68,22 @@ class OrdenCargaEvaluacionesHistorial(AuditMixin, Base):
     @hybrid_property
     def oc_semi_placa(self):
         return self.orden_carga.semi_placa
-    
+
     @hybrid_property
     def oc_chofer_nombre(self):
         return self.orden_carga.combinacion_chofer_nombre
-    
+
     @hybrid_property
     def oc_beneficiario_nombre(self):
         return self.orden_carga.camion_beneficiario_nombre
 
+    @hybrid_property
+    def oc_origen_nombre(self):
+        return self.orden_carga.origen_nombre
 
-   
+    @hybrid_property
+    def oc_destino_nombre(self):
+        return self.orden_carga.destino_nombre
+
+
+

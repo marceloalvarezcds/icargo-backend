@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas
 from app.config import REPORTS_FOLDER
+from app.enums.estado import EstadoEnum
 from app.models import (
     GestorCargaPuntoVenta,
     InsumoPuntoVenta,
@@ -52,12 +53,14 @@ async def create_punto_venta(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.PuntoVenta:
+
     if repositories.get_punto_venta_by(
-        db, data.tipo_documento_id, data.numero_documento
+        db, data.tipo_documento_id, data.numero_documento, data.numero_sucursal
     ):
         raise HTTPException(
             status_code=409,
-            detail=f"El Punto de Venta con documento {data.numero_documento} ya existe",
+            detail=f"""El Punto de Venta con documento {data.numero_documento} y
+            sucursal {data.numero_sucursal} ya existe""",
         )
 
     if repositories.get_punto_venta_by_proveedor_sucursal(
@@ -101,8 +104,9 @@ async def edit_punto_venta(
     gestor_carga_id: Optional[int],
     modified_by: str,
 ) -> schemas.PuntoVenta:
+
     exists = repositories.get_punto_venta_by(
-        db, data.tipo_documento_id, data.numero_documento
+        db, data.tipo_documento_id, data.numero_documento, data.numero_sucursal
     )
     if exists and exists.id != id:
         raise HTTPException(
@@ -118,7 +122,6 @@ async def edit_punto_venta(
             status_code=409,
             detail=f"El Punto de Venta numero {data.numero_sucursal} ya existe",
         )
-
 
     logo_url = await upload_and_get_image_url(file) if file else None
     to_edit_obj = get_punto_venta_by_id(db, id)
@@ -136,6 +139,13 @@ def delete_punto_venta(
     co = get_punto_venta_by_id(db, id)
     obj = repositories.delete_punto_venta(co, db, modified_by)
     return get_punto_venta_detail(db, obj, gestor_carga_id)
+
+
+def change_punto_venta_status(
+    db: Session, id: int, status: EstadoEnum, modified_by: str
+) -> schemas.Proveedor:
+    co = get_punto_venta_by_id(db, id)
+    return repositories.change_punto_venta_status(co, db, status, modified_by)
 
 
 def get_punto_venta_reports(db: Session, proveedor_id: int) -> str:

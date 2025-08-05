@@ -35,6 +35,7 @@ class FleteFormBaseModel(BaseModel):
     # INICIO Cantidad y Flete
     condicion_cantidad: RoundedDecimal
     saldo: Optional[RoundedDecimal]
+    cargado: Optional[RoundedDecimal]
     # inicio - Condiciones para el Gestor de Carga
     condicion_gestor_carga_moneda_id: int
     condicion_gestor_carga_tarifa: RoundedDecimal
@@ -119,6 +120,7 @@ class Flete(FleteFormBaseModel):
     complementos: List[FleteComplemento]
     descuentos: List[FleteDescuento]
     tipo_flete: Optional[TipoFleteEnum] = None
+    is_in_orden_carga: bool
     info: str
     created_by: str
     created_at: Date
@@ -139,6 +141,7 @@ class FleteList(FleteFormBaseModel):
     id: int
     remitente_nombre: str
     producto_descripcion: str
+    is_in_orden_carga: bool
     tipo_carga_descripcion: Optional[str] = None
     publicado_descripcion: str
     estado: EstadoEnum
@@ -150,11 +153,15 @@ class FleteList(FleteFormBaseModel):
     # INICIO Cantidad y Flete
     # inicio - Condiciones para el Gestor de Carga
     condicion_gestor_carga_moneda_nombre: str
+    condicion_gestor_carga_moneda_simbolo: str
     condicion_gestor_carga_unidad_descripcion: str
+    condicion_gestor_carga_unidad_abreviatura: str
     # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda_nombre: str
+    condicion_propietario_moneda_simbolo: str
     condicion_propietario_unidad_descripcion: str
+    condicion_propietario_unidad_abreviatura: str
     condicion_propietario_tarifa_unidad: str
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
@@ -168,6 +175,7 @@ class FleteList(FleteFormBaseModel):
     merma_propietario_moneda_nombre: str
     merma_propietario_unidad_descripcion: str
     merma_propietario_es_porcentual_descripcion: str
+    complementos: List[FleteComplemento]
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
     condicion_cantidad: RoundedDecimal
@@ -181,3 +189,11 @@ class FleteList(FleteFormBaseModel):
     class Config:
         orm_mode = True
         use_enum_values = True
+
+
+class FleteCantidadUpdate(BaseModel):
+    condicion_cantidad: RoundedDecimal
+
+class FleteEditModeUpdate(BaseModel):
+    is_edit: Optional[bool] = None
+

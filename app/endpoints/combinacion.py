@@ -25,7 +25,6 @@ async def read_combinacion_by_camion_id(
     return repositories.get_combinacion_list_by_camion_id(db, camion_id)
 
 
-
 @api.get("/", response_model=List[schemas.CombinacionesBD])
 async def read_combinacion_list(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -34,6 +33,14 @@ async def read_combinacion_list(
 ):
     return services.get_combinacion_list(db, current_user.gestor_carga_id)
 
+
+@api.get("/all", response_model=List[schemas.CombinacionesBD])
+async def read_combinacion_all_list(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.LISTAR, m.COMBINACION)),  # noqa: B008
+):
+    return services.get_combinacion_all_list(db, current_user.gestor_carga_id)
 
 @api.get(
     "/camion/{camion_id}/semi/{semi_id}",
@@ -49,6 +56,16 @@ async def read_combinacion_by_camion_id_and_semi_id(
     return services.get_combinacion_by_camion_id_and_semi_id_(
         db, camion_id, semi_id, current_user.gestor_carga_id
     )
+
+@api.get("/combinacion/orden-carga", response_model=List[schemas.CombinacionesBD])
+@api.get("/combinacion/orden-carga/{chapa}", response_model=List[schemas.CombinacionesBD])
+async def read_combinacion_list(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
+    chapa: Optional[str] = None,
+):
+    return services.get_combinacion_list(db, current_user.gestor_carga_id, chapa)
 
 
 @api.get("/reports")
@@ -84,6 +101,7 @@ async def add_new_combinacion(
         data,
         current_user.username,
         current_user.gestor_carga_id,
+        current_user.id
     )
 
 

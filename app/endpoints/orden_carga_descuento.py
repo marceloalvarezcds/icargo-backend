@@ -26,6 +26,7 @@ async def add_new_orden_carga_descuento(
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA_DESCUENTO)),  # noqa: B008
 ):
+
     return services.create_orden_carga_descuento(
         db,
         data,  # type: ignore

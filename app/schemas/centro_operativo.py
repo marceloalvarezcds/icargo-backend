@@ -21,6 +21,7 @@ class CentroOperativoBaseModel(BaseModel):
     telefono: Optional[str] = None
     email: Optional[str] = None
     pagina_web: Optional[str] = None
+    origen_destino: Optional[str] = None
     latitud: Optional[Decimal] = None
     longitud: Optional[Decimal] = None
     direccion: Optional[str] = None

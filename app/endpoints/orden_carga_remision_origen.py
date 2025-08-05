@@ -5,7 +5,7 @@ from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas, services
-from app.dependencies import Permiso, get_current_user, get_db_session
+from app.dependencies import Permiso, get_current_user, get_db_session, Permisos
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.logger import logger
@@ -99,9 +99,9 @@ async def read_orden_carga_list(
 async def read_orden_carga_list_by_remito(
     nro_remito: Optional[str] = None,
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA_REMISION_ORIGEN)),  # noqa: B008
+    _: bool = Depends(Permisos(a.LISTAR, [m.ORDEN_CARGA_REMISION_ORIGEN, m.ORDEN_CARGA])),  # noqa: B008
 ):
-    
+
     return repositories.get_remision_origen_list_by_nro_remito(
         db, nro_remito
     )

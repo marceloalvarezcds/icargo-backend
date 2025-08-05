@@ -38,6 +38,10 @@ class OrdenCargaForm(BaseModel):
     combinacion_id: Optional[int] = None
     cantidad_nominada: RoundedDecimal
     comentarios: Optional[str] = None
+    condicion_gestor_carga_tarifa_ml: Optional[RoundedDecimal] = None
+    condicion_propietario_tarifa_ml: Optional[RoundedDecimal] = None
+    merma_gestor_carga_valor_ml: Optional[RoundedDecimal] = None
+    merma_propietario_valor_ml: Optional[RoundedDecimal] = None
 
     class Config:
         orm_mode = True
@@ -46,6 +50,8 @@ class OrdenCargaForm(BaseModel):
 class OrdenCargaBaseModel(BaseModel):
     camion_id: Optional[int] = None
     semi_id: Optional[int] = None
+    chofer_id: Optional[int] = None
+    propietario_id: Optional[int] = None
     flete_id: Optional[int] = None
     cantidad_nominada: Optional[RoundedDecimal] = None
     comentarios: Optional[str] = None
@@ -58,21 +64,25 @@ class OrdenCargaBaseModel(BaseModel):
     # inicio - Condiciones para el Gestor de Carga
     condicion_gestor_carga_moneda_id: Optional[int] = None
     condicion_gestor_carga_tarifa: Optional[RoundedDecimal] = None
+    condicion_gestor_carga_tarifa_ml: Optional[RoundedDecimal] = None
     # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda_id: Optional[int] = None
     condicion_propietario_tarifa: Optional[RoundedDecimal] = None
+    condicion_propietario_tarifa_ml: Optional[RoundedDecimal] = None
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
     # inicio - Mermas para el Gestor de Carga
     merma_gestor_carga_valor: Optional[RoundedDecimal] = None
+    merma_gestor_carga_valor_ml: Optional[RoundedDecimal] = None
     merma_gestor_carga_moneda_id: Optional[int] = None
     merma_gestor_carga_es_porcentual: Optional[bool] = False
     merma_gestor_carga_tolerancia: Optional[RoundedDecimal] = None
     # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
     merma_propietario_valor: Optional[RoundedDecimal] = None
+    merma_propietario_valor_ml: Optional[RoundedDecimal] = None
     merma_propietario_moneda_id: Optional[int] = None
     merma_propietario_es_porcentual: Optional[bool] = False
     merma_propietario_tolerancia: Optional[RoundedDecimal] = None
@@ -97,6 +107,8 @@ class OrdenCarga(OrdenCargaBaseModel):
     propietario_documento: Optional[str] = None
     camion_chofer_numero_documento: Optional[str] = None
     camion_chofer_puede_recibir_anticipos: bool
+    is_chofer_condicionado: Optional[bool] = None
+    is_propietario_condicionado: Optional[bool] = None
     camion_limite_cantidad_oc_activas: int
     camion_estado: Optional[str] = None
     camion_limite_monto_anticipos: Optional[RoundedDecimal] = None
@@ -108,6 +120,7 @@ class OrdenCarga(OrdenCargaBaseModel):
     camion_placa: str
     camion_propietario_nombre: str
     camion_propietario_puede_recibir_anticipos: bool
+    combinacion_chofer_puede_recibir_anticipos: bool
     combinacion_propietario_id: Optional[int] = None
     combinacion_chofer_id: Optional[int] = None
     combinacion_chofer_doc: Optional[str] = None
@@ -128,20 +141,26 @@ class OrdenCarga(OrdenCargaBaseModel):
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
     flete_tarifa_unidad_gestor_carga: Optional[str] = None
+    flete_merma_unidad_gestor_carga: Optional[str] = None
+    flete_merma_unidad: Optional[str] = None
     flete_limite_credito: RoundedDecimal
     flete_numero_lote: Optional[str] = None
     flete_monto_efectivo: RoundedDecimal
     flete_monto_efectivo_complemento: RoundedDecimal
+    flete_monto_combustible: Optional[RoundedDecimal] = None
+    flete_monto_lubricante: Optional[RoundedDecimal] = None
     flete_origen_id: Optional[int] = None
     flete_origen_nombre: Optional[str] = None
     flete_producto_descripcion: str
     flete_proyectado: RoundedDecimal
+    flete_proyectado_ml: Optional[RoundedDecimal] = None
     flete_remitente_nombre: str
     flete_remitente_numero_documento: str
     flete_tarifa_unidad_abreviatura: Optional[str] = None
     flete_tarifa: RoundedDecimal
     flete_tipo: Optional[TipoFleteEnum] = None
     flete_saldo: Optional[int] = None
+    flete_tarifa_unidad: Optional[str] = None
     linea_disponible: Optional[int] = None
     gestor_carga_id: int
     gestor_carga_nombre: str
@@ -150,8 +169,11 @@ class OrdenCarga(OrdenCargaBaseModel):
     gestor_carga_moneda_nombre: str
     resultado_gestor_carga_saldo_total: Optional[int] = None
     resultado_propietario_total_anticipos_retirados: Optional[int] = None
-    saldo_efectivo: Optional[int] = None
-    saldo_combustible: Optional[int] = None
+    flete_saldo_efectivo: Optional[RoundedDecimal] = None
+    flete_saldo_combustible: Optional[int] = None
+    flete_saldo_lubricante: Optional[int] = None
+    gestor_carga_moneda_id: Optional[int] = None
+    anticipo_retirado_moneda_insumo_id: Optional[int] = None
     # Historial de Estados
     is_aceptado: bool
     is_cancelado: bool
@@ -174,11 +196,18 @@ class OrdenCarga(OrdenCargaBaseModel):
     # INICIO Cantidad y Flete
     # inicio - Condiciones para el Gestor de Carga
     condicion_gestor_cuenta_tarifa: Optional[int] = None
+    condicion_gestor_carga_tarifa_ml: Optional[int] = None
     condicion_gestor_carga_moneda: Optional[Moneda] = None
+    condicion_gestor_moneda_simbolo: Optional[str] = None
+    condicion_gestor_carga_moneda_id: Optional[int] = None
     # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda: Optional[Moneda] = None
     condicion_propietario_tarifa: Optional[int] = None
+    condicion_propietario_tarifa_ml: Optional[RoundedDecimal] = None
+    condicion_propietario_moneda_simbolo: Optional[str] = None
+    condicion_propietario_moneda_id: Optional[int] = None
+
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
@@ -187,12 +216,14 @@ class OrdenCarga(OrdenCargaBaseModel):
     merma_gestor_carga_es_porcentual_descripcion: str
     merma_gestor_carga_tolerancia: Optional[int] = None
     merma_gestor_carga_valor: Optional[int] = None
+    merma_gestor_carga_valor_ml: Optional[RoundedDecimal] = None
     # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
     merma_propietario_moneda: Optional[Moneda] = None
     merma_propietario_es_porcentual_descripcion: str
     merma_propietario_tolerancia: Optional[int] = None
     merma_propietario_valor: Optional[int] = None
+    merma_propietario_valor_ml: Optional[RoundedDecimal] = None
     # fin - Mermas para el Propietario
     # FIN Mermas de Fletes
     # Relaciones Listas
@@ -222,10 +253,13 @@ class OrdenCarga(OrdenCargaBaseModel):
     resultado_propietario_total_anticipos_retirados_combustible:  Optional[RoundedDecimal] = None
     resultado_propietario_total_anticipos_retirados_efectivo:  Optional[RoundedDecimal] = None
     resultado_propietario_total_anticipos_retirados_lubricantes:  Optional[RoundedDecimal] = None
+    resultado_propietario_tarifa_flete_ml:  Optional[RoundedDecimal] = None
     tipo_evaluacion_id: Optional[int] = None
     total_anticipo_efectivo:  Optional[int] = None
     total_anticipo_combustible:  Optional[int] = None
     total_anticipo_lubricantes:  Optional[int] = None
+    resultado_gestor_carga_merma_valor_total_moneda_local: Optional[RoundedDecimal]= None
+    monto_anticipo: Optional[RoundedDecimal]= None
     # Auditoría
     created_by: str
     created_at: Date
@@ -262,6 +296,8 @@ class OrdenCargaList(OrdenCargaForm):
     combinacion_chofer_nombre: Optional[str] = None
     combinacion_chofer_doc: Optional[str] = None
     # Datos de fletes
+    condicion_propietario_moneda_simbolo: Optional[str] = None
+    condicion_gestor_moneda_simbolo: Optional[str] = None
     flete_destino_nombre: Optional[str] = None
     flete_gestor_carga_id: int
     flete_gestor_carga_nombre: str
@@ -272,6 +308,7 @@ class OrdenCargaList(OrdenCargaForm):
     flete_remitente_numero_documento: str
     flete_tipo: Optional[TipoFleteEnum] = None
     flete_tarifa_unidad_abreviatura: Optional[str] = None
+    flete_tarifa_unidad_propietario: Optional[str] = None
     monto_anticipo_retirado:  Optional[RoundedDecimal] = None
     flete_saldo: Optional[int] = None
     resultado_flete_gestor_carga_merma_valor: Optional[int] = None
@@ -293,15 +330,18 @@ class OrdenCargaList(OrdenCargaForm):
     resultado_propietario_total_anticipos_retirados_efectivo: Optional[int] = None
     resultado_propietario_total_anticipos_retirados_combustible: Optional[int] = None
     resultado_propietario_total_anticipos_retirados_lubricantes: Optional[int] = None
+    resultado_propietario_total_anticipos_retirados_ml: Optional[int] = None
     is_anulado: bool
     resultado_saldo_combustible: Optional[int] = None
-    saldo_efectivo: Optional[int] = None
     saldo_combustible: Optional[int] = None
+    saldo_efectivo: Optional[RoundedDecimal] = None
+    monto_anticipo: Optional[RoundedDecimal]= None
     # INICIO Tramo de OC
     origen_id: Optional[int] = None
     origen_nombre: Optional[str] = None
     destino_id: Optional[int] = None
     destino_nombre: Optional[str] = None
+    anticipo_retirado_moneda_insumo_id: Optional[int] = None
     # FIN Tramo de OC
     cantidad_destino: RoundedDecimal
     cantidad_origen: RoundedDecimal
@@ -340,3 +380,22 @@ class OrdenCargaUpdateForm(BaseModel):
 
 class OrdenCargaUpdateFecha(BaseModel):
     created_at: Optional[Date] = None
+
+
+class RecalculoCondicionesResponse(BaseModel):
+    condicion_gestor_carga_tarifa_ml: float
+    condicion_propietario_tarifa_ml: float
+    merma_gestor_carga_valor_ml: float
+    merma_propietario_valor_ml: float
+    flete_cargado: Optional[float] = None
+
+
+class AnticiposPorOrdenCarga(BaseModel):
+    id: int
+    chofer_id: Optional[int] = None
+    propietario_id: Optional[int] = None
+    combinacion_chofer_puede_recibir_anticipos: Optional[bool] = None
+    camion_propietario_puede_recibir_anticipos: Optional[bool] = None
+
+    class Config:
+        orm_mode = True

@@ -10,7 +10,7 @@ from app.models import GestorCargaProveedor, Proveedor, PuntoVenta
 from app.models.insumo_punto_venta import InsumoPuntoVenta
 from app.models.insumo_punto_venta_precio import InsumoPuntoVentaPrecio
 from app.schemas import PuntoVentaForm
-
+from fastapi import HTTPException, status as http_status
 
 def get_punto_venta_list(db: Session, proveedor_id: int) -> List[PuntoVenta]:
     return (
@@ -73,6 +73,7 @@ def get_punto_venta_by(
     db: Session,
     tipo_documento_id: int,
     numero_documento: str,
+    numero_sucursal: str,
 ) -> Optional[PuntoVenta]:
     return (
         db.query(PuntoVenta)
@@ -80,9 +81,29 @@ def get_punto_venta_by(
             and_(
                 PuntoVenta.numero_documento == numero_documento,
                 PuntoVenta.tipo_documento_id == tipo_documento_id,
+                PuntoVenta.numero_sucursal == numero_sucursal,
             )
         )
         .first()
+    )
+
+
+def get_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[PuntoVenta]:
+    return (
+        db.query(PuntoVenta)
+        .join(Proveedor)
+        .join(GestorCargaProveedor)
+        .filter(
+            and_(
+                GestorCargaProveedor.gestor_carga_id == gestor_carga_id,
+                PuntoVenta.estado != EstadoEnum.ELIMINADO.value,
+                PuntoVenta.puede_recibir_anticipos_efectivo.is_(True)
+            )
+        )
+        .order_by(PuntoVenta.id.desc())
+        .all()
     )
 
 
@@ -116,6 +137,7 @@ def create_punto_venta(
         ciudad_id=data.ciudad_id,
         modified_by=modified_by,
         numero_sucursal=data.numero_sucursal,
+        puede_recibir_anticipos_efectivo=data.puede_recibir_anticipos_efectivo,
         created_by = modified_by,
     )
     db.add(obj)
@@ -149,6 +171,7 @@ def edit_punto_venta(
     obj.estado = data.estado
     obj.modified_by = modified_by
     obj.numero_sucursal = data.numero_sucursal
+    obj.puede_recibir_anticipos_efectivo = data.puede_recibir_anticipos_efectivo
     obj.modified_at = datetime.now()
     if logo_url:
         obj.logo = logo_url
@@ -185,3 +208,26 @@ def get_punto_venta_by_proveedor_sucursal(
         )
         .first()
     )
+
+
+def change_punto_venta_status(
+    obj: PuntoVenta,
+    db: Session,
+    status: EstadoEnum,
+    modified_by: str,
+) -> PuntoVenta:
+    if status == EstadoEnum.ACTIVO:
+        proveedor = obj.proveedor
+        if proveedor.estado != EstadoEnum.ACTIVO.value:
+            raise HTTPException(
+                status_code=http_status.HTTP_400_BAD_REQUEST,
+                detail="No se puede activar el Punto de Venta porque el Proveedor relacionado está inactivo."
+            )
+
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
+

@@ -35,6 +35,43 @@ def get_centro_operativo_list_by_gestor_cuenta_id(
         .all()
     )
 
+def get_centro_operativo_list_origen_ambos(
+    db: Session, gestor_cuenta_id: Optional[int]
+) -> List[CentroOperativo]:
+    return (
+        db.query(CentroOperativo)
+        .filter(
+            and_(
+                CentroOperativo.estado != EstadoEnum.ELIMINADO.value,
+                CentroOperativo.gestores.any(
+                    GestorCargaCentroOperativo.gestor_carga_id == gestor_cuenta_id
+                ),
+                CentroOperativo.origen_destino.in_(["ORIGEN", "ORIGEN|DESTINO"]),
+            )
+        )
+        .order_by(CentroOperativo.id.desc())
+        .all()
+    )
+
+
+def get_centro_operativo_list_destino_ambos(
+    db: Session, gestor_cuenta_id: Optional[int]
+) -> List[CentroOperativo]:
+    return (
+        db.query(CentroOperativo)
+        .filter(
+            and_(
+                CentroOperativo.estado != EstadoEnum.ELIMINADO.value,
+                CentroOperativo.gestores.any(
+                    GestorCargaCentroOperativo.gestor_carga_id == gestor_cuenta_id
+                ),
+                CentroOperativo.origen_destino.in_(["DESTINO", "ORIGEN|DESTINO"]),
+            )
+        )
+        .order_by(CentroOperativo.id.desc())
+        .all()
+    )
+
 
 def get_centro_operativo_by(
     db: Session, nombre: str, clasificacion_id: int, ciudad_id: Optional[int]
@@ -71,6 +108,7 @@ def create_centro_operativo(
         email=data.email,
         pagina_web=data.pagina_web,
         direccion=data.direccion,
+        origen_destino=data.origen_destino,
         latitud=data.latitud,
         longitud=data.longitud,
         clasificacion_id=data.clasificacion_id,
@@ -97,6 +135,7 @@ def edit_centro_operativo(
     obj.email = data.email
     obj.pagina_web = data.pagina_web
     obj.direccion = data.direccion
+    obj.origen_destino = data.origen_destino
     obj.latitud = data.latitud
     obj.longitud = data.longitud
     obj.clasificacion_id = data.clasificacion_id
@@ -117,6 +156,19 @@ def delete_centro_operativo(
     modified_by: str,
 ) -> CentroOperativo:
     obj.estado = EstadoEnum.ELIMINADO.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+def change_centro_operativo_status(
+    obj: CentroOperativo,
+    db: Session,
+    status: EstadoEnum,
+    modified_by: str,
+) -> CentroOperativo:
+    obj.estado = status.value
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()

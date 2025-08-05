@@ -14,6 +14,28 @@ def get_flete_anticipo_efectivo(
             return item
     return None
 
+def get_flete_anticipo_combustible(
+    flete_anticipo_list: List[FleteAnticipo],
+) -> Optional[FleteAnticipo]:
+    for item in flete_anticipo_list:
+        if (
+            item.tipo_descripcion == TipoAnticipoEnum.INSUMOS.value
+            and item.concepto == "COMBUSTIBLE"  
+        ):
+            return item
+    return None
+
+def get_flete_anticipo_lubricante(
+    flete_anticipo_list: List[FleteAnticipo],
+) -> Optional[FleteAnticipo]:
+    for item in flete_anticipo_list:
+        if (
+            item.tipo_descripcion == TipoAnticipoEnum.INSUMOS.value
+            and item.concepto == "LUBRICANTES"  
+        ):
+            return item
+    return None
+
 
 def get_flete_anticipo_by_tipo_insumo_descripcion(
     flete_anticipo_list: List[FleteAnticipo],

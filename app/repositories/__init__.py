@@ -58,6 +58,9 @@ from .centro_operativo import (  # noqa
     get_centro_operativo_by_id,
     get_centro_operativo_list,
     get_centro_operativo_list_by_gestor_cuenta_id,
+    change_centro_operativo_status,
+    get_centro_operativo_list_origen_ambos,
+    get_centro_operativo_list_destino_ambos,
 )
 from .centro_operativo_clasificacion import (  # noqa
     get_centro_operativo_clasificacion_by_nombre,
@@ -110,6 +113,10 @@ from .contraparte import (  # noqa
     get_contraparte_by_contraparte_and_tipo_contraparte_id,
     get_contraparte_list_by_tipo_contraparte_id,
 )
+
+from .comentarios_flota import (  # noqa
+    create_comentario_flota, get_comentarios_flota_by_entidad_and_gestor, get_comentarios_flota_by_entidad
+)
 from .ente_emisor_automotor import (  # noqa
     get_ente_emisor_automotor_by_descripcion,
     get_ente_emisor_automotor_list,
@@ -128,7 +135,7 @@ from .estado_cuenta import (  # noqa
     get_saldo_cuenta_contraparte,
     get_estado_cuenta_pdv_list,
     get_estado_cuenta_pdv,
-
+    get_max_date_cotizacion
 )
 from .factura import (  # noqa
     change_factura_status,
@@ -158,6 +165,7 @@ from .flete_anticipo import (  # noqa
     get_flete_anticipo_by,
     get_flete_anticipo_by_id,
     get_flete_anticipo_list_by_flete_id,
+    get_flete_anticipo_by_flete_id,
 )
 from .flete_complemento import (  # noqa
     create_flete_complemento,
@@ -180,6 +188,7 @@ from .gestor_carga import (  # noqa
     get_gestor_carga_by,
     get_gestor_carga_by_id,
     get_gestor_carga_list,
+    change_gestor_carga_status,
 )
 from .gestor_carga_centro_operativo import (  # noqa
     create_gestor_carga_centro_operativo,
@@ -350,6 +359,11 @@ from .orden_carga_anticipo_retirado import (  # noqa
     get_movimiento_by_anticipo_id,
     get_movimiento_by_anticipo_id_and_id,
     get_saldo_by_flete_anticipo_id_and_orden_carga_id,
+    get_camion_by_orden_carga_id,
+    get_orden_carga_anticipo_retirado_list_by_gestor_carga_id,
+    get_orden_carga_anticipo_retirado_list,
+    get_flete_anticipo_anterior_con_retiro,
+    get_total_anticipo_retirado_by_orden_carga_id
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     create_orden_carga_anticipo_saldo,
@@ -366,6 +380,7 @@ from .orden_carga_complemento import (  # noqa
     delete_orden_carga_complemento,
     edit_orden_carga_complemento,
     get_orden_carga_complemento_by_id,
+    update_or_create_orden_carga_complemento_by_flete
 )
 from .orden_carga_complemento_flete import (  # noqa
     create_orden_carga_complemento_by_flete,
@@ -375,6 +390,7 @@ from .orden_carga_descuento import (  # noqa
     delete_orden_carga_descuento,
     edit_orden_carga_descuento,
     get_orden_carga_descuento_by_id,
+    update_or_create_orden_carga_descuento_by_flete,
 )
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete  # noqa
 from .orden_carga_estado_historial import create_orden_carga_estado_historial  # noqa
@@ -382,6 +398,7 @@ from .orden_carga_comentarios_historial import create_orden_carga_comentarios_hi
 from .orden_carga_evaluacion import (  # noqa
     get_orden_carga_evaluaciones_historial_by_id,
     create_orden_carga_evaluacion,
+    get_evaluacion_list,
 )
 
 from .orden_carga_remision_destino import (  # noqa
@@ -446,6 +463,7 @@ from .proveedor import (  # noqa
     get_proveedor_by_id,
     get_proveedor_list,
     get_proveedor_list_by_gestor_cuenta_id,
+    change_proveedor_status,
 )
 from .proveedor_contacto_gestor_carga import (  # noqa
     create_proveedor_contacto_gestor_carga,
@@ -464,7 +482,9 @@ from .punto_venta import (  # noqa
     get_punto_venta_list,
     get_punto_venta_list_by_gestor_carga_id,
     get_punto_venta_list_with_active_prices_by_gestor_carga_id,
-    get_punto_venta_by_proveedor_sucursal
+    get_punto_venta_by_proveedor_sucursal,
+    get_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo,
+    change_punto_venta_status
 )
 from .punto_venta_contacto_gestor_carga import (  # noqa
     create_punto_venta_contacto_gestor_carga,
@@ -482,7 +502,8 @@ from .remitente import (  # noqa
     get_remitente_by_id,
     get_remitente_list,
     get_remitente_list_by_gestor_cuenta_id,
-    get_remitente_list_activo
+    get_remitente_list_activo,
+    change_remitente_status,
 )
 from .remitente_contacto_gestor_carga import (  # noqa
     create_remitente_contacto_gestor_carga,
@@ -571,7 +592,7 @@ from .tipo_registro import (  # noqa
     get_tipo_registro_list,
 )
 from .tipo_semi import get_tipo_semi_by_descripcion, get_tipo_semi_list  # noqa
-from .unidad import get_unidad_by_descripcion, get_unidad_list  # noqa
+from .unidad import get_unidad_by_descripcion, get_unidad_list, get_unidad_by_id  # noqa
 from .user import (  # noqa
     exists_user_for_rol_id,
     get_user_by_id,
@@ -601,6 +622,7 @@ from .combinacion import(
     get_combinacion_tracto_ids,
     get_combinacion_list_by_camion_id,
     get_combinaciones_relacionadas,
+    get_combinacion_all_list_by_gestor_carga_id,
 )
 
 from .provision import ( # noqa
@@ -608,3 +630,10 @@ from .provision import ( # noqa
     create_provision,
     get_query_provisiones_by_contraparte_and_gestor_carga_id,
 ) # noqa
+
+from .moneda_cotizacion import (
+    get_moneda_cotizacion_by_id,
+    get_max_date_cotizacio_by_origen_destino,
+    get_ultima_cotizacion,
+    get_moneda_cotizacion_list_by_gestor_carga_id
+)

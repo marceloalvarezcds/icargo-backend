@@ -42,6 +42,7 @@ class FleteComplemento(AuditMixin, Base):
     anticipado = Column(Boolean, server_default=text("false"))
     # INICIO Monto a pagar al Propietario
     propietario_monto = Column(Numeric(38, 10))
+    propietario_monto_ml = Column(Numeric(38, 10)) #Calculo moneda local
     propietario_moneda_id = Column(Integer, ForeignKey("moneda.id"))
     propietario_moneda = relationship(
         Moneda, uselist=False, foreign_keys=[propietario_moneda_id]
@@ -49,6 +50,7 @@ class FleteComplemento(AuditMixin, Base):
     # FIN Monto a pagar al Propietario
     # INICIO Monto a cobrar al Remitente
     remitente_monto = Column(Numeric(38, 10))
+    remitente_monto_ml = Column(Numeric(38, 10)) #Calculo moneda local
     remitente_moneda_id = Column(Integer, ForeignKey("moneda.id"))
     remitente_moneda = relationship(
         Moneda, uselist=False, foreign_keys=[remitente_moneda_id]
@@ -68,3 +70,15 @@ class FleteComplemento(AuditMixin, Base):
     @hybrid_property
     def remitente_moneda_nombre(self):
         return self.remitente_moneda.nombre
+
+    @hybrid_property
+    def propietario_moneda_simbolo(self):
+        return self.propietario_moneda.simbolo
+
+    @hybrid_property
+    def remitente_moneda_simbolo(self):
+        return self.remitente_moneda.simbolo
+
+    @hybrid_property
+    def gestor_carga_moneda_simbolo(self):
+        return self.flete.gestor_carga_moneda_simbolo

@@ -1,6 +1,7 @@
 import os
 from typing import List, Optional, cast
 
+from app.models.combinacion import Combinacion
 from app.models.tipo_persona import TipoPersona
 from fastapi import HTTPException, UploadFile  # type: ignore
 from openpyxl import Workbook  # type: ignore
@@ -40,6 +41,7 @@ async def create_propietario(
     foto_registro_reverso_file: Optional[UploadFile],
     gestor_cuenta_id: Optional[int],
     modified_by: str,
+    usuario_id: int,
 ) -> schemas.Propietario:
     if repositories.get_propietario_by(db, data.composicion_juridica_id, data.ruc):
         raise HTTPException(
@@ -77,6 +79,7 @@ async def create_propietario(
         foto_perfil_url,
         chofer,
         modified_by,
+        usuario_id
     )
     update_propietario_contacto_list(
         db, data.contactos, obj, gestor_cuenta_id, modified_by
@@ -94,7 +97,6 @@ def get_propietario_by_id(db: Session, id: int) -> Propietario:
 
 def get_propietario_list_by_id(db: Session, propietario_id: int):
     return db.query(Propietario).filter(Propietario.id == propietario_id).all()
-
 
 
 def get_propietario_by_id_and_gestor_cuenta_id(
@@ -116,8 +118,10 @@ def get_propietario_list_by_gestor_cuenta_and_camion_id(
         lista.append(propietario)
     return lista
 
+
 def get_tipo_persona_by_id(db: Session, id: int) -> Optional[TipoPersona]:
     return db.query(TipoPersona).filter(TipoPersona.id == id).first()
+
 
 def get_propietario_list_by_gestor_cuenta_and_semi_id(
     db: Session, semi_id: int, gestor_cuenta_id: Optional[int]
@@ -213,7 +217,6 @@ def delete_propietario(
     return get_propietario_detail(db, obj, gestor_cuenta_id)
 
 
-
 def change_propietario_status(
     db: Session, id: int, status: EstadoEnum, modified_by: str
 ) -> schemas.Propietario:
@@ -226,23 +229,35 @@ def change_propietario_status(
     if status == EstadoEnum.INACTIVO:
         combinaciones_relacionadas = repositories.get_combinaciones_by_propietario_id(db, propietario.id)
 
-        # Inactivar cada combinación asociada
         for combinacion in combinaciones_relacionadas:
             repositories.change_combinacion_status(combinacion, db, EstadoEnum.INACTIVO, modified_by)
 
     elif status == EstadoEnum.ACTIVO:
-        # Obtener todas las combinaciones relacionadas con este propietario
         combinaciones_relacionadas = repositories.get_combinaciones_by_propietario_id(db, propietario.id)
 
-        # Activar cada combinación asociada
         for combinacion in combinaciones_relacionadas:
-            repositories.change_combinacion_status(combinacion, db, EstadoEnum.ACTIVO, modified_by)
+            # Verificar si ya hay otra combinación activa con el mismo tracto y propietario
+            combinacion_conflictiva = db.query(Combinacion).filter(
+                Combinacion.id != combinacion.id,
+                Combinacion.camion_id == combinacion.camion_id,
+                Combinacion.propietario_id == propietario.id,
+                Combinacion.estado != EstadoEnum.INACTIVO.value
+            ).first()
 
-    # Confirmar los cambios en la base de datos
+            # Verificar que todos los elementos estén activos
+            elementos_activos = (
+                combinacion.camion.estado == EstadoEnum.ACTIVO.value and
+                combinacion.semi.estado == EstadoEnum.ACTIVO.value and
+                combinacion.chofer.estado == EstadoEnum.ACTIVO.value and
+                propietario.estado == EstadoEnum.ACTIVO.value
+            )
+
+            if not combinacion_conflictiva and elementos_activos:
+                repositories.change_combinacion_status(combinacion, db, EstadoEnum.ACTIVO, modified_by)
+            # Si hay conflicto o elementos inactivos, simplemente no se activa
+
     db.commit()
-
     return schemas.Propietario.from_orm(propietario)
-
 
 
 def get_propietario_reports(db: Session) -> str:

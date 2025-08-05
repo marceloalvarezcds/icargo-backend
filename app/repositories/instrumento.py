@@ -26,6 +26,8 @@ def get_instrumento_list_by_liquidacion_id(
         .filter(
             and_(
                 Instrumento.estado != EstadoEnum.ELIMINADO.value,
+                Instrumento.estado != EstadoEnum.ANULADO.value,
+                Instrumento.operacion_estado == OperacionEstadoEnum.CONFIRMADO.value,
                 Instrumento.liquidacion_id == liquidacion_id,
             )
         )
@@ -43,6 +45,10 @@ def create_instrumento(
     data: InstrumentoSaldoForm,
     modified_by: str,
 ) -> Instrumento:
+    #monto_ml = (
+        #(data.credito + (data.debito*-1)) * data.tipo_cambio_moneda if (data.caja_id) else
+        #(data.provision) * data.tipo_cambio_moneda
+    #)
     obj = Instrumento(
         via_id=data.via_id,
         caja_id=data.caja_id,
@@ -63,8 +69,11 @@ def create_instrumento(
         # Solo para cheque
         cheque_es_diferido=data.cheque_es_diferido,
         cheque_fecha_vencimiento=data.cheque_fecha_vencimiento,
+        tipo_cambio_moneda=data.tipo_cambio_moneda,
+        moneda_id=data.moneda_id,
         created_by=modified_by,
         modified_by=modified_by,
+        monto_ml=data.monto_ml
     )
     db.add(obj)
     db.commit()

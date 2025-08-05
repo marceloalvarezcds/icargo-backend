@@ -1,15 +1,44 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import func  # type: ignore
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
 
 from app.enums import EstadoEnum
-from app.models import Movimiento, OrdenCarga, OrdenCargaAnticipoRetirado
+from app.models import Movimiento, OrdenCarga, OrdenCargaAnticipoRetirado, Camion
+from app.models.flete_anticipo import FleteAnticipo
 from app.models.orden_carga_anticipo_saldo import OrdenCargaAnticipoSaldo
 from app.schemas import OrdenCargaAnticipoRetiradoForm
+from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
+
+
+def get_orden_carga_anticipo_retirado_list(db: Session) -> List[OrdenCargaAnticipoRetirado]:
+    return (
+        db.query(OrdenCargaAnticipoRetirado)
+        .filter(OrdenCargaAnticipoRetirado.estado_movimiento != EstadoEnum.ELIMINADO.value)
+        .order_by(desc(OrdenCargaAnticipoRetirado.id))
+        .all()
+    )
+
+
+def get_orden_carga_anticipo_retirado_list_by_gestor_carga_id(
+    db: Session, gestor_carga_id: Optional[int]
+) -> List[OrdenCargaAnticipoRetirado]:
+    return (
+        db.query(OrdenCargaAnticipoRetirado)
+        .join(OrdenCarga)  # Esto es necesario
+        .filter(
+            and_(
+                OrdenCarga.gestor_carga_id == gestor_carga_id,
+            )
+        )
+        .options(joinedload(OrdenCargaAnticipoRetirado.orden_carga))
+        .order_by(desc(OrdenCargaAnticipoRetirado.id))
+        .all()
+    )
 
 
 def get_orden_carga_anticipo_retirado_by(
@@ -58,6 +87,7 @@ def create_orden_carga_anticipo_retirado(
         numero_comprobante=data.numero_comprobante,
         moneda_id=data.moneda_id,
         monto_retirado=data.monto_retirado,
+        monto_mon_local=data.monto_mon_local,
         observacion=data.observacion,
         insumo_punto_venta_precio_id=data.insumo_punto_venta_precio_id,
         unidad_id=data.unidad_id,
@@ -66,6 +96,7 @@ def create_orden_carga_anticipo_retirado(
         created_by=modified_by,
         modified_by=modified_by,
     )
+
     db.add(obj)
     db.commit()
     db.refresh(obj)
@@ -114,27 +145,30 @@ def change_anticipo_status(
     status: EstadoEnum,
     modified_by: str,
 ) -> OrdenCargaAnticipoRetirado:
-    # Obtener el movimiento relacionado con la orden de carga
-    movimiento = get_movimiento_by_anticipo_id(db, obj.id)  # Obtiene el movimiento por el ID del anticipo
-    if movimiento:
-        # Actualizar el estado del movimiento
-        movimiento.estado = status.value
-        movimiento.modified_by = modified_by
-        movimiento.modified_at = datetime.now()
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
 
-        # Guardar los cambios en el movimiento
-        db.commit()
-        db.refresh(movimiento)  # Refrescar el objeto movimiento para obtener los últimos cambios
+    db.commit()
+    db.refresh(obj)
 
     return obj
 
+
+def get_camion_by_orden_carga_id(db: Session, orden_carga_id: int):
+    return (
+        db.query(Camion)
+        .join(OrdenCarga, Camion.id == OrdenCarga.camion_id)
+        .filter(OrdenCarga.id == orden_carga_id)
+        .first()
+    )
 
 def get_anticipo_by_id(db: Session, id: int) -> OrdenCargaAnticipoRetirado:
     return db.query(OrdenCargaAnticipoRetirado).filter(OrdenCargaAnticipoRetirado.id == id).first()
 
 
 def get_movimiento_by_anticipo_id(db: Session, anticipo_id: int):
-    return db.query(Movimiento).filter(Movimiento.anticipo_id == anticipo_id).first()
+    return db.query(Movimiento).filter(Movimiento.anticipo_id == anticipo_id).all()
 
 
 def get_movimiento_by_anticipo_id_and_id(db: Session, anticipo_id: int, id: int):
@@ -163,7 +197,7 @@ def get_total_anticipo_retirado_by_camion_id(
     subquery: Query = (
         db.query(
             OrdenCargaAnticipoRetirado.id.label("id"),
-            OrdenCargaAnticipoRetirado.monto_retirado.label("monto_retirado"),
+            OrdenCargaAnticipoRetirado.monto_mon_local.label("monto_mon_local"),
         )
         .distinct()
         # .select_from(Movimiento)
@@ -182,5 +216,37 @@ def get_total_anticipo_retirado_by_camion_id(
         .subquery()
     )
     return db.query(
-        func.sum(subquery.c.monto_retirado).label("monto_retirado")
+        func.sum(subquery.c.monto_mon_local).label("monto_mon_local")
     ).first()[0]
+
+
+def get_flete_anticipo_anterior_con_retiro(
+    db: Session,
+    orden_carga_id: int,
+    exclude_flete_anticipo_id: Optional[int] = None,
+) -> Optional[FleteAnticipo]:
+    """
+    Busca un flete anticipo anterior que haya tenido retiros en esta orden de carga.
+    Opcionalmente excluye un ID.
+    """
+    subquery = (
+        db.query(OrdenCargaAnticipoRetirado.flete_anticipo_id)
+        .filter(OrdenCargaAnticipoRetirado.orden_carga_id == orden_carga_id)
+        .group_by(OrdenCargaAnticipoRetirado.flete_anticipo_id)
+        .having(func.sum(OrdenCargaAnticipoRetirado.monto_retirado) > 0)
+        .subquery()
+    )
+
+    query = db.query(FleteAnticipo).filter(FleteAnticipo.id.in_(subquery))
+    if exclude_flete_anticipo_id:
+        query = query.filter(FleteAnticipo.id != exclude_flete_anticipo_id)
+
+    return query.first()
+
+def get_total_anticipo_retirado_by_orden_carga_id(db: Session, orden_carga_id: int) -> Decimal:
+    total_retirado = (
+        db.query(func.coalesce(func.sum(OrdenCargaAnticipoRetirado.monto_retirado), 0))
+        .filter(OrdenCargaAnticipoRetirado.orden_carga_id == orden_carga_id)
+        .scalar()
+    )
+    return total_retirado if total_retirado is not None else Decimal(0)

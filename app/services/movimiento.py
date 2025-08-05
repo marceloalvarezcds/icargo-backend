@@ -1,5 +1,6 @@
 import os
 from typing import Union
+from app.models.moneda_cotizacion import MonedaCotizacion
 from app.schemas.movimiento import EstadoCuentaMovimiento
 from datetime import datetime
 from http import HTTPStatus
@@ -19,6 +20,7 @@ from app.enums import (
     TipoMovimientoEnum,
     TipoAnticipoEnum,
     TipoInsumoEnum,
+    EstadoEnum,
 )
 from app.models import (
     Moneda,
@@ -35,6 +37,7 @@ from app.models import (
     Remitente,
     Factura,
     PuntoVenta,
+    Liquidacion
 )
 from app.schemas import MovimientoFleteEditForm, MovimientoForm, MovimientoMermaEditForm, FacturaForm
 from app.schemas.date_model import Date
@@ -134,7 +137,7 @@ def create_movimiento(
     modified_by: str,
 ) -> Optional[Movimiento]:
     # Movimiento no puede tener monto 0
-    if int(data.monto) != 0:
+    if data.monto != 0:
         gestor_id = gestor_carga_id if gestor_carga_id else data.gestor_carga_id
         if not gestor_id:
             raise HTTPException(
@@ -182,6 +185,13 @@ def create_movimiento_by_anticipo(
             status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
+    # Cotización de la moneda
+    cotizacion_moneda_origen = db.query(MonedaCotizacion.cotizacion_moneda).filter(
+        MonedaCotizacion.moneda_origen_id == anticipo.moneda_id
+    ).order_by(MonedaCotizacion.fecha.desc()).first()
+
+    tipo_cambio_moneda = cotizacion_moneda_origen[0] if cotizacion_moneda_origen else 1
+
     create_movimiento(
         db,
         MovimientoForm(
@@ -196,8 +206,9 @@ def create_movimiento_by_anticipo(
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=anticipo.detalle,
             monto=anticipo.monto_retirado,
+            monto_mon_local=anticipo.monto_mon_local,
             moneda_id=anticipo.moneda_id,
-            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+            tipo_cambio_moneda=tipo_cambio_moneda,
             fecha_cambio_moneda=datetime.now(),
             anticipo_id=anticipo.id,
             proveedor_id=anticipo.punto_venta.proveedor_id,
@@ -222,8 +233,9 @@ def create_movimiento_by_anticipo(
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=anticipo.detalle,
             monto=-anticipo.monto_retirado,
+            monto_mon_local=-anticipo.monto_mon_local,
             moneda_id=anticipo.moneda_id,
-            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en anticipos  # noqa
+            tipo_cambio_moneda=tipo_cambio_moneda,
             fecha_cambio_moneda=datetime.now(),
             anticipo_id=anticipo.id,
             propietario_id=anticipo.orden_carga.propietario_id,
@@ -267,6 +279,19 @@ def create_movimiento_by_flete(
             status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
+    # Cotización de la moneda gestor
+    cotizacion_moneda_origen_gestor = db.query(MonedaCotizacion.cotizacion_moneda).filter(
+        MonedaCotizacion.moneda_origen_id == orden_carga.flete.condicion_gestor_carga_moneda_id
+    ).order_by(MonedaCotizacion.fecha.desc()).first()
+
+    tipo_cambio_moneda_gestor = cotizacion_moneda_origen_gestor[0] if cotizacion_moneda_origen_gestor else 1
+
+    # Cotización de la moneda propietario
+    cotizacion_moneda_origen = db.query(MonedaCotizacion.cotizacion_moneda).filter(
+        MonedaCotizacion.moneda_origen_id == orden_carga.flete.condicion_propietario_moneda_id
+    ).order_by(MonedaCotizacion.fecha.desc()).first()
+
+    tipo_cambio_moneda = cotizacion_moneda_origen[0] if cotizacion_moneda_origen else 1
     create_movimiento(
         db,
         MovimientoForm(
@@ -280,9 +305,9 @@ def create_movimiento_by_flete(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.flete_gestor_carga_detalle,
-            monto=-orden_carga.resultado_gestor_carga_total_flete,
-            moneda_id=orden_carga.flete.condicion_gestor_cuenta_moneda_id,
-            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
+            monto=-orden_carga.resultado_gestor_carga_total_flete_oc / orden_carga.flete_tarifa_unidad_conversion_gestor,
+            moneda_id=orden_carga.flete.condicion_gestor_carga_moneda_id,
+            tipo_cambio_moneda=tipo_cambio_moneda_gestor,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             remitente_id=orden_carga.flete.remitente_id,
             tipo_movimiento_info=tipo_movimiento.descripcion,
@@ -304,9 +329,9 @@ def create_movimiento_by_flete(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.flete_propietario_detalle,
-            monto=orden_carga.resultado_propietario_total_flete,
+            monto=orden_carga.resultado_propietario_total_flete_oc / orden_carga.flete_tarifa_unidad_conversion_propietario,
             moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
-            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
+            tipo_cambio_moneda=tipo_cambio_moneda,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             propietario_id=orden_carga.propietario_id,
             tipo_movimiento_info=tipo_movimiento.descripcion,
@@ -349,6 +374,21 @@ def create_movimiento_by_complemento(
             status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
+
+    # Cotización de la moneda remitente
+    cotizacion_moneda_origen = db.query(MonedaCotizacion.cotizacion_moneda).filter(
+        MonedaCotizacion.moneda_origen_id == complemento.remitente_moneda_id
+    ).order_by(MonedaCotizacion.fecha.desc()).first()
+
+    tipo_cambio_moneda_remitente = cotizacion_moneda_origen[0] if cotizacion_moneda_origen else 1
+
+     # Cotización de la moneda propietario
+    cotizacion_moneda_origen_propietario = db.query(MonedaCotizacion.cotizacion_moneda).filter(
+        MonedaCotizacion.moneda_origen_id == complemento.propietario_moneda_id
+    ).order_by(MonedaCotizacion.fecha.desc()).first()
+
+    tipo_cambio_moneda_propietario = cotizacion_moneda_origen_propietario[0] if cotizacion_moneda_origen_propietario else 1
+
     if complemento.habilitar_cobro_remitente:
         create_movimiento(
             db,
@@ -365,7 +405,7 @@ def create_movimiento_by_complemento(
                 detalle=complemento.remitente_detalle,
                 monto=-complemento.remitente_monto,
                 moneda_id=complemento.remitente_moneda_id,
-                tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Complemento  # noqa
+                tipo_cambio_moneda=tipo_cambio_moneda_remitente,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Complemento  # noqa
                 fecha_cambio_moneda=datetime.now(),
                 complemento_id=complemento.id,
                 remitente_id=complemento.orden_carga.flete.remitente_id,
@@ -390,7 +430,7 @@ def create_movimiento_by_complemento(
             detalle=complemento.propietario_detalle,
             monto=complemento.propietario_monto,
             moneda_id=complemento.propietario_moneda_id,
-            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Complemento  # noqa
+            tipo_cambio_moneda=tipo_cambio_moneda_propietario,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Complemento  # noqa
             fecha_cambio_moneda=datetime.now(),
             complemento_id=complemento.id,
             propietario_id=complemento.orden_carga.propietario_id,
@@ -434,6 +474,20 @@ def create_movimiento_by_descuento(
             status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe ooooo",
         )
+    # Cotización de la moneda proveeodr
+    cotizacion_moneda_origen_proveedor = db.query(MonedaCotizacion.cotizacion_moneda).filter(
+        MonedaCotizacion.moneda_origen_id == descuento.proveedor_moneda_id
+    ).order_by(MonedaCotizacion.fecha.desc()).first()
+
+    tipo_cambio_moneda_proveedor = cotizacion_moneda_origen_proveedor[0] if cotizacion_moneda_origen_proveedor else 1
+
+    # Cotización de la moneda propietario
+    cotizacion_moneda_origen_propietario = db.query(MonedaCotizacion.cotizacion_moneda).filter(
+        MonedaCotizacion.moneda_origen_id == descuento.propietario_moneda_id
+    ).order_by(MonedaCotizacion.fecha.desc()).first()
+
+    tipo_cambio_moneda_propietario = cotizacion_moneda_origen_propietario[0] if cotizacion_moneda_origen_propietario else 1
+
     if descuento.habilitar_pago_proveedor and descuento.proveedor:
         create_movimiento(
             db,
@@ -450,7 +504,7 @@ def create_movimiento_by_descuento(
                 detalle=descuento.proveedor_detalle,
                 monto=descuento.proveedor_monto,
                 moneda_id=descuento.proveedor_moneda_id,
-                tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+                tipo_cambio_moneda=tipo_cambio_moneda_proveedor,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
                 fecha_cambio_moneda=datetime.now(),
                 descuento_id=descuento.id,
                 proveedor_id=descuento.proveedor_id,
@@ -475,7 +529,7 @@ def create_movimiento_by_descuento(
             detalle=descuento.propietario_detalle,
             monto=-descuento.propietario_monto,
             moneda_id=descuento.propietario_moneda_id,
-            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+            tipo_cambio_moneda=tipo_cambio_moneda_propietario,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
             fecha_cambio_moneda=datetime.now(),
             descuento_id=descuento.id,
             propietario_id=descuento.orden_carga.propietario_id,
@@ -519,6 +573,20 @@ def create_movimiento_by_merma(
             status_code=HTTPStatus.NOT_FOUND,
             detail="Tipo de contraparte, doc relacionado, cuenta o movimiento no existe",
         )
+    # Cotización de la moneda gestor
+    cotizacion_moneda_origen_gestor = db.query(MonedaCotizacion.cotizacion_moneda).filter(
+        MonedaCotizacion.moneda_origen_id == orden_carga.flete.merma_gestor_cuenta_moneda_id
+    ).order_by(MonedaCotizacion.fecha.desc()).first()
+
+    tipo_cambio_moneda_gestor = cotizacion_moneda_origen_gestor[0] if cotizacion_moneda_origen_gestor else 1
+
+        # Cotización de la moneda propietario
+    cotizacion_moneda_origen_propietario = db.query(MonedaCotizacion.cotizacion_moneda).filter(
+        MonedaCotizacion.moneda_origen_id == orden_carga.flete.merma_propietario_moneda_id
+    ).order_by(MonedaCotizacion.fecha.desc()).first()
+
+    tipo_cambio_moneda_propietario = cotizacion_moneda_origen_propietario[0] if cotizacion_moneda_origen_propietario else 1
+
     create_movimiento(
         db,
         MovimientoForm(
@@ -532,9 +600,9 @@ def create_movimiento_by_merma(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.merma_gestor_carga_detalle,
-            monto=orden_carga.resultado_gestor_carga_merma_valor_total,
-            moneda_id=orden_carga.flete.condicion_gestor_cuenta_moneda_id,
-            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
+            monto=orden_carga.resultado_gestor_carga_merma_valor_total_by_movimiento,
+            moneda_id=orden_carga.flete.merma_gestor_cuenta_moneda_id,
+            tipo_cambio_moneda=tipo_cambio_moneda_gestor,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             remitente_id=orden_carga.flete.remitente_id,
             tipo_movimiento_info=tipo_movimiento.descripcion,
@@ -556,9 +624,9 @@ def create_movimiento_by_merma(
             tipo_movimiento_id=tipo_movimiento.id,
             estado=MovimientoEstadoEnum.PENDIENTE,
             detalle=orden_carga.merma_propietario_detalle,
-            monto=-orden_carga.resultado_propietario_merma_valor_total,
-            moneda_id=orden_carga.flete.condicion_propietario_moneda_id,
-            tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
+            monto=-orden_carga.resultado_propietario_merma_valor_total_by_movimiento,
+            moneda_id=orden_carga.flete.merma_propietario_moneda_id,
+            tipo_cambio_moneda=tipo_cambio_moneda_propietario,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en FLETE  # noqa
             fecha_cambio_moneda=datetime.now(),
             propietario_id=orden_carga.propietario_id,
             tipo_movimiento_info=tipo_movimiento.descripcion,
@@ -627,20 +695,27 @@ def create_movimiento_by_tipo_documento_relacionado_otro(
     data.cuenta_id = tipo_cuenta.id
     data.tipo_movimiento_id = tipo_movimiento.id
     data.es_editable = True
-    data.tipo_cambio_moneda = RoundedDecimal(
-        1
-    )  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+   # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+    data.tipo_cambio_moneda = RoundedDecimal(data.tipo_cambio_moneda if data.tipo_cambio_moneda else 1)
     data.fecha_cambio_moneda = fecha
     if not data.fecha:
         data.fecha = fecha
     if not data.es_cobro:
         data.monto = data.monto * -1  # type: ignore
-    return create_movimiento(
+    movimiento = create_movimiento(
         db,
         data,
         gestor_carga_id,
         modified_by,
     )
+    if movimiento.liquidacion:
+        to_edit_obj = service.get_by_id(Liquidacion, db, movimiento.liquidacion_id)
+        to_edit_obj.pago_cobro =  sum(
+            x.saldo_ml for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+        )
+        to_edit_obj.es_pago_cobro = "PAGO" if to_edit_obj.pago_cobro > 0 else "COBRO"
+        db.commit()
+    return movimiento
 
 
 def create_movimiento_by_conciliacion_oc(
@@ -703,18 +778,21 @@ def edit_movimiento_by_gestor_flete(
         OrdenCargaEditForm(
             condicion_gestor_carga_moneda_id=data.moneda_id,
             condicion_gestor_carga_tarifa=data.tarifa,
+            condicion_gestor_carga_tarifa_ml=
+                ( data.tarifa * (data.tipo_cambio_moneda if data.tipo_cambio_moneda else 1 )),
         ),
         gestor_carga_id,
         modified_by,
     )
     moneda_id = data.moneda_id
     moneda = get_moneda_by_id(db, moneda_id)
-    monto = orden.resultado_gestor_carga_total_flete * -1
+    monto = orden.resultado_gestor_carga_total_flete_oc * -1
+    monto_ml = orden.resultado_gestor_carga_total_flete * -1
     unidad = orden.flete.condicion_gestor_cuenta_unidad
     tarifa = data.tarifa if data.tarifa else orden.flete_tarifa_gestor_carga
     detalle = get_flete_detalle(orden, tarifa, moneda, unidad)
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, monto_ml, detalle, moneda_id, data.tipo_cambio_moneda, gestor_carga_id, modified_by
     )
 
 
@@ -739,13 +817,17 @@ def edit_movimiento_by_gestor_merma(
             merma_gestor_carga_moneda_id=data.moneda_id,
             merma_gestor_carga_tolerancia=data.tolerancia,
             merma_gestor_carga_valor=data.valor,
+            merma_gestor_carga_valor_ml=(
+                data.valor * (data.tipo_cambio_moneda if data.tipo_cambio_moneda else 1 ))
         ),
         gestor_carga_id,
         modified_by,
     )
     moneda_id = data.moneda_id
     moneda = get_moneda_by_id(db, moneda_id)
+    #falta merma moneda original
     monto = orden.resultado_gestor_carga_merma_valor_total
+    monto_ml = orden.resultado_gestor_carga_merma_valor_total
     valor = data.valor if data.valor else orden.merma_gestor_carga_valor
     tolerancia = data.tolerancia if data.valor else orden.merma_gestor_carga_tolerancia
     es_porcentual = (
@@ -760,7 +842,7 @@ def edit_movimiento_by_gestor_merma(
         orden.flete.merma_gestor_cuenta_unidad,
     )
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, monto_ml, detalle, moneda_id, data.tipo_cambio_moneda, gestor_carga_id, modified_by
     )
 
 
@@ -783,18 +865,20 @@ def edit_movimiento_by_propietario_flete(
         OrdenCargaEditForm(
             condicion_propietario_moneda_id=data.moneda_id,
             condicion_propietario_tarifa=data.tarifa,
+            condicion_propietario_tarifa_ml=( data.tarifa * ( data.tipo_cambio_moneda if data.tipo_cambio_moneda else 1) ),
         ),
         gestor_carga_id,
         modified_by,
     )
     moneda_id = data.moneda_id
     moneda = get_moneda_by_id(db, moneda_id)
-    monto = orden.resultado_propietario_total_flete
+    monto = orden.resultado_propietario_total_flete_oc
+    monto_ml = orden.resultado_propietario_total_flete
     unidad = orden.flete.condicion_propietario_unidad
     tarifa = data.tarifa if data.tarifa else orden.flete_tarifa
     detalle = get_flete_detalle(orden, tarifa, moneda, unidad)
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, monto_ml, detalle, moneda_id, data.tipo_cambio_moneda, gestor_carga_id, modified_by
     )
 
 
@@ -819,13 +903,17 @@ def edit_movimiento_by_propietario_merma(
             merma_propietario_moneda_id=data.moneda_id,
             merma_propietario_tolerancia=data.tolerancia,
             merma_propietario_valor=data.valor,
+            merma_propietario_valor_ml=(
+                data.valor * (data.tipo_cambio_moneda if data.tipo_cambio_moneda else 1 )),
         ),
         gestor_carga_id,
         modified_by,
     )
     moneda_id = data.moneda_id
     moneda = get_moneda_by_id(db, moneda_id)
+    #falta merma moneda original
     monto = orden.resultado_propietario_merma_valor_total * -1
+    monto_ml = orden.resultado_propietario_merma_valor_total * -1
     valor = data.valor if data.valor else orden.merma_propietario_valor
     tolerancia = data.tolerancia if data.valor else orden.merma_propietario_tolerancia
     es_porcentual = (
@@ -840,7 +928,7 @@ def edit_movimiento_by_propietario_merma(
         orden.flete.merma_propietario_unidad,
     )
     return repositories.edit_monto_movimiento(
-        to_edit_obj, db, monto, detalle, moneda_id, gestor_carga_id, modified_by
+        to_edit_obj, db, monto, monto_ml, detalle, moneda_id, data.tipo_cambio_moneda, gestor_carga_id, modified_by
     )
 
 
@@ -978,6 +1066,18 @@ def generate_movimiento_reports(
         title_cell.value = "Monto"
         title_cell.font = Font(bold=True)
 
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Moneda"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Tipo de Cambio"
+        title_cell.font = Font(bold=True)
+
+        title_cell = ws.cell(row=1, column=(i := i + 1))
+        title_cell.value = "Monto (ML)"
+        title_cell.font = Font(bold=True)
+
     title_cell = ws.cell(row=1, column=(i := i + 1))
     title_cell.value = "Detalle"
     title_cell.font = Font(bold=True)
@@ -1054,6 +1154,16 @@ def generate_movimiento_reports(
         if not is_with_saldos:
             value_cell = ws.cell(row=row + 2, column=(i := i + 1))
             value_cell.value = item.monto
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.moneda.simbolo
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.tipo_cambio_moneda
+
+            value_cell = ws.cell(row=row + 2, column=(i := i + 1))
+            value_cell.value = item.monto_mon_local
+
 
         value_cell = ws.cell(row=row + 2, column=(i := i + 1))
         value_cell.value = item.detalle
@@ -1222,11 +1332,11 @@ def create_movimiento_by_factura(
                 detalle=tipo_movimiento.descripcion,
                 monto = factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else  factura.iva,
                 moneda_id=factura.moneda_id,
-                tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+                tipo_cambio_moneda=factura.tipo_cambio_moneda if factura.tipo_cambio_moneda else 1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
                 fecha= datetime.now(),
                 fecha_cambio_moneda=datetime.now(),
                 tipo_movimiento_info='IVA',
-                linea_movimiento=liquidacion.tipo_mov_liquidacion,
+                linea_movimiento=liquidacion.tipo_mov_liquidacion
             ),
             gestor_carga_id,
             modified_by,
@@ -1254,7 +1364,7 @@ def create_movimiento_by_factura(
                 detalle=tipo_movimiento.descripcion,
                 monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
                 moneda_id=factura.moneda_id,
-                tipo_cambio_moneda=1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
+                tipo_cambio_moneda=factura.tipo_cambio_moneda if factura.tipo_cambio_moneda else 1,  # TODO: poner el tipo de cambio correcto en cuando se maneje tipo de cambio en Descuento  # noqa
                 fecha= datetime.now(),
                 fecha_cambio_moneda=datetime.now(),
                 tipo_movimiento_info='RETENCION',
@@ -1291,16 +1401,27 @@ def edit_movimiento_by_factura(
 ) :
     mov_iva = None
     mov_retencion = None
+    iva=RoundedDecimal(0)
+    retencion=RoundedDecimal(0)
 
     if (facturaModel.iva_movimiento_id):
         mov_iva = get_movimiento_by_id(db, facturaModel.iva_movimiento_id)
-        mov_iva.monto= factura.iva *-1 if factura.sentido_mov_iva == 'COBRAR' else factura.iva,
-        mov_iva.moneda_id= factura.moneda_id
+        iva=(factura.iva*-1) if factura.sentido_mov_iva == 'COBRAR' else factura.iva
+        cambio=factura.tipo_cambio_moneda if factura.tipo_cambio_moneda else 1
+        mov_iva.monto=iva
+        mov_iva.moneda_id=factura.moneda_id
+        mov_iva.tipo_cambio_moneda=cambio
+        mov_iva.monto_mon_local=iva*cambio
 
     if (facturaModel.retencion_movimiento_id):
         mov_retencion = get_movimiento_by_id(db, facturaModel.retencion_movimiento_id)
-        mov_retencion.monto= factura.retencion *-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion,
-        mov_retencion.moneda_id= factura.moneda_id
+        retencion=factura.retencion*-1 if factura.sentido_mov_retencion == 'COBRAR' else factura.retencion
+        cambio=factura.tipo_cambio_moneda if factura.tipo_cambio_moneda else 1
+        mov_retencion.monto= retencion
+        mov_retencion.moneda_id=factura.moneda_id
+        mov_retencion.tipo_cambio_moneda=cambio
+        mov_retencion.monto_mon_local=retencion*cambio
+
 
     db.commit()
     if (mov_iva):

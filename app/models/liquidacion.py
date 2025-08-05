@@ -5,6 +5,8 @@ from sqlalchemy import (  # type: ignore
     Integer,
     String,
     Text,
+    Boolean,
+    text,
 )
 from sqlalchemy.sql.elements import and_ # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
@@ -63,10 +65,14 @@ class Liquidacion(AuditMixin, Base):
     punto_venta_id = Column(Integer, ForeignKey("punto_venta.id"))
     saldo_cc = Column(Numeric(38, 10))
     tipo_mov_liquidacion = Column(String(20))
+    es_orden_pago = Column(Boolean, server_default=text("false"))
+    observacion = Column(Text)
 
     # Listas
     movimientos = relationship(
-        "Movimiento", back_populates="liquidacion", order_by="Movimiento.created_at"
+        "Movimiento",
+        back_populates="liquidacion",
+        order_by="Movimiento.created_at"
     )
     instrumentos = relationship(
         "Instrumento", back_populates="liquidacion", order_by="Instrumento.modified_at"
@@ -81,7 +87,8 @@ class Liquidacion(AuditMixin, Base):
     @hybrid_property
     def es_cobro(self):
         #return self.movimientos_saldo > 0
-        return self.pago_cobro > 0
+        #return self.pago_cobro > 0
+        return self.es_pago_cobro == 'PAGO'
 
     @hybrid_property
     def esta_pagado(self):
@@ -90,8 +97,66 @@ class Liquidacion(AuditMixin, Base):
     @hybrid_property
     def movimientos_saldo(self):
         return sum(
-            x.saldo for x in self.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+            x.saldo_ml for x in self.movimientos if x.estado != EstadoEnum.ELIMINADO.value and x.estado != EstadoEnum.ANULADO.value
         )
+
+    @hybrid_property
+    def saldo_anticipos_combustible(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion == 'Anticipo'
+            and x.tipo_insumo_descripcion == 'COMBUSTIBLE'
+        )
+
+    @hybrid_property
+    def saldo_anticipos_efectivo(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion == 'Anticipo'
+            and x.tipo_insumo_descripcion != 'COMBUSTIBLE'
+        )
+
+
+    @hybrid_property
+    def saldo_anticipos_complemento_descuento(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion in ['Complemento', 'Descuento']
+        )
+
+    @hybrid_property
+    def saldo_anticipos_flete(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion == 'Flete'
+        )
+
+    @hybrid_property
+    def saldo_anticipos_merma(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion == 'Merma'
+        )
+
+    @hybrid_property
+    def saldo_anticipos_otro(self):
+        return sum(
+            x.saldo_ml
+            for x in self.movimientos
+            if x.estado not in [EstadoEnum.ELIMINADO.value, EstadoEnum.ANULADO.value]
+            and x.tipo_movimiento.descripcion == 'Otro'
+        )
+
 
     @hybrid_property
     def credito(self):
@@ -103,13 +168,9 @@ class Liquidacion(AuditMixin, Base):
 
     @hybrid_property
     def instrumentos_saldo(self):
-        return abs(
-            sum(
-                x.monto
-                for x in self.instrumentos
-                if x.estado != EstadoEnum.ELIMINADO.value
-            )
-        )
+        return abs(sum(
+            x.monto_ml for x in self.instrumentos if x.operacion_estado != EstadoEnum.RECHAZADO.value and x.operacion_estado != EstadoEnum.ANULADO.value
+        ))
 
     @hybrid_property
     def saldo(self):
@@ -117,8 +178,11 @@ class Liquidacion(AuditMixin, Base):
 
     @hybrid_property
     def saldo_residual(self):
-        # return abs(self.movimientos_saldo) - self.instrumentos_saldo
-        return abs(self.pago_cobro) - self.instrumentos_saldo
+        if self.es_orden_pago:
+            return abs(self.pago_cobro) - self.instrumentos_saldo
+        else:
+            return abs(self.movimientos_saldo) - self.instrumentos_saldo
+
 
     @hybrid_property
     def moneda_nombre(self):
@@ -171,6 +235,14 @@ class Liquidacion(AuditMixin, Base):
             self.tipo_contraparte_descripcion == TipoContraparteEnum.REMITENTE.value
             and self.remitente is not None
         )
+
+    @hybrid_property
+    def movimientos_activos(self):
+        if self.movimientos:
+            return [movimiento for movimiento in self.movimientos if movimiento.estado != 'Anulado']
+        else:
+            return []
+
 
     @hybrid_property
     def contraparte_id(self):

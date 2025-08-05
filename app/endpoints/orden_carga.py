@@ -9,6 +9,8 @@ from app import repositories, schemas, services
 from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+from typing import Optional
+
 
 api = APIRouter()
 
@@ -41,21 +43,25 @@ async def read_orden_carga_en_proceso(
 
 
 @api.get("/aceptadas", response_model=List[schemas.OrdenCargaList])
+@api.get("/aceptadas/{oc_id}", response_model=List[schemas.OrdenCargaList])
 async def read_orden_carga_aceptadas(
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
+    oc_id: Optional[str]=None
 ):
-    return services.get_orden_carga_aceptadas_list(db, current_user.gestor_carga_id)
+    return services.get_orden_carga_aceptadas_list(db, current_user.gestor_carga_id, oc_id)
 
 
 @api.get("/finalizadas", response_model=List[schemas.OrdenCargaList])
+@api.get("/finalizadas/{oc_id}", response_model=List[schemas.OrdenCargaList])
 async def read_orden_carga_finalizadas(
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.ORDEN_CARGA)),  # noqa: B008
+    oc_id: Optional[str]=None
 ):
-    return services.get_orden_carga_finalizadas_list(db, current_user.gestor_carga_id)
+    return services.get_orden_carga_finalizadas_list(db, current_user.gestor_carga_id, oc_id)
 
 
 @api.post("/recepcion", response_model=List[schemas.OrdenCargaList])
@@ -74,7 +80,6 @@ async def read_orden_carga_list_anticipo(
     _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.get_orden_carga_list(db, current_user.gestor_carga_id)
-
 
 
 @api.post("/aceptar/oc/nuevas", response_model=List[schemas.OrdenCargaList])
@@ -143,7 +148,6 @@ async def read_combinacion_by_orden_carga_id(
     return services.get_ordenes_carga_by_combinacion_id_and_nuevo(db, combinacion_id)
 
 
-
 @api.get("/combinacion/finalizar/{combinacion_id}", response_model=List[schemas.OrdenCargaList])
 async def read_combinacion_by_orden_carga_id(
     combinacion_id: int,
@@ -194,7 +198,6 @@ async def add_comentario_orden_carga(
         modified_by=current_user.username,
     )
     return comentario_historial
-
 
 
 @api.put("/{id}", response_model=schemas.OrdenCarga)
@@ -298,7 +301,7 @@ def conciliar_orden_carga_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
+    _: bool = Depends(Permiso(a.CONCILIAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.conciliar_orden_carga(db, id, current_user)
 
@@ -358,7 +361,7 @@ def finalizar_orden_carga_by_id(
     id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
+    _: bool = Depends(Permiso(a.FINALIZAR, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.finalizar_orden_carga(db, id, current_user)
 
@@ -422,3 +425,53 @@ async def read_orden_carga_list_by_id(
     _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
 ):
     return services.get_orden_carga_list_detail(db, id, current_user)
+
+
+@api.get("/orden-carga/recalcular-condiciones/{flete_id}/{orden_carga_id}", response_model=Optional[schemas.RecalculoCondicionesResponse])
+async def read_recalculo_condiciones(
+    flete_id: int,
+    orden_carga_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.recalcular_condiciones(db, flete_id, orden_carga_id, current_user)
+
+
+@api.get("/chofer-propietario/pueden-recibir-anticipos", response_model=bool)
+async def pueden_recibir_anticipos(
+    chofer_id: int,
+    propietario_id: int,
+    combinacion_id: int,
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.VER, m.ORDEN_CARGA)),
+):
+    return services.validar_habilitacion_para_anticipos(
+        db=db,
+        chofer_id=chofer_id,
+        propietario_id=propietario_id,
+        combinacion_id=combinacion_id,
+    )
+
+
+@api.get("/{id}/recalcular-provisiones", response_model=schemas.OrdenCarga)
+def recalcular_provisiones(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.recalcular_provisiones(db, id, current_user)
+
+
+@api.get("/actualizar-saldos/flete/{flete_id}/{orden_carga_id}", response_model=Optional[schemas.RecalculoCondicionesResponse])
+async def actualizar_saldos_oc(
+    orden_carga_id: int,
+    flete_id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.EDITAR, m.ORDEN_CARGA)),  # noqa: B008
+):
+    return services.update_flete_saldo(db, flete_id, orden_carga_id, current_user)
+

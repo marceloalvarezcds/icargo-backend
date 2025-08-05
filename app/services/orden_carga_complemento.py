@@ -5,25 +5,30 @@ from app import repositories, schemas
 from app.models import OrdenCargaComplemento
 from datetime import datetime
 
+from app.models.orden_carga import OrdenCarga
+
 from .orden_carga_anticipo_saldo import (
     update_orden_carga_anticipo_saldo_by_orden_carga_id,
 )
-
 
 def create_orden_carga_complemento(
     db: Session,
     data: schemas.OrdenCargaComplementoForm,
     modified_by: str,
 ) -> schemas.OrdenCargaComplemento:
+
     complemento = repositories.create_orden_carga_complemento(
         db,
         data,
         modified_by,
     )
+
     update_orden_carga_anticipo_saldo_by_orden_carga_id(
         db, data.orden_carga_id, modified_by
     )
+
     return complemento
+
 
 
 def get_orden_carga_complemento_by_id(db: Session, id: int) -> OrdenCargaComplemento:
@@ -61,17 +66,17 @@ def delete_orden_carga_complemento(db: Session, id: int, modified_by: str) -> sc
     obj = db.query(OrdenCargaComplemento).get(id)
     if not obj:
         raise HTTPException(status_code=404, detail="OrdenCargaComplemento not found")
-    
+
     # Actualizar los campos de auditoría
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
     db.commit()
-    
+
     # Serializar los datos antes de eliminar
     result = schemas.OrdenCargaComplemento.from_orm(obj)
-    
+
     # Eliminar el objeto
     db.delete(obj)
     db.commit()
-    
+
     return result

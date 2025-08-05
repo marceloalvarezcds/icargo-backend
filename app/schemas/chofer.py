@@ -4,6 +4,7 @@ from typing import Any, Optional
 from pydantic import BaseModel
 
 from app.enums import EstadoEnum
+from app.schemas.rounded_decimal_model import RoundedDecimal
 
 from .ciudad import Ciudad
 from .date_model import Date
@@ -28,6 +29,7 @@ class ChoferBaseModel(BaseModel):
     foto_perfil: Optional[str] = None
     es_propietario: Optional[bool] = False
     puede_recibir_anticipos: bool
+    is_chofer_condicionado: bool
     # Datos del Propietario
     pais_origen_id: Optional[int] = None
     foto_documento_frente_propietario: Optional[str] = None
@@ -66,6 +68,7 @@ class ChoferEditForm(BaseModel):
     foto_perfil: Optional[str] = None
     es_propietario: Optional[bool] = False
     puede_recibir_anticipos: bool
+    is_chofer_condicionado: bool
     anticipos_bloqueados: Optional[bool] = False
     # Datos del Propietario
     pais_origen_id: Optional[int] = None
@@ -154,6 +157,10 @@ class Chofer(ChoferBase):
     modified_at: datetime
     gestor_carga_chofer: Optional[GestorCargaChofer] = None
     oc_with_anticipos_liberados: Optional[int] = None
+    promedio_chofer_gestor: Optional[RoundedDecimal] = None
+    promedio_chofer_general: Optional[RoundedDecimal] = None
+    cantidad_chofer_evaluaciones: Optional[RoundedDecimal] = None
+    cantidad_chofer_evaluaciones_gestor: Optional[RoundedDecimal] = None
 
     @classmethod
     def from_orm(cls, obj: Any) -> "Chofer":

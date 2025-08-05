@@ -169,6 +169,21 @@ def create_insumo_punto_venta(
     gestor_carga_id: int,
     modified_by: str,
 ) -> InsumoPuntoVenta:
+    # Primero verificar si ya existe un insumo para ese insumo_id y punto_venta_id, sin importar moneda ni gestor
+    exists = db.query(InsumoPuntoVenta).filter(
+        InsumoPuntoVenta.insumo_id == data.insumo_id,
+        InsumoPuntoVenta.punto_venta_id == data.punto_venta_id,
+    ).first()
+
+    if exists:
+        insumo_nombre = db.query(Insumo.descripcion).filter(Insumo.id == data.insumo_id).scalar()
+        punto_venta_nombre = db.query(PuntoVenta.nombre_corto).filter(PuntoVenta.id == data.punto_venta_id).scalar()
+        raise HTTPException(
+            status_code=400,
+            detail=f"El insumo {insumo_nombre} ya está registrado para el establecimiento {punto_venta_nombre}.",
+        )
+
+    # Si no existe, crear normalmente
     try:
         obj = InsumoPuntoVenta(
             insumo_id=data.insumo_id,
@@ -184,21 +199,10 @@ def create_insumo_punto_venta(
         db.refresh(obj)
         return obj
 
-    except IntegrityError:
-        db.rollback()
-
-        # Obtener los nombres de insumo y punto de venta
-        insumo_nombre = db.query(Insumo.descripcion).filter(Insumo.id == data.insumo_id).scalar()
-        punto_venta_nombre = db.query(PuntoVenta.nombre_corto).filter(PuntoVenta.id == data.punto_venta_id).scalar()
-
-        raise HTTPException(
-            status_code=400,
-            detail=f"El insumo {insumo_nombre} ya está registrado para el establecimiento {punto_venta_nombre}.",
-        )
-
     except Exception as e:
         db.rollback()
         raise HTTPException(
             status_code=500,
             detail=f"Error inesperado: {str(e)}",
         )
+

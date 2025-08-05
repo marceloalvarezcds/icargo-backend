@@ -9,7 +9,7 @@ from app.models import Camion, Chofer
 from app.models.combinacion import Combinacion
 from app.models.permiso import Permiso
 from app.models.rol import Rol
-from app.models.user import UserRol
+from app.models.user import User, UserRol
 from app.schemas import ChoferEditForm, ChoferForm
 
 
@@ -113,6 +113,17 @@ def get_rol_id_by_gestor_carga_id(db: Session, gestor_carga_id: int) -> Optional
     return rol.id if rol else None
 
 
+def get_rol_id_by_usuario_id(db: Session, usuario_id: int) -> int:
+    usuario = db.query(User).filter(User.id == usuario_id).first()
+    if not usuario:
+        raise ValueError(f"No se encontró usuario con id {usuario_id}")
+
+    if not usuario.user_roles or len(usuario.user_roles) == 0:
+        raise ValueError(f"El usuario con id {usuario_id} no tiene roles asignados")
+
+    return usuario.user_roles[0].rol_id
+
+
 def create_chofer(
     db: Session,
     data: ChoferForm,
@@ -125,7 +136,7 @@ def create_chofer(
     modified_by: str,
     usuario_id: int,
 ) -> Chofer:
-    rol_id = get_rol_id_by_gestor_carga_id(db, gestor_cuenta_id)
+    rol_id = get_rol_id_by_usuario_id(db, usuario_id)
 
     roles_permisos = rol_tiene_permiso(rol_id, "Cambiar_estado 2 - chofer", db, usuario_id)
 
@@ -145,6 +156,7 @@ def create_chofer(
         oficial_cuenta_id=data.oficial_cuenta_id,
         es_propietario=data.es_propietario,
         puede_recibir_anticipos=data.puede_recibir_anticipos,
+        is_chofer_condicionado=data.is_chofer_condicionado,
         foto_documento_frente=foto_documento_frente_url,
         foto_documento_reverso=foto_documento_reverso_url,
         foto_perfil=foto_perfil_url,
@@ -194,6 +206,7 @@ def edit_chofer(
         obj.fecha_nacimiento = data.fecha_nacimiento
         obj.es_propietario = data.es_propietario
         obj.puede_recibir_anticipos = data.puede_recibir_anticipos
+        obj.is_chofer_condicionado=data.is_chofer_condicionado
         obj.email = data.email
         obj.direccion = data.direccion
         obj.ciudad_id = data.ciudad_id

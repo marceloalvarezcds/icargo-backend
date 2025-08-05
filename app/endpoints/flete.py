@@ -1,11 +1,9 @@
-from typing import List
-
+from typing import List, Optional
 from fastapi import APIRouter, Depends, Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
-
 from app import repositories, schemas, services
-from app.dependencies import Permiso, get_current_user, get_db_session
+from app.dependencies import Permiso, get_current_user, get_db_session, Permisos
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums.estado import EstadoEnum
@@ -38,6 +36,19 @@ async def flete_reports(
     _: bool = Depends(Permiso(a.REPORTE, m.FLETE)),  # noqa: B008
 ):
     return services.get_flete_reports(db)
+
+
+@api.get("/orden_carga/list", response_model=List[schemas.FleteList])
+@api.get("/orden_carga/list/{id}", response_model=List[schemas.FleteList])
+async def read_flete_list_by_gestor_carga_and_oc(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR, m.ORDEN_CARGA)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008,
+    id: Optional[int] = None,
+):
+    return repositories.get_flete_list_by_gestor_carga_id(
+        db, current_user.gestor_carga_id, id
+    )
 
 
 @api.get("/{id}", response_model=schemas.Flete)
@@ -99,7 +110,7 @@ def cancel_flete_by_id(
     _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.FLETE)),  # noqa: B008
 ):
     return services.change_flete_status(
-        db, id, EstadoEnum.INACTIVO, current_user.username
+        db, id, EstadoEnum.CANCELADO, current_user.username
     )
 
 
@@ -122,6 +133,16 @@ def unpublish_flete_by_id(
 ):
     return services.change_flete_public_status(db, id, False, current_user.username)
 
+@api.get("/{id}/active/flete", response_model=schemas.Flete)
+def active_flete_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.FLETE)),  # noqa: B008
+):
+    return services.change_flete_status(
+        db, id, EstadoEnum.ACTIVO, current_user.username
+    )
 
 @api.get(
     "/destinatarios/{remitente_id}/{origen_id}/{destino_id}",
@@ -139,6 +160,17 @@ def read_flete_destinatario_list_by_id(
         db, remitente_id, origen_id, destino_id, current_user.gestor_carga_id
     )
 
+@api.get("/{id}/inactive/flete", response_model=schemas.Flete)
+def inactive_flete_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.FLETE)),  # noqa: B008
+):
+    return services.change_flete_status(
+        db, id, EstadoEnum.INACTIVO, current_user.username
+    )
+
 
 @api.get("/flete-list/{id}", response_model=schemas.FleteList)
 async def read_flete_by_id(
@@ -147,3 +179,25 @@ async def read_flete_by_id(
     _: bool = Depends(Permiso(a.VER, m.FLETE)),  # noqa: B008
 ):
     return services.get_flete_detail_by_id(db, id)
+
+
+@api.put("/{id}/cantidad", response_model=schemas.Flete)
+async def update_flete_cantidad(
+    id: int,
+    data: schemas.FleteCantidadUpdate,
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permiso(a.EDITAR, m.FLETE)),
+):
+    return services.update_flete_cantidad(id, data.condicion_cantidad, db, current_user.username)
+
+
+@api.put("/{id}/edit-mode", response_model=schemas.Flete)
+async def update_flete_edit_mode(
+    id: int,
+    data: schemas.FleteEditModeUpdate,
+    db: Session = Depends(get_db_session),
+    current_user: schemas.AuthUser = Depends(get_current_user),
+    _: bool = Depends(Permisos(a.VER, [m.FLETE, m.ORDEN_CARGA])),
+):
+    return services.update_flete_edit_mode(id, data.is_edit, db)

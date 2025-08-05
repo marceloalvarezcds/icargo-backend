@@ -16,10 +16,12 @@ def create_orden_carga_descuento_by_flete(
         anticipado=data.anticipado,
         # INICIO Monto a cobrar al Propietario
         propietario_monto=data.propietario_monto,
+        propietario_monto_ml=data.propietario_monto_ml,
         propietario_moneda_id=data.propietario_moneda_id,
         # FIN Monto a cobrar al Propietario
         # INICIO Monto a pagar al Proveedor
         proveedor_monto=data.proveedor_monto,
+        proveedor_monto_ml=data.proveedor_monto_ml,
         proveedor_moneda_id=data.proveedor_moneda_id,
         proveedor_id=data.proveedor_id,
         # FIN Monto a pagar al Proveedor

@@ -5,9 +5,10 @@ from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas, services
-from app.dependencies import Permiso, get_current_user, get_db_session
+from app.dependencies import Permiso, get_current_user, get_db_session, Permisos
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+from app.enums.estado import EstadoEnum
 
 api = APIRouter()
 
@@ -37,7 +38,7 @@ async def read_punto_venta_list_with_active_prices_by_gestor_carga_id(
 async def read_punto_venta_list(
     proveedor_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.PUNTO_VENTA)),  # noqa: B008
+    _: bool = Depends(Permisos(a.LISTAR, [m.PUNTO_VENTA, m.ORDEN_CARGA, m.ESTADO_CUENTA])),  # noqa: B008
 ):
     return repositories.get_punto_venta_list(db, proveedor_id)
 
@@ -79,6 +80,17 @@ async def read_punto_venta_by_id(
     )
 
 
+@api.get("/pdv", response_model=List[schemas.PuntoVentaList])
+async def read_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CREAR_EFECTIVO, m.ORDEN_CARGA_ANTICIPO_RETIRADO)),  # noqa: B008
+):
+    return repositories.get_punto_venta_list_by_gestor_carga_id_and_puede_recibir_efectivo(
+        db, current_user.gestor_carga_id
+    )
+
+
 @api.post("/", response_model=schemas.PuntoVenta)
 async def add_new_punto_venta(
     db: Session = Depends(get_db_session),  # noqa: B008
@@ -115,4 +127,28 @@ async def delete_punto_venta(
 ):
     return services.delete_punto_venta(
         db, id, current_user.gestor_carga_id, current_user.username
+    )
+
+
+@api.get("/{id}/active", response_model=schemas.PuntoVenta)
+def active_punto_venta_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.PUNTO_VENTA)),  # noqa: B008
+):
+    return services.change_punto_venta_status(
+        db, id, EstadoEnum.ACTIVO, current_user.username
+    )
+
+
+@api.get("/{id}/inactive", response_model=schemas.PuntoVenta)
+def inactive_punto_venta_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.PUNTO_VENTA)),  # noqa: B008
+):
+    return services.change_punto_venta_status(
+        db, id, EstadoEnum.INACTIVO, current_user.username
     )

@@ -1,21 +1,20 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
-from sqlalchemy.orm import Query, Session # type: ignore
-from sqlalchemy import case, null, desc
+from sqlalchemy.orm import Query, Session, aliased # type: ignore
+from sqlalchemy import case, null, desc, func
 from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
-from app.enums import MovimientoEstadoEnum, EstadoEnum, TipoAnticipoEnum
+from app.enums import MovimientoEstadoEnum, EstadoEnum, TipoAnticipoEnum, TipoDocumentoRelacionadoEnum
 from app.enums.tipo_movimiento import TipoMovimientoEnum
 from app.models import (
     Movimiento, OrdenCargaAnticipoRetirado, Liquidacion, TipoCuenta, TipoMovimiento,
-    OrdenCargaAnticipoRetirado, TipoAnticipo, OrdenCarga, Propietario, Remitente,
-    Proveedor, PuntoVenta
-
+    OrdenCargaAnticipoRetirado, Moneda, OrdenCarga, Proveedor, PuntoVenta, MonedaCotizacion,
+    Camion, TipoDocumentoRelacionado
 )
 from app.schemas import MovimientoForm
 from app.schemas import MovimientoEstadoCuenta
 from app.schemas import Movimiento as MovimientoSchema
-from app.enums.tipo_liquidacion import TipoLiquidacion
+from app.repositories.moneda import get_moneda_by_gestor_carga
 
 
 def get_movimiento_list(db: Session) -> List[Movimiento]:
@@ -165,17 +164,20 @@ def get_movimiento_list_for_flete_pdf_reports_by_liquidacion_id(
     return (
         db.query(Movimiento)
         .join(Movimiento.tipo_movimiento)
+        .join(Movimiento.tipo_documento_relacionado)
         .filter(
             and_(
-                Movimiento.estado == estado,
+                #Movimiento.estado == estado,
                 Movimiento.liquidacion_id == liquidacion_id,
-                TipoMovimiento.descripcion != TipoMovimientoEnum.OTRO.value,
+                TipoMovimiento.descripcion != TipoMovimientoEnum.FISCAL.value,
+                TipoDocumentoRelacionado.descripcion == TipoDocumentoRelacionadoEnum.OC.value,
             )
         )
         .order_by(
             Movimiento.numero_documento_relacionado,
             Movimiento.contraparte,
             Movimiento.liquidacion_id,
+            Movimiento.id,
         )
         .all()
     )
@@ -189,11 +191,19 @@ def get_movimiento_list_for_otro_pdf_reports_by_liquidacion_id(
     return (
         db.query(Movimiento)
         .join(Movimiento.tipo_movimiento)
+        .join(Movimiento.tipo_documento_relacionado)
         .filter(
             and_(
-                Movimiento.estado == estado,
+                #Movimiento.estado == estado,
                 Movimiento.liquidacion_id == liquidacion_id,
-                TipoMovimiento.descripcion == TipoMovimientoEnum.OTRO.value,
+                or_(
+                    TipoDocumentoRelacionado.descripcion == TipoDocumentoRelacionadoEnum.OTRO.value,
+                    and_(
+                        TipoDocumentoRelacionado.descripcion == TipoDocumentoRelacionadoEnum.OC.value,
+                        TipoMovimiento.descripcion == TipoMovimientoEnum.FISCAL.value
+                    ),
+                )
+
             )
         )
         .order_by(
@@ -385,6 +395,7 @@ def create_movimiento(
         fecha=data.fecha,
         detalle=data.detalle,
         monto=data.monto,
+        monto_mon_local= data.monto_mon_local if data.monto_mon_local else data.monto*data.tipo_cambio_moneda,
         moneda_id=data.moneda_id,
         tipo_cambio_moneda=data.tipo_cambio_moneda,
         fecha_cambio_moneda=data.fecha_cambio_moneda,
@@ -402,7 +413,8 @@ def create_movimiento(
         modified_by=modified_by,
         tipo_movimiento_info=data.tipo_movimiento_info,
         punto_venta_id=data.punto_venta_id,
-        linea_movimiento= data.linea_movimiento if data.linea_movimiento else TipoAnticipoEnum.EFECTIVO.value
+        linea_movimiento=data.linea_movimiento if data.linea_movimiento else TipoAnticipoEnum.EFECTIVO.value,
+        # monto_mon_local=data.monto*data.tipo_cambio_moneda
     )
     db.add(obj)
     db.commit()
@@ -414,15 +426,20 @@ def edit_monto_movimiento(
     obj: Movimiento,
     db: Session,
     monto: Decimal,
+    monto_ml: Decimal,
     detalle: str,
     moneda_id: Optional[int],
+    tipo_cambio_moneda: Optional[Decimal],
     gestor_carga_id: int,
     modified_by: str,
 ) -> Movimiento:
     obj.monto = monto
+    obj.monto_mon_local = monto_ml
     obj.detalle = detalle
     if moneda_id:
         obj.moneda_id = moneda_id
+    obj.tipo_cambio_moneda = tipo_cambio_moneda if tipo_cambio_moneda else 1
+    obj.fecha_cambio_moneda = datetime.now() if tipo_cambio_moneda else obj.fecha_cambio_moneda
     obj.gestor_carga_id = gestor_carga_id
     obj.modified_by = modified_by
     obj.modified_at = datetime.now()
@@ -449,6 +466,7 @@ def edit_movimiento(
     obj.tipo_movimiento_id = data.tipo_movimiento_id
     obj.detalle = data.detalle
     obj.monto = data.monto
+    obj.monto_mon_local= data.monto_mon_local if data.monto_mon_local else data.monto*data.tipo_cambio_moneda,
     obj.moneda_id = data.moneda_id
     obj.tipo_cambio_moneda = data.tipo_cambio_moneda
     obj.fecha_cambio_moneda = data.fecha_cambio_moneda
@@ -501,6 +519,7 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
     contraparte: str,
     contraparte_numero_documento: str,
     gestor_carga_id: int,
+    mon_local_id:int,
     punto_venta_id: Optional[int],
     tipo_movimiento: Optional[str],
     ) -> Query:
@@ -557,14 +576,32 @@ def get_query_movimientos_by_contraparte_and_gestor_carga_id(
                     else_=literal_column("false"),
                 ).label("can_edit_oc"),
                 OrdenCarga.documento_fisico.label("documento_fisico"),
-                *get_cols_estado_cuenta_case_statement(),
+                Moneda.simbolo.label("moneda"),
+                Movimiento.tipo_cambio_moneda.label("tipo_cambio_moneda"),
+                Camion.placa.label("camion_placa"),
+                *get_cols_estado_cuenta_case_statement(mon_local_id),
                 )\
                 .join(Movimiento.tipo_movimiento)\
                 .join(Movimiento.cuenta)\
+                .join(Movimiento.moneda)\
+                .outerjoin(Movimiento.orden_carga)\
+                .outerjoin(OrdenCarga.camion)\
                 .outerjoin(Movimiento.orden_carga)\
                 .outerjoin(Movimiento.liquidacion)\
                 .outerjoin(Movimiento.anticipo)\
-                .outerjoin(OrdenCargaAnticipoRetirado.flete_anticipo)
+                .outerjoin(OrdenCargaAnticipoRetirado.flete_anticipo)\
+                # .outerjoin(
+                #     MonedaCotizacion,
+                #     and_(
+                #         MonedaCotizacion.moneda_origen_id == mon_local_id,
+                #         MonedaCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
+                #         MonedaCotizacion.estado == EstadoEnum.ACTIVO.value,
+                #         MonedaCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
+                #         MonedaCotizacion.fecha == (
+                #             get_max_date_cotizacion(db, mon_local_id).subquery()
+                #         )
+                #     )
+                # )
 
     query = query.filter(
             and_(
@@ -606,9 +643,12 @@ def get_all_movimiento_list_by_contraparte_and_gestor_carga_id(
     punto_venta_id: Optional[int]
 ) -> List[MovimientoEstadoCuenta]:
 
+    moneda_local= get_moneda_by_gestor_carga(db, gestor_carga_id)
+    moneda_local_id = moneda_local.id if moneda_local else 1
+
     query = get_query_movimientos_by_contraparte_and_gestor_carga_id(
         db, tipo_contraparte_id, contraparte_id, contraparte, contraparte_numero_documento,
-        gestor_carga_id, punto_venta_id)
+        gestor_carga_id, moneda_local_id, punto_venta_id )
 
     results = query.order_by(Movimiento.id.desc(), Movimiento.contraparte).all()
 
@@ -684,8 +724,9 @@ def get_all_movimiento_instrumento_estado_cuenta_list(
     return []
 
 
-def get_cols_estado_cuenta_case_statement() -> tuple:
+def get_cols_estado_cuenta_case_statement(mon_local_id:int) -> tuple:
     return (
+        Movimiento.monto.label("monto"),
         literal_column("0").label("provision"),
         case(
             (
@@ -693,7 +734,13 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
                     Movimiento.liquidacion_id == null(),
                     Movimiento.estado == EstadoEnum.PENDIENTE.value,
                 ),
-                Movimiento.monto,
+                case(
+                    (
+                        Movimiento.moneda_id == mon_local_id,
+                        Movimiento.monto,
+                    ),
+                    else_= Movimiento.monto_mon_local,
+                )
             ),
             else_=literal_column("0"),
         ).label("pendiente"),
@@ -703,7 +750,13 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
                     Liquidacion.etapa == EstadoEnum.EN_PROCESO.value,
                     Movimiento.estado == EstadoEnum.EN_PROCESO.value,
                 ),
-                Movimiento.monto,
+                case(
+                    (
+                        Movimiento.moneda_id == mon_local_id,
+                        Movimiento.monto,
+                    ),
+                    else_= Movimiento.monto_mon_local,
+                )
             ),
             else_=literal_column("0"),
         ).label("en_proceso"),
@@ -727,7 +780,13 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
                         Movimiento.estado == EstadoEnum.FINALIZADO.value,
                     ),
                 ),
-                Movimiento.monto,
+                case(
+                    (
+                        Movimiento.moneda_id == mon_local_id,
+                        Movimiento.monto,
+                    ),
+                    else_= Movimiento.monto_mon_local,
+                )
             ),
             else_=literal_column("0"),
         ).label("confirmado"),
@@ -792,4 +851,18 @@ def get_cols_estado_cuenta_case_statement() -> tuple:
         #     ),
         #     else_=literal_column("0"),
         # ).label("cantidad_finalizado"),
+    )
+
+
+def get_max_date_cotizacion(db: Session,mon_local_id:int):
+    aliasCotizacion = aliased(MonedaCotizacion)
+
+    return (
+        db.query(func.max(aliasCotizacion.fecha))
+        .filter(
+            aliasCotizacion.moneda_origen_id == mon_local_id,
+            aliasCotizacion.moneda_destino_id == Movimiento.moneda_id,  # Filtrar por gestor de carga específico
+            aliasCotizacion.estado == EstadoEnum.ACTIVO.value,
+            aliasCotizacion.gestor_carga_id == Movimiento.gestor_carga_id,
+        )
     )

@@ -31,6 +31,7 @@ class MovimientoBaseModel(BaseModel):
     fecha: Optional[Date]
     detalle: Optional[str]
     monto: RoundedDecimal
+    monto_mon_local: Optional[RoundedDecimal]
     moneda_id: int
     tipo_cambio_moneda: Optional[RoundedDecimal]
     fecha_cambio_moneda: Optional[Date]
@@ -59,6 +60,7 @@ class MovimientoForm(MovimientoBaseModel):
 class MovimientoFleteEditForm(BaseModel):
     moneda_id: Optional[int] = None
     tarifa: Optional[RoundedDecimal] = None
+    tipo_cambio_moneda: Optional[RoundedDecimal] = None
 
 
 class MovimientoMermaEditForm(BaseModel):
@@ -66,6 +68,7 @@ class MovimientoMermaEditForm(BaseModel):
     moneda_id: Optional[int] = None
     es_porcentual: Optional[bool] = False
     tolerancia: Optional[RoundedDecimal] = None
+    tipo_cambio_moneda: Optional[RoundedDecimal] = None
 
 
 class Movimiento(MovimientoBaseModel):
@@ -78,12 +81,14 @@ class Movimiento(MovimientoBaseModel):
     moneda: Moneda
     # Campos calculados
     credito: RoundedDecimal
+    credito_ml: Optional[RoundedDecimal]
     camion_placa: Optional[str]
     chofer_nombre: Optional[str]
     chofer_numero_documento: Optional[str]
     concepto: str
     cuenta_codigo_descripcion: str
     debito: RoundedDecimal
+    debito_ml: RoundedDecimal
     destino_nombre: Optional[str]
     es_cobro: bool
     fecha_pago_cobro: Optional[Date]
@@ -93,6 +98,7 @@ class Movimiento(MovimientoBaseModel):
     moneda_nombre: str
     moneda_simbolo: str
     monto_ml: RoundedDecimal
+    monto_mon_local: Optional[RoundedDecimal]
     origen_nombre: Optional[str]
     producto_descripcion: Optional[str]
     propietario_nombre: Optional[str]

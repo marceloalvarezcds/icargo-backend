@@ -91,6 +91,11 @@ class Camion(AuditMixin, Base):
     # FIN Capacidad del Camión
     combinaciones = relationship("CamionSemiNeto", back_populates="camion")
 
+    promedio_tracto_gestor = Column(Numeric(38, 1), nullable=True)
+    promedio_tracto_general = Column(Numeric(38, 1), nullable=True)
+    cantidad_tracto_evaluaciones = Column(Numeric(38, 1), nullable=True)
+    cantidad_tracto_evaluaciones_gestor = Column(Numeric(38, 1), nullable=True)
+
     @hybrid_property
     def chofer_estado(self):
         return self.chofer.estado if self.chofer else None
@@ -140,15 +145,15 @@ class Camion(AuditMixin, Base):
             else ""
         )
         return f"OC: {self.limite_cantidad_oc_activas if self.limite_cantidad_oc_activas else ''} {anticipos}"  # noqa: B950
-    
+
     @hybrid_property
     def limite_monto_anticipo(self):
         return self.limite_monto_anticipos if self.limite_monto_anticipos else 0
-    
+
     @hybrid_property
     def oc_activa(self):
         return self.limite_cantidad_oc_activas
-    
+
     @hybrid_property
     def localidad_habilitacion_municipal_id(self):
         return (
@@ -247,6 +252,10 @@ class Camion(AuditMixin, Base):
         return self.propietario.ruc
 
     @hybrid_property
+    def is_propietario_condicionado(self):
+        return self.propietario.is_propietario_condicionado
+
+    @hybrid_property
     def propietario_puede_recibir_anticipos(self):
         return self.propietario.puede_recibir_anticipos
 
@@ -261,7 +270,7 @@ class Camion(AuditMixin, Base):
     @hybrid_property
     def propietario_foto(self):
         return self.propietario.foto_perfil
-    
+
     @hybrid_property
     def propietario_camion_id(self):
         return self.propietario.id

@@ -84,6 +84,11 @@ class Semi(AuditMixin, Base):
     # FIN Capacidad del Camión
     combinaciones = relationship("CamionSemiNeto", back_populates="semi")
 
+    promedio_semi_gestor = Column(Numeric(38, 1), nullable=True)
+    promedio_semi_general = Column(Numeric(38, 1), nullable=True)
+    cantidad_semi_evaluaciones = Column(Numeric(38, 1), nullable=True)
+    cantidad_semi_evaluaciones_gestor = Column(Numeric(38, 1), nullable=True)
+
     @hybrid_property
     def ciudad_habilitacion_municipal_nombre(self):
         return (
@@ -99,11 +104,11 @@ class Semi(AuditMixin, Base):
     @hybrid_property
     def color_descripcion(self):
         return self.color.descripcion if self.color else ""
-    
+
     @hybrid_property
     def foto_semi(self):
         return self.semi.foto if self.semi else None
-    
+
     @hybrid_property
     def gestor_cuenta_id(self):
         return self.propietario.gestor_cuenta.id

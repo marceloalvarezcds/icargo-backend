@@ -75,6 +75,7 @@ class Camion(CamionForm):
     propietario_estado: EstadoEnum
     propietario_foto: Optional[str] = None
     propietario_puede_recibir_anticipos: Optional[bool] = None
+    is_propietario_condicionado: bool
     propietario_camion_id: int
     chofer: Optional[Chofer]
     chofer_estado: Optional[EstadoEnum] = None
@@ -104,6 +105,10 @@ class Camion(CamionForm):
     tipo: Optional[TipoCamion] = None
     color: Optional[Color] = None
     is_in_combinacion: Optional[bool] = None
+    promedio_tracto_gestor: Optional[RoundedDecimal] = None
+    promedio_tracto_general: Optional[RoundedDecimal] = None
+    cantidad_tracto_evaluaciones: Optional[RoundedDecimal] = None
+    cantidad_tracto_evaluaciones_gestor: Optional[RoundedDecimal] = None
     # FIN Detalles del Camión
     created_by: str
     created_at: datetime
@@ -124,6 +129,7 @@ class CamionList(BaseModel):
     propietario_foto: Optional[str] = None
     propietario_estado: EstadoEnum
     propietario_puede_recibir_anticipos: Optional[bool] = None
+    is_propietario_condicionado: bool
     propietario_camion_id: int
     chofer_nombre: Optional[str] = None
     chofer_numero_documento: Optional[str] = None

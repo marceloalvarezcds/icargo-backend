@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -50,7 +51,8 @@ class Permiso:
             modelt = permisoModeloTitulo[modelo.value]
             action = " ".join(str(accion.value).split("_")).capitalize()
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
+                status_code=HTTPStatus.BAD_REQUEST, #mejorar en algun momento
+                # status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"No tiene permiso para {action} {modelt}",
             )
         return False

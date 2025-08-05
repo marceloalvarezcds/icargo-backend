@@ -35,9 +35,11 @@ async def read_estado_cuenta_pdv(
     tipo_flujo: Optional[str]= None,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.VER, m.ESTADO_CUENTA)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_estado_cuenta_pdv_list(
         db,
+        current_user.gestor_carga_id,
         tipo_flujo,
     )
 
@@ -54,9 +56,11 @@ async def read_estado_cuenta_pdv(
     punto_venta_id: Optional[int],
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.VER, m.ESTADO_CUENTA)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_estado_cuenta_pdv(
         db,
+        current_user.gestor_carga_id,
         flujo,
         contraparte_id,
         contraparte,
@@ -76,6 +80,7 @@ async def read_estado_cuenta_by_contraparte(
     contraparte_numero_documento: str,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.VER, m.ESTADO_CUENTA)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_estado_cuenta_by_contraparte(
         db,
@@ -83,7 +88,9 @@ async def read_estado_cuenta_by_contraparte(
         contraparte_id,
         contraparte,
         contraparte_numero_documento,
+        current_user.gestor_carga_id
     )
+
 
 
 @api.get(
@@ -98,6 +105,7 @@ async def read_estado_cuenta_by_contraparte(
     punto_venta_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.VER, m.ESTADO_CUENTA)),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return services.get_estado_cuenta_by_contraparte(
         db,
@@ -105,6 +113,7 @@ async def read_estado_cuenta_by_contraparte(
         contraparte_id,
         contraparte,
         contraparte_numero_documento,
+        current_user.gestor_carga_id,
         punto_venta_id
     )
 

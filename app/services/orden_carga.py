@@ -4,6 +4,7 @@ from http import HTTPStatus
 from typing import List, Optional, cast
 
 from app.enums.tipo_anticipo import TipoAnticipoEnum
+from app.models.chofer import Chofer
 from app.models.combinacion import Combinacion
 from app.models.flete_anticipo import FleteAnticipo
 from fastapi import HTTPException
@@ -19,6 +20,10 @@ from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, STATICS_URL, templateEnv
 from app.enums import EstadoEnum
 from app.models import Camion, Flete, GestorCarga, OrdenCarga, OrdenCargaComentariosHistorial
+from app.models.orden_carga_complemento import OrdenCargaComplemento
+from app.models.orden_carga_descuento import OrdenCargaDescuento
+from app.models.orden_carga_remision_origen import OrdenCargaRemisionOrigen
+from app.models.propietario import Propietario
 from app.schemas.audit_database import AuditDatabase as A
 from app.utils import number_format, send_email_with_template_by_thread
 
@@ -32,8 +37,8 @@ from .orden_carga_anticipo_porcentaje import (
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list,
     edit_orden_carga_anticipo_porcentaje_by_oc_porcentaje_anticipos,
 )
-from .orden_carga_anticipo_saldo import get_orden_carga_by_id, get_orden_carga_by_combinacion_id
-from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete
+from .orden_carga_anticipo_saldo import get_orden_carga_by_id, get_orden_carga_by_combinacion_id, get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id
+from .orden_carga_complemento_flete import create_orden_carga_complemento_by_flete, change_flete_create_orden_carga_complemento_by_flete
 from .orden_carga_descuento_flete import create_orden_carga_descuento_by_flete
 from .orden_carga_remision_resultado import (
     get_orden_carga_remision_resultado_list_by_flete,
@@ -43,9 +48,11 @@ from .provision import (
     create_provision_by_finalizar_oc,
     borrar_provisiones_by_conciliacion_oc
 )
-from .orden_carga_anticipo_saldo import (
-    update_orden_carga_anticipo_saldo_by_orden_carga_id,
-)
+
+from .moneda_cotizacion import get_cotizacion_moneda
+from app.repositories.moneda import get_moneda_by_gestor_carga
+from fastapi.responses import HTMLResponse
+from .user import get_user_by_username
 
 
 def get_orden_carga_list(
@@ -73,18 +80,18 @@ def get_orden_carga_cerradas_list(
 
 
 def get_orden_carga_aceptadas_list(
-    db: Session, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int], oc_id: Optional[str]
 ) -> List[OrdenCarga]:
     if gestor_carga_id:
-        return repositories.get_orden_carga_aceptadas_list_by_gestor_carga_id(db, gestor_carga_id)
+        return repositories.get_orden_carga_aceptadas_list_by_gestor_carga_id(db, gestor_carga_id, oc_id)
     return repositories.get_orden_carga_aceptadas_list(db)
 
 
 def get_orden_carga_finalizadas_list(
-    db: Session, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int], oc_id: Optional[str]
 ) -> List[OrdenCarga]:
     if gestor_carga_id:
-        return repositories.get_orden_carga_finalizadas_list_by_gestor_carga_id(db, gestor_carga_id)
+        return repositories.get_orden_carga_finalizadas_list_by_gestor_carga_id(db, gestor_carga_id, oc_id)
     return repositories.get_orden_carga_finalizadas_list(db)
 
 
@@ -119,6 +126,66 @@ def create_complementos_and_descuentos(
         create_orden_carga_descuento_by_flete(db, obj, d, modified_by)
 
 
+def change_flete_create_complementos_and_descuentos(
+    db: Session, obj: OrdenCarga, flete: Flete, modified_by: str
+):
+
+    complementos_existentes_ids = {c.flete_id for c in obj.complementos}
+    descuentos_existentes_ids = {d.flete_id for d in obj.descuentos}
+
+    for c in flete.complementos:
+        if c.flete_id not in complementos_existentes_ids:
+            change_flete_create_orden_carga_complemento_by_flete(db, obj, c, modified_by)
+
+    for d in flete.descuentos:
+        if d.flete_id not in descuentos_existentes_ids:
+            create_orden_carga_descuento_by_flete(db, obj, d, modified_by)
+
+
+def validar_flete(flete: Flete):
+    if flete.estado == EstadoEnum.INACTIVO.value:
+        raise HTTPException(
+            status_code=400,
+            detail="No es posible crear la orden de carga porque el Pedido se encuentra INACTIVO."
+        )
+
+
+def validar_combinacion(
+    db: Session,
+    chofer_id: int,
+    propietario_id: int,
+    camion_id: int,
+    semi_id: int,
+    gestor_carga_id: int
+):
+    combinacion_inactiva = (
+        db.query(Combinacion)
+        .filter(
+            Combinacion.chofer_id == chofer_id,
+            Combinacion.propietario_id == propietario_id,
+            Combinacion.camion_id == camion_id,
+            Combinacion.semi_id == semi_id,
+            Combinacion.gestor_carga_id == gestor_carga_id,
+            Combinacion.estado == EstadoEnum.INACTIVO.value
+        )
+        .first()
+    )
+
+    if combinacion_inactiva:
+        raise HTTPException(
+            status_code=400,
+            detail="No es posible crear la orden de carga porque la Combinación se encuentra INACTIVO."
+        )
+
+
+def validar_cotizacion(cotizacion, moneda_origen_id: int, descripcion: str):
+        if not cotizacion or cotizacion.cotizacion_moneda is None:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Falta la cotización para {descripcion} (moneda_id={moneda_origen_id})."
+            )
+
+
 def create_orden_carga(
     db: Session,
     data: schemas.OrdenCargaForm,
@@ -133,30 +200,80 @@ def create_orden_carga(
     modified_by = current_user.username
 
     rol_id = repositories.get_rol_id_by_gestor_carga_id(db, gestor_carga_id)
-    roles_permisos = repositories.rol_tiene_permiso(rol_id, "Cambiar_estado 1 - orden de carga", db)
+    roles_permisos = repositories.rol_tiene_permiso(rol_id, "Crear 1 - orden de carga", db)
 
-    if roles_permisos:
-        estado_inicial = EstadoEnum.ACEPTADO
-    else:
-        estado_inicial = EstadoEnum.NUEVO
+    estado_inicial = EstadoEnum.ACEPTADO
 
     camion = db.query(Camion).filter(Camion.id == data.camion_id).first()
     if not camion:
         raise HTTPException(status_code=404, detail="Camión no encontrado")
 
-
     if estado_inicial == EstadoEnum.ACEPTADO:
         cant_oc_aceptadas = repositories.get_orden_carga_aceptada_count_by_camion_id(db, data.camion_id)
         if cant_oc_aceptadas >= camion.limite_cantidad_oc_activas:
-            print(f"Existen {cant_oc_aceptadas} OC aceptadas y el límite es de {camion.limite_cantidad_oc_activas} para el camión con placa {camion.placa}")
+            print(f"Existen {cant_oc_aceptadas} OC aceptadas y el límite es de {camion.limite_cantidad_oc_activas} para el tracto con placa {camion.placa}")
             raise HTTPException(
                 status_code=HTTPStatus.LOCKED,
-                detail=f"El camión con placa {camion.placa} ha alcanzado el límite de órdenes activas permitidas ({camion.limite_cantidad_oc_activas})."
+                detail=f"El tracto con placa {camion.placa} ha alcanzado el límite de órdenes activas permitidas ({camion.limite_cantidad_oc_activas})."
             )
-    camion_semi_neto = get_camion_semi_neto_by_camion_id_and_semi_id_and_producto_id(
-        db, data.camion_id, data.semi_id, flete.producto_id, gestor_carga_id
+
+    moneda_gestor_carga = get_moneda_by_gestor_carga(db, gestor_carga_id)
+    if not moneda_gestor_carga:
+        raise HTTPException(status_code=404, detail="Moneda del gestor de carga no encontrada.")
+
+
+    cotizacion_condicion_origen_gestor_carga = get_cotizacion_moneda(db, flete.condicion_gestor_carga_moneda_id, gestor_carga_id)
+    validar_cotizacion(cotizacion_condicion_origen_gestor_carga, flete.condicion_gestor_carga_moneda_id, "condición gestor de carga")
+
+    cotizacion_origen_condicion_propietario = get_cotizacion_moneda(db, flete.condicion_propietario_moneda_id, gestor_carga_id)
+    validar_cotizacion(cotizacion_origen_condicion_propietario, flete.condicion_propietario_moneda_id, "condición propietario")
+
+    cotizacion_origen_gestor_carga = get_cotizacion_moneda(db, flete.merma_gestor_carga_moneda_id, gestor_carga_id)
+    validar_cotizacion(cotizacion_origen_gestor_carga, flete.merma_gestor_carga_moneda_id, "merma gestor de carga")
+
+    cotizacion_origen_propietario = get_cotizacion_moneda(db, flete.merma_propietario_moneda_id, gestor_carga_id)
+    validar_cotizacion(cotizacion_origen_propietario, flete.merma_propietario_moneda_id, "merma propietario")
+
+    cotizacion_destino_gestor_carga_ml = get_cotizacion_moneda(db, moneda_gestor_carga.id, gestor_carga_id)
+    validar_cotizacion(cotizacion_destino_gestor_carga_ml, moneda_gestor_carga.id, "destino gestor de carga")
+
+    merma_gestor_carga_valor_ml = (
+        flete.merma_gestor_carga_valor * cotizacion_origen_gestor_carga.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
     )
-    data.camion_semi_neto_id = camion_semi_neto.id if camion_semi_neto else None
+    merma_propietario_valor_ml = (
+        flete.merma_propietario_valor * cotizacion_origen_propietario.cotizacion_moneda / cotizacion_destino_gestor_carga_ml.cotizacion_moneda
+    )
+    condicion_gestor_carga_tarifa_ml = (
+        flete.condicion_gestor_carga_tarifa * cotizacion_condicion_origen_gestor_carga.cotizacion_moneda / flete.condicion_gestor_carga_unidad_conversion
+    )
+    condicion_propietario_tarifa_ml = (
+        flete.condicion_propietario_tarifa * cotizacion_origen_condicion_propietario.cotizacion_moneda / flete.condicion_propietario_unidad_conversion
+    )
+
+    if data.cantidad_nominada > flete.saldo:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"La cantidad nominada supera el saldo disponible del pedido)."
+            )
+        )
+
+    if flete.is_edit:
+        raise HTTPException(
+            status_code=400,
+            detail="No se puede crear una orden de carga con un pedido que está en modo edición."
+    )
+
+    validar_combinacion(
+        db=db,
+        chofer_id=data.chofer_id,
+        propietario_id=data.propietario_id,
+        camion_id=data.camion_id,
+        semi_id=data.semi_id,
+        gestor_carga_id=gestor_carga_id
+    )
+
+    validar_flete(flete)
 
     obj = repositories.create_orden_carga(
         db,
@@ -165,14 +282,27 @@ def create_orden_carga(
         gestor_carga_id,
         modified_by,
         estado_inicial,
+        condicion_gestor_carga_tarifa_ml,
+        condicion_propietario_tarifa_ml,
+        merma_gestor_carga_valor_ml,
+        merma_propietario_valor_ml
     )
+
+    flete.orden_carga_id = obj.id
+    flete.is_in_orden_carga = True
+    db.add(flete)
+    db.commit()
 
     if estado_inicial in [EstadoEnum.ACEPTADO, EstadoEnum.NUEVO]:
         flete.saldo -= data.cantidad_nominada
+        if flete.cargado is None:
+            flete.cargado = 0
+        #  Sumar la cantidad nominada al cargado acumulado
+        flete.cargado += data.cantidad_nominada
+
         db.add(flete)
         db.commit()
 
-    # update_orden_carga_anticipo_saldo_by_orden_carga_id(db, OrdenCarga.id, modified_by)
     create_orden_carga_anticipo_porcentaje_by_flete_anticipo_list(
         db, obj.id, obj.flete_anticipos, modified_by
     )
@@ -194,7 +324,7 @@ def create_orden_carga_comentarios_historial(
         created_by=created_by,
         modified_by=modified_by,
     )
-    # Guardar en la base de datos
+
     db.add(nuevo_comentario)
     db.commit()
     db.refresh(nuevo_comentario)
@@ -225,7 +355,6 @@ def edit_orden_carga(
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
-
 def edit_remitir_fecha(
     id: int,
     db: Session,
@@ -238,7 +367,6 @@ def edit_remitir_fecha(
         raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
 
     return repositories.edit_remitir_fecha(db, orden_carga, data, current_user.gestor_carga_id, current_user.username)
-
 
 
 def update_comentarios(
@@ -282,6 +410,54 @@ def get_orden_carga_combinacion_detail(
     return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
+def validar_habilitacion_para_anticipos(
+    db: Session,
+    chofer_id: int,
+    propietario_id: int,
+    combinacion_id: int
+) -> bool:
+    # Validar chofer
+    chofer = db.query(Chofer).filter(Chofer.id == chofer_id).first()
+    if not chofer:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Chofer no encontrado."
+        )
+    if not chofer.puede_recibir_anticipos:
+        raise HTTPException(
+            status_code=HTTPStatus.LOCKED,
+            detail="El Chofer no está habilitado para recibir anticipos."
+        )
+
+    # Validar propietario
+    propietario = db.query(Propietario).filter(Propietario.id == propietario_id).first()
+    if not propietario:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Propietario no encontrado."
+        )
+    if not propietario.puede_recibir_anticipos:
+        raise HTTPException(
+            status_code=HTTPStatus.LOCKED,
+            detail="El Propietario no está habilitado para recibir anticipos."
+        )
+
+    # Validar combinación
+    combinacion = db.query(Combinacion).filter(Combinacion.id == combinacion_id).first()
+    if not combinacion:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Combinación no encontrada."
+        )
+    if combinacion.estado != EstadoEnum.ACTIVO.value:
+        raise HTTPException(
+            status_code=HTTPStatus.LOCKED,
+            detail="La combinación está inactiva."
+        )
+
+    return True
+
+
 def get_ordenes_carga_by_combinacion_id(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     ordenes_carga = db.query(OrdenCarga).filter(OrdenCarga.combinacion_id == combinacion_id).all()
     if not combinacion_id:
@@ -292,11 +468,9 @@ def get_ordenes_carga_by_combinacion_id(db: Session, combinacion_id: int) -> Lis
 def get_ordenes_carga_by_combinacion_id_and_nuevo(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-
-    # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
-        OrdenCarga.estado == "Nuevo"  # Ajusta este valor si el estado se almacena de manera diferente
+        OrdenCarga.estado == "Nuevo"
     ).all()
 
     return ordenes_carga
@@ -305,11 +479,9 @@ def get_ordenes_carga_by_combinacion_id_and_nuevo(db: Session, combinacion_id: i
 def get_ordenes_carga_by_combinacion_id_and_finalizar(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-
-    # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
-        OrdenCarga.estado == "Finalizado"  # Ajusta este valor si el estado se almacena de manera diferente
+        OrdenCarga.estado == "Finalizado"
     ).all()
 
     return ordenes_carga
@@ -318,13 +490,10 @@ def get_ordenes_carga_by_combinacion_id_and_finalizar(db: Session, combinacion_i
 def get_ordenes_carga_by_combinacion_id_and_aceptado(db: Session, combinacion_id: int) -> List[OrdenCarga]:
     if not combinacion_id:
         raise HTTPException(status_code=404, detail="No se encontró la combinación ID proporcionada")
-
-    # Filtrar por combinacion_id y estado "Aceptado"
     ordenes_carga = db.query(OrdenCarga).filter(
         OrdenCarga.combinacion_id == combinacion_id,
-        OrdenCarga.estado == "Aceptado"  # Ajusta este valor si el estado se almacena de manera diferente
+        OrdenCarga.estado == "Aceptado"
     ).all()
-
     return ordenes_carga
 
 
@@ -335,7 +504,6 @@ def get_orden_carga_list_by_combinacion_id(
     if not obj:
         raise HTTPException(status_code=404, detail="Combinacion no encontrada")
     return obj
-
 
 
 def get_orden_carga_pdf_by_id(db: Session, id: int) -> str:
@@ -414,9 +582,29 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
     if not gestor_carga:
         raise HTTPException(status_code=404, detail="Gestor no encontrado")
     marca_agua_url = f"{STATICS_URL}/marca-de-agua.png"
+    # Obtención del usuario
+    usuario = get_user_by_username(db, obj.created_by)
+    usuario_nombre = f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
     OUTPUT_FILENAME = f"resumen_{id}.pdf"
     TEMPLATE_FILENAME = "pdf_resumen.html"
     template: Template = templateEnv.get_template(TEMPLATE_FILENAME)
+
+    descuentos_desc = ''
+    complementos_desc = ''
+    descuentos = obj.descuentos_list
+    complementos = obj.complementos_list
+    if descuentos:
+        descuentos_desc = " ".join([
+            x.concepto_descripcion + " (" + x.propietario_moneda_simbolo + ") : "
+            + number_format(x.propietario_monto_ml)
+                            if x.propietario_monto_ml is not None else '' for x in descuentos])
+
+    if complementos:
+        complementos_desc = " ".join([
+            x.concepto_descripcion + " (" + x.propietario_moneda_simbolo + ") : "
+            + number_format(x.propietario_monto_ml)
+                            if x.propietario_monto_ml is not None else '' for x in complementos])
+
     data = {
         "id": id,
         "flete_id": obj.flete_id,
@@ -426,8 +614,13 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
         "gestor_carga_numero_documento": gestor_carga.numero_documento,
         "fecha": datetime.now().strftime("%Y-%m-%d / %H:%M:%S"),
         "propietario_nombre": obj.camion_propietario_nombre,
+        "propietario_documento": obj.camion_propietario_documento,
+        "usuario_nombre": usuario_nombre,
         "chofer_nombre": obj.chofer_nombre,
+        "chofer_documento": obj.combinacion_chofer_doc,
         "camion_placa": obj.camion_placa,
+        "camion_marca": obj.camion_marca,
+        "camion_color": obj.camion_color,
         "semi_placa": obj.semi_placa,
         "origen": obj.origen_nombre,
         "origen_direccion": obj.origen.direccion if obj.origen.direccion else "-",
@@ -436,7 +629,10 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
         "producto": obj.flete_producto_descripcion,
         "tarifa_flete": number_format(obj.flete_tarifa),
         "tasa": obj.flete_tarifa_unidad,  # noqa
+        "merma_valor": number_format(obj.resultado_propietario_merma_valor_total),
         "docs_origen": obj.remisiones,
+        "descuentos_desc": descuentos_desc,
+        "complementos_desc": complementos_desc,
         "cantidad_origen": number_format(obj.cantidad_origen),
         "docs_destino": obj.nro_tickets,
         "cantidad_destino": number_format(obj.cantidad_destino),
@@ -450,16 +646,24 @@ def get_orden_carga_resumen_pdf_by_id(db: Session, id: int) -> str:
             obj.resultado_propietario_merma_valor_total_moneda_local
         ),
         "anticipo": number_format(obj.resultado_propietario_total_anticipos_retirados),
+        "anticipo_efectivo": number_format(obj.resultado_propietario_total_anticipos_retirados_efectivo),
+        "anticipo_insumo": number_format(
+            obj.resultado_propietario_total_anticipos_retirados_combustible +
+                obj.resultado_propietario_total_anticipos_retirados_lubricantes
+            ),
         "saldo": number_format(obj.resultado_propietario_saldo),
         "marca_agua_url": marca_agua_url,
         "class_name": "marca-agua" if obj.estado == EstadoEnum.FINALIZADO.value else "",
     }
-    source_html = template.render(logo=LOGO_IMAGE_URL, **data)
+    source_html = template.render(logo=LOGO_IMAGE_URL, times=range(2), **data)
+    logger.info(f'html: {source_html}')
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
     from_string(
-        source_html, pdf_filename, {"page-size": "Legal", "orientation": "Landscape"}
+        source_html, pdf_filename, {"page-size": "Legal"}
     )
+
     return OUTPUT_FILENAME
+    #return HTMLResponse(content=source_html, status_code=200)
 
 
 def change_orden_carga_anticipos_liberados(
@@ -592,12 +796,25 @@ def finalizar_orden_carga(
     return get_orden_carga_with_resultado(db, model, current_user.id)
 
 
+def recalcular_provisiones(db: Session, id: int, current_user: schemas.AuthUser) -> schemas.OrdenCarga:
+    obj = get_orden_carga_by_id(db, id)
+    #primero borramos todas las proviciones
+    borrar_provisiones_by_conciliacion_oc(
+        db, obj, current_user.gestor_carga_id, current_user.username
+    )
+    #segundo recreamos proviciones
+    create_provision_by_finalizar_oc(
+        db, obj, current_user.gestor_carga_id, current_user.username
+    )
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
+
+
 def liquidar_orden_carga(
     db: Session, id: int, current_user: schemas.AuthUser
 ) -> schemas.OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     model = repositories.liquidar_orden_carga(obj, db, current_user.username)
-    return get_orden_carga_with_resultado(db, model, current_user.id)
+    return get_orden_carga_with_resultado(db, obj, current_user.id)
 
 
 def send_oc_mail(db: Session, id: int):
@@ -915,4 +1132,255 @@ def get_orden_carga_list_detail(
 ) -> OrdenCarga:
     obj = get_orden_carga_by_id(db, id)
     return obj
+
+
+def update_complementos_y_descuentos_oc(
+    db: Session,
+    orden_carga_id: int,
+    nuevo_flete_id: int,
+    modified_by: str,
+    flete_viejo_id: int = None
+):
+    print(f"🔁 Inicio update_complementos_y_descuentos_oc para OC={orden_carga_id} con nuevo flete={nuevo_flete_id}")
+
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
+    if not orden_carga:
+        raise HTTPException(status_code=404, detail="Orden de carga no encontrada")
+
+    if flete_viejo_id is None:
+        flete_viejo_id = orden_carga.flete_id
+
+    print(f"🧾 Flete viejo: {flete_viejo_id}, Flete nuevo: {nuevo_flete_id}")
+
+    nuevo_flete = db.query(Flete).filter(Flete.id == nuevo_flete_id).first()
+    if not nuevo_flete:
+        raise HTTPException(status_code=404, detail="Nuevo flete no encontrado")
+
+    # Actualizar o crear complementos
+    for complemento in nuevo_flete.complementos:
+        repositories.update_or_create_orden_carga_complemento_by_flete(db, orden_carga, complemento, modified_by)
+
+    # Eliminar complementos del flete viejo que no existen en el nuevo
+    nuevos_conceptos_complemento = {c.concepto_id for c in nuevo_flete.complementos}
+    complementos_a_eliminar = db.query(OrdenCargaComplemento).filter(
+        OrdenCargaComplemento.orden_carga_id == orden_carga_id,
+        OrdenCargaComplemento.flete_id == flete_viejo_id,
+        ~OrdenCargaComplemento.concepto_id.in_(nuevos_conceptos_complemento)
+    ).all()
+
+    for comp in complementos_a_eliminar:
+        print(f"🗑️ Eliminando complemento con concepto_id={comp.concepto_id}")
+        db.delete(comp)
+
+    # Actualizar o crear descuentos
+    for descuento in nuevo_flete.descuentos:
+        repositories.update_or_create_orden_carga_descuento_by_flete(db, orden_carga, descuento, modified_by)
+
+    db.commit()
+    print("✅ Complementos y descuentos actualizados correctamente.")
+
+
+def recalcular_condiciones(db: Session, flete_id: int, orden_carga_id: int, current_user: schemas.AuthUser) -> schemas.RecalculoCondicionesResponse:
+    # print(f"🔄 Inicio recalcular_condiciones para OC={orden_carga_id} con flete nuevo={flete_id}")
+
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
+    if not orden_carga:
+        print("❌ Orden de carga no encontrada")
+        return
+
+    flete_viejo_id = orden_carga.flete_id  # Guardar flete viejo antes de actualizar
+    # print(f"🔄 Llamando a update_complementos_y_descuentos_oc con flete viejo {flete_viejo_id} y nuevo {flete_id}")
+
+
+    # print(f"🧾 Flete viejo actual: {flete_viejo_id}")
+
+    # Solo recalcular si el flete es diferente al actual
+    if flete_viejo_id == flete_id:
+        # print("ℹ️ El flete nuevo es igual al viejo, no se recalcula")
+        return
+
+    flete = repositories.get_flete_by_id(db, flete_id)
+    if not flete:
+        print(f"❌ No se encontró el flete con id={flete_id}")
+        return
+
+    gestor_carga_id = current_user.gestor_carga_id
+    moneda_gc = get_moneda_by_gestor_carga(db, gestor_carga_id)
+    if not moneda_gc:
+        print(f"❌ No se encontró moneda para gestor_carga_id={gestor_carga_id}")
+        return
+
+    flete_anticipo = flete.anticipos[0] if flete.anticipos else None
+    if not flete_anticipo:
+        print("❌ El flete no tiene anticipos")
+        return
+
+    print("📊 Calculando cotizaciones...")
+    cot_gc_cond = get_cotizacion_moneda(db, flete.condicion_gestor_carga_moneda_id, gestor_carga_id)
+    cot_prop_cond = get_cotizacion_moneda(db, flete.condicion_propietario_moneda_id, gestor_carga_id)
+    cot_gc_merma = get_cotizacion_moneda(db, flete.merma_gestor_carga_moneda_id, gestor_carga_id)
+    cot_prop_merma = get_cotizacion_moneda(db, flete.merma_propietario_moneda_id, gestor_carga_id)
+    cot_destino = get_cotizacion_moneda(db, moneda_gc.id, gestor_carga_id)
+
+    # Validar cotizaciones para debug
+    if not all([cot_gc_cond, cot_prop_cond, cot_gc_merma, cot_prop_merma, cot_destino]):
+        print("❌ Alguna cotización no se encontró o es inválida")
+        return
+
+    condicion_gestor_carga_tarifa_ml = (
+        flete.condicion_gestor_carga_tarifa * cot_gc_cond.cotizacion_moneda / flete.condicion_gestor_carga_unidad_conversion
+    )
+    condicion_propietario_tarifa_ml = (
+        flete.condicion_propietario_tarifa * cot_prop_cond.cotizacion_moneda / flete.condicion_propietario_unidad_conversion
+    )
+    merma_gestor_carga_valor_ml = (
+        flete.merma_gestor_carga_valor * cot_gc_merma.cotizacion_moneda / cot_destino.cotizacion_moneda
+    )
+    merma_propietario_valor_ml = (
+        flete.merma_propietario_valor * cot_prop_merma.cotizacion_moneda / cot_destino.cotizacion_moneda
+    )
+
+    print(f"📝 Valores recalculados:\n"
+          f" - condicion_gestor_carga_tarifa_ml: {condicion_gestor_carga_tarifa_ml}\n"
+          f" - condicion_propietario_tarifa_ml: {condicion_propietario_tarifa_ml}\n"
+          f" - merma_gestor_carga_valor_ml: {merma_gestor_carga_valor_ml}\n"
+          f" - merma_propietario_valor_ml: {merma_propietario_valor_ml}")
+
+    actualizar_estado_y_cantidades_fletes(
+        db=db,
+        nuevo_flete_id=flete_id,
+        flete_anterior_id=flete_viejo_id,
+        orden_carga_id=orden_carga_id,
+        cantidad_nominada=orden_carga.cantidad_nominada
+    )
+
+
+    # Actualizar flete en la orden de carga
+    orden_carga.flete_id = flete_id
+    orden_carga.condicion_gestor_carga_tarifa_ml = condicion_gestor_carga_tarifa_ml
+    orden_carga.condicion_propietario_tarifa_ml = condicion_propietario_tarifa_ml
+    orden_carga.merma_gestor_carga_valor_ml = merma_gestor_carga_valor_ml
+    orden_carga.merma_propietario_valor_ml = merma_propietario_valor_ml
+
+    db.commit()
+    db.refresh(orden_carga)
+
+    update_complementos_y_descuentos_oc(
+        db=db,
+        orden_carga_id=orden_carga_id,
+        nuevo_flete_id=flete_id,
+        modified_by=current_user.username,
+        flete_viejo_id=flete_viejo_id
+    )
+
+    print("✅ recalcular_condiciones finalizada correctamente")
+
+    return schemas.RecalculoCondicionesResponse(
+        condicion_gestor_carga_tarifa_ml=orden_carga.condicion_gestor_carga_tarifa_ml,
+        condicion_propietario_tarifa_ml=orden_carga.condicion_propietario_tarifa_ml,
+        merma_gestor_carga_valor_ml=orden_carga.merma_gestor_carga_valor_ml,
+        merma_propietario_valor_ml=orden_carga.merma_propietario_valor_ml,
+    )
+
+
+def update_flete_saldo(db: Session, flete_id: int, orden_carga_id: int, current_user: schemas.AuthUser) -> schemas.RecalculoCondicionesResponse:
+    print(f"🔁 Inicio update_flete_saldo para OC={orden_carga_id} con flete nuevo={flete_id}")
+
+    orden_carga = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
+    if not orden_carga:
+        print("❌ Orden de carga no encontrada")
+        return
+
+    flete_anterior_id = orden_carga.flete_id
+    print(f"flete_anterior_id: {flete_anterior_id}, nuevo_flete_id: {flete_id}")
+
+    # Evitar recalculo si es el mismo flete
+    if flete_anterior_id == flete_id:
+        print("ℹ️ El flete nuevo es igual al viejo, no se actualizan saldos")
+        return
+
+    flete = repositories.get_flete_by_id(db, flete_id)
+    if not flete:
+        print(f"❌ No se encontró el flete con id={flete_id}")
+        return
+
+    gestor_carga_id = current_user.gestor_carga_id
+    moneda_gc = get_moneda_by_gestor_carga(db, gestor_carga_id)
+    if not moneda_gc:
+        print(f"❌ No se encontró moneda para gestor_carga_id={gestor_carga_id}")
+        return
+
+    flete_anticipo = flete.anticipos[0] if flete.anticipos else None
+    if not flete_anticipo:
+        print("❌ El flete no tiene anticipos")
+        return
+
+    # Ahora sí asignar el nuevo flete
+    orden_carga.flete_id = flete_id
+
+    # Actualizar saldos de fletes
+    actualizar_estado_y_cantidades_fletes(
+        db=db,
+        nuevo_flete_id=flete_id,
+        flete_anterior_id=flete_anterior_id,
+        orden_carga_id=orden_carga_id,
+        cantidad_nominada=orden_carga.cantidad_nominada
+    )
+
+    db.commit()
+    db.refresh(orden_carga)
+
+    print("✅ update_flete_saldo finalizado correctamente")
+
+
+
+def actualizar_estado_y_cantidades_fletes(
+    db: Session,
+    nuevo_flete_id: int,
+    flete_anterior_id: Optional[int],
+    orden_carga_id: int,
+    cantidad_nominada: float
+):
+    oc = db.query(OrdenCarga).filter(OrdenCarga.id == orden_carga_id).first()
+    remision_origen = None
+    if oc:
+        remision_origen = db.query(OrdenCargaRemisionOrigen).filter(
+            OrdenCargaRemisionOrigen.orden_carga_id == oc.id
+        ).first()
+
+    cantidad_real = remision_origen.cantidad if remision_origen else cantidad_nominada
+
+    # Actualizar nuevo flete
+    nuevo_flete = db.query(Flete).filter(Flete.id == nuevo_flete_id).first()
+    if nuevo_flete:
+        print(f"Antes nuevo_flete cargado: {nuevo_flete.cargado}, saldo: {nuevo_flete.saldo}")
+        nuevo_flete.is_in_orden_carga = True
+        nuevo_flete.saldo = (nuevo_flete.saldo or 0) - cantidad_real
+        nuevo_flete.cargado = (nuevo_flete.cargado or 0) + cantidad_real
+        print(f"Después nuevo_flete cargado: {nuevo_flete.cargado}, saldo: {nuevo_flete.saldo}")
+        db.add(nuevo_flete)
+
+    # Actualizar flete anterior si es distinto
+    if flete_anterior_id and flete_anterior_id != nuevo_flete_id:
+        flete_anterior = db.query(Flete).filter(Flete.id == flete_anterior_id).first()
+        if flete_anterior:
+            otras_oc = db.query(OrdenCarga).filter(
+                OrdenCarga.flete_id == flete_anterior_id,
+                OrdenCarga.id != orden_carga_id,  # excluyo la OC que se está migrando
+                OrdenCarga.estado != EstadoEnum.CANCELADO.value
+            ).count()
+
+            print(f"Otras OC en flete anterior (ID {flete_anterior_id}): {otras_oc}")
+            print(f"Antes flete_anterior cargado: {flete_anterior.cargado}, saldo: {flete_anterior.saldo}")
+
+            # Ajustar
+            flete_anterior.is_in_orden_carga = otras_oc > 0
+            flete_anterior.saldo = (flete_anterior.saldo or 0) + cantidad_real
+            flete_anterior.cargado = (flete_anterior.cargado or 0) - cantidad_real
+
+            print(f"Después flete_anterior cargado: {flete_anterior.cargado}, saldo: {flete_anterior.saldo}")
+
+            db.add(flete_anterior)
+
+
 

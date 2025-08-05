@@ -116,3 +116,17 @@ def delete_gestor_carga(
     db.commit()
     db.refresh(obj)
     return obj
+
+
+def change_gestor_carga_status(
+    obj: GestorCarga,
+    db: Session,
+    status: EstadoEnum,
+    modified_by: str,
+) -> GestorCarga:
+    obj.estado = status.value
+    obj.modified_by = modified_by
+    obj.modified_at = datetime.now()
+    db.commit()
+    db.refresh(obj)
+    return obj

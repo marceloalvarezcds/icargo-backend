@@ -44,6 +44,7 @@ from .centro_operativo import (  # noqa
     get_centro_operativo_by_id,
     get_centro_operativo_by_id_and_gestor_carga_id,
     get_centro_operativo_reports,
+    change_centro_operativo_status,
 )
 from .centro_operativo_contacto import update_centro_operativo_contacto_list  # noqa
 from .chofer import (  # noqa
@@ -59,6 +60,7 @@ from .chofer import (  # noqa
 from .ciudad import get_ciudad_list  # noqa
 from .contacto import get_contacto_by  # noqa
 from .contraparte import get_contraparte_list_by_tipo_contraparte_id  # noqa
+from .comentarios_flota import create_comentario_flota, get_comentarios_flota_by_entidad  # noqa
 from .estado_cuenta import (  # noqa
     get_estado_cuenta_by_contraparte,
     get_estado_cuenta_list,
@@ -69,14 +71,17 @@ from .estado_cuenta import (  # noqa
     get_estado_cuenta_pdv_list,
     get_estado_cuenta_pdv,
 )
+
 from .moneda_cotizacion import(
-    read_cotizacion_moneda
+    get_cotizacion_moneda
 )
+
 from .factura import (  # noqa
     create_factura,
     delete_factura,
     edit_factura,
     get_factura_by_id,
+    get_factura_pdf_by_id,
 )
 from .flete import (  # noqa
     change_flete_public_status,
@@ -86,7 +91,9 @@ from .flete import (  # noqa
     edit_flete,
     get_flete_detail_by_id,
     get_flete_reports,
-    get_flete_datail_by_id
+    get_flete_datail_by_id,
+    update_flete_cantidad,
+    update_flete_edit_mode
 )
 from .flete_anticipo import (  # noqa
     get_tipo_anticipo_insumo_list,
@@ -101,6 +108,7 @@ from .gestor_carga import (  # noqa
     edit_gestor_carga,
     get_gestor_carga_by_id,
     get_gestor_carga_reports,
+    change_gestor_carga_status,
 )
 from .gestor_carga_centro_operativo import (  # noqa
     create_gestor_carga_centro_operativo,
@@ -134,6 +142,7 @@ from .instrumento import (  # noqa
     get_instrumento_by_id,
     get_instrumento_reports,
     rechazar_instrumento,
+    anular_instrumento,
 )
 from .insumo_punto_venta import (  # noqa
     get_insumo_list_by_tipo_insumo_id_and_gestor_carga_id,
@@ -184,7 +193,9 @@ from .liquidacion import (  # noqa
     remove_movimiento,
     someter_liquidacion,
     remove_movimientos,
-    refresh_pago_cobro
+    refresh_pago_cobro,
+    add_instrumento,
+    forzar_cierre
 )
 from .movimiento import (  # noqa
     create_movimiento,
@@ -245,6 +256,11 @@ from .orden_carga import (  # noqa
     edit_remitir_fecha,
     get_orden_carga_en_proceso_list,
     get_orden_carga_cerradas_list,
+    recalcular_condiciones,
+    validar_habilitacion_para_anticipos,
+    recalcular_provisiones,
+    update_flete_saldo,
+
 )
 from .orden_carga_anticipo_retirado import (  # noqa
     create_orden_carga_anticipo_retirado,
@@ -253,12 +269,15 @@ from .orden_carga_anticipo_retirado import (  # noqa
     get_orden_carga_anticipo_retirado_by_id,
     get_orden_carga_anticipo_retirado_pdf_by_id,
     change_anticipo_status,
+    get_orden_carga_anticipo_retirado_list,
 )
 from .orden_carga_anticipo_saldo import (  # noqa
     get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id,
     get_saldos_by_orden_carga,
     get_flete_anticipo_by_orden_carga_insumos,
     get_flete_anticipo_id_by_flete_id_and_orden_carga_id,
+    get_total_complemento,
+    get_saldo_anticipo_por_flete_y_oc,
 )
 from .orden_carga_complemento import (  # noqa
     create_orden_carga_complemento,
@@ -316,6 +335,7 @@ from .proveedor import (  # noqa
     get_proveedor_by_id,
     get_proveedor_by_id_and_gestor_carga_id,
     get_proveedor_reports,
+    change_proveedor_status,
 )
 from .proveedor_contacto import update_proveedor_contacto_list  # noqa
 from .punto_venta import (  # noqa
@@ -325,6 +345,7 @@ from .punto_venta import (  # noqa
     get_punto_venta_by_id,
     get_punto_venta_by_id_and_gestor_carga_id,
     get_punto_venta_reports,
+    change_punto_venta_status,
 )
 from .punto_venta_contacto import update_punto_venta_contacto_list  # noqa
 from .remitente import (  # noqa
@@ -334,6 +355,7 @@ from .remitente import (  # noqa
     get_remitente_by_id,
     get_remitente_by_id_and_gestor_carga_id,
     get_remitente_reports,
+    change_remitente_status,
 )
 from .remitente_contacto import update_remitente_contacto_list  # noqa
 from .rentabilidad import get_rentabilidad_list, get_rentabilidad_reports  # noqa
@@ -345,6 +367,7 @@ from .rol import (  # noqa
     get_rol_active_list,
     get_rol_by_id,
     get_rol_list,
+    get_roles_by_user_id,
 )
 from .security import create_access_token  # noqa
 from .semi import (  # noqa
@@ -398,6 +421,7 @@ from .combinacion import (
     get_camion_list_combinacion,
     get_semi_list_by_camion_id,
     get_combinacion_by_camion_id_and_semi_id_,
+    get_combinacion_all_list,
 )
 from .contribuyente import (
     get_list,
@@ -410,4 +434,4 @@ from .texto_legal_service import (
     crear_texto_legal,
     edit_texto_legal
 )
-from .moneda_cotizacion import (read_cotizacion_moneda)
+from .moneda_cotizacion import (read_cotizacion_moneda, get_cotizacion_moneda, update_moneda_cotizacion_by_gestor_moneda_fecha, get_moneda_cotizacion_by_id)

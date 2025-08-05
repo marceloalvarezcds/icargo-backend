@@ -18,10 +18,10 @@ def get_orden_carga_anticipo_saldo_by(
         OrdenCargaAnticipoSaldo.flete_anticipo_id == flete_anticipo_id,
         OrdenCargaAnticipoSaldo.orden_carga_id == orden_carga_id,
     )
-    
+
     if tipo_anticipo:
         query = query.filter(OrdenCargaAnticipoSaldo.tipo_anticipo == tipo_anticipo)
-    
+
     return query.first()
 
 
@@ -40,8 +40,6 @@ def get_orden_carga_anticipo_saldo_insumo_by(
         )
         .all()
     )
-
-
 
 def get_orden_carga_anticipo_saldo_by_id(
     db: Session,
@@ -81,9 +79,10 @@ def create_orden_carga_anticipo_saldo(
         orden_carga_id=data.orden_carga_id,
         orden_carga_anticipo_porcentaje_id=data.orden_carga_anticipo_porcentaje_id,
         total_anticipo=data.total_anticipo,
+        # total_anticipo_ml=data.total_anticipo_ml,
         total_complemento=data.total_complemento,
-        total_retirado=data.total_retirado,  
-        saldo=saldo_actualizado,  
+        total_retirado=data.total_retirado,
+        saldo=saldo_actualizado,
         created_by=modified_by,
         modified_by=modified_by,
     )

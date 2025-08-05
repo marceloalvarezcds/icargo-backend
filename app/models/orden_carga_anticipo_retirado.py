@@ -9,12 +9,9 @@ from sqlalchemy import (  # type: ignore
 )
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-
 from app.audits.audit_mixin import AuditMixin
 from app.database.base import Base
-from app.schemas.movimiento import Movimiento
 from app.utils import number_format
-
 from .flete_anticipo import FleteAnticipo
 from .insumo_punto_venta_precio import InsumoPuntoVentaPrecio
 from .moneda import Moneda
@@ -51,6 +48,7 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     moneda_id = Column(Integer, ForeignKey("moneda.id"))
     moneda = relationship(Moneda, uselist=False)
     monto_retirado = Column(Numeric(38, 10))
+    monto_mon_local = Column(Numeric(38, 10))
     observacion = Column(Text)
     # OPCIONALES
     insumo_punto_venta_precio_id = Column(
@@ -65,6 +63,7 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     precio_unitario = Column(
         Numeric(38, 10)
     )  # No se usa para calcular los movimientos, solo para cargar por el momento
+    movimientos = relationship("Movimiento", back_populates="anticipo")
 
     @hybrid_property
     def concepto(self):
@@ -81,9 +80,14 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
         producto_info = ""
         if self.insumo_punto_venta_precio:
             producto_info = f" || Precio: {number_format(self.precio_unitario)} || Prod: {self.insumo_descripcion}"  # noqa: B950
-        concepto = f"{self.concepto}: {number_format(self.monto_retirado)}{self.moneda_simbolo}"
-        punto_venta_producto = f"{producto_info} || {self.punto_venta_nombre}"
+            moneda = self.gestor_carga_moneda_simbolo
+        else:
+            moneda = self.moneda_simbolo
+
+        concepto = f"{self.concepto}: {number_format(self.monto_retirado)}{moneda}"
+        punto_venta_producto = f"{producto_info} || {self.punto_venta_alias}"
         return f"{concepto} {punto_venta_producto}"
+
 
     @hybrid_property
     def gestor_carga_id(self):
@@ -96,6 +100,10 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     @hybrid_property
     def gestor_carga_moneda_nombre(self):
         return self.orden_carga.gestor_carga_moneda_nombre
+
+    @hybrid_property
+    def gestor_carga_moneda_simbolo(self):
+        return self.orden_carga.gestor_carga_moneda_simbolo
 
     @hybrid_property
     def insumo_id(self):
@@ -125,6 +133,14 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     def insumo_moneda_nombre(self):
         return (
             self.insumo_punto_venta_precio.moneda_nombre
+            if self.insumo_punto_venta_precio
+            else None
+        )
+
+    @hybrid_property
+    def insumo_moneda_id(self):
+        return (
+            self.insumo_punto_venta_precio.moneda_id
             if self.insumo_punto_venta_precio
             else None
         )
@@ -227,17 +243,16 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
     def unidad_descripcion(self):
         return self.unidad.descripcion if self.unidad else None
 
-    @hybrid_property
-    def estados_movimientos(self):
-        # Obtener todos los movimientos relacionados con la orden de carga
-        movimientos: List[Movimiento] = self.orden_carga.movimientos if self.orden_carga else []
-        movimientos_filtrados = [
-            movimiento for movimiento in movimientos
-            if movimiento.anticipo_id == self.id
-        ]
-        primer_estado = next((movimiento.estado for movimiento in movimientos_filtrados), None)
 
-        return primer_estado
+    @hybrid_property
+    def estado_movimiento_propietario(self):
+        movimiento_propietario = next((x for x in self.movimientos if x.propietario_id != None), None)
+        return movimiento_propietario.estado if movimiento_propietario else None
+
+    @hybrid_property
+    def estado_movimiento_remitente(self):
+        movimiento_remitente = next((x for x in self.movimientos if x.remitente_id != None), None)
+        return movimiento_remitente.estado if movimiento_remitente else None
 
     @hybrid_property
     def monto_litro(self):
@@ -245,4 +260,16 @@ class OrdenCargaAnticipoRetirado(AuditMixin, Base):
             return self.cantidad_retirada * self.precio_unitario
         return 0
 
+    @hybrid_property
+    def estado_movimiento(self):
+        if self.movimientos:
+            return self.movimientos[0].estado
+        return None
 
+    @hybrid_property
+    def camion_placa(self):
+        return self.orden_carga.camion_placa
+
+    @hybrid_property
+    def chofer_nombre(self):
+        return self.orden_carga.chofer_nombre

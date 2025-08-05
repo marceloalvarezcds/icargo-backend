@@ -29,9 +29,12 @@ class OrdenCargaAnticipoSaldo(AuditMixin, Base):
         OrdenCargaAnticipoPorcentaje, uselist=False, back_populates="saldos"
     )
     total_anticipo = Column(Numeric(38, 10))  # cantidad_nomidada * porcentaje
+    # total_anticipo_ml = Column(Numeric(38, 10))
     total_complemento = Column(Numeric(38, 10))
     total_retirado = Column(Numeric(38, 10))
+    # total_retirado_ml = Column(Numeric(38, 10))
     saldo = Column(Numeric(38, 10))
+    # saldo_ml = Column(Numeric(38, 10))
 
     @hybrid_property
     def cantidad_nominada(self):
@@ -52,7 +55,7 @@ class OrdenCargaAnticipoSaldo(AuditMixin, Base):
     @hybrid_property
     def total_disponible(self):
         return self.total_anticipo + self.total_complemento
-    
+
     @hybrid_property
     def flete_anticipo_id_property(self):
         return self.flete_anticipo.flete_id

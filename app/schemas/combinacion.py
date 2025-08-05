@@ -54,7 +54,7 @@ class CombinacionForm(CombinacionBaseModel):
     semi: Optional[Semi]
     propietario: Optional[Propietario]
     chofer: Optional[Chofer]
- 
+
 
 
 class CombinacionBase(BaseModel):
@@ -72,6 +72,8 @@ class CombinacionCreateModel(CombinacionBaseModel):
     oc_activa: Optional[int]
     limite_anticipos: Optional[int]
     puede_recibir_anticipos: bool
+    is_propietario_condicionado: Optional[bool] = None
+    is_chofer_condicionado: Optional[bool] = None
     anticipo_propietario: bool
 
 
@@ -90,6 +92,8 @@ class Combinaciones(CombinacionGet):
     color_camion: Optional[str] = None
     chofer_numero_documento: Optional[str] = None
     puede_recibir_anticipos: bool
+    is_propietario_condicionado: bool
+    is_chofer_condicionado: bool
     anticipo_propietario: bool
     composicion_juridica_id: Optional[int] = None
     class Config:
@@ -114,7 +118,8 @@ class CombinacionList(CombinacionBase):
     chofer: Chofer
     camion_semi_neto: Optional[CamionSemiNeto] = None
     comentario: str
-    
+    is_chofer_condicionado: bool
+    is_propietario_condicionado: bool
     created_by: str
     created_at: datetime
     modified_by: str
@@ -140,3 +145,9 @@ class CombinacionUpdate(BaseModel):
     chofer_id: Optional[int]
     propietario_id: Optional[int]
     composicion_juridica_id: Optional[int] = None
+    puede_recibir_anticipos: bool
+    camion_oc_activa: Optional[int] = None
+    limite_monto_anticipos: Optional[RoundedDecimal] = None
+    is_propietario_condicionado: bool
+    is_chofer_condicionado: bool
+

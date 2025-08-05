@@ -15,10 +15,12 @@ class FleteDescuentoForm(BaseModel):
     habilitar_pago_proveedor: Optional[bool] = False
     # INICIO Monto a cobrar al Propietario
     propietario_monto: Optional[RoundedDecimal] = None
+    propietario_monto_ml: Optional[RoundedDecimal] = None
     propietario_moneda_id: Optional[int] = None
     # FIN Monto a cobrar al Propietario
     # INICIO Monto a pagar al Proveedor
     proveedor_monto: Optional[RoundedDecimal] = None
+    proveedor_monto_ml: Optional[RoundedDecimal] = None
     proveedor_moneda_id: Optional[int] = None
     proveedor_id: Optional[int] = None
     # FIN Monto a pagar al Proveedor
@@ -31,14 +33,17 @@ class FleteDescuento(FleteDescuentoForm):
     # INICIO Monto a cobrar al Propietario
     propietario_moneda: Moneda
     propietario_moneda_nombre: str
+    propietario_moneda_simbolo: str
     # FIN Monto a cobrar al Propietario
     # INICIO Monto a pagar al Proveedor
     proveedor_moneda: Optional[Moneda]
     proveedor_moneda_nombre: Optional[str] = None
+    proveedor_moneda_simbolo: Optional[str] = None
     proveedor: Optional[Proveedor] = None
     proveedor_nombre: Optional[str] = None
     # FIN Monto a pagar al Proveedor
     flete_id: int
-
+    gestor_carga_moneda_simbolo: str
+    
     class Config:
         orm_mode = True

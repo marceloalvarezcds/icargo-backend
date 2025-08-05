@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends,  Form
 from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
@@ -42,15 +42,13 @@ async def read_by_id(
     )
 
 
-@api.get("/title/get_by_title", response_model=schemas.TextoLegalModel)
+@api.get("/title/get_by_title", response_model=Optional[schemas.TextoLegalModel])
 async def read_by_title(
     title: str,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.TEXTO_LEGAL)),  # noqa: B008
 ):
-    # TODO: crear get by que retorne un solo item
-    item = service.get_list_by_filter(TextoLegal, db, estado=EstadoEnum.ACTIVO.value, titulo=title)
-    return item[0]
+    return service.get_by_title(TextoLegal, db, title)
 
 
 @api.post("/", response_model=schemas.TextoLegalModel)

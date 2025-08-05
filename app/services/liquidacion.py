@@ -9,6 +9,7 @@ from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Font  # type: ignore
 from pdfkit import from_string  # type: ignore
 from sqlalchemy.orm import Session  # type: ignore
+from fastapi.responses import HTMLResponse
 
 from app import repositories, schemas
 from app.config import LOGO_IMAGE_URL, REPORTS_FOLDER, templateEnv
@@ -30,12 +31,17 @@ from app.schemas import (
     LiquidacionAddInstrumentosForm,
     LiquidacionAddMovimientosForm,
     LiquidacionForm,
-    LiquidacionCabeceraMovimientosForm
+    LiquidacionCabeceraMovimientosForm,
+    InstrumentoForm,
+    Instrumento,
+    LiquidacionReport
 )
+from app.schemas import Instrumento as InstrumentoSchema
 from app.utils import get_gestor_carga_by_params, number_format
 
 from .camion import update_camion_anticipo_retirado
 from .instrumento import create_instrumento
+from .user import get_user_by_username
 from app.logger import logger
 
 
@@ -91,7 +97,7 @@ def create_liquidacion_pendiente(
     data: LiquidacionCabeceraMovimientosForm,
     gestor_carga_id: Optional[int],
     modified_by: str,
-) -> Movimiento:
+) -> Liquidacion:
     gestor_id = None
     chofer_id = None
     propietario_id = None
@@ -108,7 +114,7 @@ def create_liquidacion_pendiente(
         gestor_id = get_gestor_carga_by_params(movimiento, gestor_carga_id)
         nombre_contraparte = movimiento.contraparte
         contraparte_documento = movimiento.contraparte_numero_documento
-        moneda = movimiento.moneda_id
+        moneda = data.moneda.id
         if movimiento.es_chofer:
             chofer_id = movimiento.chofer_id
         elif movimiento.es_proveedor:
@@ -122,7 +128,7 @@ def create_liquidacion_pendiente(
         else:
             propietario_id = movimiento.propietario_id
     else:
-        moneda = data.cabecera.moneda_id
+        moneda = data.moneda.id
         nombre_contraparte = data.cabecera.contraparte
         contraparte_documento = data.cabecera.contraparte_numero_documento
         if data.cabecera.tipo_contraparte_descripcion == TipoContraparteEnum.CHOFER.value:
@@ -140,7 +146,7 @@ def create_liquidacion_pendiente(
             punto_venta = data.cabecera.punto_venta_id
             nombre_contraparte = data.cabecera.contraparte_pdv
             contraparte_documento = data.cabecera.contraparte_numero_documento_pdv
-        else:
+        elif data.cabecera.tipo_contraparte_descripcion == TipoContraparteEnum.PROPIETARIO.value:
             propietario_id = data.cabecera.contraparte_id
 
     # logger.info("create_liquidacion_pendiente")
@@ -162,7 +168,9 @@ def create_liquidacion_pendiente(
             punto_venta_id=punto_venta,
             es_pago_cobro=data.es_pago_cobro,
             monto=data.monto,
-            tipo_mov_liquidacion=data.tipo_mov_liquidacion
+            tipo_mov_liquidacion=data.tipo_mov_liquidacion,
+            es_orden_pago=data.es_orden_pago,
+            observacion=data.observacion
         ),
         gestor_id,
         modified_by,
@@ -218,8 +226,9 @@ def add_movimientos(
     to_edit_obj.modified_by = modified_by
     to_edit_obj.modified_at = datetime.now()
     to_edit_obj.pago_cobro =  sum(
-            x.saldo for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+            x.saldo_ml for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
         )
+    to_edit_obj.es_pago_cobro = "PAGO" if to_edit_obj.pago_cobro > 0 else "COBRO"
     db.commit()
     return to_edit_obj
 
@@ -243,8 +252,9 @@ def remove_movimiento(
     to_edit_obj.modified_by = modified_by
     to_edit_obj.modified_at = datetime.now()
     to_edit_obj.pago_cobro =  sum(
-        x.saldo for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
-    )
+            x.saldo_ml for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+        )
+    to_edit_obj.es_pago_cobro = "PAGO" if to_edit_obj.pago_cobro > 0 else "COBRO"
     db.commit()
     return to_edit_obj
 
@@ -286,8 +296,9 @@ def remove_movimientos(
     to_edit_obj.modified_by = modified_by
     to_edit_obj.modified_at = datetime.now()
     to_edit_obj.pago_cobro =  sum(
-        x.saldo for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
-    )
+            x.saldo_ml for x in to_edit_obj.movimientos if x.estado != EstadoEnum.ELIMINADO.value
+        )
+    to_edit_obj.es_pago_cobro = "PAGO" if to_edit_obj.pago_cobro > 0 else "COBRO"
     db.commit()
 
     return to_edit_obj
@@ -316,6 +327,13 @@ def cancelar_liquidacion(db: Session, id: int, modified_by: str) -> Liquidacion:
         db, movimientos, LiquidacionEstadoEnum.PENDIENTE, modified_by
     )
     obj.movimientos = []
+    if not obj.comentarios:
+        obj.comentarios = ""
+    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    full_name = f"{modified_by}"
+    obj.comentarios += (
+        f"<strong>{full_name} ({date}): </strong><ul>Liquidacion Cancelada </ul>"
+    )
     return repositories.change_liquidacion_status(
         obj, db, LiquidacionEstadoEnum.CANCELADO, modified_by
     )
@@ -337,6 +355,27 @@ def en_revision_liquidacion(
     )
 
 
+def add_instrumento(
+    id: int,
+    db: Session,
+    data: InstrumentoForm,
+    modified_by: str,
+) -> InstrumentoSchema:
+
+    obj = get_liquidacion_by_id(db, id)
+    saldo_residual = obj.saldo_residual - data.monto_ml
+
+    if int(saldo_residual) < 0:
+        raise HTTPException(
+            status_code=409,
+            detail="La suma de los instrumentos ha superado el saldo de la liquidacion",
+        )
+
+    instrumento = create_instrumento(db, id, data, modified_by)
+
+    return instrumento
+
+
 def add_instrumentos(
     id: int,
     db: Session,
@@ -344,6 +383,12 @@ def add_instrumentos(
     modified_by: str,
 ) -> Liquidacion:
     saldo_residual = 0  # TODO: obtener de lo que viene del front
+
+    if len(data.instrumentos) == 0:
+        raise HTTPException(
+            status_code=409, detail="Debe elegir al menos un instrumento"
+        )
+
     if int(saldo_residual) == 0:
         obj = get_liquidacion_by_id(db, id)
         obj = repositories.change_liquidacion_status(
@@ -375,6 +420,9 @@ def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
     gestor_carga = repositories.get_gestor_carga_by_id(db, obj.gestor_carga_id)
     if not gestor_carga:
         raise HTTPException(status_code=404, detail="Gestor no encontrado")
+    # Obtención del usuario
+    usuario = get_user_by_username(db, obj.created_by)
+    usuario_nombre = f"{usuario.first_name} {usuario.last_name}" if usuario else "Sistema"
     OUTPUT_FILENAME = f"resumen_liquidacion_{id}.pdf"
     TEMPLATE_FILENAME = "pdf_liquidacion_resumen.html"
     templateEnv.filters["number_format"] = number_format
@@ -400,32 +448,75 @@ def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
     total_anticipo_combustible = Decimal(0)
     total_anticipo_otro = Decimal(0)
     total_otros = Decimal(0)
+
+# totalizar por OC
+# agregar a LiquidacionReport
+# LiquidacionReport va ser una lista
+
+    liquidacionList: List[LiquidacionReport] = []
+    oc_liquidacion=LiquidacionReport(
+        orden_carga_id=0,  total_orden_carga=0, movimientos=[]
+    )
+    oc_id: int = 0
+
+    logger.info('******************************************************************: ')
+    logger.info('******************************************************************: ')
+    logger.info(f'flete_movimientos {len(flete_movimientos)}')
+
     for mov in flete_movimientos:
-        total_contraparte += mov.monto
+
+        logger.info('flete_movimientos:')
+        logger.info(f'oc: {oc_id}')
+        logger.info(f'mov.orden_carga_id: {mov.orden_carga_id}')
+
+        if oc_id == 0:
+            oc_liquidacion = LiquidacionReport(
+                orden_carga_id=mov.orden_carga_id, total_orden_carga=0, movimientos=[]
+            )
+            oc_id= mov.orden_carga_id
+
+        if oc_id != mov.orden_carga_id:
+            #oc_liquidacion.total_orden_carga += total_contraparte
+            liquidacionList.append(oc_liquidacion)
+            oc_liquidacion = LiquidacionReport(
+                orden_carga_id=mov.orden_carga_id, total_orden_carga=0, movimientos=[]
+            )
+            oc_id= mov.orden_carga_id
+
+        oc_liquidacion.movimientos.append(mov)
+        total_contraparte += mov.monto_mon_local
+        oc_liquidacion.total_orden_carga += mov.monto_mon_local
         total_flete += (
-            mov.monto
+            mov.monto_mon_local
             if (mov.es_flete or mov.es_complemento or mov.es_descuento or mov.es_merma)
             else Decimal(0)
         )
-        total_anticipo_efectivo += mov.monto if mov.es_anticipo_efectivo else Decimal(0)
+        total_anticipo_efectivo += mov.monto_mon_local if mov.es_anticipo_efectivo else Decimal(0)
         total_anticipo_combustible += (
-            mov.monto if mov.es_anticipo_combustible else Decimal(0)
+            mov.monto_mon_local if mov.es_anticipo_combustible else Decimal(0)
         )
-        total_anticipo_otro += mov.monto if mov.es_anticipo_otro else Decimal(0)
+        total_anticipo_otro += mov.monto_mon_local if mov.es_anticipo_otro else Decimal(0)
+
+    #oc_liquidacion.total_orden_carga += total_contraparte
+    liquidacionList.append(oc_liquidacion)
 
     for mov in otro_movimientos:
-        total_otros += mov.monto
+        total_otros += mov.monto_mon_local
+        total_contraparte += mov.monto_mon_local
 
     # FIN Obtención de totales
     data = {
         "id": id,
         "gestor_carga_direccion": gestor_carga.direccion,
         "gestor_carga_logo": gestor_carga.logo,
-        "gestor_carga_nombre": f"{gestor_carga.nombre} - {gestor_carga.numero_documento}",
+        "gestor_carga_nombre": gestor_carga.nombre,
+        "gestor_carga_numero_documento": gestor_carga.numero_documento,
         "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "usuario_nombre": usuario_nombre,
         "contraparte": obj.contraparte,
+        "documento_contraparte": obj.contraparte_numero_documento,
         "tipo_contraparte": obj.tipo_contraparte_descripcion,
-        "flete_movimientos": flete_movimientos,
+        "flete_movimientos": liquidacionList,
         "otro_movimientos": otro_movimientos,
         "instrumentos": instrumentos,
         "total_contraparte": f"{number_format(total_contraparte)}",
@@ -436,10 +527,22 @@ def get_liquidacion_resumen_pdf_by_id(db: Session, id: int, estado: str) -> str:
         "total_otros": f"{number_format(total_otros)}",
         "total_instrumentos": f"{number_format(obj.instrumentos_saldo)}",
     }
-    source_html = template.render(logo=LOGO_IMAGE_URL, **data)
+    #source_html = template.render(logo=LOGO_IMAGE_URL, **data)
+    source_html = template.render(logo=LOGO_IMAGE_URL, times=range(1), **data)
+    #logger.info(f'html: {source_html}')
+
+    for o in liquidacionList:
+        logger.info(f'orden_carga_id: {o.orden_carga_id}')
+        logger.info(f'movimientos: {len(o.movimientos)}')
+
     pdf_filename = os.path.join(REPORTS_FOLDER, OUTPUT_FILENAME)
     from_string(source_html, pdf_filename, {"page-size": "Legal"})
+
+    logger.info('******************************************************************: ')
+    logger.info('******************************************************************: ')
+
     return OUTPUT_FILENAME
+    #return HTMLResponse(content=source_html, status_code=200)
 
 
 def get_reports(datalist: List[Liquidacion]) -> str:
@@ -592,9 +695,11 @@ def change_movimiento_list_status(
         mov.modified_by = modified_by
         mov.modified_at = datetime.now()
         if (
-            mov.anticipo
-            and estado == LiquidacionEstadoEnum.CONFIRMADO
-            or estado == LiquidacionEstadoEnum.FINALIZADO
+            mov.anticipo and (
+                estado == LiquidacionEstadoEnum.CONFIRMADO
+                or estado == LiquidacionEstadoEnum.FINALIZADO
+                or estado == LiquidacionEstadoEnum.PENDIENTE
+            )
         ):
             db.commit()
             anticipo: OrdenCargaAnticipoRetirado = mov.anticipo
@@ -680,3 +785,41 @@ def someter_liquidacion(
     return change_liquidacion_status(
         db, id, data.comentario, LiquidacionEstadoEnum.PENDIENTE, current_user
     )
+
+
+def forzar_cierre(
+    db: Session, id: int, data: schemas.LiquidacionSometer, current_user: schemas.AuthUser
+) -> Liquidacion:
+    to_edit_obj = get_liquidacion_by_id(db, id)
+
+    if ( not (
+            to_edit_obj.estado == LiquidacionEstadoEnum.ACEPTADO.value
+            or to_edit_obj.estado == LiquidacionEstadoEnum.SALDO_ABIERTO.value
+            or to_edit_obj.estado == LiquidacionEstadoEnum.SALDO_CERRADO.value
+            ) ):
+        raise HTTPException(
+            status_code=409, detail=f"No se puede forzar cierre en estado {to_edit_obj.estado}"
+        )
+
+    to_edit_obj.modified_by = current_user.username
+    to_edit_obj.modified_at = datetime.now()
+    to_edit_obj.estado = LiquidacionEstadoEnum.FINALIZADO.value
+    to_edit_obj.etapa = LiquidacionEstadoEnum.FINALIZADO.value
+
+    if data.comentario:
+        if not to_edit_obj.comentarios:
+            to_edit_obj.comentarios = ""
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        comentarios = "".join([f"<li>{c}</li>" for c in data.comentario.split(".")])
+        full_name = f"{current_user.first_name} {current_user.last_name}"
+        to_edit_obj.comentarios += (
+            f"<strong>{full_name} ({date}): </strong><ul>{comentarios}</ul>"
+        )
+
+    change_movimiento_list_status(
+        db, to_edit_obj.movimientos, LiquidacionEtapaEnum.FINALIZADO, current_user.username
+    )
+
+    db.commit()
+    db.refresh(to_edit_obj)
+    return to_edit_obj

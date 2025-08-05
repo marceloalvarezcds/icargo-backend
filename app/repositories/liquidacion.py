@@ -18,7 +18,7 @@ def get_liquidacion_list(db: Session, gestor_carga_id: Optional[int] = None) -> 
         return (
             db.query(Liquidacion)
             .filter(Liquidacion.estado != LiquidacionEstadoEnum.ELIMINADO.value)
-            .order_by(Liquidacion.created_at.desc(), Liquidacion.contraparte)
+            .order_by(Liquidacion.id.desc(), Liquidacion.contraparte)
             .all()
         )
 
@@ -113,7 +113,7 @@ def get_liquidacion_list_by_gestor_carga_id(
                 Liquidacion.estado != LiquidacionEstadoEnum.ELIMINADO.value,
             )
         )
-        .order_by(Liquidacion.created_at.desc(), Liquidacion.contraparte )
+        .order_by(Liquidacion.id.desc(), Liquidacion.contraparte )
         .all()
     )
 
@@ -146,7 +146,9 @@ def create_liquidacion(
         modified_by=modified_by,
         pago_cobro=data.monto,
         es_pago_cobro=data.es_pago_cobro,
-        tipo_mov_liquidacion=data.tipo_mov_liquidacion
+        tipo_mov_liquidacion=data.tipo_mov_liquidacion,
+        es_orden_pago=data.es_orden_pago,
+        observacion=data.observacion,
     )
     db.add(obj)
     db.commit()

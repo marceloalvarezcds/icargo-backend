@@ -9,7 +9,10 @@ from app.enums import (
 from sqlalchemy.sql.elements import and_, or_, literal_column # type: ignore
 from app.models import (
     TipoCuenta,
-    Provision
+    Provision,
+    Moneda,
+    OrdenCarga,
+    Camion
 )
 from app.schemas import ProvisionForm
 
@@ -43,11 +46,10 @@ def create_provision(
         fecha=data.fecha,
         detalle=data.detalle,
         monto=data.monto,
+        monto_mon_local= data.monto_mon_local if data.monto_mon_local else data.monto*data.tipo_cambio_moneda,
         moneda_id=data.moneda_id,
         tipo_cambio_moneda=data.tipo_cambio_moneda,
         fecha_cambio_moneda=data.fecha_cambio_moneda,
-        # En caso de ser movimiento de anticipo
-        anticipo_id=data.anticipo_id,
         # En caso de ser movimiento de complemento o descuento
         complemento_id=data.complemento_id,
         descuento_id=data.descuento_id,
@@ -96,7 +98,11 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
                 literal_column("false").label("es_editable"),
                 literal_column("false").label("can_edit_oc"),
                 literal_column("false").label("documento_fisico"),
-                Provision.monto.label("provision"),
+                Moneda.simbolo.label("moneda"),
+                Provision.tipo_cambio_moneda.label("tipo_cambio_moneda"),
+                Camion.placa.label("camion_placa"),
+                Provision.monto.label("monto"),
+                Provision.monto_mon_local.label("provision"),
                 literal_column("0").label("pendiente"),
                 literal_column("0").label("en_proceso"),
                 literal_column("0").label("confirmado"),
@@ -104,7 +110,10 @@ def get_query_provisiones_by_contraparte_and_gestor_carga_id(
                 )\
                 .join(Provision.tipo_movimiento)\
                 .join(Provision.cuenta)\
-                .outerjoin(Provision.anticipo)\
+                .join(Provision.moneda)\
+                .outerjoin(Provision.orden_carga)\
+                .outerjoin(OrdenCarga.camion)\
+
 
     query = query.filter(
             and_(

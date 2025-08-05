@@ -59,11 +59,11 @@ async def read_propietario_list_by_gestor_cuenta_and_semi_id(
 
 # @api.get("/tipo_persona/{tipo_persona_id}", response_model=List[schemas.Propietario])
 # async def read_propietario_list_by_tipo_persona_id(
-#     tipo_persona_id: int, 
+#     tipo_persona_id: int,
 #     db: Session = Depends(get_db_session),  # noqa: B008
 #     _: bool = Depends(Permiso(a.LISTAR, m.PROPIETARIO)),  # noqa: B008
 #     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
-  
+
 # ):
 #     return services.get_propietario_list_by_tipo_persona_id(
 #         db, tipo_persona_id
@@ -71,7 +71,7 @@ async def read_propietario_list_by_gestor_cuenta_and_semi_id(
 
 @api.get("/propietario/{propietario_id}", response_model=List[schemas.Propietario])
 async def read_propietario_list_by_id(
-    propietario_id: int, 
+    propietario_id: int,
     db: Session = Depends(get_db_session),  # noqa: B008
     _: bool = Depends(Permiso(a.LISTAR, m.PROPIETARIO)),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
@@ -127,6 +127,7 @@ async def add_new_propietario(
         foto_registro_reverso_file,
         current_user.gestor_carga_id,
         current_user.username,
+        current_user.id,
     )
 
 

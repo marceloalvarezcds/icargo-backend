@@ -1,7 +1,9 @@
 from decimal import Decimal
 from typing import List, Optional
 
+from app.enums.estado import EstadoEnum
 from app.models.combinacion import Combinacion
+from app.models.flete import Flete
 from fastapi import HTTPException
 from sqlalchemy.orm import Session  # type: ignore
 
@@ -13,7 +15,9 @@ from app.models import (
     OrdenCargaAnticipoSaldo,
     OrdenCargaComplemento,
 )
+from app.models.movimiento import Movimiento
 from app.models.orden_carga_anticipo_porcentaje import OrdenCargaAnticipoPorcentaje
+from app.models.orden_carga_anticipo_retirado import OrdenCargaAnticipoRetirado
 
 from .flete_anticipo import get_flete_anticipo_by_id, get_flete_anticipo_by_flete_and_tipo
 from .orden_carga_anticipo_porcentaje_create import (
@@ -21,6 +25,12 @@ from .orden_carga_anticipo_porcentaje_create import (
     get_orden_carga_anticipo_porcentaje_by,
 )
 
+from .moneda_cotizacion import get_cotizacion_moneda
+from app.repositories.moneda import get_moneda_by_gestor_carga
+from sqlalchemy import func
+from sqlalchemy.orm import aliased
+from sqlalchemy import and_
+from sqlalchemy.orm import aliased
 
 def create_orden_carga_anticipo_saldo(
     db: Session,
@@ -45,22 +55,17 @@ def create_orden_carga_anticipo_saldo(
     tipo_insumo_actual = flete_anticipo_actual.tipo_insumo_id
 
     saldo_actualizado = data.saldo
+    # saldo_actualizado_ml = data.saldo_ml
     for anticipo in sorted_anticipos:
-
         if anticipo.flete_anticipo_id != data.flete_anticipo_id:
-            # Recuperar tipo_insumo_id del FleteAnticipo relacionado al anticipo
-            tipo_insumo_id = (
-                anticipo.flete_anticipo.tipo_insumo_id
-                if anticipo.flete_anticipo
-                else None
-            )
-            # Restar según el tipo de insumo
-            if tipo_insumo_id is None and tipo_insumo_actual is None:  # Efectivo
+            tipo_insumo_id = anticipo.flete_anticipo.tipo_insumo_id if anticipo.flete_anticipo else None
+            if tipo_insumo_id is None and tipo_insumo_actual is None:
                 saldo_actualizado -= anticipo.total_retirado
-            elif tipo_insumo_id == 1 and tipo_insumo_actual == 1:  # Combustible
+            elif tipo_insumo_id == 1 and tipo_insumo_actual == 1:
                 saldo_actualizado -= anticipo.total_retirado
-            elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:  # Lubricantes
+            elif tipo_insumo_id == 2 and tipo_insumo_actual == 2:
                 saldo_actualizado -= anticipo.total_retirado
+
     return repositories.create_orden_carga_anticipo_saldo(
         db,
         data,
@@ -103,7 +108,6 @@ def get_orden_carga_by_combinacion_id(db: Session, combinacion_id: int)  -> Orde
     return obj
 
 
-
 def get_orden_carga_anticipo_saldo_by_id(
     db: Session, id: int
 ) -> OrdenCargaAnticipoSaldo:
@@ -139,8 +143,6 @@ def get_flete_anticipo_id_by_flete_id_and_orden_carga_id(
     ).first()
 
 
-
-
 def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
     db: Session,
     flete_anticipo_id: int,
@@ -171,20 +173,22 @@ def get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
                 total_complemento,
                 modified_by,
             )
-    oc_monto_disponible: Decimal = exists.saldo if exists else Decimal(0)
+    oc_monto_disponible: Decimal = exists.total_disponible if exists else Decimal(0)
+    total_retirado: Decimal = exists.total_retirado if exists else Decimal(0)
     camion_monto_disponible: Optional[
         Decimal
     ] = orden_carga.camion_monto_anticipo_disponible
     return (
         camion_monto_disponible
-        if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible
+        if camion_monto_disponible and camion_monto_disponible < (total_retirado - oc_monto_disponible)
         else oc_monto_disponible
     )
 
 
+
 def get_total_complemento(complementos: List[OrdenCargaComplemento], es_efectivo: bool):
     if es_efectivo:
-        return sum(x.propietario_monto for x in complementos if x.anticipado)
+        return sum((x.propietario_monto_ml or 0) for x in complementos if x.anticipado)
     else:
         return 0
 
@@ -218,6 +222,9 @@ def update_orden_carga_anticipo_saldo(
     total_complemento: Decimal,
     modified_by: str,
 ) -> Optional[schemas.OrdenCargaAnticipoSaldo]:
+    moneda_gestor_carga = get_moneda_by_gestor_carga(db, orden_carga.gestor_carga_id)
+    cotizacion_condicion_origen = get_cotizacion_moneda(db, orden_carga.condicion_propietario_moneda_id, orden_carga.gestor_carga_id)
+    cotizacion_destino = get_cotizacion_moneda(db, moneda_gestor_carga.id, orden_carga.gestor_carga_id)
     flete_anticipo_id = flete_anticipo.id
     orden_carga_id = orden_carga.id
     camion: Camion = orden_carga.camion
@@ -230,11 +237,18 @@ def update_orden_carga_anticipo_saldo(
         if total_anticipos_retirados_en_estado_pendiente_o_en_proceso
         else Decimal(0)
     )
+    monto_retirado_ml = (
+    monto_retirado * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda
+    if monto_retirado
+    else Decimal(0)
+    )
+    monto_retirado_ml = (monto_retirado_ml)
     camion_monto_disponible = (
         camion_limite - camion_monto_retirado - monto_retirado
         if camion_limite
         else None
     )
+
     exists = repositories.get_orden_carga_anticipo_saldo_by(
         db, flete_anticipo_id, orden_carga_id
     )
@@ -246,20 +260,26 @@ def update_orden_carga_anticipo_saldo(
         if porcentaje_anticipo
         else flete_anticipo.porcentaje
     )
+
     oc_limite = (
-        orden_carga.flete_proyectado * (porcentaje / Decimal(100))
+        orden_carga.flete_proyectado_ml * (porcentaje / Decimal(100))
         if porcentaje
         else Decimal(0)
     )
-    oc_monto_retirado = monto_retirado + (
-        exists.total_retirado if exists else Decimal(0)
+    oc_limite_ml = (
+        orden_carga.flete_proyectado_ml * cotizacion_condicion_origen.cotizacion_moneda / cotizacion_destino.cotizacion_moneda * (porcentaje / Decimal(100))
+        if porcentaje
+        else Decimal(0)
     )
+    oc_monto_retirado = monto_retirado + (exists.total_retirado if exists else Decimal(0))
+
     oc_monto_disponible = oc_limite + total_complemento - oc_monto_retirado
     saldo = (
         camion_monto_disponible
         if camion_monto_disponible and camion_monto_disponible < oc_monto_disponible
         else oc_monto_disponible
     )
+
     porcentaje_anticipo = get_orden_carga_anticipo_porcentaje_by(
         db, flete_anticipo_id, orden_carga_id
     )
@@ -276,6 +296,7 @@ def update_orden_carga_anticipo_saldo(
             orden_carga_id=orden_carga_id,
             orden_carga_anticipo_porcentaje_id=porcentaje_anticipo.id,
             total_anticipo=oc_limite,
+            total_anticipo_ml=oc_limite_ml,
             total_complemento=total_complemento,
             total_retirado=oc_monto_retirado,
             saldo=saldo,
@@ -292,6 +313,7 @@ def update_orden_carga_anticipo_saldo(
             orden_carga_id=orden_carga_id,
             orden_carga_anticipo_porcentaje_id=porcentaje_anticipo.id,
             total_anticipo=oc_limite,
+            total_anticipo_ml=oc_limite_ml,
             total_complemento=total_complemento,
             total_retirado=oc_monto_retirado,
             saldo=saldo,
@@ -309,7 +331,7 @@ def update_orden_carga_anticipo_saldo(
         porcentaje_minimo = (oc_monto_retirado * 100) / flete_proyectado
         porcentaje_minimo = (
             flete_anticipo.porcentaje
-            if porcentaje_minimo > flete_anticipo.porcentaje
+            if flete_anticipo.porcentaje is not None and porcentaje_minimo > flete_anticipo.porcentaje
             else porcentaje_minimo
         )
         porcentaje_anticipo.porcentaje_minimo = porcentaje_minimo
@@ -329,7 +351,12 @@ def update_orden_carga_anticipo_saldo_by_form(
         orden_carga.complementos,
         flete_anticipo.tipo_descripcion == enums.TipoAnticipoEnum.EFECTIVO.value,
     )
-    monto_retirado = data.monto_retirado - last_monto_retirado
+
+    if flete_anticipo.tipo_descripcion == enums.TipoAnticipoEnum.INSUMOS.value:
+        monto_retirado = data.monto_mon_local - last_monto_retirado
+    else:
+        monto_retirado = data.monto_mon_local - last_monto_retirado
+
     return update_orden_carga_anticipo_saldo(
         db,
         flete_anticipo,
@@ -360,3 +387,28 @@ def update_orden_carga_anticipo_saldo_by_orden_carga_id(
             db, flete_anticipo, orden_carga, Decimal(0), total_complemento, modified_by
         )
     return None
+
+
+def get_saldo_anticipo_por_flete_y_oc(db, flete_id, orden_carga_id, modified_by):
+    flete = db.query(Flete).filter(Flete.id == flete_id).first()
+    if not flete:
+        raise HTTPException(status_code=404, detail="Flete no encontrado")
+
+    saldo_total = 0
+
+    anticipos_combustible = [a for a in flete.anticipos if a.tipo_insumo_id == 1]
+
+    if not anticipos_combustible:
+        return 0
+
+    for anticipo in anticipos_combustible:
+        saldo = get_saldo_anticipo_by_flete_anticipo_id_and_orden_carga_id(
+            db, anticipo.id, orden_carga_id, modified_by
+        )
+        saldo_total += saldo
+
+    return saldo_total
+
+
+
+

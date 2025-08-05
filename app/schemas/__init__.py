@@ -20,6 +20,7 @@ from .color import Color  # noqa
 from .composicion_juridica import ComposicionJuridica  # noqa
 from .contacto import Contacto, ContactoForm  # noqa
 from .contraparte import Contraparte  # noqa
+from .comentarios_flota import ComentarioFlotaForm, ComentarioFlota, ComentarioFlotaList  # noqa
 from .ente_emisor_automotor import EnteEmisorAutomotor  # noqa
 from .ente_emisor_transporte import EnteEmisorTransporte  # noqa
 from .estado_cuenta import ( # noqa
@@ -27,7 +28,7 @@ from .estado_cuenta import ( # noqa
     ContraparteEstadoCuenta
 )
 from .factura import Factura, FacturaForm  # noqa
-from .flete import Flete, FleteForm, FleteList  # noqa
+from .flete import Flete, FleteForm, FleteList, FleteCantidadUpdate, FleteEditModeUpdate  # noqa
 from .flete_anticipo import FleteAnticipo, FleteAnticipoForm  # noqa
 from .flete_complemento import FleteComplemento, FleteComplementoForm  # noqa
 from .flete_descuento import FleteDescuento, FleteDescuentoForm  # noqa
@@ -56,7 +57,8 @@ from .liquidacion import (  # noqa
     LiquidacionAddMovimientosForm,
     LiquidacionForm,
     LiquidacionSometer,
-    LiquidacionCabeceraMovimientosForm
+    LiquidacionCabeceraMovimientosForm,
+    LiquidacionReport
 )
 from .localidad import Localidad  # noqa
 from .marca_camion import MarcaCamion  # noqa
@@ -80,6 +82,8 @@ from .orden_carga import (  # noqa
     OrdenCargaGetList,
     OrdenCargaUpdateForm,
     OrdenCargaUpdateFecha,
+    RecalculoCondicionesResponse,
+    AnticiposPorOrdenCarga,
 )
 from .orden_carga_anticipo_porcentaje import (  # noqa
     OrdenCargaAnticipoPorcentaje,
@@ -147,7 +151,7 @@ from .remitente_contacto_gestor_carga import (  # noqa
     RemitenteContactoGestorCargaList,
 )
 from .rentabilidad import Rentabilidad  # noqa
-from .rol import Rol, RolChecked, RolCreate, RolUpdate  # noqa
+from .rol import Rol, RolChecked, RolCreate, RolUpdate, RolSimple  # noqa
 from .semi import Semi, SemiForm, SemiList  # noqa
 from .semi_clasificacion import SemiClasificacion  # noqa
 from .tipo_anticipo import TipoAnticipo  # noqa
@@ -196,4 +200,4 @@ from .provision import (
 )
 from .contribuyente import ( Contribuyente )
 from .texto_legal import ( TextoLegalBaseModel, TextoLegalModel )
-from .moneda_cotizacion import( MonedaCotizacion )
+from .moneda_cotizacion import( MonedaCotizacion, MonedaCotizacionForm )

@@ -28,11 +28,10 @@ class ProvisionBaseModel(BaseModel):
     fecha: Optional[Date]
     detalle: Optional[str]
     monto: RoundedDecimal
+    monto_mon_local: Optional[RoundedDecimal]
     moneda_id: int
     tipo_cambio_moneda: Optional[RoundedDecimal]
     fecha_cambio_moneda: Optional[Date]
-    # En caso de ser movimiento de anticipo
-    anticipo_id: Optional[int]
     # En caso de ser movimiento de complemento o descuento
     complemento_id: Optional[int]
     descuento_id: Optional[int]

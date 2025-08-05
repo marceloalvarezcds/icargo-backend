@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 import select
 from typing import List, Optional, Union
 
@@ -84,6 +84,7 @@ class OrdenCarga(AuditMixin, Base):
         Moneda, uselist=False, foreign_keys=[condicion_gestor_carga_moneda_id]
     )
     condicion_gestor_carga_tarifa = Column(Numeric(38, 10))
+    condicion_gestor_carga_tarifa_ml = Column(Numeric(38, 10))
     # fin - Condiciones para el Gestor de Carga
     # inicio - Condiciones para el Propietario
     condicion_propietario_moneda_id = Column(Integer, ForeignKey("moneda.id"))
@@ -91,11 +92,14 @@ class OrdenCarga(AuditMixin, Base):
         Moneda, uselist=False, foreign_keys=[condicion_propietario_moneda_id]
     )
     condicion_propietario_tarifa = Column(Numeric(38, 10))
+    condicion_propietario_tarifa_ml = Column(Numeric(38, 10))
     # fin - Condiciones para el Propietario
     # FIN Cantidad y Flete
     # INICIO Mermas de Fletes
     # inicio - Mermas para el Gestor de Carga
     merma_gestor_carga_valor = Column(Numeric(38, 10))
+        # Nueva columna
+    merma_gestor_carga_valor_ml = Column(Numeric(38, 10))
     merma_gestor_carga_moneda_id = Column(Integer, ForeignKey("moneda.id"))
     merma_gestor_carga_moneda = relationship(
         Moneda, uselist=False, foreign_keys=[merma_gestor_carga_moneda_id]
@@ -105,6 +109,7 @@ class OrdenCarga(AuditMixin, Base):
     # fin - Mermas para el Gestor de Carga
     # inicio - Mermas para el Propietario
     merma_propietario_valor = Column(Numeric(38, 10))
+    merma_propietario_valor_ml = Column(Numeric(38, 10))
     merma_propietario_moneda_id = Column(Integer, ForeignKey("moneda.id"))
     merma_propietario_moneda = relationship(
         Moneda, uselist=False, foreign_keys=[merma_propietario_moneda_id]
@@ -119,8 +124,10 @@ class OrdenCarga(AuditMixin, Base):
     evaluaciones_historial = relationship("OrdenCargaEvaluacionesHistorial", back_populates="orden_carga")
     anticipos = relationship("OrdenCargaAnticipoRetirado", back_populates="orden_carga")
     movimientos = relationship("Movimiento", back_populates="orden_carga")
-    complementos = relationship("OrdenCargaComplemento", back_populates="orden_carga")
-    descuentos = relationship("OrdenCargaDescuento", back_populates="orden_carga")
+    complementos = relationship(
+        "OrdenCargaComplemento", back_populates="orden_carga", order_by="OrdenCargaComplemento.id")
+    descuentos = relationship(
+        "OrdenCargaDescuento", back_populates="orden_carga", order_by="OrdenCargaDescuento.id")
     saldos = relationship("OrdenCargaAnticipoSaldo", back_populates="orden_carga")
     porcentaje_anticipos = relationship(
         "OrdenCargaAnticipoPorcentaje", back_populates="orden_carga"
@@ -169,11 +176,19 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def camion_marca(self):
-        return self.camion.marca.descripcion
+        return (
+            self.camion.marca.descripcion
+            if self.camion.marca
+            else ""
+        )
 
     @hybrid_property
     def camion_color(self):
-        return self.camion.color.descripcion
+        return (
+            self.camion.color.descripcion
+            if self.camion.color
+            else ""
+        )
 
     @hybrid_property
     def camion_chofer_numero_documento(self):
@@ -182,6 +197,10 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def camion_chofer_puede_recibir_anticipos(self):
         return self.camion.chofer_puede_recibir_anticipos
+
+    @hybrid_property
+    def combinacion_chofer_puede_recibir_anticipos(self):
+        return self.combinacion.puede_recibir_anticipos
 
     @hybrid_property
     def camion_estado(self):
@@ -244,12 +263,20 @@ class OrdenCarga(AuditMixin, Base):
         return self.combinacion.propietario_id
 
     @hybrid_property
+    def is_propietario_condicionado(self):
+        return self.propietario.is_propietario_condicionado
+
+    @hybrid_property
     def combinacion_chofer_id(self):
         return self.combinacion.combinacion_chofer_id
 
     @hybrid_property
     def combinacion_chofer_nombre(self):
         return self.combinacion.chofer_nombre
+
+    @hybrid_property
+    def is_chofer_condicionado(self):
+        return self.chofer.is_chofer_condicionado
 
     @hybrid_property
     def neto(self):
@@ -293,7 +320,10 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def total_anticipo_complemento(self):
-        return sum(x.propietario_monto for x in self.complementos if x.anticipado)
+        if not self.complementos:
+            return 0
+        return sum((x.propietario_monto_ml or 0) for x in self.complementos if x.anticipado)
+
 
     @hybrid_property
     def flete_saldo(self):
@@ -361,12 +391,40 @@ class OrdenCarga(AuditMixin, Base):
         return self.flete.numero_lote
 
     @hybrid_property
+    def flete_saldo_efectivo(self):
+        porcentaje = self.flete.porcentaje_efectivo / Decimal(100)
+        subtotal = self.condicion_propietario_tarifa_ml * self.cantidad_nominada * porcentaje
+        resultado = subtotal + self.total_anticipo_complemento
+        return resultado.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+    @hybrid_property
+    def flete_saldo_combustible(self):
+        porcentaje = self.flete.porcentaje_combustible / Decimal(100)
+        subtotal = self.condicion_propietario_tarifa_ml * self.cantidad_nominada * porcentaje
+        return subtotal.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+    @hybrid_property
+    def flete_saldo_lubricante(self):
+        porcentaje = self.flete.porcentaje_lubricante / Decimal(100)
+        subtotal = self.condicion_propietario_tarifa_ml * self.cantidad_nominada * porcentaje
+        return subtotal.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+    @hybrid_property
     def flete_monto_efectivo(self):
-        return (self.flete.porcentaje_efectivo / Decimal(100)) * self.flete_proyectado
+        return (self.flete.porcentaje_efectivo / Decimal(100)) * self.flete_proyectado_ml
+
 
     @hybrid_property
     def flete_monto_efectivo_complemento(self):
         return self.total_anticipo_complemento + self.flete_monto_efectivo
+
+    @hybrid_property
+    def flete_monto_combustible(self):
+        return (self.flete.porcentaje_combustible / Decimal(100))  * self.flete_proyectado_ml
+
+    @hybrid_property
+    def flete_monto_lubricante(self):
+        return (self.flete.porcentaje_lubricante / Decimal(100))  * self.flete_proyectado_ml
 
     @hybrid_property
     def flete_origen_id(self):
@@ -398,6 +456,10 @@ class OrdenCarga(AuditMixin, Base):
         return self.flete_tarifa * self.cantidad_nominada
 
     @hybrid_property
+    def flete_proyectado_ml(self):
+        return self.flete_tarifa_ml * self.cantidad_nominada
+
+    @hybrid_property
     def flete_remitente_nombre(self):
         return self.flete.remitente_nombre
 
@@ -408,6 +470,10 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def flete_tarifa(self):
         return self.flete.condicion_propietario_tarifa
+
+    @hybrid_property
+    def flete_tarifa_ml(self):
+        return self.condicion_propietario_tarifa_ml
 
     @hybrid_property
     def flete_tarifa_gestor_carga(self):
@@ -426,6 +492,26 @@ class OrdenCarga(AuditMixin, Base):
         return self.flete.condicion_gestor_carga_unidad.abreviatura # noqa
 
     @hybrid_property
+    def flete_tarifa_unidad_conversion_gestor(self):
+        return self.flete.condicion_gestor_carga_unidad.conversion_kg # noqa
+
+    @hybrid_property
+    def flete_tarifa_unidad_propietario(self):
+        return f"{self.flete.condicion_propietario_moneda.simbolo}/{self.flete.condicion_propietario_unidad.abreviatura}"  # noqa
+
+    @hybrid_property
+    def flete_tarifa_unidad_conversion_propietario(self):
+        return self.flete.condicion_propietario_unidad.conversion_kg # noqa
+
+    @hybrid_property
+    def flete_merma_unidad_conversion_gestor(self):
+        return self.flete.merma_gestor_cuenta_unidad.conversion_kg # noqa
+
+    @hybrid_property
+    def flete_merma_unidad_conversion_propietario(self):
+        return self.flete.merma_propietario_unidad.conversion_kg # noqa
+
+    @hybrid_property
     def flete_tipo(self):
         return self.flete.tipo_flete
 
@@ -440,6 +526,10 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def gestor_carga_moneda_simbolo(self):
         return self.gestor_carga.moneda_simbolo
+
+    @hybrid_property
+    def gestor_carga_moneda_id(self):
+        return self.gestor_carga.moneda_id
 
     @hybrid_property
     def is_aceptado(self):
@@ -468,6 +558,14 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def is_liquidado(self):
         return self.find_estado_in_historial(EstadoEnum.LIQUIDADO)
+
+    @hybrid_property
+    def flete_merma_unidad(self):
+        return f"{self.flete.merma_propietario_moneda.simbolo}/{self.flete.merma_propietario_unidad.abreviatura}"  # noqa
+
+    @hybrid_property
+    def flete_merma_unidad_gestor_carga(self):
+        return f"{self.flete.merma_gestor_cuenta_moneda.simbolo}/{self.flete.merma_gestor_cuenta_unidad.abreviatura}"  # noqa
 
     @hybrid_property
     def merma_gestor_carga_detalle(self):
@@ -547,7 +645,19 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_gestor_carga_merma_valor_total(self):
-        return self.merma_gestor_carga_valor * self.resultado_gestor_carga_merma
+        if self.flete_merma_unidad_conversion_gestor:
+            return (
+                self.merma_gestor_carga_valor_ml * self.resultado_gestor_carga_merma
+            ) / self.flete_merma_unidad_conversion_gestor
+        return 0
+
+    @hybrid_property
+    def resultado_gestor_carga_merma_valor_total_by_movimiento(self):
+        if self.flete_merma_unidad_conversion_gestor:
+            return (
+                self.merma_gestor_carga_valor * self.resultado_gestor_carga_merma
+            ) / self.flete_merma_unidad_conversion_gestor
+        return 0
 
     @hybrid_property
     def resultado_gestor_carga_merma_valor_total_moneda_local(self):
@@ -584,14 +694,8 @@ class OrdenCarga(AuditMixin, Base):
         return self.condicion_gestor_carga_tarifa
 
     @hybrid_property
-    def resultado_gestor_carga_tarifa_flete_str(self):
-        """
-        Devuelve la tarifa formateada con la moneda como string.
-        """
-        if self.condicion_gestor_carga_moneda:
-            return f"{self.resultado_gestor_carga_tarifa_flete} {self.condicion_gestor_carga_moneda.simbolo}"
-        return str(self.resultado_gestor_carga_tarifa_flete)
-
+    def resultado_gestor_carga_tarifa_flete_ml(self):
+        return self.condicion_gestor_carga_tarifa_ml
 
     @hybrid_property
     def resultado_gestor_carga_tolerancia_kg(self):
@@ -601,27 +705,35 @@ class OrdenCarga(AuditMixin, Base):
             else self.merma_gestor_carga_tolerancia_kg
         )
 
+    # @hybrid_property
+    # def resultado_gestor_carga_total_flete(self):
+    #     return self.resultado_gestor_carga_tarifa_flete * self.cantidad_destino
+
     @hybrid_property
     def resultado_gestor_carga_total_flete(self):
+        return self.resultado_gestor_carga_tarifa_flete_ml * self.cantidad_destino
+
+
+    @hybrid_property
+    def resultado_gestor_carga_total_flete_oc(self):
         return self.resultado_gestor_carga_tarifa_flete * self.cantidad_destino
 
     @hybrid_property
     def resultado_gestor_carga_total_flete_saldo_bruto(self):
         return (
-                (
-                    self.resultado_gestor_carga_total_flete
-                    - self.resultado_gestor_carga_merma_valor_total
-                )
-                + (
-                    self.resultado_gestor_carga_total_complemento
-                    - self.resultado_gestor_carga_total_descuento
-                )
+            (
+                self.resultado_gestor_carga_total_flete
+                - self.resultado_gestor_carga_merma_valor_total
+            )
+            + (
+                self.resultado_gestor_carga_total_complemento
+                - self.resultado_gestor_carga_total_descuento
+            )
         )
 
     @hybrid_property
     def resultado_gestor_carga_complemento_descuento(self):
-        return (self.resultado_gestor_carga_total_complemento
-                - self.resultado_gestor_carga_total_descuento)
+        return self.resultado_gestor_carga_total_complemento - self.resultado_gestor_carga_total_descuento
 
 
     @hybrid_property
@@ -639,7 +751,19 @@ class OrdenCarga(AuditMixin, Base):
 
     @hybrid_property
     def resultado_propietario_merma_valor_total(self):
-        return self.merma_propietario_valor * self.resultado_propietario_merma
+        if self.flete_merma_unidad_conversion_propietario:
+            return (
+                self.merma_propietario_valor_ml * self.resultado_propietario_merma
+            ) / self.flete_merma_unidad_conversion_propietario
+        return 0
+
+    @hybrid_property
+    def resultado_propietario_merma_valor_total_by_movimiento(self):
+        if self.flete_merma_unidad_conversion_propietario:
+            return (
+                self.merma_propietario_valor * self.resultado_propietario_merma
+            ) / self.flete_merma_unidad_conversion_propietario
+        return 0
 
     @hybrid_property
     def resultado_propietario_merma_valor_total_moneda_local(self):
@@ -656,35 +780,33 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_propietario_saldo(self):
         return (
-            (
-                self.resultado_propietario_total_flete
-                - self.resultado_propietario_merma_valor_total
+          self.resultado_propietario_saldo_bruto
+            - (
+                self.resultado_propietario_total_anticipos_retirados_efectivo
+                + self.resultado_propietario_total_anticipos_retirados_combustible
             )
-            + (
-                self.resultado_propietario_total_complemento
-                - self.resultado_propietario_total_descuento
-            )
-            - self.resultado_propietario_total_anticipos_retirados
         )
+
 
     @hybrid_property
     def resultado_propietario_complemento_descuento(self):
-        return ( self.resultado_propietario_total_complemento
-                - self.resultado_propietario_total_descuento)
-
+      return (
+          self.resultado_propietario_total_complemento -
+          self.resultado_propietario_total_descuento
+      )
 
     @hybrid_property
     def resultado_propietario_saldo_bruto(self):
-        return (
-            (
-                self.resultado_propietario_total_flete
-                - self.resultado_propietario_merma_valor_total
-            )
-            + (
-                self.resultado_propietario_total_complemento
-                - self.resultado_propietario_total_descuento
-            )
-        )
+      return (
+          (
+              self.resultado_propietario_total_flete
+              - self.resultado_propietario_merma_valor_total
+          )
+          + (
+              self.resultado_propietario_total_complemento
+              - self.resultado_propietario_total_descuento
+          )
+      )
 
     @hybrid_property
     def resultado_propietario_saldo_total(self):
@@ -694,13 +816,17 @@ class OrdenCarga(AuditMixin, Base):
         )
 
     @hybrid_property
+    def anticipo_retirado_moneda_insumo_id(self):
+         return self.anticipos.insumo_moneda_id
+
+    @hybrid_property
     def resultado_propietario_total_anticipos_retirados_efectivo(self):
         lista: List[OrdenCargaAnticipoRetirado] = self.anticipos
         total_efectivo = 0
         for anticipo in lista:
             if not self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
                 if anticipo.concepto == 'EFECTIVO':
-                    total_efectivo += anticipo.monto_retirado
+                    total_efectivo += anticipo.monto_mon_local
         return total_efectivo
 
     @hybrid_property
@@ -710,7 +836,7 @@ class OrdenCarga(AuditMixin, Base):
         for anticipo in lista:
             if not self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
                 if anticipo.concepto == 'COMBUSTIBLE':
-                    total_combustible += anticipo.monto_retirado
+                    total_combustible += anticipo.monto_mon_local
         return total_combustible
 
     @hybrid_property
@@ -720,13 +846,22 @@ class OrdenCarga(AuditMixin, Base):
         for anticipo in lista:
             if not self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
                 if anticipo.concepto == 'LUBRICANTES':
-                    total_lubricantes += anticipo.monto_retirado
+                    total_lubricantes += anticipo.monto_mon_local
         return total_lubricantes
 
+    @hybrid_property
+    def resultado_propietario_total_anticipos_retirados_ml(self):
+        efectivo = self.resultado_propietario_total_anticipos_retirados_efectivo or 0
+        combustible = self.resultado_propietario_total_anticipos_retirados_combustible or 0
+        return efectivo + combustible
 
     @hybrid_property
     def resultado_propietario_tarifa_flete(self):
         return self.condicion_propietario_tarifa
+
+    @hybrid_property
+    def resultado_propietario_tarifa_flete_ml(self):
+        return self.condicion_propietario_tarifa_ml
 
     @hybrid_property
     def resultado_propietario_tolerancia_kg(self):
@@ -749,13 +884,13 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_propietario_total_complemento(self):
         lista: List[OrdenCargaComplemento] = self.complementos
-        return sum(x.propietario_monto if x.propietario_monto is not None else 0 for x in lista)
+        return sum(x.propietario_monto_ml if x.propietario_monto_ml is not None else 0 for x in lista)
 
 
     @hybrid_property
     def resultado_gestor_carga_total_complemento(self):
         lista: List[OrdenCargaComplemento] = self.complementos
-        return sum(x.remitente_monto if x.remitente_monto is not None else 0 for x in lista)
+        return sum(x.remitente_monto_ml if x.remitente_monto_ml is not None else 0 for x in lista)
 
 
     @hybrid_property
@@ -772,16 +907,12 @@ class OrdenCarga(AuditMixin, Base):
 
         return sobrante_combustible
 
+
     @hybrid_property
     def saldo_efectivo(self):
-        fa = aliased(FleteAnticipo)
-        total_saldo = sum(
-            saldo.saldo or 0
-            for saldo in self.saldos
-            if saldo.flete_anticipo and saldo.flete_anticipo.tipo_insumo_id is None
-        )
-
-        return total_saldo
+        monto = self.flete_monto_efectivo_complemento or 0
+        anticipos = self.resultado_propietario_total_anticipos_retirados_efectivo or 0
+        return monto - anticipos
 
     @hybrid_property
     def saldo_combustible(self):
@@ -808,7 +939,7 @@ class OrdenCarga(AuditMixin, Base):
     @hybrid_property
     def resultado_propietario_total_complemento_a_cobrar(self):
         lista: List[OrdenCargaComplemento] = self.complementos
-        return sum(x.remitente_monto for x in lista if x.remitente_monto)
+        return sum(x.remitente_monto_ml for x in lista if x.remitente_monto_ml)
 
     @hybrid_property
     def resultado_diferencia_complemento(self):
@@ -817,21 +948,33 @@ class OrdenCarga(AuditMixin, Base):
             - self.resultado_propietario_total_complemento
         )
 
+
     @hybrid_property
     def resultado_propietario_total_descuento(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
-        return sum(x.propietario_monto if x.propietario_monto is not None else 0 for x in lista)
+        return sum(x.propietario_monto_ml if x.propietario_monto_ml is not None else 0 for x in lista)
+
+    @hybrid_property
+    def descuentos_list(self):
+        lista: List[OrdenCargaDescuento] = self.descuentos
+        return lista
+
+
+    @hybrid_property
+    def complementos_list(self):
+        lista: List[OrdenCargaComplemento] = self.complementos
+        return lista
+
 
     @hybrid_property
     def resultado_gestor_carga_total_descuento(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
-        return sum(x.proveedor_monto if x.proveedor_monto is not None else 0 for x in lista)
-
+        return sum(x.proveedor_monto_ml if x.proveedor_monto_ml is not None else 0 for x in lista)
 
     @hybrid_property
     def resultado_propietario_total_descuento_a_pagar(self):
         lista: List[OrdenCargaDescuento] = self.descuentos
-        return sum(x.proveedor_monto for x in lista if x.proveedor_monto)
+        return sum(x.proveedor_monto_ml for x in lista if x.proveedor_monto_ml)
 
     @hybrid_property
     def resultado_diferencia_descuento(self):
@@ -840,8 +983,14 @@ class OrdenCarga(AuditMixin, Base):
             - self.resultado_propietario_total_descuento_a_pagar
         )
 
+
     @hybrid_property
     def resultado_propietario_total_flete(self):
+        return self.resultado_propietario_tarifa_flete_ml * self.cantidad_destino #anteriormente era resultado_propietario_tarifa_flete
+
+
+    @hybrid_property
+    def resultado_propietario_total_flete_oc(self):
         return self.resultado_propietario_tarifa_flete * self.cantidad_destino
 
     # fin - propietario
@@ -1069,3 +1218,16 @@ class OrdenCarga(AuditMixin, Base):
             if self.find_estado_en_movimientos_por_anticipo_id(anticipo.id, "Anulado"):
                 return True
         return False
+
+    @hybrid_property
+    def condicion_gestor_moneda_simbolo(self):
+        return self.condicion_gestor_carga_moneda.simbolo
+
+    @hybrid_property
+    def condicion_propietario_moneda_simbolo(self):
+        return self.condicion_propietario_moneda.simbolo
+
+
+    @hybrid_property
+    def flete_cargado(self):
+        return self.flete.cargado

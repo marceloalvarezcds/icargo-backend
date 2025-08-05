@@ -17,6 +17,8 @@ from app.database.base import Base
 from app.enums import EstadoEnum, TipoFleteEnum
 from app.utils import (
     get_flete_anticipo_efectivo,
+    get_flete_anticipo_combustible,
+    get_flete_anticipo_lubricante,
     get_porcentaje_maximo_by_flete_anticipo_list,
 )
 
@@ -48,6 +50,8 @@ class Flete(AuditMixin, Base):
     es_subasta = Column(Boolean, server_default=text("false"))
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
     saldo = Column(Numeric(38, 10))
+    cargado = Column(Numeric(38, 10), nullable=True)
+    is_edit = Column(Boolean, nullable=False, server_default=text("false"))
     # INICIO Tramo de Fletes
     origen_id = Column(Integer, ForeignKey("centro_operativo.id"))
     origen = relationship(CentroOperativo, uselist=False, foreign_keys=[origen_id])
@@ -76,6 +80,7 @@ class Flete(AuditMixin, Base):
         Moneda, uselist=False, foreign_keys=[condicion_propietario_moneda_id]
     )
     condicion_propietario_tarifa = Column(Numeric(38, 10))
+
     condicion_propietario_unidad_id = Column(Integer, ForeignKey("unidad.id"))
     condicion_propietario_unidad = relationship(
         Unidad, uselist=False, foreign_keys=[condicion_propietario_unidad_id]
@@ -132,6 +137,7 @@ class Flete(AuditMixin, Base):
         cascade="save-update,delete,delete-orphan",
         back_populates="flete",
     )
+    is_in_orden_carga = Column(Boolean, default=False)
     # FIN Emisión de Órdenes
 
     @hybrid_property
@@ -151,6 +157,10 @@ class Flete(AuditMixin, Base):
         return self.condicion_gestor_carga_moneda.nombre
 
     @hybrid_property
+    def condicion_gestor_carga_moneda_simbolo(self):
+        return self.condicion_gestor_carga_moneda.simbolo
+
+    @hybrid_property
     def condicion_gestor_carga_tarifa(self):
         return self.condicion_gestor_cuenta_tarifa
 
@@ -167,8 +177,20 @@ class Flete(AuditMixin, Base):
         return self.condicion_gestor_carga_unidad.descripcion
 
     @hybrid_property
+    def condicion_gestor_carga_unidad_abreviatura(self):
+        return self.condicion_gestor_carga_unidad.abreviatura
+
+    @hybrid_property
+    def condicion_gestor_carga_unidad_conversion(self):
+        return self.condicion_gestor_carga_unidad.conversion_kg
+
+    @hybrid_property
     def condicion_propietario_moneda_nombre(self):
         return self.condicion_propietario_moneda.nombre
+
+    @hybrid_property
+    def condicion_propietario_moneda_simbolo(self):
+        return self.condicion_propietario_moneda.simbolo
 
     @hybrid_property
     def condicion_propietario_tarifa_unidad(self):
@@ -179,12 +201,24 @@ class Flete(AuditMixin, Base):
         return self.condicion_propietario_unidad.descripcion
 
     @hybrid_property
+    def condicion_propietario_unidad_abreviatura(self):
+        return self.condicion_propietario_unidad.abreviatura
+
+    @hybrid_property
+    def condicion_propietario_unidad_conversion(self):
+        return self.condicion_propietario_unidad.conversion_kg
+
+    @hybrid_property
     def destino_nombre(self):
         return self.destino.nombre
 
     @hybrid_property
     def gestor_carga_nombre(self):
         return self.gestor_carga.nombre
+
+    @hybrid_property
+    def gestor_carga_moneda_simbolo(self):
+        return self.gestor_carga.moneda_simbolo
 
     @hybrid_property
     def merma_gestor_carga_valor(self):
@@ -262,6 +296,24 @@ class Flete(AuditMixin, Base):
         return (
             anticipo_efectivo.porcentaje
             if (anticipo_efectivo and anticipo_efectivo.porcentaje)
+            else 0
+        )
+
+    @hybrid_property
+    def porcentaje_combustible(self):
+        anticipo_combustible = get_flete_anticipo_combustible(self.anticipos)
+        return (
+            anticipo_combustible.porcentaje
+            if (anticipo_combustible and anticipo_combustible.porcentaje)
+            else 0
+        )
+
+    @hybrid_property
+    def porcentaje_lubricante(self):
+        anticipo_lubricante = get_flete_anticipo_lubricante(self.anticipos)
+        return (
+            anticipo_lubricante.porcentaje
+            if (anticipo_lubricante and anticipo_lubricante.porcentaje)
             else 0
         )
 

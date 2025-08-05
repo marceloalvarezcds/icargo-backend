@@ -1,19 +1,22 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Optional
 
+from app.models.chofer import Chofer
 from app.models.combinacion import Combinacion
+from app.models.orden_carga_remision_origen import OrdenCargaRemisionOrigen
 from app.models.permiso import Permiso
+from app.models.propietario import Propietario
 from app.models.rol import Rol
 from sqlalchemy.orm import Query, Session  # type: ignore
 from sqlalchemy.sql.elements import and_, or_  # type: ignore
-from sqlalchemy.sql.expression import true  # type: ignore
-from sqlalchemy import desc
-
+from sqlalchemy.sql.expression import true, cast  # type: ignore
+from sqlalchemy import desc, String
 from app.enums import EstadoEnum, OrdenCargaEstadoEnum
 from app.models import Camion, Flete, OrdenCarga
+from app.models.unidad import Unidad
 from app.schemas import OrdenCargaEditForm, OrdenCargaForm
 from app.schemas.orden_carga import OrdenCargaUpdateFecha
-
 from .orden_carga_estado_historial import create_orden_carga_estado_historial
 from .orden_carga_comentarios_historial import create_orden_carga_comentarios_historial
 from sqlalchemy import func
@@ -174,8 +177,25 @@ def get_orden_carga_cerradas_list_by_gestor_carga_id(
 
 
 def get_orden_carga_aceptadas_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int], oc_id: Optional[str]
 ) -> List[OrdenCarga]:
+
+    if oc_id:
+        oc_filter = f'%{oc_id}%'
+        return (
+            db.query(OrdenCarga)
+            .filter(
+                and_(
+                    OrdenCarga.gestor_carga_id == gestor_carga_id,
+                    OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
+                    OrdenCarga.estado == EstadoEnum.ACEPTADO.value,  # Filtro agregado
+                    cast(OrdenCarga.id, String).ilike(oc_filter)
+                )
+            )
+            .order_by(desc(OrdenCarga.id))
+            .all()
+        )
+
     return (
         db.query(OrdenCarga)
         .filter(
@@ -190,8 +210,26 @@ def get_orden_carga_aceptadas_list_by_gestor_carga_id(
     )
 
 def get_orden_carga_finalizadas_list_by_gestor_carga_id(
-    db: Session, gestor_carga_id: Optional[int]
+    db: Session, gestor_carga_id: Optional[int], oc_id: Optional[str]
 ) -> List[OrdenCarga]:
+
+    if oc_id:
+        oc_filter = f'%{oc_id}%'
+        return (
+            db.query(OrdenCarga)
+            .filter(
+                and_(
+                    OrdenCarga.gestor_carga_id == gestor_carga_id,
+                    OrdenCarga.estado != EstadoEnum.ELIMINADO.value,
+                    OrdenCarga.estado == EstadoEnum.FINALIZADO.value,  # Filtro agregado
+                    cast(OrdenCarga.id, String).ilike(oc_filter)
+                )
+            )
+            .order_by(desc(OrdenCarga.id))
+            .all()
+        )
+
+
     return (
         db.query(OrdenCarga)
         .filter(
@@ -330,13 +368,18 @@ def create_orden_carga(
     gestor_carga_id: Optional[int],
     modified_by: str,
     estado_inicial: EstadoEnum,
+    condicion_gestor_carga_tarifa_ml: Optional[float] = None,
+    condicion_propietario_tarifa_ml: Optional[float] = None,
+    merma_gestor_carga_valor_ml: Optional[float] = None,
+    merma_propietario_valor_ml: Optional[float] = None,
+
 ) -> OrdenCarga:
 
     obj = OrdenCarga(
         camion_id=data.camion_id,
         camion_semi_neto_id=data.camion_semi_neto_id,
         semi_id=data.semi_id,
-        chofer_id = data.chofer_id,
+        chofer_id=data.chofer_id,
         propietario_id=data.propietario_id,
         flete_id=data.flete_id,
         combinacion_id=data.combinacion_id,
@@ -348,21 +391,24 @@ def create_orden_carga(
         # inicio - Condiciones para el Gestor de Carga
         condicion_gestor_carga_moneda_id=flete.condicion_gestor_carga_moneda_id,
         condicion_gestor_carga_tarifa=flete.condicion_gestor_carga_tarifa,
+        condicion_gestor_carga_tarifa_ml=condicion_gestor_carga_tarifa_ml,
         # fin - Condiciones para el Gestor de Cuenta
         # inicio - Condiciones para el Propietario
         condicion_propietario_moneda_id=flete.condicion_propietario_moneda_id,
         condicion_propietario_tarifa=flete.condicion_propietario_tarifa,
-        # fin - Condiciones para el Gestor de Carga
-        # inicio - Condiciones para el Propietario
+        condicion_propietario_tarifa_ml=condicion_propietario_tarifa_ml,
+        # fin - Condiciones para el Propietario
         # INICIO Mermas de Fletes
         # inicio - Mermas para el Gestor de Carga
         merma_gestor_carga_valor=flete.merma_gestor_carga_valor,
+        merma_gestor_carga_valor_ml=merma_gestor_carga_valor_ml,  # Nueva columna para la merma convertida
         merma_gestor_carga_moneda_id=flete.merma_gestor_carga_moneda_id,
         merma_gestor_carga_es_porcentual=flete.merma_gestor_carga_es_porcentual,
         merma_gestor_carga_tolerancia=flete.merma_gestor_carga_tolerancia,
         # fin - Mermas para el Gestor de Carga
         # inicio - Mermas para el Propietario
-        merma_propietario_valor=flete.merma_propietario_valor,
+        merma_propietario_valor=flete.merma_propietario_valor, # Nueva columna para la merma convertida
+        merma_propietario_valor_ml=merma_propietario_valor_ml,
         merma_propietario_moneda_id=flete.merma_propietario_moneda_id,
         merma_propietario_es_porcentual=flete.merma_propietario_es_porcentual,
         merma_propietario_tolerancia=flete.merma_propietario_tolerancia,
@@ -372,8 +418,19 @@ def create_orden_carga(
         created_by=modified_by,
         modified_by=modified_by,
     )
+
     if estado_inicial == EstadoEnum.ACEPTADO:
-        obj.anticipos_liberados = True
+        chofer = db.query(Chofer).filter(Chofer.id == data.chofer_id).first()
+        propietario = db.query(Propietario).filter(Propietario.id == data.propietario_id).first()
+
+        if not chofer or not propietario:
+            raise ValueError("Chofer o Propietario no encontrados")
+
+        if not chofer.is_chofer_condicionado and not propietario.is_propietario_condicionado:
+            obj.anticipos_liberados = True
+        else:
+            obj.anticipos_liberados = False
+
     db.add(obj)
     db.commit()
     db.refresh(obj)
@@ -381,7 +438,7 @@ def create_orden_carga(
 
     # Solo crear el historial de comentarios si hay un comentario
     comentario = data.comentarios
-    if comentario:  # Si el comentario no es vacío ni None
+    if comentario:
         create_orden_carga_comentarios_historial(
             db=db,
             orden_carga_id=obj.id,
@@ -534,24 +591,30 @@ def cancelar_orden_carga(
     db: Session,
     modified_by: str,
 ) -> OrdenCarga:
-    # Crear historial de estados
     create_orden_carga_estado_historial(db, obj.id, EstadoEnum.CANCELADO, modified_by)
-    # Verificar si la orden tiene un flete asociado
+
     flete = obj.flete
 
-    # Revertir el saldo del flete
-    flete.saldo += obj.cantidad_nominada
+    remisionado_oc = (
+        db.query(func.sum(OrdenCargaRemisionOrigen.cantidad * Unidad.conversion_kg))
+        .join(Unidad, OrdenCargaRemisionOrigen.unidad_id == Unidad.id)
+        .filter(OrdenCargaRemisionOrigen.orden_carga_id == obj.id)
+        .scalar()
+    ) or Decimal("0")
+
+    cantidad_a_devolver = remisionado_oc if remisionado_oc > 0 else obj.cantidad_nominada
+
+    flete.cargado -= cantidad_a_devolver
+    flete.saldo += cantidad_a_devolver
+
     db.add(flete)
 
-    # Cambiar el estado de la orden
     updated_obj = change_orden_carga_status(obj, db, EstadoEnum.CANCELADO, modified_by)
 
-    # Confirmar los cambios
     db.commit()
     db.refresh(updated_obj)
 
     return updated_obj
-
 
 
 def conciliar_orden_carga(

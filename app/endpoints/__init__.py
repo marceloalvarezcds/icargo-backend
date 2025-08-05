@@ -14,6 +14,7 @@ from app.endpoints import (
     composicion_juridica,
     contacto,
     contraparte,
+    comentarios_flota,
     ente_emisor_automotor,
     ente_emisor_transporte,
     estado_cuenta,
@@ -74,7 +75,8 @@ from app.endpoints import (
     user,
     combinacion,
     contribuyente,
-    texto_legal
+    texto_legal,
+    moneda_cotizacion
 )
 
 api = APIRouter()
@@ -105,6 +107,7 @@ api.include_router(
 )
 api.include_router(contacto.api, prefix="/contacto", tags=["contacto"])
 api.include_router(contraparte.api, prefix="/contraparte", tags=["contraparte"])
+api.include_router(comentarios_flota.api, prefix="/comentarios_flota", tags=["comentarios_flota"])
 api.include_router(
     ente_emisor_automotor.api,
     prefix="/ente_emisor_automotor",
@@ -233,6 +236,11 @@ api.include_router(unidad.api, prefix="/unidad", tags=["unidad"])
 api.include_router(user.api, prefix="/user", tags=["user"])
 api.include_router(contribuyente.api, prefix="/contribuyente", tags=["contribuyente"])
 api.include_router( texto_legal.api, prefix="/texto_legal", tags=["texto_legal"] )
+api.include_router(
+    moneda_cotizacion.api,
+    prefix="/moneda_cotizacion",
+    tags=["moneda_cotizacion"],
+)
 
 @api.get("/alive")
 def alive() -> dict:

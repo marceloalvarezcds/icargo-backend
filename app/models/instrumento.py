@@ -20,6 +20,7 @@ from .caja import Caja
 from .instrumento_via import InstrumentoVia
 from .liquidacion import Liquidacion
 from .tipo_instrumento import TipoInstrumento
+from .moneda import Moneda
 
 
 class Instrumento(AuditMixin, Base):
@@ -57,6 +58,10 @@ class Instrumento(AuditMixin, Base):
     # Solo para cheque
     cheque_es_diferido = Column(Boolean)
     cheque_fecha_vencimiento = Column(DateTime)
+    monto_ml = Column(Numeric(38, 10))
+    tipo_cambio_moneda = Column(Numeric(38, 10))
+    moneda_id = Column(Integer, ForeignKey("moneda.id"))
+    moneda = relationship(Moneda, uselist=False)
 
     @hybrid_property
     def contraparte(self):
@@ -78,13 +83,13 @@ class Instrumento(AuditMixin, Base):
             else f"{self.banco.nombre} ({self.banco.titular} - {self.banco.numero_cuenta})"
         )
 
-    @hybrid_property
-    def moneda(self):
-        return self.cuenta.moneda
+    #@hybrid_property
+    #def moneda(self):
+    #    return self.cuenta.moneda
 
-    @hybrid_property
-    def moneda_id(self):
-        return self.moneda.id
+    #@hybrid_property
+    #def moneda_id(self):
+    #    return self.moneda.id
 
     @hybrid_property
     def moneda_nombre(self):
@@ -108,10 +113,9 @@ class Instrumento(AuditMixin, Base):
 
     @hybrid_property
     def tipo_operacion_descripcion(self):
-        #return (
-        #    "COBRO" if self.liquidacion.tipo_operacion_descripcion == "COBRO" else "PAGO"
-        #)
-        return self.liquidacion.tipo_operacion_descripcion
+        return (
+            "Cobro" if self.liquidacion.tipo_operacion_descripcion == "Pago" else "Pago"
+        )
 
     @hybrid_property
     def url(self):

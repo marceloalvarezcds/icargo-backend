@@ -32,6 +32,7 @@ class CentroOperativo(AuditMixin, Base):
     email = Column(String(50))
     pagina_web = Column(String(255))
     direccion = Column(String(255))
+    origen_destino = Column(String(255))
     latitud = Column(DECIMAL)
     longitud = Column(DECIMAL)
     clasificacion_id = Column(Integer, ForeignKey("centro_operativo_clasificacion.id"))

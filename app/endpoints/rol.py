@@ -9,6 +9,7 @@ from app.dependencies import Permiso, get_current_user, get_db_session
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
 from app.enums.estado import EstadoEnum
+from app.models.user import User
 
 api = APIRouter()
 
@@ -99,3 +100,15 @@ async def delete_rol(
     _: bool = Depends(Permiso(a.ELIMINAR, m.ROL)),  # noqa: B008
 ):
     return services.delete_rol(db, id, current_user.username)
+
+
+@api.get("/me/roles", response_model=List[schemas.RolSimple])
+def get_my_roles(
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: User = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.INICIAR_SESION, m.USER)),  # noqa: B008
+) -> Any:
+    """
+    Retrieve roles of the current user.
+    """
+    return services.get_roles_by_user_id(db, current_user.id)

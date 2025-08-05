@@ -5,9 +5,10 @@ from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas, services
-from app.dependencies import Permiso, get_current_user, get_db_session
+from app.dependencies import Permiso, get_current_user, get_db_session, Permisos
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+from app.enums.estado import EstadoEnum
 
 api = APIRouter()
 
@@ -23,7 +24,7 @@ async def read_remitente_list(
 @api.get("/remitente_activos", response_model=List[schemas.RemitenteList])
 async def read_remitente_list_activo(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.PROPIETARIO)),  # noqa: B008
+    _: bool = Depends(Permisos(a.LISTAR, [m.REMITENTE, m.FLETE])),  # noqa: B008
 ):
     return repositories.get_remitente_list_activo(db)
 
@@ -95,4 +96,28 @@ async def delete_remitente(
 ):
     return services.delete_remitente(
         db, id, current_user.gestor_carga_id, current_user.username
+    )
+
+
+@api.get("/{id}/active", response_model=schemas.Remitente)
+def active_remitente_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.REMITENTE)),  # noqa: B008
+):
+    return services.change_remitente_status(
+        db, id, EstadoEnum.ACTIVO, current_user.username
+    )
+
+
+@api.get("/{id}/inactive", response_model=schemas.Remitente)
+def inactive_remitente_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.REMITENTE)),  # noqa: B008
+):
+    return services.change_remitente_status(
+        db, id, EstadoEnum.INACTIVO, current_user.username
     )

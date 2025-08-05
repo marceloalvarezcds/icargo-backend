@@ -5,9 +5,10 @@ from pydantic import Json
 from sqlalchemy.orm import Session  # type: ignore
 
 from app import repositories, schemas, services
-from app.dependencies import Permiso, get_current_user, get_db_session
+from app.dependencies import Permiso, get_current_user, get_db_session, Permisos
 from app.enums import PermisoAccionEnum as a
 from app.enums import PermisoModeloEnum as m
+from app.enums.estado import EstadoEnum
 
 api = APIRouter()
 
@@ -23,7 +24,7 @@ async def read_proveedor_list(
 @api.get("/gestor_cuenta_id", response_model=List[schemas.ProveedorList])
 async def read_proveedor_list_by_gestor_cuenta_id(
     db: Session = Depends(get_db_session),  # noqa: B008
-    _: bool = Depends(Permiso(a.LISTAR, m.PROVEEDOR)),  # noqa: B008
+    _: bool = Depends(Permisos(a.LISTAR, [m.PROVEEDOR, m.FLETE, m.ORDEN_CARGA])),  # noqa: B008
     current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
 ):
     return repositories.get_proveedor_list_by_gestor_cuenta_id(
@@ -99,4 +100,27 @@ async def delete_proveedor(
 ):
     return services.delete_proveedor(
         db, id, current_user.gestor_carga_id, current_user.username
+    )
+
+@api.get("/{id}/active", response_model=schemas.Proveedor)
+def active_proveedor_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.PROVEEDOR)),  # noqa: B008
+):
+    return services.change_proveedor_status(
+        db, id, EstadoEnum.ACTIVO, current_user.username
+    )
+
+
+@api.get("/{id}/inactive", response_model=schemas.Proveedor)
+def inactive_proveedor_by_id(
+    id: int,
+    db: Session = Depends(get_db_session),  # noqa: B008
+    current_user: schemas.AuthUser = Depends(get_current_user),  # noqa: B008
+    _: bool = Depends(Permiso(a.CAMBIAR_ESTADO, m.PROVEEDOR)),  # noqa: B008
+):
+    return services.change_proveedor_status(
+        db, id, EstadoEnum.INACTIVO, current_user.username
     )

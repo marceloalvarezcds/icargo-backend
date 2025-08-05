@@ -30,11 +30,15 @@ class MovimientoEstadoCuenta(BaseModel):
     nro_documento_relacionado: Optional[int]
     detalle: Optional[str]
     info: Optional[str]
+    camion_placa: Optional[str]
     estado: str
     estado_liquidacion: Optional[str]
     es_editable: bool
     can_edit_oc: bool
     documento_fisico: Optional[bool]
+    moneda: Optional[str]
+    tipo_cambio_moneda: Optional[RoundedDecimal]
+    monto: RoundedDecimal
     provision: Optional[RoundedDecimal]
     pendiente: RoundedDecimal
     en_proceso: RoundedDecimal

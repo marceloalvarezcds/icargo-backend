@@ -5,9 +5,10 @@ from sqlalchemy import (  # type: ignore
     Integer,
     Numeric,
     String,
-    DateTime,
+    Date,
 )
 
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.sql.schema import UniqueConstraint  # type: ignore
 
@@ -21,15 +22,32 @@ from app.models.moneda import Moneda
 class MonedaCotizacion(AuditMixin, Base):
     __tablename__ = "moneda_cotizacion"
     __table_args__ = (
-        UniqueConstraint("gestor_carga_id", "moneda_origen_id", "moneda_destino_id"),
+        UniqueConstraint("gestor_carga_id", "moneda_origen_id", "moneda_destino_id", "fecha"),
     )
 
     id = Column(Integer, primary_key=True)
     gestor_carga_id = Column(Integer, ForeignKey("gestor_carga.id"))
     gestor_carga = relationship(GestorCarga, uselist=False)
+
     moneda_origen_id = Column(Integer, ForeignKey("moneda.id"))
     moneda_destino_id = Column(Integer, ForeignKey("moneda.id"))
-    #moneda = relationship(Moneda, uselist=False)
-    fecha = Column(DateTime)
+    moneda_origen = relationship("Moneda", uselist=False, foreign_keys=[moneda_origen_id])
+    moneda_destino = relationship("Moneda", uselist=False, foreign_keys=[moneda_destino_id])
+
+    fecha = Column(Date, nullable=False)
     estado = Column(String(255), server_default=EstadoEnum.ACTIVO.value)
-    cotizacion_moneda = Column(Numeric(38, 10))
+    cotizacion_moneda = Column(Numeric(38, 10), nullable=False)
+
+
+    @hybrid_property
+    def gestor_carga_nombre(self):
+        return self.gestor_carga.nombre
+
+    @hybrid_property
+    def moneda_origen_nombre(self):
+        return self.moneda_origen.nombre
+
+    @hybrid_property
+    def moneda_destino_nombre(self):
+        return self.moneda_destino.nombre
+

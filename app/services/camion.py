@@ -160,21 +160,35 @@ def change_camion_status(
     camion = get_camion_by_id(db, id)
     if not camion:
         raise HTTPException(status_code=404, detail="Camión no encontrado.")
+
     repositories.change_camion_status(camion, db, status, modified_by)
+
+    combinaciones_relacionadas = repositories.get_combinaciones_by_camion_id(db, camion.id)
+
     if status == EstadoEnum.INACTIVO:
-        combinaciones_relacionadas = repositories.get_combinaciones_by_camion_id(db, camion.id)
         # Inactivar cada combinación asociada
         for combinacion in combinaciones_relacionadas:
             repositories.change_combinacion_status(combinacion, db, EstadoEnum.INACTIVO, modified_by)
-    # Si el camión es activado, activar las combinaciones relacionadas
-    elif status == EstadoEnum.ACTIVO:
-        # Obtener todas las combinaciones relacionadas con este camión
-        combinaciones_relacionadas = repositories.get_combinaciones_by_camion_id(db, camion.id)
-        # Activar cada combinación asociada
-        for combinacion in combinaciones_relacionadas:
-            repositories.change_combinacion_status(combinacion, db, EstadoEnum.ACTIVO, modified_by)
-    db.commit()
 
+    elif status == EstadoEnum.ACTIVO:
+        for combinacion in combinaciones_relacionadas:
+            if (
+                combinacion.semi and combinacion.semi.estado == EstadoEnum.ACTIVO.value and
+                combinacion.chofer and combinacion.chofer.estado == EstadoEnum.ACTIVO.value and
+                combinacion.propietario and combinacion.propietario.estado == EstadoEnum.ACTIVO.value
+            ):
+                # Verificar que no exista otra combinación activa con el mismo tracto y propietario
+                conflicto = db.query(Combinacion).filter(
+                    Combinacion.id != combinacion.id,
+                    Combinacion.camion_id == combinacion.camion_id,
+                    Combinacion.propietario_id == combinacion.propietario_id,
+                    Combinacion.estado != EstadoEnum.INACTIVO.value
+                ).first()
+
+                if not conflicto:
+                    repositories.change_combinacion_status(combinacion, db, EstadoEnum.ACTIVO, modified_by)
+
+    db.commit()
     return schemas.Camion.from_orm(camion)
 
 

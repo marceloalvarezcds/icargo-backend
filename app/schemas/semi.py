@@ -95,6 +95,10 @@ class Semi(SemiForm):
     tipo: Optional[TipoSemi] = None
     tipo_carga: Optional[TipoCarga] = None
     color: Optional[Color] = None
+    promedio_semi_gestor: Optional[RoundedDecimal] = None
+    promedio_semi_general: Optional[RoundedDecimal] = None
+    cantidad_semi_evaluaciones: Optional[RoundedDecimal] = None
+    cantidad_semi_evaluaciones_gestor: Optional[RoundedDecimal] = None
     # FIN Detalles del Camión
     created_by: str
     created_at: datetime
